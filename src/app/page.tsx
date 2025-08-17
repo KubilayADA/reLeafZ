@@ -278,7 +278,7 @@ export default function LandingPage() {
 
         <div className="relative max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
           <h2 className="text-5xl font-bold mb-6">
-            Ready to Transform Your<br />Medical Cannabis Experience?
+            Ready to Transform Your<br />Medical Cannabis Experience? .
           </h2>
           <p className="text-xl text-emerald-100 mb-12 max-w-2xl mx-auto">
             Join thousands of patients who've found better care, faster relief, and a supportive community with reLeafZ.
