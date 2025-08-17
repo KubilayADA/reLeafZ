@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useEffect, useState } from 'react'
-import { ArrowRight, ArrowDown, ListCheck, MousePointer, ZapIcon, Sparkles, Brain, Users, Shield, Clock, MapPin, ChevronRight, Star } from 'lucide-react'
+import { ArrowRight, ArrowDown, ListCheck, MousePointer, ZapIcon, Sparkles, Brain, Users, Shield, Clock, MapPin, ChevronRight, Star, BikeIcon, LucideBike, Hospital, HospitalIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
 // Font setup - tried a few different ways before settling on this
@@ -86,7 +86,7 @@ export default function LandingPage() {
           <div className="flex justify-between items-center py-4">
             <div className="flex items-center space-x-3">
               <LeafLogo />
-              <span className="text-2xl font-bold bg-gradient-to-r from-emerald-700 to-teal-600 bg-clip-text text-transparent">
+              <span className="text-2xl font-bold bg-gradient-to-r from-green-600 to-green-700 bg-clip-text text-transparent">
                 reLeafZ
               </span>
               <span className="bg-emerald-100 text-emerald-700 px-2 py-1 rounded-full text-xs font-medium">
@@ -104,7 +104,7 @@ export default function LandingPage() {
               <a href="#doctors" className="text-gray-600 hover:text-emerald-600 transition-colors">
                 For Doctors
               </a>
-              <Button className="bg-gradient-to-r from-emerald-600 to-teal-700 text-white hover:from-emerald-700 hover:to-teal-800 shadow-lg hover:shadow-xl">
+              <Button className="bg-gradient-to-r from-green-600 to-green-700 text-white hover:from-emerald-700 hover:to-teal-800 shadow-lg hover:shadow-xl">
                 Get Started
               </Button>
             </nav>
@@ -132,11 +132,11 @@ export default function LandingPage() {
             </div>
 
             {/* Main heading */}
-            <h1 className="text-5xl md:text-7xl font-bold text-gray-900 mb-6 leading-tight">
-              Medizinal Cannabis<br />
-              <span className="bg-gradient-to-r from-emerald-600 to-teal-700 bg-clip-text text-transparent">
-                in Minuten geliefert
-              </span><br />
+            <h1 className="text-5xl md:text-7xl font-bold text-gray-900 mb-6 leading-tight italic">
+              MED. CANNABIS<br />
+              <span className="bg-gradient-to-r from-green-600 to-purple-700 bg-clip-text text-transparent">
+                - IN MINUTEN GELIEFERT -
+            </span><br />
               <span className="relative">
                 in Berlin
                 <div className="absolute -bottom-2 left-0 w-full h-1 bg-gradient-to-r from-emerald-500 to-teal-600 rounded-full" />
@@ -156,7 +156,7 @@ export default function LandingPage() {
 
             {/* CTA button */}
             <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
-              <Button className="bg-gradient-to-r from-emerald-600 to-teal-700 text-white px-8 py-6 rounded-2xl text-lg font-semibold hover:from-emerald-700 hover:to-teal-800 shadow-xl hover:shadow-2xl">
+              <Button className="bg-gradient-to-r from-green-600 to-green-700 text-white px-8 py-6 rounded-2xl text-lg font-semibold hover:from-emerald-700 hover:to-teal-800 shadow-xl hover:shadow-2xl">
                 Rezept anfragen
                 <ChevronRight className="w-5 h-5 ml-2" />
               </Button>
@@ -185,45 +185,45 @@ export default function LandingPage() {
       <section className="py-24 bg-white/50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">SO LÄUFT'S</h2>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              Behandlung anfragen und Medikamente in kürzester Zeit erhalten
+            <h2 className="text-6xl font-bold text-gray-900 mb-4 italic">Cannabis-Patient werden</h2>
+            <p className="text-xl text-gray-600 max-w-2xl mx-auto italic">
+              Jetzt loslegen und Cannabis auf Rezept blitzschnell erhalten.
             </p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
             {/* Step 1 - removed all the fancy hover stuff, was too much */}
             <div className="text-center">
-              <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center mb-6 mx-auto">
+              <div className="w-16 h-16 bg-gradient-to-br from-green-600 to-green-700 rounded-2xl flex items-center justify-center mb-6 mx-auto">
                 <ListCheck className="w-8 h-8 text-white" />
               </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-4">Fragebogen Ausfüllen</h3>
-              <p className="text-gray-600">
-                Fülle den medizinischen Fragebogen aus oder buche eine Video-Beratung. So kann der Arzt deinen Gesundheitszustand genau verstehen.
+              <h3 className="text-3xl font-bold text-gray-900 mb-4 italic">Online Anfrage stellen</h3>
+              <p className="text-xl text-gray-600 italic">
+                Fülle unseren medizinischen Fragebogen aus – easy von der Couch aus.
               </p>
             </div>
 
             {/* Step 2 */}
             <div className="text-center">
-              <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-600 rounded-2xl flex items-center justify-center mb-6 mx-auto">
-                <MousePointer className="w-8 h-8 text-white" />
+              <div className="w-16 h-16 bg-gradient-to-br from-green-600 to-purple-600 rounded-2xl flex items-center justify-center mb-6 mx-auto">
+                <Hospital className="w-8 h-8 text-white" />
               </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-4">Behandlung erhalten</h3>
-              <p className="text-gray-600">
-                Ein Arzt prüft deine Anfrage, berät dich und stellt dir gegebenenfalls ein Rezept aus.
+              <h3 className="text-3xl font-bold text-gray-900 mb-4 italic">Ärztliche Behandlung erhalten</h3>
+              <p className="text-xl text-gray-600 italic">
+                Ein Arzt prüft deine Angaben und stellt dir bei Eignung ein Rezept aus.
               </p>
             </div>
 
             {/* Step 3 */}
             <div className="text-center">
-              <div className="w-16 h-16 bg-gradient-to-br from-emerald-600 to-teal-700 rounded-2xl flex items-center justify-center mb-6 mx-auto">
-                <ZapIcon className="w-8 h-8 text-white" />
+              <div className="w-16 h-16 bg-gradient-to-br from-purple-400 to-purple-800 rounded-2xl flex items-center justify-center mb-6 mx-auto ">
+                <LucideBike className="w-8 h-8 text-white" />
               </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-4">15-90min Delivery</h3>
-              <p className="text-gray-600 mb-4">
+              <h3 className="text-3xl font-bold text-gray-900 mb-4 italic">Expresslieferung erhalten</h3>
+              <p className="text-xl text-gray-600 mb-4 italic">
                 Medikamente in Berlin in max. 90 Min. geliefert oder in 15–30 Min. selbst in der Apotheke abholen.
               </p>
-              <div className="text-emerald-700 font-semibold">Powered by Wolt & Uber →</div>
+              <div className="text-emerald-700 font-semibold italic">Powered by Wolt & Uber →</div>
             </div>
           </div>
         </div>
