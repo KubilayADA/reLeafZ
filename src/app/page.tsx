@@ -13,15 +13,13 @@ const barlowStyle = {
 }
 
 // Simple leaf thing with emoji cause co-pilot reccommend SVG whic was extremely annoying
-const LeafLogo = ({ className = 'w-10 h-10' }) => (
-  <div className={`${className} relative overflow-visible`}>
+const LeafLogo = ({ className = 'w-40 h-40 sm:w-56 sm:h-24 md:w-72 md:h-32' }) => (
+  <div className={`relative overflow-hidden ${className}`}>
     <img
       src="/logo.png"
       alt="reLeafZ Logo"
-      className="absolute top-[85%] left-1/2 w-full h-full object-contain scale-[4.5] -translate-x-1/2 -translate-y-1/2"
-      style={{ transformOrigin: 'center' }}
+      className="w-full h-full object-contain"
     />
-    
   </div>
 )
 
@@ -89,12 +87,13 @@ export default function LandingPage() {
       {/* Top nav */}
 
       
-      <header className="relative z-50 bg-white/80 backdrop-blur-md border-b border-emerald-200">
-  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    <div className="flex justify-between items-center py-4">
-      {/* Logo always visible */}
-      <div className="flex items-center py-4">
-        <LeafLogo />
+      <header className="relative z-50 bg-white/70 backdrop-blur-md border-b border-emerald-200 h-20">
+  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20">
+    <div className="flex justify-between items-center h-20">
+      {/* Logo geniş, navbar sabit yükseklikte */}
+      {/* Logo container - consistently big and overflowing navbar */}
+      <div className="flex items-center h-20 overflow-visible">
+        <LeafLogo className="w-64 h-32 transform translate-y-4" />
       </div>
       {/* Desktop Nav */}
       <nav className="hidden md:flex flex-1 justify-center items-center space-x-5 mx-auto">
