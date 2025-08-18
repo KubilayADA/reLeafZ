@@ -13,10 +13,14 @@ const barlowStyle = {
 
 // Simple leaf thing with emoji cause co-pilot reccommend SVG whic was extremely annoying
 const LeafLogo = ({ className = 'w-10 h-10' }) => (
-  <div className={`${className} relative`}>
-    <div className="w-full h-full bg-gradient-to-br from-emerald-600 to-teal-700 rounded-full flex items-center justify-center text-white text-lg font-bold shadow-lg">
-      🍃
-    </div>
+  <div className={`${className} relative overflow-visible`}>
+    <img
+      src="/logo.png"
+      alt="reLeafZ Logo"
+      className="absolute top-[85%] left-1/2 w-full h-full object-contain scale-[4.5] -translate-x-1/2 -translate-y-1/2"
+      style={{ transformOrigin: 'center' }}
+    />
+    
   </div>
 )
 
@@ -84,30 +88,29 @@ export default function LandingPage() {
       <header className="relative z-50 bg-white/80 backdrop-blur-md border-b border-emerald-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-4">
-            <div className="flex items-center space-x-3">
+             <div className="flex justify-between items-center py-4">
               <LeafLogo />
-              <span className="text-2xl font-bold bg-gradient-to-r from-green-600 to-green-700 bg-clip-text text-transparent">
-                reLeafZ
-              </span>
-              <span className="bg-emerald-100 text-emerald-700 px-2 py-1 rounded-full text-xs font-medium">
-                Beta v.1.1
-              </span>
             </div>
-            
-            <nav className="hidden md:flex items-center space-x-8">
-              <a href="#how-it-works" className="text-gray-600 hover:text-emerald-600 transition-colors">
-                How it Works
+            <nav className="hidden md:flex flex-1 justify-center items-center space-x-5 mx-auto">
+              <a href="#how-it-works" className="text-base md:text-lg text-black-600 leading-relaxed">
+                Ablauf
               </a>
-              <a href="#community" className="text-gray-600 hover:text-emerald-600 transition-colors">
-                Community
+              <a href="vorteile" className="text-base md:text-lg text-black-600 leading-relaxed">
+                Vorteile
               </a>
-              <a href="#doctors" className="text-gray-600 hover:text-emerald-600 transition-colors">
-                For Doctors
+              <a href="contact" className="text-base md:text-lg text-black-600 leading-relaxed">
+                Contact
               </a>
+               <a href="faq" className="text-base md:text-lg text-black-600 leading-relaxed">
+                FAQ
+              </a>
+              </nav>
+              <div className="hidden md:block ml-6">
               <Button className="bg-gradient-to-r from-green-600 to-green-700 text-white hover:from-emerald-700 hover:to-teal-800 shadow-lg hover:shadow-xl">
                 Get Started
               </Button>
-            </nav>
+              </div>
+            
           </div>
         </div>
       </header>
@@ -124,9 +127,9 @@ export default function LandingPage() {
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             {/* Badge */}
-            <div className="inline-flex items-center px-4 py-2 bg-white/60 backdrop-blur-sm rounded-full border border-emerald-300 mb-8">
-              <Sparkles className="w-4 h-4 text-emerald-600 mr-2" />
-              <span className="text-sm font-medium text-emerald-800">
+            <div className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-green-600 to-purple-600 bg-opacity-70 backdrop-blur-sm rounded-full border border-emerald-300 mb-8">
+              <Sparkles className="w-4 h-4 text-white/90 mr-2" />
+              <span className="text-sm font-medium text-white/90">
                 AI-Powered, Ultra fast Medical Cannabis Service
               </span>
             </div>
@@ -143,8 +146,8 @@ export default function LandingPage() {
               </span>
             </h1>
 
-            {/* Description - messy HTML from content team */}
-            <div className="text-base md:text-lg text-gray-600 mb-5 max-w-4xl mx-auto leading-relaxed">
+            {/* - messy HTML */}
+            <div className="text-base md:text-lg text-gray-600 mb-6 max-w-4xl mx-auto leading-relaxed">
               Lieferung in 30-90 Minuten in Berlin.<br />
               Abholung in 15 minuten in Berlin<br />
               Ganz Deutschland in 1-2 Tagen<br /><br />
@@ -309,9 +312,9 @@ export default function LandingPage() {
           <div className="grid md:grid-cols-4 gap-8">
             {/* Company info */}
             <div>
-              <div className="flex items-center space-x-3 mb-6">
+              <div className="flex items-center space-x-3 mb-15">
                 <LeafLogo />
-                <span className="text-2xl font-bold">reLeafZ</span>
+                
               </div>
               <p className="text-gray-400 mb-4">
                 Germany's fastest, safest, and coolest medical cannabis platform.
