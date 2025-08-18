@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react'
 import { ArrowRight, ArrowDown, ListCheck, MousePointer, ZapIcon, Sparkles, Brain, Users, Shield, Clock, MapPin, ChevronRight, Star, BikeIcon, LucideBike, Hospital, HospitalIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { Menu, X } from 'lucide-react' 
 
 // Font setup - tried a few different ways before settling on this
 const barlowStyle = {
@@ -52,6 +53,7 @@ const FloatingMonkey = () => {
 
 export default function LandingPage() {
   const [testimonialIdx, setTestimonialIdx] = useState(0)
+  const [mobileNavOpen, setMobileNavOpen] = useState(false)
   // const [videoPlaying, setVideoPlaying] = useState(false) // might use later
 
   const reviews = [
@@ -85,35 +87,53 @@ export default function LandingPage() {
       <style>{`@import url('https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:wght@700&display=swap');`}</style>
       <div className="min-h-screen bg-gradient-to-br from-emerald-100 via-white to-teal-50" style={barlowStyle}>
       {/* Top nav */}
+
+      
       <header className="relative z-50 bg-white/80 backdrop-blur-md border-b border-emerald-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-4">
-             <div className="flex justify-between items-center py-4">
-              <LeafLogo />
-            </div>
-            <nav className="hidden md:flex flex-1 justify-center items-center space-x-5 mx-auto">
-              <a href="#how-it-works" className="text-base md:text-lg text-black-600 leading-relaxed">
-                Ablauf
-              </a>
-              <a href="vorteile" className="text-base md:text-lg text-black-600 leading-relaxed">
-                Vorteile
-              </a>
-              <a href="contact" className="text-base md:text-lg text-black-600 leading-relaxed">
-                Contact
-              </a>
-               <a href="faq" className="text-base md:text-lg text-black-600 leading-relaxed">
-                FAQ
-              </a>
-              </nav>
-              <div className="hidden md:block ml-6">
-              <Button className="bg-gradient-to-r from-green-600 to-green-700 text-white hover:from-emerald-700 hover:to-teal-800 shadow-lg hover:shadow-xl">
-                Get Started
-              </Button>
-              </div>
-            
-          </div>
-        </div>
-      </header>
+  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="flex justify-between items-center py-4">
+      {/* Logo always visible */}
+      <div className="flex items-center py-4">
+        <LeafLogo />
+      </div>
+      {/* Desktop Nav */}
+      <nav className="hidden md:flex flex-1 justify-center items-center space-x-5 mx-auto">
+        <a href="#ablauf" className="text-lg md:text-2xl text-black-600 leading-relaxed">Ablauf</a>
+        <a href="vorteile" className="text-lg md:text-2xl text-black-600 leading-relaxed">Vorteile</a>
+        <a href="contact" className="text-lg md:text-2xl text-black-600 leading-relaxed">Contact</a>
+        <a href="faq" className="text-lg md:text-2xl text-black-600 leading-relaxed">FAQ</a>
+      </nav>
+      {/* Desktop Button */}
+      <div className="hidden md:block ml-6">
+        <Button className="text-lg md:text-xl bg-gradient-to-r from-green-600 to-green-700 text-white hover:from-emerald-700 hover:to-teal-800 shadow-lg hover:shadow-xl">
+          Get Started
+        </Button>
+      </div>
+      {/* Hamburger for mobile */}
+      <button
+        className="md:hidden ml-4 p-2 rounded focus:outline-none"
+        onClick={() => setMobileNavOpen(!mobileNavOpen)}
+        aria-label="Open menu"
+      >
+        {mobileNavOpen ? <X className="w-7 h-7" /> : <Menu className="w-7 h-7" />}
+      </button>
+    </div>
+    {/* Mobile Nav Drawer */}
+    {mobileNavOpen && (
+      <div className="md:hidden absolute top-full left-0 w-full bg-white shadow-lg border-t border-emerald-200 z-50">
+        <nav className="flex flex-col items-center py-4 space-y-4">
+          <a href="#ablauf" className="text-xl text-black-600" onClick={() => setMobileNavOpen(false)}>Ablauf</a>
+          <a href="vorteile" className="text-xl text-black-600" onClick={() => setMobileNavOpen(false)}>Vorteile</a>
+          <a href="contact" className="text-xl text-black-600" onClick={() => setMobileNavOpen(false)}>Contact</a>
+          <a href="faq" className="text-xl text-black-600" onClick={() => setMobileNavOpen(false)}>FAQ</a>
+          <Button className="w-full mt-2 bg-gradient-to-r from-green-600 to-green-700 text-white text-lg">
+            Get Started
+          </Button>
+        </nav>
+      </div>
+    )}
+  </div>
+</header>
 
       {/* Main hero area */}
       <section className="relative pt-20 pb-32 overflow-hidden">
@@ -128,14 +148,14 @@ export default function LandingPage() {
           <div className="text-center">
             {/* Badge */}
             <div className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-green-600 to-purple-600 bg-opacity-70 backdrop-blur-sm rounded-full border border-emerald-300 mb-8">
-              <Sparkles className="w-4 h-4 text-white/90 mr-2" />
+              <Sparkles className="w-4 h-4 text-white/90 mr-5" />
               <span className="text-sm font-medium text-white/90">
                 AI-Powered, Ultra fast Medical Cannabis Service
               </span>
             </div>
 
             {/* Main heading */}
-            <h1 className="text-5xl md:text-7xl font-bold text-gray-900 mb-6 leading-tight italic">
+            <h1 className="text-5xl md:text-7xl font-bold text-gray-900 mb-5 leading-tight italic">
               MED. CANNABIS<br />
               <span className="bg-gradient-to-r from-green-600 to-purple-700 bg-clip-text text-transparent">
                 - IN MINUTEN GELIEFERT -
@@ -152,7 +172,7 @@ export default function LandingPage() {
               Abholung in 15 minuten in Berlin<br />
               Ganz Deutschland in 1-2 Tagen<br /><br />
 
-              ✓ Online Behandlung anfragen<br />
+              ✓ Blüten ab 4,99€*<br />
               ✓ Rezept digital austellen lassen<br />
               ✓ Medikamente aus der Apotheke abholen oder liefern lassen<br />
             </div>
@@ -182,6 +202,12 @@ export default function LandingPage() {
             </div>
           </div>
         </div>
+        <img
+          src="/payy.png"
+          alt="Payy"
+          className="absolute bottom-10 left-1/2 -translate-x-1/2 w-90 h-10 opacity-80"
+          style={{ zIndex: 10 }}
+        />
       </section>
 
       {/* How it works section */}
