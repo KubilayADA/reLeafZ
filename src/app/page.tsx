@@ -77,12 +77,12 @@ export default function LandingPage() {
         <LeafLogo className="w-50 h-52 transform translate-y-4" />
       </div>
       {/* Desktop Nav */}
-      <nav className="hidden md:flex flex-1 justify-center items-center space-x-5 mx-auto">
-        <a href="#ablauf" className="text-lg md:text-2xl text-black-600 leading-relaxed">Ablauf</a>
-        <a href="vorteile" className="text-lg md:text-2xl text-black-600 leading-relaxed">Vorteile</a>
-        <a href="contact" className="text-lg md:text-2xl text-black-600 leading-relaxed">Contact</a>
-        <a href="faq" className="text-lg md:text-2xl text-black-600 leading-relaxed">FAQ</a>
-      </nav>
+      <nav className="hidden md:flex absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 space-x-8">
+  <a href="#ablauf" className="text-lg md:text-2xl font-light text-black leading-relaxed">Ablauf</a>
+  <a href="vorteile" className="text-lg md:text-2xl font-light text-black leading-relaxed">Vorteile</a>
+  <a href="contact" className="text-lg md:text-2xl font-light text-black leading-relaxed">Contact</a>
+  <a href="faq" className="text-lg md:text-2xl font-light text-black leading-relaxed">FAQ</a>
+</nav>
       {/* Desktop Button */}
       <div className="hidden md:block ml-6">
         <Button className="text-lg md:text-xl bg-gradient-to-r from-green-600 to-green-700 text-white hover:from-emerald-700 hover:to-teal-800 shadow-lg hover:shadow-xl">
@@ -119,9 +119,9 @@ export default function LandingPage() {
       <section className="relative pt-20 pb-32 overflow-hidden">
         {/* Background decoration */}
         <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute top-40 left-20 w-72 h-72 bg-emerald-300/40 rounded-full blur-3xl" />
-          <div className="absolute top-60 right-20 w-96 h-96 bg-teal-200/30 rounded-full blur-3xl" />
-          <div className="absolute bottom-20 left-1/2 w-80 h-80 bg-emerald-200/35 rounded-full blur-3xl" />
+          <div className="absolute top-40 left-20 w-72 h-72 bg-purple-500/40 -full blur-3xl" />
+          <div className="absolute top-60 right-20 w-96 h-96 bg-green-500/30 -full blur-3xl" />
+          <div className="absolute bottom-20 left-1/2 w-90 h-80 bg-green-600/35 -full blur-3xl" />
         </div>
 
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
