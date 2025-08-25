@@ -74,7 +74,7 @@ export default function LandingPage() {
     <div className="flex justify-between items-center h-20">
       {/* Logo geniş, navbar sabit yükseklikte */}
       <div className="flex items-center h-20 overflow-visible">
-        <LeafLogo className="w-40 h-52 transform translate-y-4" />
+        <LeafLogo className="w-50 h-52 transform translate-y-4" />
       </div>
       {/* Desktop Nav */}
       <nav className="hidden md:flex flex-1 justify-center items-center space-x-5 mx-auto">
