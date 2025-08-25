@@ -12,8 +12,8 @@ const barlowStyle = {
   lineHeight: '35px',
 }
 
-// Simple leaf thing with emoji cause co-pilot reccommend SVG whic was extremely annoying
-const LeafLogo = ({ className = 'w-40 h-40 sm:w-56 sm:h-24 md:w-72 md:h-32' }) => (
+// logo
+const LeafLogo = ({ className = 'w-80 h-40 sm:w-56 sm:h-24 md:w-72 md:h-32' }) => (
   <div className={`relative overflow-hidden ${className}`}>
     <img
       src="/logo.png"
@@ -29,6 +29,7 @@ const LeafLogo = ({ className = 'w-40 h-40 sm:w-56 sm:h-24 md:w-72 md:h-32' }) =
     { name: "Köln", explanation: "Coming soon" },
     { name: "Frankfurt am Main", explanation: "Coming soon" }
   ];
+  
 
 // Fun monkey easter egg - for now I like it lol
 const FloatingMonkey = () => {
@@ -73,7 +74,7 @@ export default function LandingPage() {
     <div className="flex justify-between items-center h-20">
       {/* Logo geniş, navbar sabit yükseklikte */}
       <div className="flex items-center h-20 overflow-visible">
-        <LeafLogo className="w-64 h-32 transform translate-y-4" />
+        <LeafLogo className="w-40 h-52 transform translate-y-4" />
       </div>
       {/* Desktop Nav */}
       <nav className="hidden md:flex flex-1 justify-center items-center space-x-5 mx-auto">
@@ -134,10 +135,10 @@ export default function LandingPage() {
             </div>
 
             {/* Main heading */}
-            <h1 className="text-5xl md:text-7xl font-bold text-gray-900 mb-5 leading-tight italic">
+            <h1 className="text-5xl md:text-7xl font-bold text-gray-900 mb-5 leading-tight italic ">
               MED. CANNABIS<br />
-              <span className="bg-gradient-to-r from-green-600 to-purple-700 bg-clip-text text-transparent">
-                - IN MINUTEN GELIEFERT -
+              <span className="bg-gradient-to-r from-green-600 to-purple-700 bg-clip-text text-transparent inline-block italic px-2">
+              IN MINUTEN GELIEFERT
             </span><br />
               <span className="relative">
                 in Berlin
@@ -245,12 +246,14 @@ export default function LandingPage() {
       TO YOUR DOOR? IN MINUTES. </h2>
     <p className="text-light text-gray-500">BERLIN in können deine Medikamente in 30-90 minuten geliefert werden, In folgenden Städten ansonsten per DHL in 1-3 Tagen 
     </p>
+
+    
     <div className="mt-6 text-lg text-gray-700">
         {cities.map(city => (
                 <div key={city.name} className="mb-4">
                   <button
-                    className="w-full text-left font-semibold text-gray-800 py-2 px-4 rounded hover:bg-emerald-50 transition italic underline"
-                    onClick={() => setOpenCity(openCity === city.name ? null : city.name)}
+                  className="w-full text-left text-2xl tracking-widest bg-gradient-to-r from-green-900 to-purple-800 bg-clip-text text-transparent py-2 px-4 italic-bold"
+                  onClick={() => setOpenCity(openCity === city.name ? null : city.name)}
                   >
                     {city.name}
                   </button>
@@ -264,7 +267,7 @@ export default function LandingPage() {
       </div>
     </div>
     {/* Map on the right, half width */}
-    <div className="w-full md:w-1/2 flex justify-center">
+    <div className="w-full md:w-1/2 flex  gap-x-6">
       <img
         src="/berlinmap.png"
         alt="Berlin Service Zones"
