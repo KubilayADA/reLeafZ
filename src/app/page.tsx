@@ -22,6 +22,13 @@ const LeafLogo = ({ className = 'w-40 h-40 sm:w-56 sm:h-24 md:w-72 md:h-32' }) =
     />
   </div>
 )
+  const cities = [
+    { name: "Berlin", explanation: "Mo – So, 09-21 Uhr in fast allen Bezirken\nMo – Fr, 09-19 Uhr in Neukölln, Schöneberg, Sa 9-18Uhr" },
+    { name: "München", explanation: "Coming soon" },
+    { name: "Hamburg", explanation: "Coming soon" },
+    { name: "Köln", explanation: "Coming soon" },
+    { name: "Frankfurt am Main", explanation: "Coming soon" }
+  ];
 
 // Fun monkey easter egg - for now I like it lol
 const FloatingMonkey = () => {
@@ -52,46 +59,19 @@ const FloatingMonkey = () => {
 export default function LandingPage() {
   const [testimonialIdx, setTestimonialIdx] = useState(0)
   const [mobileNavOpen, setMobileNavOpen] = useState(false)
+  const [openCity, setOpenCity] = useState<string | null>(null)
   // const [videoPlaying, setVideoPlaying] = useState(false) // might use later
-
-  const reviews = [
-    {
-      name: 'Sarah M.',
-      condition: 'Chronic Pain',
-      text: 'Finally found relief in under 90 minutes. The AI recommendations were spot on.'
-    },
-    {
-      name: 'Marcus K.',
-      condition: 'Anxiety', 
-      text: 'The community support and expert guidance made all the difference in my treatment.'
-    },
-    {
-      name: 'Elena R.',
-      condition: 'Insomnia',
-      text: 'Fast, reliable, and professionally handled. Best medical cannabis service in Berlin.'
-    }
-  ]
-
-  // Auto cycle through testimonials
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setTestimonialIdx(current => (current + 1) % reviews.length)
-    }, 4000)
-    return () => clearInterval(interval)
-  }, [reviews.length])
 
   return (
     <>
       <style>{`@import url('https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:wght@700&display=swap');`}</style>
       <div className="min-h-screen bg-gradient-to-br from-emerald-100 via-white to-teal-50" style={barlowStyle}>
       {/* Top nav */}
-
       
       <header className="relative z-50 bg-white/70 backdrop-blur-md border-b border-emerald-200 h-20">
   <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20">
     <div className="flex justify-between items-center h-20">
       {/* Logo geniş, navbar sabit yükseklikte */}
-      {/* Logo container - consistently big and overflowing navbar */}
       <div className="flex items-center h-20 overflow-visible">
         <LeafLogo className="w-64 h-32 transform translate-y-4" />
       </div>
@@ -257,45 +237,42 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Customer testimonials */}
-      <section className="py-24 bg-gradient-to-r from-emerald-100 to-teal-100">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-4xl font-bold text-gray-900 mb-16">Real Stories from Real Patients</h2>
-
-          <div className="bg-white rounded-3xl p-12 shadow-2xl border border-emerald-200 relative overflow-hidden">
-            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-emerald-600 to-teal-700" />
-
-            {/* 5 stars */}
-            <div className="flex justify-center mb-6">
-              {[1,2,3,4,5].map(i => (
-                <Star key={i} className="w-6 h-6 text-yellow-400" />
-              ))}
-            </div>
-
-            <blockquote className="text-2xl text-gray-800 mb-8 leading-relaxed">
-              "{reviews[testimonialIdx].text}"
-            </blockquote>
-
-            <div className="text-emerald-700 font-semibold text-lg">{reviews[testimonialIdx].name}</div>
-            <div className="text-gray-500">{reviews[testimonialIdx].condition} Patient</div>
-
-            {/* Pagination dots */}
-            <div className="flex justify-center mt-8 space-x-2">
-              {reviews.map((_, idx) => {
-                const isActive = idx === testimonialIdx
-                return (
-                  <div
-                    key={idx}
-                    className={`h-3 rounded-full transition-all duration-300 ${
-                      isActive ? 'bg-emerald-600 w-8' : 'bg-gray-300 w-3'
-                    }`}
-                  />
-                )
-              })}
-            </div>
-          </div>
-        </div>
-      </section>
+     <section className="py-24 bg-gradient-to-r from-emerald-100 to-teal-100">
+  <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center md:items-start text-center md:text-left">
+    {/* city descr. on the lef */}
+    <div className="w-full md:w-1/2 mt-8 md:mt-0 md:pr-12 flex flex-col justify-center">
+    <h2 className="text-5xl font-bold mb-8 italic bg-gradient-to-r from-green-600 to-purple-600 bg-clip-text text-transparent">
+      TO YOUR DOOR? IN MINUTES. </h2>
+    <p className="text-light text-gray-500">BERLIN in können deine Medikamente in 30-90 minuten geliefert werden, In folgenden Städten ansonsten per DHL in 1-3 Tagen 
+    </p>
+    <div className="mt-6 text-lg text-gray-700">
+        {cities.map(city => (
+                <div key={city.name} className="mb-4">
+                  <button
+                    className="w-full text-left font-semibold text-gray-800 py-2 px-4 rounded hover:bg-emerald-50 transition italic underline"
+                    onClick={() => setOpenCity(openCity === city.name ? null : city.name)}
+                  >
+                    {city.name}
+                  </button>
+                  {openCity === city.name && (
+                    <div className="bg-white border border-emerald-200 rounded p-4 mt-2 text-gray-700 whitespace-pre-line">
+                      {city.explanation}
+                    </div>
+                  )}
+                </div>
+        ))}
+      </div>
+    </div>
+    {/* Map on the right, half width */}
+    <div className="w-full md:w-1/2 flex justify-center">
+      <img
+        src="/berlinmap.png"
+        alt="Berlin Service Zones"
+        className="w-full max-w-md rounded-2xl shadow-xl border border-emerald-200"
+      />
+    </div>
+  </div>
+</section>
 
       {/* Bottom CTA section */}
       <section className="py-24 bg-gradient-to-br from-emerald-700 to-teal-800 text-white relative overflow-hidden">
