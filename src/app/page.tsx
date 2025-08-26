@@ -75,20 +75,20 @@ export default function LandingPage() {
       <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400&display=swap" rel="stylesheet"></link>
       {/* Logo geniş, navbar sabit yükseklikte */}
       <div className="flex items-center h-20 overflow-visible">
-        <LeafLogo className="w-50 h-52 transform translate-y-4" />
+        <LeafLogo className="w-45 h-52 transform translate-y-4" />
       </div>
       {/* Desktop Nav */}
-      <nav className="hidden md:flex absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 space-x-8">
-  <a href="#ablauf" className="text-lg md:text-2xl font-light text-black leading-relaxed">Ablauf</a>
-  <a href="vorteile" className="text-lg md:text-2xl font-light text-black leading-relaxed">Vorteile</a>
-  <a href="contact" className="text-lg md:text-2xl font-light text-black leading-relaxed">Contact</a>
-  <a href="faq" className="text-lg md:text-2xl font-light text-black leading-relaxed">FAQ</a>
+      <nav className="hidden md:flex absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 space-x-8 font-[Inter] font-thin ">
+  <a href="#ablauf" className="text-mg md:text-xl   leading-relaxed">Ablauf</a>
+  <a href="vorteile" className="text-lg md:text-xl   leading-relaxed">Vorteile</a>
+  <a href="faq" className="text-lg md:text-xl   leading-relaxed">FAQ</a>
+  <a href="chat" className="text-lg md:text-xl leading-relaxed">Chat with us!</a>
 </nav>
       {/* Desktop Button */}
       {!mobileNavOpen && (
       <Button
-      className="hidden md:inline-block text-base font-normal font-[Inter]  px-4 py-2 bg-gradient-to-r from-green-400 to-green-700 text-black hover:from-emerald-700 hover:to-teal-800 shadow-lg hover:shadow-xl "
-      style={{ fontFamily: 'Inter, sans-serif', fontWeight: 300, color: 'rgb(0,0,0)', fontSize: '12px', lineHeight: '24px' }}
+      className="hidden md:inline-block text-base font-normal border border-black font-[Inter]  px-4 py-2 bg-gradient-to-r from-green-300 to-green-500 text-black hover:from-emerald-700 hover:to-teal-800 shadow-lg hover:shadow-xl  "
+      style={{ fontFamily: 'Inter, sans-serif', fontWeight: 300, color: 'rgba(0, 0, 0, 1)', fontSize: '12px', lineHeight: '24px' }}
       >
       BEHANDLUNG ANFRAGEN
       </Button>
@@ -110,8 +110,8 @@ export default function LandingPage() {
           <a href="vorteile" className="text-xl text-black-600" onClick={() => setMobileNavOpen(false)}>Vorteile</a>
           <a href="contact" className="text-xl text-black-600" onClick={() => setMobileNavOpen(false)}>Contact</a>
           <a href="faq" className="text-xl text-black-600" onClick={() => setMobileNavOpen(false)}>FAQ</a>
-          <Button className="w-full mt-2 bg-gradient-to-r from-green-600 to-green-700 text-white text-lg">
-            Get Started
+          <Button className="w-full mt-2 bg-gradient-to-r from-green-600 to-green-700 border text-white text-lg font-[Inter] px-4 py-2 shadow-lg hover:shadow-xl border border-black">
+            BEHANDLUNG ANFRAGEN
           </Button>
         </nav>
       </div>
@@ -140,22 +140,19 @@ export default function LandingPage() {
 
             {/* Main heading */}
             <h1 className="text-5xl md:text-7xl font-bold text-gray-900 mb-5 leading-tight italic ">
-              MED. CANNABIS<br />
+              MEDIZINAL CANNABIS<br />
               <span className="bg-gradient-to-r from-green-600 to-purple-700 bg-clip-text text-transparent inline-block italic px-2">
               IN MINUTEN GELIEFERT
             </span><br />
-              <span className="relative">
-                in Berlin
-                <div className="absolute -bottom-2 left-0 w-full h-1 bg-gradient-to-r from-emerald-500 to-teal-600 rounded-full" />
-              </span>
+              
             </h1>
 
             {/* - messy HTML */}
-            <div className="text-base md:text-lg text-gray-600 mb-6 max-w-4xl mx-auto leading-relaxed">
-              Lieferung in 30-90 Minuten in Berlin.<br />
-              Abholung in 15 minuten in Berlin<br />
+            <div className="text-base md:text-lg text-gray-600 font-[Inter] mb-6 max-w-4xl mx-auto leading-relaxed  ">
+              BER | HAM | MUC | COL | DUS | FFM <br />Lieferung in 30-90 Minuten in Berlin<br />
               Ganz Deutschland in 1-2 Tagen<br /><br />
-
+              </div>
+            <div className="text-base md:text-lg text-gray-600 font-[Inter] mb-6 max-w-4xl  mx-auto leading-relaxed font-thin">
               ✓ Blüten ab 4,99€*<br />
               ✓ Rezept digital austellen lassen<br />
               ✓ Medikamente aus der Apotheke abholen oder liefern lassen<br />
@@ -163,8 +160,9 @@ export default function LandingPage() {
 
             {/* CTA button */}
             <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
-              <Button className="bg-gradient-to-r from-green-600 to-green-700 text-white px-8 py-6 rounded-2xl text-lg font-semibold hover:from-emerald-700 hover:to-teal-800 shadow-xl hover:shadow-2xl">
-                Rezept anfragen
+              <Button className=" text-base font-normal border border-black  font-[Inter]  px-4 py-2 bg-gradient-to-r from-green-300 to-green-500 text-black hover:from-emerald-700 hover:to-teal-800 shadow-lg hover:shadow-xl  "
+              style={{ fontFamily: 'Inter, sans-serif', fontWeight: 300, color: 'rgba(0, 0, 0, 1)', fontSize: '12px', lineHeight: '24px' }}>
+                BEHANDLUNG ANFRAGEN
                 <ChevronRight className="w-5 h-5 ml-2" />
               </Button>
             </div>
@@ -198,8 +196,8 @@ export default function LandingPage() {
       <section className="py-24 bg-white/50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-6xl font-bold text-gray-900 mb-4 italic">Cannabis-Patient werden</h2>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto italic">
+            <h2 className="text-5xl font-bold text-gray-900 mb-4 italic">SO FUNKTIONIERT'S</h2>
+            <p className="text-xl text-gray-600 max-w-2xl mx-auto font-[Inter] font-thin ">
               Jetzt loslegen und Cannabis auf Rezept blitzschnell erhalten.
             </p>
           </div>
@@ -210,8 +208,8 @@ export default function LandingPage() {
               <div className="w-16 h-16 bg-gradient-to-br from-green-600 to-green-700 rounded-2xl flex items-center justify-center mb-6 mx-auto">
                 <ListCheck className="w-8 h-8 text-white" />
               </div>
-              <h3 className="text-3xl font-bold text-gray-900 mb-4 italic">Online Anfrage stellen</h3>
-              <p className="text-xl text-gray-600 italic">
+              <h3 className="text-3xl font-bold text-gray-900 mb-4 italic">FRAGENBOGEN AUSFULLEN</h3>
+              <p className="text-l text-gray-600  font-[Inter] font-thin ">
                 Fülle unseren medizinischen Fragebogen aus – easy von der Couch aus.
               </p>
             </div>
@@ -221,8 +219,8 @@ export default function LandingPage() {
               <div className="w-16 h-16 bg-gradient-to-br from-green-600 to-purple-600 rounded-2xl flex items-center justify-center mb-6 mx-auto">
                 <Hospital className="w-8 h-8 text-white" />
               </div>
-              <h3 className="text-3xl font-bold text-gray-900 mb-4 italic">Ärztliche Behandlung erhalten</h3>
-              <p className="text-xl text-gray-600 italic">
+              <h3 className="text-3xl font-bold text-gray-900 mb-4 italic ">BEHANDLUNG ERHALTEN</h3>
+              <p className="text-l text-gray-600 font-[Inter] font-thin ">
                 Ein Arzt prüft deine Angaben und stellt dir bei Eignung ein Rezept aus.
               </p>
             </div>
@@ -232,8 +230,8 @@ export default function LandingPage() {
               <div className="w-16 h-16 bg-gradient-to-br from-purple-400 to-purple-800 rounded-2xl flex items-center justify-center mb-6 mx-auto ">
                 <LucideBike className="w-8 h-8 text-white" />
               </div>
-              <h3 className="text-3xl font-bold text-gray-900 mb-4 italic">Expresslieferung erhalten</h3>
-              <p className="text-xl text-gray-600 mb-4 italic">
+              <h3 className="text-3xl font-bold text-gray-900 mb-4 italic">EXPRESSLIEFERUNG ERHALTEN</h3>
+              <p className="text-l text-gray-600 mb-4 font-[Inter] font-thin ">
                 Medikamente in Berlin in max. 90 Min. geliefert oder in 15–30 Min. selbst in der Apotheke abholen.
               </p>
               <div className="text-emerald-700 font-semibold italic">Powered by Wolt & Uber →</div>
@@ -242,7 +240,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-     <section className="py-24 bg-gradient-to-r from-emerald-100 to-teal-100">
+     <section className="py-24 bg-gradient-to-r ">
   <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center md:items-start text-center md:text-left">
     {/* city descr. on the lef */}
     <div className="w-full md:w-1/2 mt-8 md:mt-0 md:pr-12 flex flex-col justify-center">
