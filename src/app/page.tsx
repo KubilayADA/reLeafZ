@@ -72,6 +72,7 @@ export default function LandingPage() {
       <header className="relative z-50 bg-white/70 backdrop-blur-md border-b border-emerald-200 h-20">
   <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20">
     <div className="flex justify-between items-center h-20">
+      <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400&display=swap" rel="stylesheet"></link>
       {/* Logo geniş, navbar sabit yükseklikte */}
       <div className="flex items-center h-20 overflow-visible">
         <LeafLogo className="w-50 h-52 transform translate-y-4" />
@@ -84,11 +85,14 @@ export default function LandingPage() {
   <a href="faq" className="text-lg md:text-2xl font-light text-black leading-relaxed">FAQ</a>
 </nav>
       {/* Desktop Button */}
-      <div className="hidden md:block ml-6">
-        <Button className="text-lg md:text-xl bg-gradient-to-r from-green-600 to-green-700 text-white hover:from-emerald-700 hover:to-teal-800 shadow-lg hover:shadow-xl">
-          Get Started
-        </Button>
-      </div>
+      {!mobileNavOpen && (
+      <Button
+      className="hidden md:inline-block text-base font-normal font-[Inter]  px-4 py-2 bg-gradient-to-r from-green-400 to-green-700 text-black hover:from-emerald-700 hover:to-teal-800 shadow-lg hover:shadow-xl "
+      style={{ fontFamily: 'Inter, sans-serif', fontWeight: 300, color: 'rgb(0,0,0)', fontSize: '12px', lineHeight: '24px' }}
+      >
+      BEHANDLUNG ANFRAGEN
+      </Button>
+      )}
       {/* Hamburger for mobile */}
       <button
         className="md:hidden ml-4 p-2 rounded focus:outline-none"
