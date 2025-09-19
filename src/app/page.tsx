@@ -22,14 +22,13 @@ const LeafLogo = ({ className = 'w-80 h-40 sm:w-56 sm:h-24 md:w-72 md:h-32' }) =
     />
   </div>
 )
-  const cities = [
-    { name: "Berlin", explanation: "Mo – So, 09-21 Uhr in fast allen Bezirken\nMo – Fr, 09-19 Uhr in Neukölln, Schöneberg, Sa 9-18Uhr" },
-    { name: "München", explanation: "Coming soon" },
-    { name: "Hamburg", explanation: "Coming soon" },
-    { name: "Köln", explanation: "Coming soon" },
-    { name: "Frankfurt am Main", explanation: "Coming soon" }
-  ];
-  
+const cities = [
+  { name: "Berlin", explanation: "Mo – So, 09-21 Uhr in fast allen Bezirken\nMo – Fr, 09-19 Uhr in Neukölln, Schöneberg, Sa 9-18Uhr" },
+  { name: "München", explanation: "Coming soon" },
+  { name: "Hamburg", explanation: "Coming soon" },
+  { name: "Köln", explanation: "Coming soon" },
+  { name: "Frankfurt am Main", explanation: "Coming soon" }
+];
 
 // Fun monkey easter egg - for now I like it lol
 const FloatingMonkey = () => {
@@ -61,8 +60,58 @@ export default function LandingPage() {
   const [testimonialIdx, setTestimonialIdx] = useState(0)
   const [mobileNavOpen, setMobileNavOpen] = useState(false)
   const [openCity, setOpenCity] = useState<string | null>(null)
-  // const [videoPlaying, setVideoPlaying] = useState(false) // might use later
+  // --- Begin zip code state and form state ---
+  const [zipEntered, setZipEntered] = useState(false);
+  const [zipInput, setZipInput] = useState('');
+  const [formData, setFormData] = useState({
+    zip: '',
+    fullName: '',
+    email: '',
+    phone: '',
+    city: '',
+    symptoms: '',
+  });
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
 
+    try {
+      const response = await fetch('http://localhost:3001/api/treatment/submit', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        alert('Request submitted successfully!');
+        console.log(result.data); // optional
+        // Reset form
+        setFormData({
+          zip: '',
+          fullName: '',
+          email: '',
+          phone: '',
+          city: '',
+          symptoms: '',
+        });
+        setZipEntered(false);
+        setZipInput('');
+      } else {
+        alert(result.message || 'Submission failed.');
+      }
+    } catch (error) {
+      console.error('Error submitting form:', error);
+      alert('An error occurred.');
+    }
+  };
+  // --- End zip code state and form state ---
   return (
     <>
       <style>{`@import url('https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:wght@700&display=swap');`}</style>
@@ -87,10 +136,11 @@ export default function LandingPage() {
       {/* Desktop Button */}
       {!mobileNavOpen && (
       <Button
-      className="hidden md:inline-block text-base font-normal border border-black font-[Inter]  px-4 py-2 bg-gradient-to-r from-green-300 to-green-500 text-black hover:from-emerald-700 hover:to-teal-800 shadow-lg hover:shadow-xl  "
-      style={{ fontFamily: 'Inter, sans-serif', fontWeight: 300, color: 'rgba(0, 0, 0, 1)', fontSize: '12px', lineHeight: '24px' }}
+        className="hidden md:inline-block text-base font-normal border border-black font-[Inter]  px-4 py-2 bg-gradient-to-r from-green-300 to-green-500 text-black hover:from-emerald-700 hover:to-teal-800 shadow-lg hover:shadow-xl  "
+        style={{ fontFamily: 'Inter, sans-serif', fontWeight: 300, color: 'rgba(0, 0, 0, 1)', fontSize: '12px', lineHeight: '24px' }}
+        onClick={() => setZipEntered(true)}
       >
-      BEHANDLUNG ANFRAGEN
+        BEHANDLUNG ANFRAGEN
       </Button>
       )}
       {/* Hamburger for mobile */}
@@ -120,7 +170,9 @@ export default function LandingPage() {
 </header>
 
       {/* Main hero area */}
-      <section className="relative pt-20 pb-32 overflow-hidden">
+      <section className="relative pt-20 pb-32 overflow-hidden"
+      
+      >
         {/* Background decoration */}
         <div className="absolute inset-0 overflow-hidden">
           <div className="absolute top-40 left-20 w-72 h-72 bg-purple-500/40 -full blur-3xl" />
@@ -160,12 +212,51 @@ export default function LandingPage() {
 
             {/* CTA button */}
             <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
-              <Button className=" text-base font-normal border border-black  font-[Inter]  px-4 py-2 bg-gradient-to-r from-green-300 to-green-500 text-black hover:from-emerald-700 hover:to-teal-800 shadow-lg hover:shadow-xl  "
-              style={{ fontFamily: 'Inter, sans-serif', fontWeight: 300, color: 'rgba(0, 0, 0, 1)', fontSize: '12px', lineHeight: '24px' }}>
+              <Button
+                className=" text-base font-normal border border-black  font-[Inter]  px-4 py-2 bg-gradient-to-r from-green-300 to-green-500 text-black hover:from-emerald-700 hover:to-teal-800 shadow-lg hover:shadow-xl  "
+                style={{ fontFamily: 'Inter, sans-serif', fontWeight: 300, color: 'rgba(0, 0, 0, 1)', fontSize: '12px', lineHeight: '24px' }}
+                onClick={() => setZipEntered(true)}
+              >
                 BEHANDLUNG ANFRAGEN
                 <ChevronRight className="w-5 h-5 ml-2" />
               </Button>
             </div>
+
+            {/* --- Zip code entry & form conditional rendering --- */}
+            {zipEntered && !formData.zip && (
+              <div className="max-w-md mx-auto mt-6 bg-white p-4 shadow rounded">
+                <input
+                  type="text"
+                  name="zip"
+                  placeholder="Enter your ZIP code"
+                  value={zipInput}
+                  onChange={(e) => setZipInput(e.target.value)}
+                  className="w-full p-2 border rounded"
+                />
+                <button
+                  onClick={() => {
+                    if (zipInput.trim()) {
+                      setFormData(prev => ({ ...prev, zip: zipInput }));
+                    }
+                  }}
+                  className="mt-2 bg-emerald-600 text-white px-4 py-2 rounded hover:bg-emerald-700"
+                >
+                  Continue
+                </button>
+              </div>
+            )}
+            {zipEntered && formData.zip && (
+              <form onSubmit={handleSubmit} className="max-w-md mx-auto bg-white p-6 rounded shadow-md space-y-4 mt-4">
+                <input type="text" name="fullName" placeholder="Full Name" onChange={handleChange} required className="w-full p-2 border rounded" />
+                <input type="email" name="email" placeholder="Email" onChange={handleChange} required className="w-full p-2 border rounded" />
+                <input type="tel" name="phone" placeholder="Phone Number" onChange={handleChange} required className="w-full p-2 border rounded" />
+                <input type="text" name="city" placeholder="City" onChange={handleChange} required className="w-full p-2 border rounded" />
+                <textarea name="symptoms" placeholder="Describe your symptoms..." onChange={handleChange} required className="w-full p-2 border rounded" />
+                <button type="submit" className="bg-emerald-600 text-white px-4 py-2 rounded hover:bg-emerald-700">
+                  Submit Request
+                </button>
+              </form>
+            )}
 
             {/* Trust badges */}
             <div className="flex flex-wrap items-center justify-center gap-8 text-sm text-gray-600">
