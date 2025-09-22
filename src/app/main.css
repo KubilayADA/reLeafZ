@@ -1,0 +1,74 @@
+
+/* Inconsolata Font Configuration */
+
+.inconsolata {
+    font-family: "Inconsolata", monospace;
+    font-optical-sizing: auto;
+    font-style: normal;
+    font-variation-settings: "wdth" 108;
+}
+
+/* Font weight variants for Inconsolata */
+.inconsolata-200 {
+    font-family: "Inconsolata", monospace;
+    font-weight: 200;
+    font-optical-sizing: auto;
+    font-style: normal;
+    font-variation-settings: "wdth" 108;
+}
+
+.inconsolata-300 {
+    font-family: "Inconsolata", monospace;
+    font-weight: 300;
+    font-optical-sizing: auto;
+    font-style: normal;
+    font-variation-settings: "wdth" 108;
+}
+
+.inconsolata-400 {
+    font-family: "Inconsolata", monospace;
+    font-weight: 400;
+    font-optical-sizing: auto;
+    font-style: normal;
+    font-variation-settings: "wdth" 108;
+}
+
+.inconsolata-500 {
+    font-family: "Inconsolata", monospace;
+    font-weight: 500;
+    font-optical-sizing: auto;
+    font-style: normal;
+    font-variation-settings: "wdth" 108;
+}
+
+.inconsolata-600 {
+    font-family: "Inconsolata", monospace;
+    font-weight: 600;
+    font-optical-sizing: auto;
+    font-style: normal;
+    font-variation-settings: "wdth" 108;
+}
+
+.inconsolata-700 {
+    font-family: "Inconsolata", monospace;
+    font-weight: 700;
+    font-optical-sizing: auto;
+    font-style: normal;
+    font-variation-settings: "wdth" 108;
+}
+
+.inconsolata-800 {
+    font-family: "Inconsolata", monospace;
+    font-weight: 800;
+    font-optical-sizing: auto;
+    font-style: normal;
+    font-variation-settings: "wdth" 108;
+}
+
+.inconsolata-900 {
+    font-family: "Inconsolata", monospace;
+    font-weight: 900;
+    font-optical-sizing: auto;
+    font-style: normal;
+    font-variation-settings: "wdth" 108;
+}

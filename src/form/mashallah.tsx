@@ -1,0 +1,167 @@
+'use client'
+
+import React, { useState } from 'react'
+import { Button } from '@/components/ui/button'
+import { ArrowLeft } from 'lucide-react'
+
+interface MashallahFormProps {
+  postcode: string
+  onBack: () => void
+}
+
+export default function MashallahForm({ postcode, onBack }: MashallahFormProps) {
+  const [formData, setFormData] = useState({
+    fullName: '',
+    email: '',
+    phone: '',
+    symptoms: '',
+  })
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target
+    setFormData(prev => ({ ...prev, [name]: value }))
+  }
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    
+    try {
+      const response = await fetch('http://localhost:3001/api/treatment/submit', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ ...formData, zip: postcode }),
+      })
+
+      const result = await response.json()
+
+      if (response.ok) {
+        alert('Request submitted successfully!')
+        console.log(result.data)
+        // Reset form
+        setFormData({
+          fullName: '',
+          email: '',
+          phone: '',
+          symptoms: '',
+        })
+      } else {
+        alert(result.message || 'Submission failed.')
+      }
+    } catch (error) {
+      console.error('Error submitting form:', error)
+      alert('An error occurred.')
+    }
+  }
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-emerald-100 via-white to-teal-50 inconsolata">
+      <div className="max-w-2xl mx-auto px-4 py-8">
+        {/* Header */}
+        <div className="mb-8">
+          <Button
+            onClick={onBack}
+            variant="outline"
+            className="mb-4 inconsolata"
+          >
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Zurück
+          </Button>
+          <h1 className="text-4xl font-bold text-gray-900 mb-2">
+            Medizinische Anfrage
+          </h1>
+          <p className="text-lg text-gray-600">
+            Postleitzahl: <span className="font-semibold text-emerald-600">{postcode}</span>
+          </p>
+        </div>
+
+        {/* Form */}
+        <div className="bg-white rounded-lg shadow-lg p-8">
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div>
+              <label htmlFor="fullName" className="block text-sm font-medium text-gray-700 mb-2">
+                Vollständiger Name
+              </label>
+              <input
+                type="text"
+                id="fullName"
+                name="fullName"
+                value={formData.fullName}
+                onChange={handleChange}
+                required
+                className="w-full p-3 border border-gray-300 rounded-lg inconsolata text-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"
+                placeholder="Max Mustermann"
+              />
+            </div>
+
+            <div>
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+                E-Mail Adresse
+              </label>
+              <input
+                type="email"
+                id="email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                required
+                className="w-full p-3 border border-gray-300 rounded-lg inconsolata text-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"
+                placeholder="max@example.com"
+              />
+            </div>
+
+            <div>
+              <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-2">
+                Telefonnummer
+              </label>
+              <input
+                type="tel"
+                id="phone"
+                name="phone"
+                value={formData.phone}
+                onChange={handleChange}
+                required
+                className="w-full p-3 border border-gray-300 rounded-lg inconsolata text-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"
+                placeholder="+49 30 12345678"
+              />
+            </div>
+
+            <div>
+              <label htmlFor="symptoms" className="block text-sm font-medium text-gray-700 mb-2">
+                Beschreibung Ihrer Symptome
+              </label>
+              <textarea
+                id="symptoms"
+                name="symptoms"
+                value={formData.symptoms}
+                onChange={handleChange}
+                required
+                rows={4}
+                className="w-full p-3 border border-gray-300 rounded-lg inconsolata text-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none resize-none"
+                placeholder="Bitte beschreiben Sie Ihre Beschwerden und warum Sie eine medizinische Cannabis-Behandlung benötigen..."
+              />
+            </div>
+
+            <Button
+              type="submit"
+              className="w-full inconsolata bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-medium py-4 text-lg"
+            >
+              Anfrage absenden
+            </Button>
+          </form>
+        </div>
+
+        {/* Info */}
+        <div className="mt-8 bg-emerald-50 border border-emerald-200 rounded-lg p-6">
+          <h3 className="text-lg font-semibold text-emerald-800 mb-2">
+            Lieferung in Berlin
+          </h3>
+          <p className="text-emerald-700">
+            Da Sie in Berlin wohnen, können wir Ihre Medikamente in 30-90 Minuten direkt zu Ihnen liefern lassen.
+          </p>
+        </div>
+      </div>
+    </div>
+  )
+}
