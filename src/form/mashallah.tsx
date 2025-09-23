@@ -15,6 +15,7 @@ export default function MashallahForm({ postcode, onBack }: MashallahFormProps) 
     email: '',
     phone: '',
     symptoms: '',
+    city: '',
   })
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -45,6 +46,7 @@ export default function MashallahForm({ postcode, onBack }: MashallahFormProps) 
           email: '',
           phone: '',
           symptoms: '',
+          city: '',
         })
       } else {
         alert(result.message || 'Submission failed.')
