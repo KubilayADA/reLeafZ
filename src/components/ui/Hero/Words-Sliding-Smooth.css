@@ -1,0 +1,192 @@
+/* Animated Words Slider Styles */
+  .animated-words-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 80px; /* More compact height */
+    width: 100%; /* Full width to accommodate all text */
+    overflow: hidden;
+    margin: -0.5rem 0 0.5rem 0; /* Negative top margin to pull closer to title */
+  }
+  
+  .words-wrapper {
+    display: flex;
+    flex-direction: column;
+    animation: wordsSlider 14s infinite ease-in-out;
+    height: 100%;
+  }
+  
+  .word-item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 80px; /* More compact height */
+    width: 100%; /* Full width to show all text */
+    text-align: center;
+    white-space: nowrap;
+    min-height: 80px;
+    color: #000000; /* Fallback green color */
+    padding: 0 1rem; /* Add some padding for better spacing */
+  }
+  
+  @keyframes wordsSlider {
+    0%   { transform: translateY(0%); }
+    12%  { transform: translateY(0%); }
+  
+    14%  { transform: translateY(-100%); }
+    26%  { transform: translateY(-100%); }
+  
+    28%  { transform: translateY(-200%); }
+    40%  { transform: translateY(-200%); }
+  
+    42%  { transform: translateY(-300%); }
+    54%  { transform: translateY(-300%); }
+  
+    56%  { transform: translateY(-400%); }
+    68%  { transform: translateY(-400%); }
+  
+    70%  { transform: translateY(-500%); }
+    82%  { transform: translateY(-500%); }
+  
+    84%  { transform: translateY(-600%); }
+    96%  { transform: translateY(-600%); }
+  
+    100% { transform: translateY(0%); }
+  }
+  
+  /* Optional: Container styles for proper positioning */
+  .hero-text {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    font-size: 30px;
+    font-weight: 600;
+    position: relative;
+    z-index: 10;
+    pointer-events: none;
+  }
+  
+  .hero-text img {
+    width: 2rem;
+    height: 2rem;
+    object-fit: contain;
+  }
+  
+  .hero-text .slide {
+    position: absolute;
+    padding-top: 0;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+    padding-bottom: 30px;
+    height: 48px;
+    transform: translateY(0);
+    overflow: hidden;
+  }
+  
+  /* Responsive styles */
+  @media (min-width: 768px) {
+    .hero-text {
+      font-size: 60px;
+    }
+    
+    .hero-text img {
+      width: 2.5rem;
+      height: 2.5rem;
+    }
+    
+    .hero-text .slide {
+      padding-left: 1.25rem;
+      padding-right: 1.25rem;
+      height: 78px;
+      transform: translateY(0.25rem);
+    }
+  }
+  
+  @media (min-width: 1280px) {
+    .hero-text img {
+      width: 3rem;
+      height: 3rem;
+    }
+  }
+
+  /* Reduce spacing between title and animated words */
+  h1 + .animated-words-container {
+    margin-top: -2rem; /* Pull animated words closer to h1 */
+  }
+
+  /* iPad specific styles */
+  @media (min-width: 768px) and (max-width: 1024px) {
+    .animated-words-container {
+      height: 70px; /* Medium height for iPad */
+      margin: -1.8rem 0 0.5rem 0;
+      width: 100%;
+    }
+    
+    .word-item {
+      height: 70px;
+      min-height: 70px;
+      font-size: 2rem; /* Medium text size for iPad */
+      padding: 0 0.75rem;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      white-space: nowrap;
+    }
+    
+    h1 + .animated-words-container {
+      margin-top: -1.8rem;
+    }
+  }
+
+  /* iPad landscape orientation */
+  @media (min-width: 768px) and (max-width: 1024px) and (orientation: landscape) {
+    .animated-words-container {
+      height: 65px;
+    }
+    
+    .word-item {
+      height: 65px;
+      min-height: 65px;
+      font-size: 1.8rem;
+    }
+  }
+
+  /* Mobile responsiveness */
+  @media (max-width: 767px) {
+    .animated-words-container {
+      height: 60px; /* Smaller height on mobile */
+      margin: -1.5rem 0 0.5rem 0; /* Adjusted spacing for mobile */
+    }
+    
+    .word-item {
+      height: 60px; /* Smaller word height on mobile */
+      min-height: 60px;
+      font-size: 1.5rem; /* Smaller text on mobile */
+      padding: 0 0.5rem; /* Less padding on mobile */
+    }
+    
+    h1 + .animated-words-container {
+      margin-top: -1.5rem; /* Less aggressive spacing on mobile */
+    }
+  }
+
+  @media (max-width: 480px) {
+    .animated-words-container {
+      height: 50px; /* Even smaller on very small screens */
+      margin: -1rem 0 0.5rem 0;
+    }
+    
+    .word-item {
+      height: 50px;
+      min-height: 50px;
+      font-size: 1.25rem; /* Smaller text for very small screens */
+      padding: 0 0.25rem;
+    }
+    
+    h1 + .animated-words-container {
+      margin-top: -1rem; /* Conservative spacing on very small screens */
+    }
+  }
+  

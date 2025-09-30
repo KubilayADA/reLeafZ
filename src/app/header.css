@@ -1,0 +1,61 @@
+/* Moving text banner styles */
+.moving-text {
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+  animation: scroll-left 30s linear infinite;
+  font-size: 12px;
+  font-weight: 400;
+  letter-spacing: 0.3px;
+  line-height: 1.2;
+  width: 200%; /* Ensure content is wide enough for seamless loop */
+}
+
+.moving-text span {
+  margin: 0 15px;
+  color: #000000;
+}
+
+.moving-text span:nth-child(even) {
+  color: #000000; /* separators */
+  font-weight: bold;
+  font-size: 12px;
+}
+
+.moving-text .spacer {
+  margin: 0 30px;
+  color: #666666;
+  font-weight: normal;
+  font-size: 10px;
+  letter-spacing: 2px;
+}
+
+@keyframes scroll-left {
+  0% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+/* Pause animation on hover */
+.moving-text:hover {
+  animation-play-state: paused;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .moving-text {
+    font-size: 10px;
+    animation-duration: 15s; /* Faster on mobile */
+  }
+  
+  .moving-text span {
+    margin: 0 12px;
+  }
+  
+  .moving-text span:nth-child(even) {
+    font-size: 10px;
+  }
+}

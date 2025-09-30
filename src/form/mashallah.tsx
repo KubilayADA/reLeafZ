@@ -70,10 +70,10 @@ export default function MashallahForm({ postcode, onBack }: MashallahFormProps) 
             <ArrowLeft className="w-4 h-4 mr-2" />
             Zurück
           </Button>
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">
+          <h1 className="text-4xl font-bold title-gradient mb-2">
             Medizinische Anfrage
           </h1>
-          <p className="text-lg text-gray-600">
+          <p className="text-lg subtitle-text">
             Postleitzahl: <span className="font-semibold text-emerald-600">{postcode}</span>
           </p>
         </div>
@@ -82,7 +82,7 @@ export default function MashallahForm({ postcode, onBack }: MashallahFormProps) 
         <div className="bg-white rounded-lg shadow-lg p-8">
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
-              <label htmlFor="fullName" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="fullName" className="block text-sm font-medium form-label mb-2">
                 Vollständiger Name
               </label>
               <input
@@ -98,7 +98,7 @@ export default function MashallahForm({ postcode, onBack }: MashallahFormProps) 
             </div>
 
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="email" className="block text-sm font-medium form-label mb-2">
                 E-Mail Adresse
               </label>
               <input
@@ -114,7 +114,7 @@ export default function MashallahForm({ postcode, onBack }: MashallahFormProps) 
             </div>
 
             <div>
-              <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="phone" className="block text-sm font-medium form-label mb-2">
                 Telefonnummer
               </label>
               <input
@@ -130,7 +130,7 @@ export default function MashallahForm({ postcode, onBack }: MashallahFormProps) 
             </div>
 
             <div>
-              <label htmlFor="symptoms" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="symptoms" className="block text-sm font-medium form-label mb-2">
                 Beschreibung Ihrer Symptome
               </label>
               <textarea
