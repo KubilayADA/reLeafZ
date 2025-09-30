@@ -3,9 +3,11 @@
 import React, { useEffect, useState } from 'react'
 import { ArrowRight, ArrowDown, ListCheck, MousePointer, ZapIcon, Sparkles, Brain, Users, Shield, Clock, MapPin, ChevronRight, Star, BikeIcon, LucideBike, Hospital, HospitalIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { Menu, X } from 'lucide-react'
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
-import MashallahForm from '@/form/mashallah' 
+import MashallahForm from '@/form/mashallah'
+import words from '@/constants/index'
+import Header from './header'
+import '@/components/ui/Hero/Words-Sliding-Smooth.css' 
 
 // Font setup - using Inconsolata
 const inconsolataStyle = {
@@ -14,7 +16,7 @@ const inconsolataStyle = {
   lineHeight: '35px',
 }
 
-// logo
+// logo component for footer
 const LeafLogo = ({ className = 'w-80 h-40 sm:w-56 sm:h-24 md:w-72 md:h-32' }) => (
   <div className={`relative overflow-hidden ${className}`}>
     <img
@@ -24,6 +26,7 @@ const LeafLogo = ({ className = 'w-80 h-40 sm:w-56 sm:h-24 md:w-72 md:h-32' }) =
     />
   </div>
 )
+
 const cities = [
   { name: "Berlin", explanation: "Mo – So, 09-21 Uhr in fast allen Bezirken\nMo – Fr, 09-19 Uhr in Neukölln, Schöneberg, Sa 9-18Uhr" },
   { name: "München", explanation: "Coming soon" },
@@ -34,14 +37,17 @@ const cities = [
 
 // Fun monkey easter egg - for now I like it lol
 const FloatingMonkey = () => {
-  const [show, setShow] = useState(true)
+  const [show, setShow] = useState(false)
+  const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
+    setMounted(true)
+    setShow(true)
     const timer = setInterval(() => setShow(prev => !prev), 8000)
     return () => clearInterval(timer)
   }, [])
 
-  if (!show) return null
+  if (!mounted || !show) return null
 
   return (
     <div className="fixed bottom-8 right-8 z-40 transition-opacity duration-1000">
@@ -60,7 +66,6 @@ const FloatingMonkey = () => {
 
 export default function LandingPage() {
   const [testimonialIdx, setTestimonialIdx] = useState(0)
-  const [mobileNavOpen, setMobileNavOpen] = useState(false)
   const [openCity, setOpenCity] = useState<string | null>(null)
   const [dialogOpen, setDialogOpen] = useState(false)
   const [showForm, setShowForm] = useState(false)
@@ -87,17 +92,11 @@ export default function LandingPage() {
   };
   
   const handlePostcodeSubmit = () => {
-    if (zipInput.trim()) {
+    if (zipInput.trim() && isValidBerlinPostcode(zipInput)) {
       setFormData(prev => ({ ...prev, zip: zipInput }));
       setDialogOpen(false);
-      
-      if (isValidBerlinPostcode(zipInput)) {
-        // Valid Berlin postcode - show the form
-        setShowForm(true);
-      } else {
-        // Not a Berlin postcode - show message
-        alert(`Wir liefern derzeit nur in Berlin. Ihre Postleitzahl ${zipInput} liegt außerhalb unseres Liefergebiets.`);
-      }
+      // Valid Berlin postcode - show the form
+      setShowForm(true);
     }
   };
   
@@ -152,118 +151,15 @@ export default function LandingPage() {
   return (
     <>
       <div className="min-h-screen bg-gradient-to-br from-emerald-100 via-white to-teal-50" style={inconsolataStyle}>
-      {/* Top nav */}
-      
-      <header className="relative z-50 bg-white/70 backdrop-blur-md border-b border-emerald-200 h-20">
-  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20">
-    <div className="flex justify-between items-center h-20">
-      {/* Logo geniş, navbar sabit yükseklikte */}
-      <div className="flex items-center h-20 overflow-visible">
-        <LeafLogo className="w-45 h-52 transform translate-y-4" />
-      </div>
-      {/* Desktop Nav */}
-      <nav className="hidden md:flex absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 space-x-8 inconsolata font-thin ">
-  <a href="#ablauf" className="text-mg md:text-xl   leading-relaxed">Ablauf</a>
-  <a href="vorteile" className="text-lg md:text-xl   leading-relaxed">Vorteile</a>
-  <a href="faq" className="text-lg md:text-xl   leading-relaxed">FAQ</a>
-  <a href="chat" className="text-lg md:text-xl leading-relaxed">Chat with us!</a>
-</nav>
-      {/* Desktop Button */}
-      {!mobileNavOpen && (
-      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogTrigger asChild>
-          <Button
-            className="hidden md:inline-block text-base font-normal border border-black inconsolata px-4 py-2 bg-gradient-to-r from-green-300 to-green-500 text-black hover:from-emerald-700 hover:to-teal-800 shadow-lg hover:shadow-xl  "
-            style={{ fontFamily: 'Inconsolata, monospace', fontWeight: 400, color: 'rgba(0, 0, 0, 1)', fontSize: '12px', lineHeight: '24px' }}
-          >
-            BEHANDLUNG ANFRAGEN
-          </Button>
-        </DialogTrigger>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle className="inconsolata text-xl font-bold">Postleitzahl eingeben</DialogTitle>
-            <DialogDescription className="inconsolata text-gray-600">
-              Bitte geben Sie Ihre Postleitzahl ein, um zu prüfen, ob wir in Ihrer Region liefern können.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="py-4">
-            <input
-              type="text"
-              name="zip"
-              placeholder="z.B. 10115"
-              value={zipInput}
-              onChange={(e) => setZipInput(e.target.value)}
-              className="w-full p-3 border border-gray-300 rounded-lg inconsolata text-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"
-              maxLength={5}
-            />
-          </div>
-          <DialogFooter>
-            <Button
-              onClick={handlePostcodeSubmit}
-              className="w-full inconsolata bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-medium py-3"
-            >
-              Weiter
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-      )}
-      {/* Hamburger for mobile */}
-      <button
-        className="md:hidden ml-4 p-2 rounded focus:outline-none"
-        onClick={() => setMobileNavOpen(!mobileNavOpen)}
-        aria-label="Open menu"
-      >
-        {mobileNavOpen ? <X className="w-7 h-7" /> : <Menu className="w-7 h-7" />}
-      </button>
-    </div>
-    {/* Mobile Nav Drawer */}
-    {mobileNavOpen && (
-      <div className="md:hidden absolute top-full left-0 w-full bg-white shadow-lg border-t border-emerald-200 z-50">
-        <nav className="flex flex-col items-center py-4 space-y-4">
-          <a href="#ablauf" className="text-xl text-black-600" onClick={() => setMobileNavOpen(false)}>Ablauf</a>
-          <a href="vorteile" className="text-xl text-black-600" onClick={() => setMobileNavOpen(false)}>Vorteile</a>
-          <a href="contact" className="text-xl text-black-600" onClick={() => setMobileNavOpen(false)}>Contact</a>
-          <a href="faq" className="text-xl text-black-600" onClick={() => setMobileNavOpen(false)}>FAQ</a>
-          <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-            <DialogTrigger asChild>
-              <Button className="w-full mt-2 bg-gradient-to-r from-green-600 to-green-700 border text-white text-lg inconsolata px-4 py-2 shadow-lg hover:shadow-xl border border-black">
-                BEHANDLUNG ANFRAGEN
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-md">
-              <DialogHeader>
-                <DialogTitle className="inconsolata text-xl font-bold">Postleitzahl eingeben</DialogTitle>
-                <DialogDescription className="inconsolata text-gray-600">
-                  Bitte geben Sie Ihre Postleitzahl ein, um zu prüfen, ob wir in Ihrer Region liefern können.
-                </DialogDescription>
-              </DialogHeader>
-              <div className="py-4">
-                <input
-                  type="text"
-                  name="zip"
-                  placeholder="z.B. 10115"
-                  value={zipInput}
-                  onChange={(e) => setZipInput(e.target.value)}
-                  className="w-full p-3 border border-gray-300 rounded-lg inconsolata text-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"
-                  maxLength={5}
-                />
-              </div>
-              <DialogFooter>
-                <Button
-                  onClick={handlePostcodeSubmit}
-                  className="w-full inconsolata bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-medium py-3"
-                >
-                  Weiter
-                </Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
-        </nav>
-      </div>
-    )}
-  </div>
-</header>
+      {/* Header */}
+      <Header 
+        dialogOpen={dialogOpen}
+        setDialogOpen={setDialogOpen}
+        zipInput={zipInput}
+        setZipInput={setZipInput}
+        handlePostcodeSubmit={handlePostcodeSubmit}
+        isValidBerlinPostcode={isValidBerlinPostcode}
+      />
 
       {/* Main hero area */}
       <section className="relative pt-20 pb-32 overflow-hidden"
@@ -271,36 +167,44 @@ export default function LandingPage() {
       >
         {/* Background decoration */}
         <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute top-40 left-20 w-72 h-72 bg-purple-500/40 -full blur-3xl" />
+          {/* <div className="absolute top-40 left-20 w-72 h-72 bg-purple-500/40 -full blur-3xl" />
           <div className="absolute top-60 right-20 w-96 h-96 bg-green-500/30 -full blur-3xl" />
-          <div className="absolute bottom-20 left-1/2 w-90 h-80 bg-green-600/35 -full blur-3xl" />
+          <div className="absolute bottom-20 left-1/2 w-90 h-80 bg-green-600/35 -full blur-3xl" /> */}
         </div>
 
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             {/* Badge */}
-            <div className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-green-600 to-purple-600 bg-opacity-70 backdrop-blur-sm rounded-full border border-emerald-300 mb-8">
-              <Sparkles className="w-4 h-4 text-white/90 mr-5" />
-              <span className="text-sm font-medium text-white/90">
+            <div className="inline-flex items-center px-4 py-2 bg-gradient-to-r mb-8">
+              <Sparkles className="w-4 h-4 mr-5" />
+              <span className="text-sm font-medium subtitle-text">
                 AI-Powered, Ultra fast Medical Cannabis Service
               </span>
             </div>
 
             {/* Main heading */}
-            <h1 className="text-5xl md:text-7xl font-bold text-gray-900 mb-5 leading-tight italic ">
-              MEDIZINAL CANNABIS<br />
-              <span className="bg-gradient-to-r from-green-600 to-purple-700 bg-clip-text text-transparent inline-block italic px-2">
-              IN MINUTEN GELIEFERT
-            </span><br />
-              
+            <h1 className="text-5xl md:text-7xl font-bold title-gradient mb-5 leading-tight italic">
+              MEDIZINAL CANNABIS
             </h1>
+            <div className="animated-words-container">
+                <div className="words-wrapper">
+                    {words.map((word, index) => (
+                        <div 
+                            key={index} 
+                            className="word-item text-5xl md:text-7xl font-bold title-gradient leading-tight italic"
+                        >
+                            {word}
+                        </div>
+                    ))}
+                </div>
+            </div>
 
             {/* - messy HTML */}
-            <div className="text-base md:text-lg text-gray-600 inconsolata mb-6 max-w-4xl mx-auto leading-relaxed  ">
+            <div className="text-base md:text-lg subtitle-text inconsolata mb-6 max-w-4xl mx-auto leading-relaxed  ">
               BER | HAM | MUC | COL | DUS | FFM <br />Lieferung in 30-90 Minuten in Berlin<br />
               Ganz Deutschland in 1-2 Tagen<br /><br />
               </div>
-            <div className="text-base md:text-lg text-gray-600 inconsolata mb-6 max-w-4xl  mx-auto leading-relaxed font-thin">
+            <div className="text-base md:text-lg subtitle-text inconsolata mb-6 max-w-4xl  mx-auto leading-relaxed font-thin">
               ✓ Blüten ab 4,99€*<br />
               ✓ Rezept digital austellen lassen<br />
               ✓ Medikamente aus der Apotheke abholen oder liefern lassen<br />
@@ -311,8 +215,8 @@ export default function LandingPage() {
               <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
                 <DialogTrigger asChild>
                   <Button
-                    className=" text-base font-normal border border-black inconsolata px-4 py-2 bg-gradient-to-r from-green-300 to-green-500 text-black hover:from-emerald-700 hover:to-teal-800 shadow-lg hover:shadow-xl  "
-                    style={{ fontFamily: 'Inconsolata, monospace', fontWeight: 400, color: 'rgba(0, 0, 0, 1)', fontSize: '12px', lineHeight: '24px' }}
+                    className="text-base font-normal border border-black inconsolata px-8 py-3 text-white shadow-lg hover:shadow-xl flex items-center justify-center min-w-64 w-auto"
+                    style={{ fontFamily: 'Inconsolata, monospace', fontWeight: 400, backgroundColor: '#72906F', color: 'white', fontSize: '12px', lineHeight: '24px' }}
                   >
                     BEHANDLUNG ANFRAGEN
                     <ChevronRight className="w-5 h-5 ml-2" />
@@ -339,7 +243,12 @@ export default function LandingPage() {
                   <DialogFooter>
                     <Button
                       onClick={handlePostcodeSubmit}
-                      className="w-full inconsolata bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-medium py-3"
+                      disabled={!zipInput.trim() || !isValidBerlinPostcode(zipInput)}
+                      className={`w-full inconsolata text-white font-medium py-3 ${
+                        !zipInput.trim() || !isValidBerlinPostcode(zipInput) 
+                          ? 'opacity-50 cursor-not-allowed bg-gray-400' 
+                          : 'animated-button'
+                      }`}
                     >
                       Weiter
                     </Button>
@@ -412,11 +321,11 @@ export default function LandingPage() {
       </section>
 
       {/* How it works section */}
-      <section className="py-24 bg-white/50">
+      <section className="section-container">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-5xl font-bold text-gray-900 mb-4 italic">SO FUNKTIONIERT'S</h2>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto inconsolata font-thin ">
+            <h2 className="text-5xl font-bold title-gradient mb-4 italic">SO FUNKTIONIERT'S</h2>
+            <p className="text-xl subtitle-text max-w-2xl mx-auto inconsolata font-thin ">
               Jetzt loslegen und Cannabis auf Rezept blitzschnell erhalten.
             </p>
           </div>
@@ -425,10 +334,10 @@ export default function LandingPage() {
             {/* Step 1 - removed all the fancy hover stuff, was too much */}
             <div className="text-center">
               <div className="w-16 h-16 bg-gradient-to-br from-green-600 to-green-700 rounded-2xl flex items-center justify-center mb-6 mx-auto">
-                <ListCheck className="w-8 h-8 text-white" />
+                <ListCheck className="w-8 h-8 text-black" />
               </div>
-              <h3 className="text-3xl font-bold text-gray-900 mb-4 italic">FRAGENBOGEN AUSFULLEN</h3>
-              <p className="text-l text-gray-600 inconsolata font-thin ">
+              <h3 className="text-3xl font-bold title-gradient mb-4 italic">FRAGENBOGEN AUSFULLEN</h3>
+              <p className="text-l subtitle-text inconsolata font-thin ">
                 Fülle unseren medizinischen Fragebogen aus – easy von der Couch aus.
               </p>
             </div>
@@ -436,10 +345,10 @@ export default function LandingPage() {
             {/* Step 2 */}
             <div className="text-center">
               <div className="w-16 h-16 bg-gradient-to-br from-green-600 to-purple-600 rounded-2xl flex items-center justify-center mb-6 mx-auto">
-                <Hospital className="w-8 h-8 text-white" />
+                <Hospital className="w-8 h-8 text-black" />
               </div>
-              <h3 className="text-3xl font-bold text-gray-900 mb-4 italic ">BEHANDLUNG ERHALTEN</h3>
-              <p className="text-l text-gray-600 inconsolata font-thin ">
+              <h3 className="text-3xl font-bold title-gradient mb-4 italic ">BEHANDLUNG ERHALTEN</h3>
+              <p className="text-l subtitle-text inconsolata font-thin ">
                 Ein Arzt prüft deine Angaben und stellt dir bei Eignung ein Rezept aus.
               </p>
             </div>
@@ -447,10 +356,10 @@ export default function LandingPage() {
             {/* Step 3 */}
             <div className="text-center">
               <div className="w-16 h-16 bg-gradient-to-br from-purple-400 to-purple-800 rounded-2xl flex items-center justify-center mb-6 mx-auto ">
-                <LucideBike className="w-8 h-8 text-white" />
+                <LucideBike className="w-8 h-8 text-black" />
               </div>
-              <h3 className="text-3xl font-bold text-gray-900 mb-4 italic">EXPRESSLIEFERUNG ERHALTEN</h3>
-              <p className="text-l text-gray-600 mb-4 inconsolata font-thin ">
+              <h3 className="text-3xl font-bold title-gradient mb-4 italic">EXPRESSLIEFERUNG ERHALTEN</h3>
+              <p className="text-l subtitle-text mb-4 inconsolata font-thin ">
                 Medikamente in Berlin in max. 90 Min. geliefert oder in 15–30 Min. selbst in der Apotheke abholen.
               </p>
               <div className="text-emerald-700 font-semibold italic">Powered by Wolt & Uber →</div>
@@ -459,17 +368,17 @@ export default function LandingPage() {
         </div>
       </section>
 
-     <section className="py-24 bg-gradient-to-r ">
+     <section className="py-24 bg-gradient-to-r section-container">
   <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center md:items-start text-center md:text-left">
     {/* city descr. on the lef */}
-    <div className="w-full md:w-1/2 mt-8 md:mt-0 md:pr-12 flex flex-col justify-center">
+    <div className="w-full md:w-1/2 mt-8 md:mt-0 md:pr-12 flex flex-col justify-center ">
     <h2 className="text-5xl font-bold mb-8 italic bg-gradient-to-r from-green-600 to-purple-600 bg-clip-text text-transparent">
       TO YOUR DOOR? IN MINUTES. </h2>
-    <p className="text-light text-gray-500">BERLIN in können deine Medikamente in 30-90 minuten geliefert werden, In folgenden Städten ansonsten per DHL in 1-3 Tagen 
+    <p className="text-light subtitle-text">BERLIN in können deine Medikamente in 30-90 minuten geliefert werden, In folgenden Städten ansonsten per DHL in 1-3 Tagen 
     </p>
 
     
-    <div className="mt-6 text-lg text-gray-700">
+    <div className="mt-6 text-lg subtitle-text">
         {cities.map(city => (
                 <div key={city.name} className="mb-4">
                   <button
@@ -479,7 +388,7 @@ export default function LandingPage() {
                     {city.name}
                   </button>
                   {openCity === city.name && (
-                    <div className="bg-white border border-emerald-200 rounded p-4 mt-2 text-gray-700 whitespace-pre-line">
+                    <div className="bg-white border border-emerald-200 rounded p-4 mt-2 subtitle-text whitespace-pre-line">
                       {city.explanation}
                     </div>
                   )}
@@ -488,7 +397,7 @@ export default function LandingPage() {
       </div>
     </div>
     {/* Map on the right, half width */}
-    <div className="w-full md:w-1/2 flex  gap-x-6">
+    <div className="w-full md:w-1/2 flex  gap-x-6 ">
       <img
         src="/berlinmap.png"
         alt="Berlin Service Zones"
@@ -499,34 +408,34 @@ export default function LandingPage() {
 </section>
 
       {/* Bottom CTA section */}
-      <section className="py-24 bg-gradient-to-br from-emerald-700 to-teal-800 text-white relative overflow-hidden">
+      <section className="py-24 bg-gradient-to-br from-emerald-700 to-teal-800 text-white relative overflow-hidden section-container">
         <div className="absolute inset-0">
           <div className="absolute top-20 left-20 w-64 h-64 bg-white/10 rounded-full blur-3xl" />
           <div className="absolute bottom-20 right-20 w-80 h-80 bg-white/5 rounded-full blur-3xl" />
         </div>
 
         <div className="relative max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
-          <h2 className="text-5xl font-bold mb-6">
+          <h2 className="text-5xl font-bold mb-6 title-gradient">
             Ready to Transform Your<br />Medical Cannabis Experience? .
           </h2>
-          <p className="text-xl text-emerald-100 mb-12 max-w-2xl mx-auto">
+          <p className="text-xl text-emerald-100 mb-12 max-w-2xl mx-auto subtitle-text">
             Join thousands of patients who've found better care, faster relief, and a supportive community with reLeafZ.
           </p>
 
-          <div className="flex flex-col sm:flex-row gap-6 justify-center">
+          <div className="flex flex-col sm:flex-row gap-6 justify-center subtitle-text">
             <Button className="bg-white text-emerald-700 hover:bg-gray-50 px-10 py-6 rounded-2xl text-lg font-bold shadow-xl hover:shadow-2xl">
               Start Your Journey Today
               <ChevronRight className="w-5 h-5 ml-2" />
             </Button>
             <Button 
               variant="outline" 
-              className="border-2 border-white/30 text-white hover:border-white hover:bg-white/10 px-10 py-6 rounded-2xl text-lg font-bold"
+              className="border-2 border-white/30 text-white hover:border-white hover:bg-white/10 px-10 py-6 rounded-2xl text-lg font-bold subtitle-text"
             >
               Speak with Luna
             </Button>
           </div>
 
-          <p className="text-emerald-200 text-sm mt-8">
+          <p className="text-emerald-200 text-sm mt-8 subtitle-text">
             No commitment required • Speak with licensed doctors • GDPR compliant
           </p>
         </div>
@@ -542,7 +451,7 @@ export default function LandingPage() {
                 <LeafLogo />
                 
               </div>
-              <p className="text-gray-400 mb-4">
+              <p className="text-gray-400 mb-4 subtitle-text">
                 Germany's fastest, safest, and coolest medical cannabis platform.
               </p>
             </div>
