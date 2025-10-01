@@ -4,6 +4,7 @@ import React, { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Menu, X } from 'lucide-react'
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
+import CookieBanner from '@/components/ui/cookie'
 import './header.css'
 
 // logo
@@ -37,9 +38,15 @@ export default function Header({
   const [mobileNavOpen, setMobileNavOpen] = useState(false)
 
   return (
-    <header className="relative z-50 bg-#E9E6DE/50 backdrop-blur-md border-b border-black">
-      {/* Moving information banner */}
-      <div className="bg-transparent text-black py-1 overflow-hidden border-b border-black">
+    <>
+      <header className="relative z-50 bg-#E9E6DE/50 backdrop-blur-md border-b border-black">
+        {/* Cookie Banner - positioned above everything */}
+        <div className="relative z-[90]">
+          <CookieBanner />
+        </div>
+        
+        {/* Moving information banner */}
+        <div className="bg-transparent text-black py-1 overflow-hidden border-b border-black">
         <div className="moving-text">
           <span>Card payment accepted</span>
           <span>|</span>
@@ -64,7 +71,7 @@ export default function Header({
           </div>
           
           {/* Desktop Nav */}
-          <nav className="hidden md:flex absolute left-1/2 top-16 transform -translate-x-1/2 -translate-y-1/2 space-x-8 inconsolata font-normal ">
+          <nav className="hidden md:flex absolute left-1/2 top-flex mt-12 transform -translate-x-1/2 -translate-y-1/2 space-x-8 inconsolata font-normal ">
             <a href="#ablauf" className="text-mg md:text-xl   leading-relaxed">Ablauf</a>
             <a href="vorteile" className="text-lg md:text-xl   leading-relaxed">Vorteile</a>
             <a href="faq" className="text-lg md:text-xl   leading-relaxed">FAQ</a>
@@ -182,5 +189,6 @@ export default function Header({
         )}
       </div>
     </header>
+    </>
   )
 }
