@@ -183,7 +183,7 @@ export default function LandingPage() {
             </div>
 
             {/* Main heading */}
-            <h1 className="text-5xl md:text-7xl font-bold title-gradient mb-5 leading-tight italic">
+            <h1 className="text-3xl sm:text-5xl md:text-7xl font-bold title-gradient mb-5 leading-tight italic">
               MEDIZINAL CANNABIS
             </h1>
             <div className="animated-words-container">
@@ -191,7 +191,7 @@ export default function LandingPage() {
                     {words.map((word, index) => (
                         <div 
                             key={index} 
-                            className="word-item text-5xl md:text-7xl font-bold title-gradient leading-tight italic"
+                            className="word-item text-3xl sm:text-5xl md:text-7xl font-bold title-gradient leading-tight italic"
                         >
                             {word}
                         </div>
@@ -200,17 +200,17 @@ export default function LandingPage() {
             </div>
 
             {/* - messy HTML */}
-            <div className="text-base md:text-lg subtitle-text inconsolata mb-6 max-w-4xl mx-auto leading-relaxed  ">
+            <div className="text-sm sm:text-base md:text-lg subtitle-text inconsolata mb-6 max-w-4xl mx-auto leading-relaxed px-4">
               BER | HAM | MUC | COL | DUS | FFM <br />Lieferung in 30-90 Minuten in Berlin<br />
               Ganz Deutschland in 1-2 Tagen<br /><br />
               </div>
-            <div className="text-base md:text-lg subtitle-text inconsolata mb-6 max-w-4xl  mx-auto leading-relaxed font-thin">
+            <div className="text-sm sm:text-base md:text-lg subtitle-text inconsolata mb-6 max-w-4xl mx-auto leading-relaxed font-thin px-4">
               ✓ Blüten ab 4,99€*<br />
               ✓ Rezept digital austellen lassen<br />
               ✓ Medikamente aus der Apotheke abholen oder liefern lassen<br />
             </div>
 
-            {/* CTA button */}
+            {/* CTA button - Visible on all devices */}
             <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
               <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
                 <DialogTrigger asChild>
@@ -323,9 +323,9 @@ export default function LandingPage() {
       {/* How it works section */}
       <section className="section-container">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-5xl font-bold title-gradient mb-4 italic">SO FUNKTIONIERT'S</h2>
-            <p className="text-xl subtitle-text max-w-2xl mx-auto inconsolata font-thin ">
+          <div className="text-center mb-16 px-4">
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold title-gradient mb-4 italic">SO FUNKTIONIERT'S</h2>
+            <p className="text-lg sm:text-xl subtitle-text max-w-2xl mx-auto inconsolata font-thin">
               Jetzt loslegen und Cannabis auf Rezept blitzschnell erhalten.
             </p>
           </div>
@@ -336,8 +336,8 @@ export default function LandingPage() {
               <div className="w-16 h-16 bg-gradient-to-br from-green-600 to-green-700 rounded-2xl flex items-center justify-center mb-6 mx-auto">
                 <ListCheck className="w-8 h-8 text-black" />
               </div>
-              <h3 className="text-3xl font-bold title-gradient mb-4 italic">FRAGENBOGEN AUSFULLEN</h3>
-              <p className="text-l subtitle-text inconsolata font-thin ">
+              <h3 className="text-xl sm:text-2xl md:text-3xl font-bold title-gradient mb-4 italic">FRAGENBOGEN AUSFULLEN</h3>
+              <p className="text-base sm:text-lg subtitle-text inconsolata font-thin px-4">
                 Fülle unseren medizinischen Fragebogen aus – easy von der Couch aus.
               </p>
             </div>
@@ -347,8 +347,8 @@ export default function LandingPage() {
               <div className="w-16 h-16 bg-gradient-to-br from-green-600 to-purple-600 rounded-2xl flex items-center justify-center mb-6 mx-auto">
                 <Hospital className="w-8 h-8 text-black" />
               </div>
-              <h3 className="text-3xl font-bold title-gradient mb-4 italic ">BEHANDLUNG ERHALTEN</h3>
-              <p className="text-l subtitle-text inconsolata font-thin ">
+              <h3 className="text-xl sm:text-2xl md:text-3xl font-bold title-gradient mb-4 italic">BEHANDLUNG ERHALTEN</h3>
+              <p className="text-base sm:text-lg subtitle-text inconsolata font-thin px-4">
                 Ein Arzt prüft deine Angaben und stellt dir bei Eignung ein Rezept aus.
               </p>
             </div>
@@ -358,37 +358,37 @@ export default function LandingPage() {
               <div className="w-16 h-16 bg-gradient-to-br from-purple-400 to-purple-800 rounded-2xl flex items-center justify-center mb-6 mx-auto ">
                 <LucideBike className="w-8 h-8 text-black" />
               </div>
-              <h3 className="text-3xl font-bold title-gradient mb-4 italic">EXPRESSLIEFERUNG ERHALTEN</h3>
-              <p className="text-l subtitle-text mb-4 inconsolata font-thin ">
+              <h3 className="text-xl sm:text-2xl md:text-3xl font-bold title-gradient mb-4 italic">EXPRESSLIEFERUNG ERHALTEN</h3>
+              <p className="text-base sm:text-lg subtitle-text mb-4 inconsolata font-thin px-4">
                 Medikamente in Berlin in max. 90 Min. geliefert oder in 15–30 Min. selbst in der Apotheke abholen.
               </p>
-              <div className="text-emerald-700 font-semibold italic">Powered by Wolt & Uber →</div>
+              <div className="text-emerald-700 font-semibold italic px-4">Powered by Wolt & Uber →</div>
             </div>
           </div>
         </div>
       </section>
 
-     <section className="py-24 bg-gradient-to-r section-container">
+     <section className="py-12 sm:py-16 md:py-24 bg-gradient-to-r section-container">
   <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center md:items-start text-center md:text-left">
-    {/* city descr. on the lef */}
-    <div className="w-full md:w-1/2 mt-8 md:mt-0 md:pr-12 flex flex-col justify-center ">
-    <h2 className="text-5xl font-bold mb-8 italic bg-gradient-to-r from-green-600 to-purple-600 bg-clip-text text-transparent">
+    {/* city descr. on the left */}
+    <div className="w-full md:w-1/2 mt-8 md:mt-0 md:pr-12 flex flex-col justify-center">
+    <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-6 md:mb-8 italic bg-gradient-to-r from-green-600 to-purple-600 bg-clip-text text-transparent">
       TO YOUR DOOR? IN MINUTES. </h2>
-    <p className="text-light subtitle-text">BERLIN in können deine Medikamente in 30-90 minuten geliefert werden, In folgenden Städten ansonsten per DHL in 1-3 Tagen 
+    <p className="text-sm sm:text-base subtitle-text mb-6">BERLIN in können deine Medikamente in 30-90 minuten geliefert werden, In folgenden Städten ansonsten per DHL in 1-3 Tagen 
     </p>
 
     
-    <div className="mt-6 text-lg subtitle-text">
+    <div className="mt-6 text-base sm:text-lg subtitle-text">
         {cities.map(city => (
                 <div key={city.name} className="mb-4">
                   <button
-                  className="w-full text-left text-2xl tracking-widest bg-gradient-to-r from-green-900 to-purple-800 bg-clip-text text-transparent py-2 px-4 italic-bold"
+                  className="w-full text-left text-lg sm:text-xl md:text-2xl tracking-widest bg-gradient-to-r from-green-900 to-purple-800 bg-clip-text text-transparent py-2 px-2 sm:px-4 italic-bold"
                   onClick={() => setOpenCity(openCity === city.name ? null : city.name)}
                   >
                     {city.name}
                   </button>
                   {openCity === city.name && (
-                    <div className="bg-white border border-emerald-200 rounded p-4 mt-2 subtitle-text whitespace-pre-line">
+                    <div className="bg-white border border-emerald-200 rounded p-3 sm:p-4 mt-2 subtitle-text whitespace-pre-line text-sm sm:text-base">
                       {city.explanation}
                     </div>
                   )}
@@ -397,45 +397,45 @@ export default function LandingPage() {
       </div>
     </div>
     {/* Map on the right, half width */}
-    <div className="w-full md:w-1/2 flex  gap-x-6 ">
+    <div className="w-full md:w-1/2 flex gap-x-6 mt-6 md:mt-0">
       <img
         src="/berlinmap.png"
         alt="Berlin Service Zones"
-        className="w-full max-w-md rounded-2xl shadow-xl border border-emerald-200"
+        className="w-full max-w-sm sm:max-w-md rounded-2xl shadow-xl border border-emerald-200"
       />
     </div>
   </div>
 </section>
 
       {/* Bottom CTA section */}
-      <section className="py-24 bg-gradient-to-br from-emerald-700 to-teal-800 text-white relative overflow-hidden section-container">
+      <section className="py-12 sm:py-16 md:py-24 bg-gradient-to-br from-emerald-700 to-teal-800 text-white relative overflow-hidden section-container">
         <div className="absolute inset-0">
           <div className="absolute top-20 left-20 w-64 h-64 bg-white/10 rounded-full blur-3xl" />
           <div className="absolute bottom-20 right-20 w-80 h-80 bg-white/5 rounded-full blur-3xl" />
         </div>
 
         <div className="relative max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
-          <h2 className="text-5xl font-bold mb-6 title-gradient">
-            Ready to Transform Your<br />Medical Cannabis Experience? .
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-6 title-gradient">
+            Ready to Transform Your<br className="hidden sm:block" />Medical Cannabis Experience?
           </h2>
-          <p className="text-xl text-emerald-100 mb-12 max-w-2xl mx-auto subtitle-text">
+          <p className="text-lg sm:text-xl text-emerald-100 mb-8 sm:mb-12 max-w-2xl mx-auto subtitle-text">
             Join thousands of patients who've found better care, faster relief, and a supportive community with reLeafZ.
           </p>
 
-          <div className="flex flex-col sm:flex-row gap-6 justify-center subtitle-text">
-            <Button className="bg-white text-emerald-700 hover:bg-gray-50 px-10 py-6 rounded-2xl text-lg font-bold shadow-xl hover:shadow-2xl">
+          <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 justify-center subtitle-text">
+            <Button className="bg-white text-emerald-700 hover:bg-gray-50 px-6 sm:px-10 py-4 sm:py-6 rounded-2xl text-base sm:text-lg font-bold shadow-xl hover:shadow-2xl">
               Start Your Journey Today
               <ChevronRight className="w-5 h-5 ml-2" />
             </Button>
             <Button 
               variant="outline" 
-              className="border-2 border-white/30 text-white hover:border-white hover:bg-white/10 px-10 py-6 rounded-2xl text-lg font-bold subtitle-text"
+              className="border-2 border-white/30 text-white hover:border-white hover:bg-white/10 px-6 sm:px-10 py-4 sm:py-6 rounded-2xl text-base sm:text-lg font-bold subtitle-text"
             >
               Speak with Luna
             </Button>
           </div>
 
-          <p className="text-emerald-200 text-sm mt-8 subtitle-text">
+          <p className="text-emerald-200 text-xs sm:text-sm mt-6 sm:mt-8 subtitle-text px-4">
             No commitment required • Speak with licensed doctors • GDPR compliant
           </p>
         </div>
