@@ -9,6 +9,7 @@ import words from '@/constants/index'
 import Header from './header'
 import '@/components/ui/Hero/Words-Sliding-Smooth.css' 
 
+
 // Font setup - using Inconsolata
 const inconsolataStyle = {
   fontFamily: '"Inconsolata", monospace',
