@@ -32,7 +32,7 @@ export default function MashallahForm({ postcode, onBack }: MashallahFormProps) 
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ ...formData, zip: postcode }),
+        body: JSON.stringify({ ...formData, postcode }),
       })
 
       const result = await response.json()
