@@ -2,6 +2,8 @@
 
 import React, { useState } from 'react'
 
+const API_BASE = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:3001'
+
 interface TreatmentRequest {
   id: number
   fullName: string
@@ -21,7 +23,7 @@ export default function DoctorDashboard() {
   // Doctor login
   const handleLogin = async () => {
     try {
-      const res = await fetch('http://localhost:3001/api/doctor/doctor-login', {
+      const res = await fetch(`${API_BASE}/api/doctor/doctor-login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
@@ -43,7 +45,7 @@ export default function DoctorDashboard() {
   // Fetch pending requests
   const fetchRequests = async (authToken: string) => {
     try {
-      const res = await fetch('http://localhost:3001/api/doctor/requests', {
+      const res = await fetch(`${API_BASE}/api/doctor/requests`, {
         headers: { Authorization: `Bearer ${authToken}` },
       })
       const data = await res.json()
@@ -58,7 +60,7 @@ export default function DoctorDashboard() {
   // Approve or Decline
   const updateRequest = async (id: number, action: 'approve' | 'decline') => {
     try {
-      const res = await fetch(`http://localhost:3001/api/doctor/requests/${id}/${action}`, {
+      const res = await fetch(`${API_BASE}/api/doctor/requests/${id}/${action}`, {
         method: 'POST',
         headers: { Authorization: `Bearer ${token}` },
       })

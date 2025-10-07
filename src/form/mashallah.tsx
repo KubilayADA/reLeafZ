@@ -17,6 +17,7 @@ export default function MashallahForm({ postcode, onBack }: MashallahFormProps) 
     symptoms: '',
     city: '',
   })
+  const API_BASE = process.env.REACT_APP_BACKEND_URL;
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
@@ -27,7 +28,7 @@ export default function MashallahForm({ postcode, onBack }: MashallahFormProps) 
     e.preventDefault()
     
     try {
-      const response = await fetch('http://localhost:3001/api/treatment/submit', {
+      const response = await fetch(`${API_BASE}/api/treatment/submit`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
