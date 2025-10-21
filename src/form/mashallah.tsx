@@ -17,7 +17,7 @@ export default function MashallahForm({ postcode, onBack }: MashallahFormProps) 
     symptoms: '',
     city: '',
   })
-  const API_BASE = process.env.REACT_APP_BACKEND_URL;
+  const API_BASE = process.env.NEXT_PUBLIC_API_URL;
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
