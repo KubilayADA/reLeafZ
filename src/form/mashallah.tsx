@@ -16,6 +16,7 @@ export default function MashallahForm({ postcode, onBack }: MashallahFormProps) 
     phone: '',
     symptoms: '',
   })
+  const [loading, setLoading] = useState(false)
 
   // Validate form fields
   const isFormValid = formData.fullName.trim() !== '' && 
@@ -30,6 +31,7 @@ export default function MashallahForm({ postcode, onBack }: MashallahFormProps) 
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
+    setLoading(true)
     
     try {
       const response = await fetch('http://localhost:3001/api/treatment/submit', {
@@ -58,6 +60,8 @@ export default function MashallahForm({ postcode, onBack }: MashallahFormProps) 
     } catch (error) {
       console.error('Error submitting form:', error)
       alert('An error occurred.')
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -151,18 +155,14 @@ export default function MashallahForm({ postcode, onBack }: MashallahFormProps) 
 
             <Button
               type="submit"
-<<<<<<< Updated upstream
-              className="w-full inconsolata bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-medium py-4 text-lg"
-=======
               disabled={loading || !isFormValid}
               className={`w-full inconsolata py-4 text-lg ${
                 isFormValid && !loading
                   ? 'bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white font-bold shadow-xl transition-all duration-200 transform hover:scale-[1.02]'
                   : 'bg-gray-300 text-gray-500 cursor-not-allowed font-medium'
               }`}
->>>>>>> Stashed changes
             >
-              Anfrage absenden
+              {loading ? 'Wird verarbeitet...' : 'Anfrage absenden'}
             </Button>
           </form>
         </div>
