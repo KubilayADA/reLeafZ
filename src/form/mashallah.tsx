@@ -3,6 +3,7 @@
 import React, { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { ArrowLeft } from 'lucide-react'
+import { useRouter } from 'next/navigation'
 
 interface MashallahFormProps {
   postcode: string
@@ -10,12 +11,16 @@ interface MashallahFormProps {
 }
 
 export default function MashallahForm({ postcode, onBack }: MashallahFormProps) {
+  const router = useRouter()
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
     phone: '',
     symptoms: '',
+    city: '',
   })
+  const [loading, setLoading] = useState(false)
+  const API_BASE = process.env.NEXT_PUBLIC_API_URL
 
   // Validate form fields
   const isFormValid = formData.fullName.trim() !== '' && 
@@ -30,34 +35,44 @@ export default function MashallahForm({ postcode, onBack }: MashallahFormProps) 
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
+    setLoading(true)
     
     try {
-      const response = await fetch('http://localhost:3001/api/treatment/submit', {
+      // Step 1: Create treatment request in PENDING_STRAIN_SELECTION state
+      const response = await fetch(`${API_BASE}/api/treatment/submit`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ ...formData, zip: postcode }),
+        body: JSON.stringify({ 
+          ...formData, 
+          postcode,
+          status: 'PENDING_STRAIN_SELECTION' // NEW: Mark as pending strain selection
+        }),
       })
 
       const result = await response.json()
 
       if (response.ok) {
-        alert('Request submitted successfully!')
-        console.log(result.data)
-        // Reset form
-        setFormData({
-          fullName: '',
-          email: '',
-          phone: '',
-          symptoms: '',
-        })
+        // Step 2: Store treatment request data in localStorage
+        localStorage.setItem('treatmentRequest', JSON.stringify({
+          id: result.data.id,
+          patientId: result.data.patientId,
+          pharmacyId: result.data.pharmacyId,
+          postcode,
+          ...formData
+        }))
+
+        // Step 3: Redirect to marketplace
+        router.push('/marketplace')
       } else {
         alert(result.message || 'Submission failed.')
       }
     } catch (error) {
       console.error('Error submitting form:', error)
       alert('An error occurred.')
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -96,7 +111,8 @@ export default function MashallahForm({ postcode, onBack }: MashallahFormProps) 
                 value={formData.fullName}
                 onChange={handleChange}
                 required
-                className="w-full p-3 border border-gray-300 rounded-lg inconsolata text-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"
+                disabled={loading}
+                className="w-full p-3 border border-gray-300 rounded-lg inconsolata text-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none disabled:bg-gray-100"
                 placeholder="Max Mustermann"
               />
             </div>
@@ -112,7 +128,8 @@ export default function MashallahForm({ postcode, onBack }: MashallahFormProps) 
                 value={formData.email}
                 onChange={handleChange}
                 required
-                className="w-full p-3 border border-gray-300 rounded-lg inconsolata text-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"
+                disabled={loading}
+                className="w-full p-3 border border-gray-300 rounded-lg inconsolata text-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none disabled:bg-gray-100"
                 placeholder="max@example.com"
               />
             </div>
@@ -128,7 +145,8 @@ export default function MashallahForm({ postcode, onBack }: MashallahFormProps) 
                 value={formData.phone}
                 onChange={handleChange}
                 required
-                className="w-full p-3 border border-gray-300 rounded-lg inconsolata text-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"
+                disabled={loading}
+                className="w-full p-3 border border-gray-300 rounded-lg inconsolata text-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none disabled:bg-gray-100"
                 placeholder="+49 30 12345678"
               />
             </div>
@@ -143,26 +161,28 @@ export default function MashallahForm({ postcode, onBack }: MashallahFormProps) 
                 value={formData.symptoms}
                 onChange={handleChange}
                 required
+                disabled={loading}
                 rows={4}
-                className="w-full p-3 border border-gray-300 rounded-lg inconsolata text-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none resize-none"
+                className="w-full p-3 border border-gray-300 rounded-lg inconsolata text-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none resize-none disabled:bg-gray-100"
                 placeholder="Bitte beschreiben Sie Ihre Beschwerden und warum Sie eine medizinische Cannabis-Behandlung benötigen..."
               />
             </div>
 
             <Button
               type="submit"
-<<<<<<< Updated upstream
-              className="w-full inconsolata bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-medium py-4 text-lg"
-=======
+              
               disabled={loading || !isFormValid}
               className={`w-full inconsolata py-4 text-lg ${
                 isFormValid && !loading
                   ? 'bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white font-bold shadow-xl transition-all duration-200 transform hover:scale-[1.02]'
                   : 'bg-gray-300 text-gray-500 cursor-not-allowed font-medium'
               }`}
->>>>>>> Stashed changes
+
+              disabled={loading}
+              className="w-full inconsolata bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-medium py-4 text-lg disabled:opacity-50"
+
             >
-              Anfrage absenden
+              {loading ? 'Wird verarbeitet...' : 'Anfrage absenden'}
             </Button>
           </form>
         </div>
