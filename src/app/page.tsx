@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useEffect, useState } from 'react'
-import { ArrowRight, ArrowDown, ListCheck, MousePointer, ZapIcon, Sparkles, Brain, Users, Shield, Clock, MapPin, ChevronRight, Star, BikeIcon, LucideBike, Hospital, HospitalIcon } from 'lucide-react'
+import { ArrowRight, ArrowDown, ListCheck, MousePointer, ZapIcon, Sparkles, Brain, Users, Shield, Clock, MapPin, ChevronRight, ChevronDown, Star, BikeIcon, LucideBike, Hospital, HospitalIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import MashallahForm from '@/form/mashallah'
@@ -150,7 +150,7 @@ export default function LandingPage() {
   
   return (
     <>
-      <div className="min-h-screen bg-gradient-to-br from-emerald-100 via-white to-teal-50" style={inconsolataStyle}>
+      <div className="min-h-screen inconsolata" style={inconsolataStyle}>
       {/* Header */}
       <Header 
         dialogOpen={dialogOpen}
@@ -175,7 +175,7 @@ export default function LandingPage() {
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             {/* Badge */}
-            <div className="inline-flex items-center px-4 py-2 bg-gradient-to-r mb-8">
+            <div className="inline-flex items-center px-4 py-2 bg-gradient-to-r-custom mb-8">
               <Sparkles className="w-4 h-4 mr-5" />
               <span className="text-sm font-medium subtitle-text">
                 AI-Powered, Ultra fast Medical Cannabis Service
@@ -298,15 +298,15 @@ export default function LandingPage() {
             {/* Trust badges */}
             <div className="flex flex-wrap items-center justify-center gap-8 text-sm text-gray-600">
               <div className="flex items-center">
-                <Shield className="w-5 h-5 text-emerald-600 mr-2" />
+                <Shield className="w-5 h-5 text-green-700 mr-2" />
                 GDPR Compliant
               </div>
               <div className="flex items-center">
-                <Clock className="w-5 h-5 text-emerald-600 mr-2" />
+                <Clock className="w-5 h-5 text-green-700 mr-2" />
                 Licensed Doctors
               </div>
               <div className="flex items-center">
-                <MapPin className="w-5 h-5 text-emerald-600 mr-2" />
+                <MapPin className="w-5 h-5 text-green-700 mr-2" />
                 Berlin Pharmacies
               </div>
             </div>
@@ -333,8 +333,8 @@ export default function LandingPage() {
           <div className="grid md:grid-cols-3 gap-8">
             {/* Step 1 - removed all the fancy hover stuff, was too much */}
             <div className="text-center">
-              <div className="w-16 h-16 bg-gradient-to-br from-green-600 to-green-700 rounded-2xl flex items-center justify-center mb-6 mx-auto">
-                <ListCheck className="w-8 h-8 text-black" />
+              <div className="w-16 h-16 rounded-2xl flex items-center justify-center mb-6 mx-auto icon-container">
+                <ListCheck className="w-8 h-8 text-white" />
               </div>
               <h3 className="text-xl sm:text-2xl md:text-3xl font-bold title-gradient mb-4 italic">FRAGENBOGEN AUSFULLEN</h3>
               <p className="text-base sm:text-lg subtitle-text inconsolata font-thin px-4">
@@ -344,8 +344,8 @@ export default function LandingPage() {
 
             {/* Step 2 */}
             <div className="text-center">
-              <div className="w-16 h-16 bg-gradient-to-br from-green-600 to-purple-600 rounded-2xl flex items-center justify-center mb-6 mx-auto">
-                <Hospital className="w-8 h-8 text-black" />
+              <div className="w-16 h-16 rounded-2xl flex items-center justify-center mb-6 mx-auto icon-container">
+                <Hospital className="w-8 h-8 text-white" />
               </div>
               <h3 className="text-xl sm:text-2xl md:text-3xl font-bold title-gradient mb-4 italic">BEHANDLUNG ERHALTEN</h3>
               <p className="text-base sm:text-lg subtitle-text inconsolata font-thin px-4">
@@ -355,20 +355,20 @@ export default function LandingPage() {
 
             {/* Step 3 */}
             <div className="text-center">
-              <div className="w-16 h-16 bg-gradient-to-br from-purple-400 to-purple-800 rounded-2xl flex items-center justify-center mb-6 mx-auto ">
-                <LucideBike className="w-8 h-8 text-black" />
+              <div className="w-16 h-16 rounded-2xl flex items-center justify-center mb-6 mx-auto icon-container">
+                <LucideBike className="w-8 h-8 text-white" />
               </div>
               <h3 className="text-xl sm:text-2xl md:text-3xl font-bold title-gradient mb-4 italic">EXPRESSLIEFERUNG ERHALTEN</h3>
               <p className="text-base sm:text-lg subtitle-text mb-4 inconsolata font-thin px-4">
                 Medikamente in Berlin in max. 90 Min. geliefert oder in 15–30 Min. selbst in der Apotheke abholen.
               </p>
-              <div className="text-emerald-700 font-semibold italic px-4">Powered by Wolt & Uber →</div>
+              <div className="text-gray-700 font-semibold italic px-4">Powered by Wolt & Uber →</div>
             </div>
           </div>
         </div>
       </section>
 
-     <section className="py-12 sm:py-16 md:py-24 bg-gradient-to-r section-container">
+     <section className="py-12 sm:py-16 md:py-24 bg-gradient-to-r-custom section-container">
   <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center md:items-start text-center md:text-left">
     {/* city descr. on the left */}
     <div className="w-full md:w-1/2 mt-8 md:mt-0 md:pr-12 flex flex-col justify-center">
@@ -380,18 +380,21 @@ export default function LandingPage() {
     
     <div className="mt-6 text-base sm:text-lg subtitle-text">
         {cities.map(city => (
-                <div key={city.name} className="mb-4">
+                <div key={city.name} className="mb-4 city-dropdown-wrapper">
                   <button
-                  className="w-full text-left text-lg sm:text-xl md:text-2xl tracking-widest bg-gradient-to-r from-green-900 to-purple-800 bg-clip-text text-transparent py-2 px-2 sm:px-4 italic-bold"
+                  className="w-full text-left text-lg sm:text-xl md:text-2xl tracking-widest bg-gradient-to-r from-green-900 to-purple-800 bg-clip-text text-transparent py-2 px-2 sm:px-4 flex items-center justify-between hover:opacity-80 transition-all duration-200 group cursor-pointer"
                   onClick={() => setOpenCity(openCity === city.name ? null : city.name)}
                   >
-                    {city.name}
+                    <span className="italic font-bold">{city.name}</span>
+                    <ChevronDown className={`w-5 h-5 text-gray-700 transition-transform duration-300 ${openCity === city.name ? 'rotate-180' : ''}`} />
                   </button>
-                  {openCity === city.name && (
-                    <div className="bg-white border border-emerald-200 rounded p-3 sm:p-4 mt-2 subtitle-text whitespace-pre-line text-sm sm:text-base">
+                  <div className={`overflow-hidden transition-all duration-300 ease-in-out ${
+                    openCity === city.name ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
+                  }`}>
+                    <div className="bg-white border border-emerald-200 rounded p-3 sm:p-4 mt-2 subtitle-text whitespace-pre-line text-sm sm:text-base city-dropdown-content">
                       {city.explanation}
                     </div>
-                  )}
+                  </div>
                 </div>
         ))}
       </div>
@@ -408,34 +411,29 @@ export default function LandingPage() {
 </section>
 
       {/* Bottom CTA section */}
-      <section className="py-12 sm:py-16 md:py-24 bg-gradient-to-br from-emerald-700 to-teal-800 text-white relative overflow-hidden section-container">
-        <div className="absolute inset-0">
-          <div className="absolute top-20 left-20 w-64 h-64 bg-white/10 rounded-full blur-3xl" />
-          <div className="absolute bottom-20 right-20 w-80 h-80 bg-white/5 rounded-full blur-3xl" />
-        </div>
-
-        <div className="relative max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
+      <section className="py-12 sm:py-16 md:py-24 section-container">
+        <div className="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-6 title-gradient">
             Ready to Transform Your<br className="hidden sm:block" />Medical Cannabis Experience?
           </h2>
-          <p className="text-lg sm:text-xl text-emerald-100 mb-8 sm:mb-12 max-w-2xl mx-auto subtitle-text">
+          <p className="text-lg sm:text-xl subtitle-text mb-8 sm:mb-12 max-w-2xl mx-auto">
             Join thousands of patients who've found better care, faster relief, and a supportive community with reLeafZ.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 justify-center subtitle-text">
-            <Button className="bg-white text-emerald-700 hover:bg-gray-50 px-6 sm:px-10 py-4 sm:py-6 rounded-2xl text-base sm:text-lg font-bold shadow-xl hover:shadow-2xl">
+            <Button className="bg-white text-gray-900 hover:bg-gray-50 px-6 sm:px-10 py-4 sm:py-6 rounded-2xl text-base sm:text-lg font-bold shadow-xl hover:shadow-2xl">
               Start Your Journey Today
               <ChevronRight className="w-5 h-5 ml-2" />
             </Button>
             <Button 
               variant="outline" 
-              className="border-2 border-white/30 text-white hover:border-white hover:bg-white/10 px-6 sm:px-10 py-4 sm:py-6 rounded-2xl text-base sm:text-lg font-bold subtitle-text"
+              className="border-2 border-gray-900 text-gray-900 hover:bg-gray-100 px-6 sm:px-10 py-4 sm:py-6 rounded-2xl text-base sm:text-lg font-bold subtitle-text"
             >
               Speak with Luna
             </Button>
           </div>
 
-          <p className="text-emerald-200 text-xs sm:text-sm mt-6 sm:mt-8 subtitle-text px-4">
+          <p className="subtitle-text text-xs sm:text-sm mt-6 sm:mt-8 px-4">
             No commitment required • Speak with licensed doctors • GDPR compliant
           </p>
         </div>
