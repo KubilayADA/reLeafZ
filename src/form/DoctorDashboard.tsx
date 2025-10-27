@@ -76,28 +76,48 @@ export default function DoctorDashboard() {
   // If not logged in, show login form
   if (!token) {
     return (
-      <div className="p-8 max-w-md mx-auto">
-        <h1 className="text-2xl font-bold mb-4">Doctor Login</h1>
-        <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={e => setEmail(e.target.value)}
-          className="w-full mb-2 p-2 border rounded"
-        />
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={e => setPassword(e.target.value)}
-          className="w-full mb-2 p-2 border rounded"
-        />
-        <button
-          onClick={handleLogin}
-          className="w-full bg-green-600 text-white p-2 rounded hover:bg-green-700"
-        >
-          Login
-        </button>
+      <div className="min-h-screen flex items-center justify-center px-4 inconsolata">
+        <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-8">
+          <h2 className="text-3xl font-bold mb-2 title-gradient">Arzt Login</h2>
+          <p className="text-sm subtitle-text mb-6">Auf das medizinische Dashboard zugreifen</p>
+          
+          <div className="space-y-4">
+            <div>
+              <label htmlFor="email" className="block text-sm font-medium form-label mb-2">
+                E-Mail Adresse
+              </label>
+              <input
+                type="email"
+                id="email"
+                placeholder="doctor@example.com"
+                value={email}
+                onChange={e => setEmail(e.target.value)}
+                className="w-full p-3 border border-gray-300 rounded-lg inconsolata text-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+              />
+            </div>
+            
+            <div>
+              <label htmlFor="password" className="block text-sm font-medium form-label mb-2">
+                Passwort
+              </label>
+              <input
+                type="password"
+                id="password"
+                placeholder="••••••••"
+                value={password}
+                onChange={e => setPassword(e.target.value)}
+                className="w-full p-3 border border-gray-300 rounded-lg inconsolata text-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+              />
+            </div>
+            
+            <button
+              onClick={handleLogin}
+              className="w-full inconsolata bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-bold py-3 text-lg rounded-lg shadow-lg transition-all duration-200 transform hover:scale-[1.02]"
+            >
+              Anmelden
+            </button>
+          </div>
+        </div>
       </div>
     )
   }

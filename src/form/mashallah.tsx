@@ -22,6 +22,12 @@ export default function MashallahForm({ postcode, onBack }: MashallahFormProps) 
   const [loading, setLoading] = useState(false)
   const API_BASE = process.env.NEXT_PUBLIC_API_URL
 
+  // Validate form fields
+  const isFormValid = formData.fullName.trim() !== '' && 
+                     formData.email.trim() !== '' && 
+                     formData.phone.trim() !== '' && 
+                     formData.symptoms.trim() !== ''
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
     setFormData(prev => ({ ...prev, [name]: value }))
@@ -164,8 +170,12 @@ export default function MashallahForm({ postcode, onBack }: MashallahFormProps) 
 
             <Button
               type="submit"
-              disabled={loading}
-              className="w-full inconsolata bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-medium py-4 text-lg disabled:opacity-50"
+              disabled={loading || !isFormValid}
+              className={`w-full inconsolata py-4 text-lg ${
+                isFormValid && !loading
+                  ? 'bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white font-bold shadow-xl transition-all duration-200 transform hover:scale-[1.02]'
+                  : 'bg-gray-300 text-gray-500 cursor-not-allowed font-medium'
+              }`}
             >
               {loading ? 'Wird verarbeitet...' : 'Anfrage absenden'}
             </Button>
