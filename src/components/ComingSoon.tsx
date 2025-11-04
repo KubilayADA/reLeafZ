@@ -19,7 +19,7 @@ const ComingSoon: React.FC = () => {
       </div>
 
       {/* Main content card */}
-      <div className="relative z-10 max-w-2xl w-full">
+      <div className="relative z-10 max-w-xl w-full">
         <div 
           className="bg-white border-2 border-black rounded-2xl p-8 sm:p-12 shadow-2xl"
           style={{
@@ -29,9 +29,9 @@ const ComingSoon: React.FC = () => {
           {/* Logo */}
           <div className="flex justify-center mb-8">
             <img
-              src="/logo.png"
+              src="/logo1.png"
               alt="ReLeafZ Logo"
-              className="w-48 sm:w-64 h-auto"
+              className="w-96 sm:w-204 h-auto"
             />
           </div>
 
