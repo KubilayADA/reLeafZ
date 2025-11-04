@@ -113,7 +113,7 @@ export default function MashallahForm({ postcode, onBack }: MashallahFormProps) 
                 required
                 disabled={loading}
                 className="w-full p-3 border border-gray-300 rounded-lg inconsolata text-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none disabled:bg-gray-100"
-                placeholder="Max Mustermann"
+                placeholder="Patient Mustermann"
               />
             </div>
 
@@ -130,7 +130,7 @@ export default function MashallahForm({ postcode, onBack }: MashallahFormProps) 
                 required
                 disabled={loading}
                 className="w-full p-3 border border-gray-300 rounded-lg inconsolata text-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none disabled:bg-gray-100"
-                placeholder="max@example.com"
+                placeholder="patient@example.com"
               />
             </div>
 

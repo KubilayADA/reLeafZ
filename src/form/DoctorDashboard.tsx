@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState } from 'react'
+import {Eye, EyeOff, Lock, Mail, User } from 'lucide-react';
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
 
@@ -17,6 +18,7 @@ interface TreatmentRequest {
 export default function DoctorDashboard() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
   const [token, setToken] = useState('')
   const [requests, setRequests] = useState<TreatmentRequest[]>([])
 
@@ -73,6 +75,8 @@ export default function DoctorDashboard() {
     }
   }
 
+  // go back to home page To do
+  
   // If not logged in, show login form
   if (!token) {
     return (
@@ -86,28 +90,41 @@ export default function DoctorDashboard() {
               <label htmlFor="email" className="block text-sm font-medium form-label mb-2">
                 E-Mail Adresse
               </label>
-              <input
-                type="email"
-                id="email"
-                placeholder="doctor@example.com"
-                value={email}
-                onChange={e => setEmail(e.target.value)}
-                className="w-full p-3 border border-gray-300 rounded-lg inconsolata text-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
-              />
+              <div className="relative">
+                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+                <input
+                  type="email"
+                  id="email"
+                  placeholder="doctor@example.com"
+                  value={email}
+                  onChange={e => setEmail(e.target.value)}
+                  className="w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg inconsolata text-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                />
+              </div>
             </div>
             
             <div>
               <label htmlFor="password" className="block text-sm font-medium form-label mb-2">
                 Passwort
               </label>
-              <input
-                type="password"
-                id="password"
-                placeholder="••••••••"
-                value={password}
-                onChange={e => setPassword(e.target.value)}
-                className="w-full p-3 border border-gray-300 rounded-lg inconsolata text-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
-              />
+              <div className="relative">
+                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+                <input
+                  type={showPassword ? "text" : "password"}
+                  id="password"
+                  placeholder="••••••••"
+                  value={password}
+                  onChange={e => setPassword(e.target.value)}
+                  className="w-full pl-10 pr-10 py-3 border border-gray-300 rounded-lg inconsolata text-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none"
+                >
+                  {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                </button>
+              </div>
             </div>
             
             <button
