@@ -21,14 +21,19 @@ const ComingSoon: React.FC = () => {
         width: '100%',
         textAlign: 'center'
       }}>
-        <h1 style={{
-          fontSize: '48px',
-          marginBottom: '10px',
-          color: '#667eea',
-          fontWeight: 'bold'
-        }}>
-          🌿 ReLeafZ
-        </h1>
+        {/* Logo */}
+        <img
+          src="/logo.png"
+          alt="ReLeafZ Logo"
+          style={{
+            width: '200px',
+            height: 'auto',
+            marginBottom: '30px',
+            marginLeft: 'auto',
+            marginRight: 'auto',
+            display: 'block'
+          }}
+        />
         
         <h2 style={{
           fontSize: '24px',
