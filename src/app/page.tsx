@@ -8,7 +8,9 @@ import MashallahForm from '@/form/mashallah'
 import words from '@/constants/index'
 import Header from './header'
 import '@/components/ui/Hero/Words-Sliding-Smooth.css' 
+import ComingSoon from '@/components/ComingSoon'  
 
+const COMING_SOON_MODE = true;
 
 // Font setup - using Inconsolata
 const inconsolataStyle = {
@@ -66,6 +68,10 @@ const FloatingMonkey = () => {
 }
 
 export default function LandingPage() {
+  // Show coming soon page if flag is true
+  if (COMING_SOON_MODE) {
+    return <ComingSoon />;
+  }
   const [testimonialIdx, setTestimonialIdx] = useState(0)
   const [openCity, setOpenCity] = useState<string | null>(null)
   const [dialogOpen, setDialogOpen] = useState(false)
