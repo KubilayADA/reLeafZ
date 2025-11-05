@@ -6,13 +6,15 @@ import { Brain, Clock, ZapIcon, Leaf, Sparkles } from 'lucide-react';
 const ComingSoon: React.FC = () => {
   return (
     <div 
-      className="min-h-screen flex flex-col items-center justify-center p-4 sm:p-8 relative overflow-hidden"
+      className="min-h-screen min-h-dvh flex flex-col items-center justify-start p-4 sm:p-8 relative overflow-x-hidden"
       style={{
-        fontFamily: '"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif'
+        fontFamily: '"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
+        paddingTop: 'env(safe-area-inset-top, 0px)',
+        paddingBottom: 'env(safe-area-inset-bottom, 0px)'
       }}
     >
       {/* Beautiful organic gradient background - aesthetic and smooth */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+      <div className="fixed inset-0 overflow-hidden pointer-events-none" style={{ minHeight: '100dvh' }}>
         {/* Base color - soft cream/green foundation */}
         <div 
           className="absolute inset-0"
@@ -195,9 +197,9 @@ const ComingSoon: React.FC = () => {
       </div>
 
       {/* Main content - no card wrapper */}
-      <div className="relative z-10 max-w-2xl w-full animate-fade-in px-4 sm:px-8">
+      <div className="relative z-10 max-w-2xl w-full animate-fade-in px-4 sm:px-8 py-8 sm:py-12">
         {/* Logo - Made smaller */}
-        <div className="flex justify-center mb-8">
+        <div className="flex justify-center mb-8 mt-4 sm:mt-0">
           <img
             src="/logo1.png"
             alt="ReLeafZ Logo"
@@ -211,11 +213,12 @@ const ComingSoon: React.FC = () => {
           <div className="animated-border-box inline-flex items-center rounded-full">
             <div className="inline-flex items-center px-5 py-2.5 rounded-full" style={{ background: 'transparent', display: 'inline-flex' }}>
               <Sparkles className="w-4 h-4 mr-2 animate-pulse" style={{ 
-                background: 'linear-gradient(135deg, #10b981, #34d399)',
+                background: 'linear-gradient(135deg, #059669, #10b981)',
                 WebkitBackgroundClip: 'text',
                 backgroundClip: 'text',
                 WebkitTextFillColor: 'transparent',
-                color: '#10b981'
+                color: '#059669',
+                filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.15))'
               }} />
               <span 
                 className="text-sm font-semibold tracking-wide"
@@ -235,16 +238,17 @@ const ComingSoon: React.FC = () => {
           AI-powered strain matching analyzes your medical questionnaire to recommend personalized cannabis strains.
         </p>
 
-        {/* Early Access Announcement - Transparent with animated border */}
-        <div className="animated-border-box mb-10 rounded-2xl max-w-2xl mx-auto">
+        {/* Early Access Announcement - Transparent with simple border */}
+        <div className="mb-10 rounded-2xl max-w-2xl mx-auto" style={{ border: '1px solid rgba(0, 0, 0, 0.1)' }}>
           <div className="rounded-2xl p-6" style={{ background: 'transparent' }}>
             <div className="flex items-start gap-4">
               <Sparkles className="w-8 h-8 flex-shrink-0 mt-1" style={{ 
-                background: 'linear-gradient(135deg, #10b981, #34d399)',
+                background: 'linear-gradient(135deg, #059669, #10b981)',
                 WebkitBackgroundClip: 'text',
                 backgroundClip: 'text',
                 WebkitTextFillColor: 'transparent',
-                color: '#10b981'
+                color: '#059669',
+                filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.15))'
               }} />
               <div className="flex-1 pt-0.5">
                 <h3 
@@ -267,7 +271,7 @@ const ComingSoon: React.FC = () => {
                     border: '1px solid rgba(2, 120, 82, 0.2)'
                   }}
                 >
-                  <Clock className="w-3.5 h-3.5" />
+                  <Clock className="w-3.5 h-3.5" style={{ color: '#027852', filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.1))' }} />
                   <span>Limited spots available</span>
                 </div>
               </div>
@@ -280,12 +284,12 @@ const ComingSoon: React.FC = () => {
           {/* Feature 1 - Flash/ZapIcon */}
           <div className="text-center transition-all duration-300">
             <ZapIcon className="w-10 h-10 mb-4 mx-auto" style={{ 
-              background: 'linear-gradient(135deg, #34d399, #06b6d4)',
+              background: 'linear-gradient(135deg, #059669, #0891b2)',
               WebkitBackgroundClip: 'text',
               backgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
-              color: '#34d399',
-              filter: 'drop-shadow(0 2px 4px rgba(255,255,255,0.5))'
+              color: '#059669',
+              filter: 'drop-shadow(0 2px 6px rgba(0,0,0,0.2))'
             }} />
             <h3 
               className="text-sm font-semibold mb-2"
@@ -304,8 +308,8 @@ const ComingSoon: React.FC = () => {
           {/* Feature 2 - Brain */}
           <div className="text-center transition-all duration-300">
             <Brain className="w-10 h-10 mb-4 mx-auto" style={{ 
-              color: '#a78bfa',
-              filter: 'drop-shadow(0 2px 4px rgba(255,255,255,0.5))'
+              color: '#7c3aed',
+              filter: 'drop-shadow(0 2px 6px rgba(0,0,0,0.2))'
             }} />
             <h3 
               className="text-sm font-semibold mb-2"
@@ -324,12 +328,12 @@ const ComingSoon: React.FC = () => {
           {/* Feature 3 - Leaf */}
           <div className="text-center transition-all duration-300">
             <Leaf className="w-10 h-10 mb-4 mx-auto" style={{ 
-              background: 'linear-gradient(135deg, #0ea5e9, #3b82f6)',
+              background: 'linear-gradient(135deg, #0891b2, #2563eb)',
               WebkitBackgroundClip: 'text',
               backgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
-              color: '#0ea5e9',
-              filter: 'drop-shadow(0 2px 4px rgba(255,255,255,0.5))'
+              color: '#0891b2',
+              filter: 'drop-shadow(0 2px 6px rgba(0,0,0,0.2))'
             }} />
             <h3 
               className="text-sm font-semibold mb-2"
@@ -351,7 +355,7 @@ const ComingSoon: React.FC = () => {
 
         {/* Footer text */}
         <p 
-          className="text-center text-sm font-light"
+          className="text-center text-sm font-light mb-8 sm:mb-12"
           style={{ color: '#1f2937', textShadow: '0 1px 4px rgba(255,255,255,0.8)' }}
         >
           © 2025 ReLeafZ
