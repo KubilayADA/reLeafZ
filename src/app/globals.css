@@ -135,4 +135,12 @@
     min-height: 100vh;
     min-height: 100dvh;
   }
+  
+  /* ComingSoon page specific styles */
+  body:has(.coming-soon-page) {
+    background: #0a0a0a;
+  }
+  html:has(.coming-soon-page) {
+    background: #0a0a0a;
+  }
 }
