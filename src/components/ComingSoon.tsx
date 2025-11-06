@@ -52,7 +52,7 @@ const ComingSoon: React.FC = () => {
 
   return (
     <div 
-      className="coming-soon-page min-h-screen min-h-dvh flex items-center justify-center relative overflow-hidden"
+      className="coming-soon-page min-h-screen min-h-dvh relative overflow-y-auto"
       style={{
         background: '#0a0a0a',
         fontFamily: '"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
@@ -60,18 +60,12 @@ const ComingSoon: React.FC = () => {
         padding: 0,
         width: '100vw',
         minHeight: '100dvh',
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        zIndex: 0,
       }}
     >
       {/* Futuristic glowing background elements */}
       <div 
         className="fixed overflow-hidden pointer-events-none"
-        style={{
+          style={{
           top: 0,
           left: 0,
           right: 0,
@@ -143,10 +137,10 @@ const ComingSoon: React.FC = () => {
 
       {/* Main content */}
           <div 
-        className="relative z-10 w-full max-w-4xl mx-auto text-center"
+        className="relative z-10 w-full max-w-4xl mx-auto text-center flex flex-col items-center justify-center min-h-screen min-h-dvh py-8"
             style={{
-          paddingTop: 'max(env(safe-area-inset-top, 0px), 1rem)',
-          paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 1rem)',
+          paddingTop: 'max(env(safe-area-inset-top, 0px), 2rem)',
+          paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 2rem)',
           paddingLeft: 'max(env(safe-area-inset-left, 0px), 1rem)',
           paddingRight: 'max(env(safe-area-inset-right, 0px), 1rem)',
         }}
