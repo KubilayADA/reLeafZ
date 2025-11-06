@@ -16,9 +16,7 @@ export const metadata: Metadata = {
   title: "releafZ ",
   description: "AI-powered medical cannabis platform",
   icons: {
-    icon: [
-      { url: '/logo1.ico', sizes: '540x540', type: 'image/x-icon' },
-    ],
+    icon: '/logo1.ico',
     shortcut: '/logo1.ico',
     apple: '/logo1.ico',
   },
