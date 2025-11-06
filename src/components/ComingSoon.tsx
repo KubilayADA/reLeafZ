@@ -1,10 +1,18 @@
 'use client'
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ZapIcon, Brain, Leaf, Lock } from 'lucide-react';
 
 const ComingSoon: React.FC = () => {
   const [email, setEmail] = useState('');
+  const [particles, setParticles] = useState<Array<{
+    id: number;
+    size: number;
+    left: number;
+    top: number;
+    duration: number;
+    delay: number;
+  }>>([]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -12,30 +20,57 @@ const ComingSoon: React.FC = () => {
     console.log('Email submitted:', email);
   };
 
-  // Generate fixed particle positions to prevent re-renders
-  const particles = useMemo(() => {
-    return Array.from({ length: 6 }, (_, i) => ({
-      id: i,
-      size: Math.random() * 4 + 2,
-      left: Math.random() * 100,
-      top: Math.random() * 100,
-      duration: Math.random() * 10 + 10,
-      delay: Math.random() * 5,
-    }));
+  // Generate particle positions only on client side to avoid hydration mismatch
+  useEffect(() => {
+    setParticles(
+      Array.from({ length: 6 }, (_, i) => ({
+        id: i,
+        size: Math.random() * 4 + 2,
+        left: Math.random() * 100,
+        top: Math.random() * 100,
+        duration: Math.random() * 10 + 10,
+        delay: Math.random() * 5,
+      }))
+    );
   }, []);
 
   return (
     <div 
-      className="min-h-screen min-h-dvh flex items-center justify-center p-4 sm:p-6 md:p-8 relative overflow-hidden"
+      className="min-h-screen min-h-dvh flex items-center justify-center relative overflow-hidden"
       style={{
         background: '#0a0a0a',
         fontFamily: '"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
+        margin: 0,
+        padding: 0,
+        width: '100vw',
+        minHeight: '100dvh',
+        position: 'relative',
       }}
     >
       {/* Futuristic glowing background elements */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none">
+      <div 
+        className="fixed overflow-hidden pointer-events-none"
+          style={{
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          width: '100vw',
+          height: '100dvh',
+          zIndex: 0,
+        }}
+      >
         {/* Base dark background */}
-        <div className="absolute inset-0 bg-gradient-to-b from-[#0a0a0a] via-[#0f0f0f] to-[#0a0a0a]" />
+        <div 
+          className="absolute"
+          style={{
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: 'linear-gradient(to bottom, #0a0a0a 0%, #0f0f0f 50%, #0a0a0a 100%)',
+          }}
+        />
         
         {/* Glowing horizontal ring/line - positioned behind form elements */}
         <div 
@@ -68,7 +103,7 @@ const ComingSoon: React.FC = () => {
         
         {/* Floating particles/glow dots */}
         {particles.map((particle) => (
-          <div
+          <div 
             key={particle.id}
             className="absolute rounded-full"
             style={{
@@ -83,10 +118,18 @@ const ComingSoon: React.FC = () => {
             }}
           />
         ))}
-      </div>
+          </div>
 
       {/* Main content */}
-      <div className="relative z-10 w-full max-w-4xl mx-auto text-center">
+          <div 
+        className="relative z-10 w-full max-w-4xl mx-auto text-center"
+            style={{
+          paddingTop: 'max(env(safe-area-inset-top, 0px), 1rem)',
+          paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 1rem)',
+          paddingLeft: 'max(env(safe-area-inset-left, 0px), 1rem)',
+          paddingRight: 'max(env(safe-area-inset-right, 0px), 1rem)',
+        }}
+      >
         {/* Logo */}
         <div className="flex justify-center mb-8 md:mb-12">
           <img
@@ -154,13 +197,13 @@ const ComingSoon: React.FC = () => {
               type="submit"
               disabled
               className="px-6 md:px-8 py-3 md:py-4 bg-transparent border border-white/20 rounded-lg text-white font-medium hover:border-[#22d3ee] hover:text-[#22d3ee] transition-all whitespace-nowrap cursor-not-allowed opacity-70"
-              style={{
+                  style={{
                 backdropFilter: 'blur(10px)',
-              }}
-            >
+                  }}
+                >
               Get Notified
             </button>
-          </div>
+                </div>
 
           {/* Mobile: Vertical layout */}
           <div className="flex flex-col gap-4 sm:hidden">
@@ -212,7 +255,7 @@ const ComingSoon: React.FC = () => {
                   filter: 'drop-shadow(0 0 10px rgba(34, 211, 238, 0.6))',
                 }} 
               />
-            </div>
+        </div>
             <h3 
               className="text-sm md:text-base font-semibold mb-2"
               style={{ color: '#ffffff' }}
