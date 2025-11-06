@@ -34,9 +34,25 @@ const ComingSoon: React.FC = () => {
     );
   }, []);
 
+  // Set dark background on html/body only for ComingSoon page
+  useEffect(() => {
+    const html = document.documentElement;
+    const body = document.body;
+    const originalHtmlBg = html.style.background;
+    const originalBodyBg = body.style.background;
+
+    html.style.background = '#0a0a0a';
+    body.style.background = '#0a0a0a';
+
+    return () => {
+      html.style.background = originalHtmlBg;
+      body.style.background = originalBodyBg;
+    };
+  }, []);
+
   return (
     <div 
-      className="min-h-screen min-h-dvh flex items-center justify-center relative overflow-hidden"
+      className="coming-soon-page min-h-screen min-h-dvh flex items-center justify-center relative overflow-hidden"
       style={{
         background: '#0a0a0a',
         fontFamily: '"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
@@ -44,13 +60,18 @@ const ComingSoon: React.FC = () => {
         padding: 0,
         width: '100vw',
         minHeight: '100dvh',
-        position: 'relative',
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        zIndex: 0,
       }}
     >
       {/* Futuristic glowing background elements */}
       <div 
         className="fixed overflow-hidden pointer-events-none"
-          style={{
+        style={{
           top: 0,
           left: 0,
           right: 0,
