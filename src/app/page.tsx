@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { ArrowRight, ArrowDown, ListCheck, MousePointer, ZapIcon, Sparkles, Brain, Users, Shield, Clock, MapPin, ChevronRight, ChevronDown, Star, BikeIcon, LucideBike, Hospital, HospitalIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
@@ -66,6 +67,7 @@ const FloatingMonkey = () => {
 }
 
 export default function LandingPage() {
+  const router = useRouter()
   const [testimonialIdx, setTestimonialIdx] = useState(0)
   const [openCity, setOpenCity] = useState<string | null>(null)
   const [dialogOpen, setDialogOpen] = useState(false)
@@ -96,8 +98,8 @@ export default function LandingPage() {
     if (zipInput.trim() && isValidBerlinPostcode(zipInput)) {
       setFormData(prev => ({ ...prev, zip: zipInput }));
       setDialogOpen(false);
-      // Valid Berlin postcode - show the form
-      setShowForm(true);
+      // Valid Berlin postcode - navigate to form page
+      router.push(`/form?postcode=${zipInput}`);
     }
   };
   
@@ -218,8 +220,7 @@ export default function LandingPage() {
               <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
                 <DialogTrigger asChild>
                   <Button
-                    className="text-base font-normal border border-black inconsolata px-8 py-3 text-white shadow-lg hover:shadow-xl flex items-center justify-center min-w-64 w-auto"
-                    style={{ fontFamily: 'Inconsolata, monospace', fontWeight: 400, backgroundColor: '#72906F', color: 'white', fontSize: '12px', lineHeight: '24px' }}
+                    className="behandlung-button px-8 py-3 flex items-center justify-center min-w-64 w-auto"
                   >
                     BEHANDLUNG ANFRAGEN
                     <ChevronRight className="w-5 h-5 ml-2" />
@@ -247,11 +248,7 @@ export default function LandingPage() {
                     <Button
                       onClick={handlePostcodeSubmit}
                       disabled={!zipInput.trim() || !isValidBerlinPostcode(zipInput)}
-                      className={`w-full inconsolata text-white font-medium py-3 ${
-                        !zipInput.trim() || !isValidBerlinPostcode(zipInput) 
-                          ? 'opacity-50 cursor-not-allowed bg-gray-400' 
-                          : 'animated-button'
-                      }`}
+                      className="w-full btn-primary font-medium py-3"
                     >
                       Weiter
                     </Button>
@@ -291,7 +288,7 @@ export default function LandingPage() {
                 <input type="tel" name="phone" placeholder="Phone Number" onChange={handleChange} required className="w-full p-2 border rounded" />
                 <input type="text" name="city" placeholder="City" onChange={handleChange} required className="w-full p-2 border rounded" />
                 <textarea name="symptoms" placeholder="Describe your symptoms..." onChange={handleChange} required className="w-full p-2 border rounded" />
-                <button type="submit" className="bg-emerald-600 text-white px-4 py-2 rounded hover:bg-emerald-700">
+                <button type="submit" className="btn-secondary px-4 py-2 rounded">
                   Submit Request
                 </button>
               </form>
@@ -424,13 +421,12 @@ export default function LandingPage() {
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 justify-center subtitle-text">
-            <Button className="bg-white text-gray-900 hover:bg-gray-50 px-6 sm:px-10 py-4 sm:py-6 rounded-2xl text-base sm:text-lg font-bold shadow-xl hover:shadow-2xl">
+            <Button className="btn-outline px-6 sm:px-10 py-4 sm:py-6 rounded-2xl text-base sm:text-lg font-bold">
               Start Your Journey Today
               <ChevronRight className="w-5 h-5 ml-2" />
             </Button>
             <Button 
-              variant="outline" 
-              className="border-2 border-gray-900 text-gray-900 hover:bg-gray-100 px-6 sm:px-10 py-4 sm:py-6 rounded-2xl text-base sm:text-lg font-bold subtitle-text"
+              className="btn-outline px-6 sm:px-10 py-4 sm:py-6 rounded-2xl text-base sm:text-lg font-bold"
             >
               Speak with Luna
             </Button>

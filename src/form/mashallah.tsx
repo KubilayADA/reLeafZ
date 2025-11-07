@@ -2,8 +2,9 @@
 
 import React, { useState } from 'react'
 import { Button } from '@/components/ui/button'
-import { ArrowLeft } from 'lucide-react'
+import { ArrowLeft, MapPin, Building2 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
+import '@/app/main.css'
 
 interface MashallahFormProps {
   postcode: string
@@ -16,7 +17,7 @@ export default function MashallahForm({ postcode, onBack }: MashallahFormProps) 
     fullName: '',
     email: '',
     phone: '',
-    symptoms: '',
+    street: '',
     city: '',
   })
   const [loading, setLoading] = useState(false)
@@ -26,7 +27,8 @@ export default function MashallahForm({ postcode, onBack }: MashallahFormProps) 
   const isFormValid = formData.fullName.trim() !== '' && 
                      formData.email.trim() !== '' && 
                      formData.phone.trim() !== '' && 
-                     formData.symptoms.trim() !== ''
+                     formData.street.trim() !== '' &&
+                     formData.city.trim() !== ''
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
@@ -47,59 +49,95 @@ export default function MashallahForm({ postcode, onBack }: MashallahFormProps) 
         body: JSON.stringify({ 
           ...formData, 
           postcode,
-          status: 'PENDING_STRAIN_SELECTION' // NEW: Mark as pending strain selection
+          status: 'PENDING_STRAIN_SELECTION'
         }),
       })
 
-      const result = await response.json()
+      let result
+      try {
+        result = await response.json()
+      } catch (parseError) {
+        console.error('Error parsing response:', parseError)
+        // If response parsing fails, still proceed with questionnaire
+        result = { data: {} }
+      }
 
-      if (response.ok) {
-        // Step 2: Store treatment request data in localStorage
-        localStorage.setItem('treatmentRequest', JSON.stringify({
-          id: result.data.id,
-          patientId: result.data.patientId,
-          pharmacyId: result.data.pharmacyId,
-          postcode,
-          ...formData
-        }))
+      // Step 2: Store treatment request data in localStorage (even if API fails)
+      const treatmentRequestData = {
+        id: result.data?.id || `temp-${Date.now()}`,
+        patientId: result.data?.patientId || null,
+        pharmacyId: result.data?.pharmacyId || null,
+        postcode,
+        ...formData
+      }
+      localStorage.setItem('treatmentRequest', JSON.stringify(treatmentRequestData))
 
-        // Step 3: Redirect to marketplace
-        router.push('/marketplace')
+      // Step 3: Store postcode in localStorage for back navigation
+      localStorage.setItem('formPostcode', postcode)
+
+      if (response.ok && result.data) {
+        // Step 4: Check if patient is registered
+        // The API may return isRegistered, isNewPatient, or patientExists
+        const isRegistered = result.data?.isRegistered === true || 
+                            (result.data?.isNewPatient === false && result.data?.isRegistered !== false)
+        const isNewPatient = result.data?.isNewPatient === true || 
+                            result.data?.isRegistered === false ||
+                            result.data?.patientExists === false
+
+        // Step 5: Redirect based on registration status
+        // If explicitly registered, go to marketplace; otherwise show questionnaire
+        if (isRegistered && !isNewPatient) {
+          // Registered patient → go directly to marketplace
+          router.push('/marketplace')
+        } else {
+          // New patient or status unclear → redirect to questionnaire
+          router.push('/questionnaire')
+        }
       } else {
-        alert(result.message || 'Submission failed.')
+        // If API call fails, still redirect to questionnaire to allow user to continue
+        console.warn('API call failed or returned error, but proceeding to questionnaire:', result.message || 'Unknown error')
+        router.push('/questionnaire')
       }
     } catch (error) {
       console.error('Error submitting form:', error)
-      alert('An error occurred.')
+      // Even on error, store data and redirect to questionnaire
+      localStorage.setItem('treatmentRequest', JSON.stringify({
+        id: `temp-${Date.now()}`,
+        patientId: null,
+        pharmacyId: null,
+        postcode,
+        ...formData
+      }))
+      localStorage.setItem('formPostcode', postcode)
+      router.push('/questionnaire')
     } finally {
       setLoading(false)
     }
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-emerald-100 via-white to-teal-50 inconsolata">
-      <div className="max-w-2xl mx-auto px-4 py-8">
+    <div className="min-h-screen bg-beige inconsolata">
+      <div className="max-w-2xl mx-auto px-4 sm:px-6 py-4 sm:py-8">
         {/* Header */}
-        <div className="mb-8">
+        <div className="mb-6 sm:mb-8">
           <Button
             onClick={onBack}
-            variant="outline"
-            className="mb-4 inconsolata"
+            className="mb-4 btn-outline text-sm sm:text-base"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
             Zurück
           </Button>
-          <h1 className="text-4xl font-bold title-gradient mb-2">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold title-gradient mb-2">
             Medizinische Anfrage
           </h1>
-          <p className="text-lg subtitle-text">
+          <p className="text-base sm:text-lg subtitle-text">
             Postleitzahl: <span className="font-semibold text-emerald-600">{postcode}</span>
           </p>
         </div>
 
         {/* Form */}
-        <div className="bg-white rounded-lg shadow-lg p-8">
-          <form onSubmit={handleSubmit} className="space-y-6">
+        <div className="bg-white rounded-lg shadow-lg p-4 sm:p-6 md:p-8">
+          <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
             <div>
               <label htmlFor="fullName" className="block text-sm font-medium form-label mb-2">
                 Vollständiger Name
@@ -112,7 +150,7 @@ export default function MashallahForm({ postcode, onBack }: MashallahFormProps) 
                 onChange={handleChange}
                 required
                 disabled={loading}
-                className="w-full p-3 border border-gray-300 rounded-lg inconsolata text-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none disabled:bg-gray-100"
+                className="w-full p-2.5 sm:p-3 border border-gray-300 rounded-lg inconsolata text-base sm:text-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none disabled:bg-gray-100"
                 placeholder="Patient Mustermann"
               />
             </div>
@@ -129,7 +167,7 @@ export default function MashallahForm({ postcode, onBack }: MashallahFormProps) 
                 onChange={handleChange}
                 required
                 disabled={loading}
-                className="w-full p-3 border border-gray-300 rounded-lg inconsolata text-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none disabled:bg-gray-100"
+                className="w-full p-2.5 sm:p-3 border border-gray-300 rounded-lg inconsolata text-base sm:text-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none disabled:bg-gray-100"
                 placeholder="patient@example.com"
               />
             </div>
@@ -146,36 +184,80 @@ export default function MashallahForm({ postcode, onBack }: MashallahFormProps) 
                 onChange={handleChange}
                 required
                 disabled={loading}
-                className="w-full p-3 border border-gray-300 rounded-lg inconsolata text-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none disabled:bg-gray-100"
+                className="w-full p-2.5 sm:p-3 border border-gray-300 rounded-lg inconsolata text-base sm:text-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none disabled:bg-gray-100"
                 placeholder="+49 30 12345678"
               />
             </div>
 
             <div>
-              <label htmlFor="symptoms" className="block text-sm font-medium form-label mb-2">
-                Beschreibung Ihrer Symptome
+              <label htmlFor="street" className="block text-sm font-medium form-label mb-2">
+                Straße + Hausnummer *
               </label>
-              <textarea
-                id="symptoms"
-                name="symptoms"
-                value={formData.symptoms}
-                onChange={handleChange}
-                required
-                disabled={loading}
-                rows={4}
-                className="w-full p-3 border border-gray-300 rounded-lg inconsolata text-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none resize-none disabled:bg-gray-100"
-                placeholder="Bitte beschreiben Sie Ihre Beschwerden und warum Sie eine medizinische Cannabis-Behandlung benötigen..."
-              />
+              <div className="relative">
+                {!formData.street && (
+                  <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 z-10 pointer-events-none transition-opacity duration-200" size={20} />
+                )}
+                <input
+                  type="text"
+                  id="street"
+                  name="street"
+                  value={formData.street}
+                  onChange={handleChange}
+                  required
+                  disabled={loading}
+                  className={`w-full pr-3 p-2.5 sm:p-3 border border-gray-300 rounded-lg inconsolata text-base sm:text-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none disabled:bg-gray-100 transition-all duration-200 ${
+                    formData.street ? 'pl-3' : 'pl-[5rem]'
+                  }`}
+                  placeholder="   z.B. Grassstraße 42"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label htmlFor="city" className="block text-sm font-medium form-label mb-2">
+                  Stadt *
+                </label>
+                <div className="relative">
+                  {!formData.city && (
+                    <Building2 className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 z-10 pointer-events-none transition-opacity duration-200" size={20} />
+                  )}
+                  <input
+                    type="text"
+                    id="city"
+                    name="city"
+                    value={formData.city}
+                    onChange={handleChange}
+                    required
+                    disabled={loading}
+                    className={`w-full pr-3 p-2.5 sm:p-3 border border-gray-300 rounded-lg inconsolata text-base sm:text-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none disabled:bg-gray-100 transition-all duration-200 ${
+                      formData.city ? 'pl-3' : 'pl-[5rem]'
+                    }`}
+                    placeholder="   Berlin"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label htmlFor="postcode" className="block text-sm font-medium form-label mb-2">
+                  PLZ *
+                </label>
+                <input
+                  type="text"
+                  id="postcode"
+                  name="postcode"
+                  value={postcode}
+                  disabled
+                  className="w-full px-3 p-2.5 sm:p-3 border border-gray-300 rounded-lg inconsolata text-base sm:text-lg bg-gray-100 text-gray-600 cursor-not-allowed"
+                  placeholder={postcode}
+                />
+              </div>
             </div>
 
             <Button
               type="submit"
               disabled={loading || !isFormValid}
-              className={`w-full inconsolata py-4 text-lg ${
-                isFormValid && !loading
-                  ? 'bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white font-bold shadow-xl transition-all duration-200 transform hover:scale-[1.02]'
-                  : 'bg-gray-300 text-gray-500 cursor-not-allowed font-medium'
-              }`}
+              className="w-full btn-secondary py-3 sm:py-4 text-base sm:text-lg font-bold"
             >
               {loading ? 'Wird verarbeitet...' : 'Anfrage absenden'}
             </Button>
@@ -183,11 +265,11 @@ export default function MashallahForm({ postcode, onBack }: MashallahFormProps) 
         </div>
 
         {/* Info */}
-        <div className="mt-8 bg-emerald-50 border border-emerald-200 rounded-lg p-6">
-          <h3 className="text-lg font-semibold text-emerald-800 mb-2">
+        <div className="mt-6 sm:mt-8 bg-emerald-50 border border-emerald-200 rounded-lg p-4 sm:p-6">
+          <h3 className="text-base sm:text-lg font-semibold text-emerald-800 mb-2">
             Lieferung in Berlin
           </h3>
-          <p className="text-emerald-700">
+          <p className="text-sm sm:text-base text-emerald-700">
             Da Sie in Berlin wohnen, können wir Ihre Medikamente in 30-90 Minuten direkt zu Ihnen liefern lassen.
           </p>
         </div>

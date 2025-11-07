@@ -214,7 +214,7 @@ export default function DoctorDashboard() {
             
             <button
               onClick={handleLogin}
-              className="w-full inconsolata bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-bold py-3 text-lg rounded-lg shadow-lg transition-all duration-200 transform hover:scale-[1.02]"
+              className="w-full btn-primary py-3 text-lg font-bold rounded-lg"
             >
               Anmelden
             </button>
@@ -262,7 +262,7 @@ export default function DoctorDashboard() {
           </div>
           <button
             onClick={handleLogout}
-            className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+            className="btn-outline flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg"
           >
             <LogOut size={16} />
             Abmelden
@@ -371,14 +371,14 @@ export default function DoctorDashboard() {
                         <div className="flex gap-3 pt-4 border-t border-gray-100">
                           <button
                             onClick={() => updateRequest(req.id, 'approve')}
-                            className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-green-600 text-white font-medium rounded-lg hover:bg-green-700 transition-colors"
+                            className="btn-success flex-1 flex items-center justify-center gap-2 px-4 py-2.5 font-medium rounded-lg"
                           >
                             <CheckCircle size={18} />
                             Genehmigen
                           </button>
                           <button
                             onClick={() => updateRequest(req.id, 'decline')}
-                            className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-red-600 text-white font-medium rounded-lg hover:bg-red-700 transition-colors"
+                            className="btn-danger flex-1 flex items-center justify-center gap-2 px-4 py-2.5 font-medium rounded-lg"
                           >
                             <XCircle size={18} />
                             Ablehnen

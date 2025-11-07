@@ -79,6 +79,11 @@ body {
     background-color: #E9E6DE;
 }
 
+/* Beige background utility class */
+.bg-beige {
+    background-color: #E9E6DE;
+}
+
 .bg-gradient-to-br-custom {
     background: linear-gradient(to bottom, #E9E6DE, #E9E6DE);
 }
@@ -133,6 +138,149 @@ body {
         opacity: 1;
         transform: translateY(0);
     }
+}
+
+/* ============================================
+   CONSISTENT BUTTON STYLING SYSTEM
+   ============================================ */
+
+/* Base Button Styles - Applied to all buttons */
+button,
+[data-slot="button"],
+button[type="button"],
+button[type="submit"],
+button[type="reset"] {
+    font-family: "Inconsolata", monospace;
+    font-weight: 400;
+    transition: all 0.3s ease;
+    outline: none;
+    cursor: pointer;
+}
+
+button:disabled,
+button[disabled] {
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+/* Primary Button - Main action buttons */
+.btn-primary,
+.behandlung-button {
+    font-family: "Inconsolata", monospace;
+    font-weight: 400;
+    font-size: 12px;
+    line-height: 24px;
+    background-color: #72906F;
+    color: white;
+    border: 1px solid #000000;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover:not(:disabled),
+.behandlung-button:hover:not(:disabled) {
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    transform: translateY(-1px);
+}
+
+.btn-primary:active:not(:disabled),
+.behandlung-button:active:not(:disabled) {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.1);
+}
+
+/* Secondary Button - Alternative actions (same color as primary) */
+.btn-secondary {
+    font-family: "Inconsolata", monospace;
+    font-weight: 400;
+    background-color: #72906F;
+    color: white;
+    border: 1px solid #000000;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    transition: all 0.3s ease;
+}
+
+.btn-secondary:hover:not(:disabled) {
+    background-color: #72906F;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    transform: translateY(-1px);
+}
+
+.btn-secondary:active:not(:disabled) {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.1);
+}
+
+/* Outline Button - Secondary actions, back buttons */
+.btn-outline {
+    font-family: "Inconsolata", monospace;
+    font-weight: 400;
+    background-color: transparent;
+    color: #111827;
+    border: 1px solid #000000;
+    box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+}
+
+.btn-outline:hover:not(:disabled) {
+    background-color: #f3f4f6;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    transform: translateY(-1px);
+}
+
+.btn-outline:active:not(:disabled) {
+    transform: translateY(0);
+    background-color: #e5e7eb;
+}
+
+/* Success Button - Approve, confirm actions */
+.btn-success {
+    font-family: "Inconsolata", monospace;
+    font-weight: 400;
+    background-color: #10b981;
+    color: white;
+    border: 1px solid #000000;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    transition: all 0.3s ease;
+}
+
+.btn-success:hover:not(:disabled) {
+    background-color: #059669;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    transform: translateY(-1px);
+}
+
+/* Danger Button - Delete, decline actions */
+.btn-danger {
+    font-family: "Inconsolata", monospace;
+    font-weight: 400;
+    background-color: #ef4444;
+    color: white;
+    border: 1px solid #000000;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    transition: all 0.3s ease;
+}
+
+.btn-danger:hover:not(:disabled) {
+    background-color: #dc2626;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    transform: translateY(-1px);
+}
+
+/* Disabled Button State */
+.btn-primary:disabled,
+.btn-secondary:disabled,
+.btn-outline:disabled,
+.btn-success:disabled,
+.btn-danger:disabled,
+.behandlung-button:disabled {
+    background-color: #d1d5db;
+    color: #6b7280;
+    border-color: #9ca3af;
+    cursor: not-allowed;
+    opacity: 0.6;
+    transform: none;
+    box-shadow: none;
 }
 
 /* Animated Button Styles */
