@@ -83,8 +83,7 @@ export default function Header({
             <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
               <DialogTrigger asChild>
                   <Button
-                    className="text-base font-normal border border-black inconsolata px-4 py-2 text-white shadow-lg hover:shadow-xl flex items-center justify-center"
-                    style={{ fontFamily: 'Inconsolata, monospace', fontWeight: 400, backgroundColor: '#72906F', color: 'white', fontSize: '12px', lineHeight: '24px' }}
+                    className="behandlung-button px-4 py-2 flex items-center justify-center"
                   >
                   BEHANDLUNG ANFRAGEN
                 </Button>
@@ -111,11 +110,7 @@ export default function Header({
                   <Button
                     onClick={handlePostcodeSubmit}
                     disabled={!zipInput.trim() || !isValidBerlinPostcode(zipInput)}
-                    className={`w-full inconsolata text-white font-medium py-3 ${
-                      !zipInput.trim() || !isValidBerlinPostcode(zipInput) 
-                        ? 'opacity-50 cursor-not-allowed bg-gray-400' 
-                        : 'animated-button'
-                    }`}
+                    className="w-full btn-primary font-medium py-3"
                   >
                     Weiter
                   </Button>
@@ -146,8 +141,7 @@ export default function Header({
                 <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
                   <DialogTrigger asChild>
                     <Button 
-                      className="w-full text-base font-normal border border-black inconsolata px-6 py-3 text-white shadow-lg hover:shadow-xl flex items-center justify-center"
-                      style={{ fontFamily: 'Inconsolata, monospace', fontWeight: 400, backgroundColor: '#72906F', color: 'white', fontSize: '12px', lineHeight: '24px' }}
+                      className="behandlung-button w-full px-6 py-3 flex items-center justify-center"
                     >
                       BEHANDLUNG ANFRAGEN
                     </Button>
