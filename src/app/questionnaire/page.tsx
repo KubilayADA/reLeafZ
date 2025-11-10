@@ -12,7 +12,8 @@ export default function QuestionnairePage() {
   const [currentStep, setCurrentStep] = useState<'step1' | 'step2' | 'step3' | 'step4'>('step1')
   const [selectedConsultation, setSelectedConsultation] = useState<string>('')
   const [selectedDelivery, setSelectedDelivery] = useState<string>('')
-  const [selectedPreviousPrescription, setSelectedPreviousPrescription] = useState<string>('')
+  const [selectedCondition, setSelectedCondition] = useState<string>('')
+  const [symptomDetails, setSymptomDetails] = useState<{ onset: string; frequency: string } | null>(null)
 
   const handleStep1Next = (option: string) => {
     setSelectedConsultation(option)
@@ -39,57 +40,35 @@ export default function QuestionnairePage() {
     const treatmentRequest = localStorage.getItem('treatmentRequest')
     if (treatmentRequest) {
       const request = JSON.parse(treatmentRequest)
-      // Check if option includes pharmacy email (for prescription-only)
-      if (option.includes(':')) {
-        const [deliveryMethod, pharmacyEmail] = option.split(':')
-        request.deliveryMethod = deliveryMethod
-        request.pharmacyEmail = pharmacyEmail
-      } else {
-        request.deliveryMethod = option
-      }
+      request.deliveryMethod = option
       localStorage.setItem('treatmentRequest', JSON.stringify(request))
     }
     
-    // Check if courier or shipping is selected - if so, go to step3
-    const deliveryMethod = option.includes(':') ? option.split(':')[0] : option
-    if (deliveryMethod === 'courier' || deliveryMethod === 'shipping') {
-      setCurrentStep('step3')
-    } else {
-      // For prescription-only, go directly to marketplace
-      router.push('/marketplace')
-    }
+    setCurrentStep('step3')
   }
 
   const handleStep3Next = (option: string) => {
-    setSelectedPreviousPrescription(option)
-    // Store the previous prescription answer
+    setSelectedCondition(option)
     const treatmentRequest = localStorage.getItem('treatmentRequest')
     if (treatmentRequest) {
       const request = JSON.parse(treatmentRequest)
-      request.previousPrescription = option
+      request.condition = option
       localStorage.setItem('treatmentRequest', JSON.stringify(request))
     }
-    
-    // If "no" is selected, go to step4 (agreements page)
-    // If "yes" is selected and user is logged in, go to marketplace
-    if (option === 'no') {
-      setCurrentStep('step4')
-    } else {
-      // For "yes" (user already logged in), go to marketplace
-      router.push('/marketplace')
-    }
+
+    setCurrentStep('step4')
   }
 
-  const handleStep4Next = () => {
-    // Store agreements acceptance
+  const handleStep4Next = (answers: { onset: string; frequency: string }) => {
+    setSymptomDetails(answers)
     const treatmentRequest = localStorage.getItem('treatmentRequest')
     if (treatmentRequest) {
       const request = JSON.parse(treatmentRequest)
-      request.agreementsAccepted = true
+      request.symptomOnset = answers.onset
+      request.symptomFrequency = answers.frequency
       localStorage.setItem('treatmentRequest', JSON.stringify(request))
     }
-    
-    // Redirect to marketplace after step4
+
     router.push('/marketplace')
   }
 
