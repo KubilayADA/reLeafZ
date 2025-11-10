@@ -2,40 +2,33 @@
 
 import React, { useState } from 'react'
 import { Button } from '@/components/ui/button'
-import { ArrowLeft, FileText, Video, Building2 } from 'lucide-react'
+import { ArrowLeft, Bike, Package } from 'lucide-react'
 import '@/app/main.css'
 
-interface Step1Props {
+interface Step2Props {
   onNext: (selectedOption: string) => void
   onBack?: () => void
 }
 
-type ConsultationOption = 'questionnaire' | 'video' | 'onsite'
+type DeliveryOption = 'courier' | 'shipping'
 
-export default function Step1({ onNext, onBack }: Step1Props) {
-  const [selectedOption, setSelectedOption] = useState<ConsultationOption | ''>('')
+export default function Step2({ onNext, onBack }: Step2Props) {
+  const [selectedOption, setSelectedOption] = useState<DeliveryOption | ''>('')
 
   const options = [
     {
-      id: 'questionnaire' as ConsultationOption,
-      title: 'Online-Fragebogen',
-      price: '14,99€*',
-      icon: FileText,
-      description: 'Schnell und einfach von zu Hause aus'
+      id: 'courier' as DeliveryOption,
+      title: 'Rezept + Kurier: 60-90min',
+      description: 'Mo-So: 09-21:30 Uhr | Die Herz Apotheke Berlin',
+      icon: Bike,
+      time: '60-90min'
     },
     {
-      id: 'video' as ConsultationOption,
-      title: 'Video-Sprechstunde',
-      price: 'ab 45€*',
-      icon: Video,
-      description: 'Persönliche Beratung per Video'
-    },
-    {
-      id: 'onsite' as ConsultationOption,
-      title: 'Vor-Ort-Termin',
-      price: 'Auf Anfrage*',
-      icon: Building2,
-      description: 'Termin in unserer Praxis'
+      id: 'shipping' as DeliveryOption,
+      title: 'Rezept + Versand: 1-2 Tage',
+      description: 'Internationale HBF Apotheke München',
+      icon: Package,
+      time: '1-2 Tage'
     }
   ]
 
@@ -47,7 +40,7 @@ export default function Step1({ onNext, onBack }: Step1Props) {
 
   return (
     <div className="min-h-screen bg-beige inconsolata">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 py-4 sm:py-8">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 py-4 sm:py-8 flex flex-col items-center">
         {/* Header */}
         {onBack && (
           <div className="mb-4 sm:mb-6">
@@ -62,21 +55,21 @@ export default function Step1({ onNext, onBack }: Step1Props) {
         )}
 
         {/* Progress Indicator */}
-        <div className="mb-6 sm:mb-8">
+        <div className="mb-6 sm:mb-8 w-full">
           <div className="flex items-center justify-center gap-2 sm:gap-4 mb-4 overflow-x-auto">
             <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
-              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-emerald-600 text-white flex items-center justify-center font-bold text-sm sm:text-base">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gray-300 text-gray-600 flex items-center justify-center font-bold text-sm sm:text-base">
                 1
               </div>
-              <span className="font-medium text-emerald-600 text-xs sm:text-sm md:text-base">Anfrage</span>
+              <span className="font-medium text-gray-500 text-xs sm:text-sm md:text-base hidden sm:inline">Anfrage</span>
             </div>
             <div className="w-8 sm:w-16 h-0.5 bg-gray-300 flex-shrink-0"></div>
             <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
-              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gray-300 text-gray-600 flex items-center justify-center font-bold text-sm sm:text-base">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-emerald-600 text-white flex items-center justify-center font-bold text-sm sm:text-base">
                 2
               </div>
-              <span className="font-medium text-gray-500 text-xs sm:text-sm md:text-base hidden sm:inline">Produktauswahl</span>
-              <span className="font-medium text-gray-500 text-xs sm:hidden">Produkt</span>
+              <span className="font-medium text-emerald-600 text-xs sm:text-sm md:text-base hidden sm:inline">Produktauswahl</span>
+              <span className="font-medium text-emerald-600 text-xs sm:hidden">Produkt</span>
             </div>
             <div className="w-8 sm:w-16 h-0.5 bg-gray-300 flex-shrink-0"></div>
             <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
@@ -90,13 +83,17 @@ export default function Step1({ onNext, onBack }: Step1Props) {
         </div>
 
         {/* Main Content */}
-        <div className="bg-white rounded-lg shadow-lg p-4 sm:p-6 md:p-8">
-          <h2 className="text-xl sm:text-2xl md:text-2xl font-bold title-gradient mb-6 sm:mb-8">
-            Wie möchtest du Angaben zu deinem Gesundheitszustand machen? *
+        <div className="bg-white rounded-lg shadow-lg p-4 sm:p-6 md:p-8 w-full">
+          <h2 className="text-xl sm:text-2xl md:text-2xl font-bold title-gradient mb-4 sm:mb-6 text-center">
+            Falls ein Rezept ausgestellt wird, wie möchtest du deine Medikamente erhalten?
           </h2>
+          
+          <p className="text-sm sm:text-base text-gray-600 mb-6 sm:mb-8 text-center">
+            Berlin: Wähle deine Versandart und Apotheke aus *
+          </p>
 
           {/* Options Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 mb-6 sm:mb-8 justify-items-center">
             {options.map((option) => {
               const Icon = option.icon
               const isSelected = selectedOption === option.id
@@ -104,22 +101,24 @@ export default function Step1({ onNext, onBack }: Step1Props) {
               return (
                 <div
                   key={option.id}
-                  onClick={() => setSelectedOption(option.id)}
+                  onClick={() => {
+                    setSelectedOption(option.id)
+                  }}
                   className={`
-                    relative border-2 rounded-lg p-4 sm:p-6 cursor-pointer transition-all duration-200
+                    relative border-2 rounded-lg p-4 sm:p-6 cursor-pointer transition-all duration-200 text-center w-full max-w-xs
                     ${isSelected 
                       ? 'border-emerald-500 bg-emerald-50 shadow-md' 
                       : 'border-gray-200 bg-white hover:border-emerald-300 hover:shadow-sm'
                     }
                   `}
                 >
-                  {/* Icon */}
+                  {/* Icon Area */}
                   <div className={`
-                    w-12 h-12 sm:w-16 sm:h-16 rounded-lg flex items-center justify-center mb-3 sm:mb-4
+                    w-full h-32 sm:h-40 rounded-lg flex items-center justify-center mb-4
                     ${isSelected ? 'bg-emerald-100' : 'bg-gray-100'}
                   `}>
                     <Icon 
-                      className={`w-6 h-6 sm:w-8 sm:h-8 ${isSelected ? 'text-emerald-600' : 'text-gray-600'}`}
+                      className={`w-16 h-16 sm:w-20 sm:h-20 ${isSelected ? 'text-emerald-600' : 'text-gray-600'}`}
                     />
                   </div>
 
@@ -132,13 +131,6 @@ export default function Step1({ onNext, onBack }: Step1Props) {
                   <p className="text-xs sm:text-sm text-gray-600 mb-3 sm:mb-4">
                     {option.description}
                   </p>
-
-                  {/* Price */}
-                  <div className="mb-3 sm:mb-4">
-                    <span className="text-lg sm:text-xl font-bold text-gray-900">
-                      {option.price}
-                    </span>
-                  </div>
 
                   {/* Radio Button */}
                   <div className="flex items-center justify-center mt-4">
@@ -160,9 +152,9 @@ export default function Step1({ onNext, onBack }: Step1Props) {
           </div>
 
           {/* Disclaimer */}
-          <div className="mb-6 sm:mb-8 pt-4 sm:pt-6 border-t border-gray-200">
+          <div className="mb-6 sm:mb-8 pt-4 sm:pt-6 border-t border-gray-200 text-center">
             <p className="text-xs sm:text-sm text-gray-600">
-              * Die ärztlichen Leistungen werden nach der aktuell gültigen Gebührenordnung für Ärzte (GoÄ) berechnet.
+              * Die Versandart kann nach der Rezeptausstellung ausgewählt werden.
             </p>
           </div>
 
@@ -179,4 +171,3 @@ export default function Step1({ onNext, onBack }: Step1Props) {
     </div>
   )
 }
-

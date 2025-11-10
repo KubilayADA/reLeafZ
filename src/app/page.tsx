@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { ArrowRight, ArrowDown, ListCheck, MousePointer, ZapIcon, Sparkles, Brain, Users, Shield, Clock, MapPin, ChevronRight, ChevronDown, Star, BikeIcon, LucideBike, Hospital, HospitalIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
@@ -72,6 +73,7 @@ export default function LandingPage() {
   if (COMING_SOON_MODE) {
     return <ComingSoon />;
   }
+  const router = useRouter()
   const [testimonialIdx, setTestimonialIdx] = useState(0)
   const [openCity, setOpenCity] = useState<string | null>(null)
   const [dialogOpen, setDialogOpen] = useState(false)
@@ -102,8 +104,8 @@ export default function LandingPage() {
     if (zipInput.trim() && isValidBerlinPostcode(zipInput)) {
       setFormData(prev => ({ ...prev, zip: zipInput }));
       setDialogOpen(false);
-      // Valid Berlin postcode - show the form
-      setShowForm(true);
+      // Valid Berlin postcode - navigate to form page
+      router.push(`/form?postcode=${zipInput}`);
     }
   };
   
@@ -224,8 +226,7 @@ export default function LandingPage() {
               <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
                 <DialogTrigger asChild>
                   <Button
-                    className="text-base font-normal border border-black inconsolata px-8 py-3 text-white shadow-lg hover:shadow-xl flex items-center justify-center min-w-64 w-auto"
-                    style={{ fontFamily: 'Inconsolata, monospace', fontWeight: 400, backgroundColor: '#72906F', color: 'white', fontSize: '12px', lineHeight: '24px' }}
+                    className="behandlung-button px-8 py-3 flex items-center justify-center min-w-64 w-auto"
                   >
                     BEHANDLUNG ANFRAGEN
                     <ChevronRight className="w-5 h-5 ml-2" />
