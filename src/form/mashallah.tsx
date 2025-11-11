@@ -49,7 +49,7 @@ export default function MashallahForm({ postcode, onBack }: MashallahFormProps) 
         body: JSON.stringify({ 
           ...formData, 
           postcode,
-          status: 'PENDING_STRAIN_SELECTION'
+         // status: 'PENDING_STRAIN_SELECTION' // no status here anymıre changing the workflow
         }),
       })
 
