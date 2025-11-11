@@ -61,7 +61,13 @@ export default function MashallahForm({ postcode, onBack }: MashallahFormProps) 
         // If response parsing fails, still proceed with questionnaire
         result = { data: {} }
       }
-
+      if (response.ok && result.data) {
+        // Store pharmacyId separately for marketplace
+        if (result.data.pharmacyId) {
+          localStorage.setItem('assignedPharmacyId', result.data.pharmacyId.toString())
+          console.log('✅ Pharmacy ID stored:', result.data.pharmacyId)
+        }
+      }
       // Step 2: Store treatment request data in localStorage (even if API fails)
       const treatmentRequestData = {
         id: result.data?.id || `temp-${Date.now()}`,
