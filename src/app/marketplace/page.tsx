@@ -53,6 +53,21 @@ export default function MarketplacePage() {
       const request: TreatmentRequest = JSON.parse(treatmentData)
       setTreatmentRequest(request)
 
+      // Try to get pharmacyId from multiple sources ⬇️
+    let pharmacyId = localStorage.getItem('assignedPharmacyId')
+    
+    if (!pharmacyId && request.pharmacyId) {
+      pharmacyId = request.pharmacyId.toString()
+    }
+
+    console.log('Final pharmacy ID to use:', pharmacyId)
+
+    if (!pharmacyId || pharmacyId === 'null' || pharmacyId === 'undefined') {
+      setError('No pharmacy assigned. Please complete the form again.')
+      setLoading(false)
+      return
+    }
+
       // Fetch products for assigned pharmacy
       const data = await fetchPharmacyProducts(parseInt(request.pharmacyId))
       setProducts(data)
