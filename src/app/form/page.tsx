@@ -1,33 +1,32 @@
 'use client'
 
-import React, { useEffect, useState } from 'react'
+import React, { Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import MashallahForm from '@/form/mashallah'
 
-export default function FormPage() {
+// Child component (useSearchParams burada) ⬇
+function FormContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const [postcode, setPostcode] = useState<string>('')
-
-  useEffect(() => {
-    const postcodeParam = searchParams.get('postcode')
-    if (postcodeParam) {
-      setPostcode(postcodeParam)
-    } else {
-      // If no postcode, redirect to home
-      router.push('/')
-    }
-  }, [searchParams, router])
-
-  const handleBack = () => {
-    // Navigate back to home page
-    router.push('/')
-  }
+  const postcode = searchParams.get('postcode') || ''
 
   if (!postcode) {
-    return null // Will redirect in useEffect
+    router.push('/')
+    return null
   }
 
-  return <MashallahForm postcode={postcode} onBack={handleBack} />
+  return <MashallahForm postcode={postcode} onBack={() => router.push('/')} />
 }
 
+// ⬇Parent component (Suspense wrapper) 
+export default function FormPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-beige flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-600"></div>
+      </div>
+    }>
+      <FormContent />
+    </Suspense>
+  )
+}
