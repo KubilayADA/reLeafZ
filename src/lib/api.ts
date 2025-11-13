@@ -12,6 +12,7 @@ export interface Product {
   unit: string;
   stock: number;
   pharmacyId: number;
+  productTags?: Array<{ tag: { id: number; name: string } }>;
 }
 
 export interface Pharmacy {
