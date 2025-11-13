@@ -177,7 +177,7 @@ const ComingSoon: React.FC = () => {
           }}
         >
           Be among the first to experience our AI-powered strain matching. Waiting list goes live{' '}
-          <strong style={{ color: '#22d3ee' }}>15 November Saturday at 12:00 PM </strong>. First 30 registrations receive{' '}
+          <strong style={{ color: '#22d3ee' }}>20 December Saturday at 12:00 PM </strong>. First 30 registrations receive{' '}
           <strong style={{ color: '#22d3ee' }}>free prescription</strong> instead of €14.99.
         </p>
 
