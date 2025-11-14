@@ -3,6 +3,7 @@
 import React, { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { ArrowLeft, MoonStar, Activity, Brain, Sparkles } from 'lucide-react'
+import StepIndicator from '@/form/StepIndicator'
 import '@/app/main.css'
 
 interface Step3Props {
@@ -63,6 +64,8 @@ export default function Step3({ onNext, onBack }: Step3Props) {
             </Button>
           </div>
         )}
+
+        <StepIndicator currentStep={3} />
 
         {/* Title */}
         <div className="text-center mb-6 sm:mb-10 px-2 sm:px-8">

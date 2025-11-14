@@ -3,6 +3,7 @@
 import React, { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { ArrowLeft, FileText, Video, Building2 } from 'lucide-react'
+import StepIndicator from '@/form/StepIndicator'
 import '@/app/main.css'
 
 interface Step1Props {
@@ -61,33 +62,7 @@ export default function Step1({ onNext, onBack }: Step1Props) {
           </div>
         )}
 
-        {/* Progress Indicator */}
-        <div className="mb-6 sm:mb-8">
-          <div className="flex items-center justify-center gap-2 sm:gap-4 mb-4 overflow-x-auto">
-            <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
-              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-emerald-600 text-white flex items-center justify-center font-bold text-sm sm:text-base">
-                1
-              </div>
-              <span className="font-medium text-emerald-600 text-xs sm:text-sm md:text-base">Anfrage</span>
-            </div>
-            <div className="w-8 sm:w-16 h-0.5 bg-gray-300 flex-shrink-0"></div>
-            <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
-              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gray-300 text-gray-600 flex items-center justify-center font-bold text-sm sm:text-base">
-                2
-              </div>
-              <span className="font-medium text-gray-500 text-xs sm:text-sm md:text-base hidden sm:inline">Produktauswahl</span>
-              <span className="font-medium text-gray-500 text-xs sm:hidden">Produkt</span>
-            </div>
-            <div className="w-8 sm:w-16 h-0.5 bg-gray-300 flex-shrink-0"></div>
-            <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
-              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gray-300 text-gray-600 flex items-center justify-center font-bold text-sm sm:text-base">
-                3
-              </div>
-              <span className="font-medium text-gray-500 text-xs sm:text-sm md:text-base hidden sm:inline">Anfrage absenden</span>
-              <span className="font-medium text-gray-500 text-xs sm:hidden">Absenden</span>
-            </div>
-          </div>
-        </div>
+        <StepIndicator currentStep={1} />
 
         {/* Main Content */}
         <div className="bg-white rounded-lg shadow-lg p-4 sm:p-6 md:p-8">

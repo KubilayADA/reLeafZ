@@ -3,6 +3,7 @@
 import React, { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { ArrowLeft, Bike, Package } from 'lucide-react'
+import StepIndicator from '@/form/StepIndicator'
 import '@/app/main.css'
 
 interface Step2Props {
@@ -40,7 +41,7 @@ export default function Step2({ onNext, onBack }: Step2Props) {
 
   return (
     <div className="min-h-screen bg-beige inconsolata">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 py-4 sm:py-8 flex flex-col items-center">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 py-4 sm:py-8 flex flex-col">
         {/* Header */}
         {onBack && (
           <div className="mb-4 sm:mb-6">
@@ -54,33 +55,7 @@ export default function Step2({ onNext, onBack }: Step2Props) {
           </div>
         )}
 
-        {/* Progress Indicator */}
-        <div className="mb-6 sm:mb-8 w-full">
-          <div className="flex items-center justify-center gap-2 sm:gap-4 mb-4 overflow-x-auto">
-            <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
-              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gray-300 text-gray-600 flex items-center justify-center font-bold text-sm sm:text-base">
-                1
-              </div>
-              <span className="font-medium text-gray-500 text-xs sm:text-sm md:text-base hidden sm:inline">Anfrage</span>
-            </div>
-            <div className="w-8 sm:w-16 h-0.5 bg-gray-300 flex-shrink-0"></div>
-            <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
-              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-emerald-600 text-white flex items-center justify-center font-bold text-sm sm:text-base">
-                2
-              </div>
-              <span className="font-medium text-emerald-600 text-xs sm:text-sm md:text-base hidden sm:inline">Produktauswahl</span>
-              <span className="font-medium text-emerald-600 text-xs sm:hidden">Produkt</span>
-            </div>
-            <div className="w-8 sm:w-16 h-0.5 bg-gray-300 flex-shrink-0"></div>
-            <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
-              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gray-300 text-gray-600 flex items-center justify-center font-bold text-sm sm:text-base">
-                3
-              </div>
-              <span className="font-medium text-gray-500 text-xs sm:text-sm md:text-base hidden sm:inline">Anfrage absenden</span>
-              <span className="font-medium text-gray-500 text-xs sm:hidden">Absenden</span>
-            </div>
-          </div>
-        </div>
+        <StepIndicator currentStep={2} />
 
         {/* Main Content */}
         <div className="bg-white rounded-lg shadow-lg p-4 sm:p-6 md:p-8 w-full">

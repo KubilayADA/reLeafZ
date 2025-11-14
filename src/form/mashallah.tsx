@@ -123,7 +123,7 @@ export default function MashallahForm({ postcode, onBack }: MashallahFormProps) 
 
   return (
     <div className="min-h-screen bg-beige inconsolata">
-      <div className="max-w-2xl mx-auto px-4 sm:px-6 py-4 sm:py-8">
+      <div className="max-w-2xl mx-auto px-4 sm:px-6 py-6 sm:py-10">
         {/* Header */}
         <div className="mb-6 sm:mb-8">
           <Button
@@ -142,8 +142,8 @@ export default function MashallahForm({ postcode, onBack }: MashallahFormProps) 
         </div>
 
         {/* Form */}
-        <div className="bg-white rounded-lg shadow-lg p-4 sm:p-6 md:p-8">
-          <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
+        <div className="bg-white rounded-xl shadow-lg p-4 sm:p-6 md:p-8">
+          <form onSubmit={handleSubmit} className="space-y-5 sm:space-y-6">
             <div>
               <label htmlFor="fullName" className="block text-sm font-medium form-label mb-2">
                 Vollständiger Name
@@ -156,7 +156,7 @@ export default function MashallahForm({ postcode, onBack }: MashallahFormProps) 
                 onChange={handleChange}
                 required
                 disabled={loading}
-                className="w-full p-2.5 sm:p-3 border border-gray-300 rounded-lg inconsolata text-base sm:text-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none disabled:bg-gray-100"
+                className="w-full p-3 sm:p-3.5 border border-gray-300 rounded-lg inconsolata text-base sm:text-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none disabled:bg-gray-100"
                 placeholder="Patient Mustermann"
               />
             </div>
@@ -173,7 +173,7 @@ export default function MashallahForm({ postcode, onBack }: MashallahFormProps) 
                 onChange={handleChange}
                 required
                 disabled={loading}
-                className="w-full p-2.5 sm:p-3 border border-gray-300 rounded-lg inconsolata text-base sm:text-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none disabled:bg-gray-100"
+                className="w-full p-3 sm:p-3.5 border border-gray-300 rounded-lg inconsolata text-base sm:text-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none disabled:bg-gray-100"
                 placeholder="patient@example.com"
               />
             </div>
@@ -190,7 +190,7 @@ export default function MashallahForm({ postcode, onBack }: MashallahFormProps) 
                 onChange={handleChange}
                 required
                 disabled={loading}
-                className="w-full p-2.5 sm:p-3 border border-gray-300 rounded-lg inconsolata text-base sm:text-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none disabled:bg-gray-100"
+                className="w-full p-2.5 sm:p-3.5 border border-gray-300 rounded-lg inconsolata text-base sm:text-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none disabled:bg-gray-100"
                 placeholder="+49 30 12345678"
               />
             </div>
@@ -211,8 +211,8 @@ export default function MashallahForm({ postcode, onBack }: MashallahFormProps) 
                   onChange={handleChange}
                   required
                   disabled={loading}
-                  className={`w-full pr-3 p-2.5 sm:p-3 border border-gray-300 rounded-lg inconsolata text-base sm:text-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none disabled:bg-gray-100 transition-all duration-200 ${
-                    formData.street ? 'pl-3' : 'pl-[5rem]'
+                className={`w-full pr-3 p-2.5 sm:p-3.5 border border-gray-300 rounded-lg inconsolata text-base sm:text-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none disabled:bg-gray-100 transition-all duration-200 ${
+                    formData.street ? 'pl-3' : 'pl-12 sm:pl-16'
                   }`}
                   placeholder="   z.B. Grassstraße 42"
                 />
@@ -237,7 +237,7 @@ export default function MashallahForm({ postcode, onBack }: MashallahFormProps) 
                     required
                     disabled={loading}
                     className={`w-full pr-3 p-2.5 sm:p-3 border border-gray-300 rounded-lg inconsolata text-base sm:text-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none disabled:bg-gray-100 transition-all duration-200 ${
-                      formData.city ? 'pl-3' : 'pl-[5rem]'
+                    formData.city ? 'pl-3' : 'pl-12 sm:pl-16'
                     }`}
                     placeholder="   Berlin"
                   />
@@ -254,7 +254,7 @@ export default function MashallahForm({ postcode, onBack }: MashallahFormProps) 
                   name="postcode"
                   value={postcode}
                   disabled
-                  className="w-full px-3 p-2.5 sm:p-3 border border-gray-300 rounded-lg inconsolata text-base sm:text-lg bg-gray-100 text-gray-600 cursor-not-allowed"
+                className="w-full px-3 p-2.5 sm:p-3.5 border border-gray-300 rounded-lg inconsolata text-base sm:text-lg bg-gray-100 text-gray-600 cursor-not-allowed"
                   placeholder={postcode}
                 />
               </div>
@@ -271,7 +271,7 @@ export default function MashallahForm({ postcode, onBack }: MashallahFormProps) 
         </div>
 
         {/* Info */}
-        <div className="mt-6 sm:mt-8 bg-emerald-50 border border-emerald-200 rounded-lg p-4 sm:p-6">
+        <div className="mt-6 sm:mt-8 bg-emerald-50 border border-emerald-200 rounded-xl p-4 sm:p-6">
           <h3 className="text-base sm:text-lg font-semibold text-emerald-800 mb-2">
             Lieferung in Berlin
           </h3>

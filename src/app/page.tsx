@@ -70,9 +70,9 @@ const FloatingMonkey = () => {
 
 export default function LandingPage() {
   // Show coming soon page if flag is true
-  if (COMING_SOON_MODE) {
-    return <ComingSoon />;
-  }
+  // if (COMING_SOON_MODE) {
+  //   return <ComingSoon />;
+  // }
   const router = useRouter()
   const [testimonialIdx, setTestimonialIdx] = useState(0)
   const [openCity, setOpenCity] = useState<string | null>(null)

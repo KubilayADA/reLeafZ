@@ -1,9 +1,22 @@
 'use client'
 
 import React, { useState } from 'react'
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import {Eye, EyeOff, Lock, Mail, User, Clock, CheckCircle, XCircle, FileText, Phone, MapPin, AlertCircle, LogOut, Package } from 'lucide-react';
-
+import {
+  AlertCircle,
+  CheckCircle,
+  Clock,
+  Eye,
+  EyeOff,
+  FileText,
+  Lock,
+  LogOut,
+  Mail,
+  MapPin,
+  Package,
+  Phone,
+  XCircle,
+} from 'lucide-react'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
 
@@ -39,6 +52,12 @@ export default function DoctorDashboard() {
   const [pastRequests, setPastRequests] = useState<TreatmentRequest[]>([])
   const [activeView, setActiveView] = useState<ViewType>('pending')
   const [loading, setLoading] = useState(false)
+
+  const handleLogout = () => {
+    setToken('')
+    setRequests([])
+    setPastRequests([])
+  }
 
   // Doctor login
   const handleLogin = async () => {
@@ -121,44 +140,6 @@ export default function DoctorDashboard() {
     }
   }
 
-  // Handle logout
-  const handleLogout = () => {
-    setToken('')
-    setRequests([])
-    setPastRequests([])
-    setEmail('')
-    setPassword('')
-    setActiveView('pending')
-  }
-
-  // Get status badge styling
-  const getStatusBadge = (status: string) => {
-    const statusLower = status.toLowerCase()
-    if (statusLower === 'approved' || statusLower === 'approve') {
-      return 'bg-green-100 text-green-800 border-green-200'
-    } else if (statusLower === 'declined' || statusLower === 'decline') {
-      return 'bg-red-100 text-red-800 border-red-200'
-    } else {
-      return 'bg-yellow-100 text-yellow-800 border-yellow-200'
-    }
-  }
-
-  // Format date
-  const formatDate = (dateString?: string) => {
-    if (!dateString) return 'N/A'
-    try {
-      return new Date(dateString).toLocaleDateString('de-DE', {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit'
-      })
-    } catch {
-      return dateString
-    }
-  }
-
   // go back to home page To do
   
   // If not logged in, show login form
@@ -225,6 +206,29 @@ export default function DoctorDashboard() {
 
   // Get current requests based on active view
   const currentRequests = activeView === 'pending' ? requests : pastRequests
+
+  const getStatusBadge = (status: string) => {
+    switch (status.toLowerCase()) {
+      case 'approved':
+        return 'border-emerald-200 text-emerald-700 bg-emerald-50'
+      case 'declined':
+        return 'border-red-200 text-red-700 bg-red-50'
+      default:
+        return 'border-gray-200 text-gray-700 bg-gray-50'
+    }
+  }
+
+  const formatDate = (value: string) => {
+    const date = new Date(value)
+    if (Number.isNaN(date.getTime())) return value
+    return date.toLocaleString('de-DE', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    })
+  }
 
   // Empty state component
   const EmptyState = ({ view }: { view: ViewType }) => (

@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { ArrowLeft } from 'lucide-react'
+import StepIndicator from '@/form/StepIndicator'
 import '@/app/main.css'
 
 interface Step4Props {
@@ -69,6 +70,8 @@ export default function Step4({ onNext, onBack }: Step4Props) {
             </Button>
           </div>
         )}
+
+        <StepIndicator currentStep={4} />
 
         <div className="text-center mb-8 sm:mb-12 px-2 sm:px-8">
           <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-3">
