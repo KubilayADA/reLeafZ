@@ -1,10 +1,18 @@
 'use client'
 
 import React, { useState } from 'react'
-import {Eye, EyeOff, Lock, Mail, User, Clock, CheckCircle, XCircle, FileText, Phone, MapPin, AlertCircle, LogOut } from 'lucide-react';
+
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import {Eye, EyeOff, Lock, Mail, User, Clock, CheckCircle, XCircle, FileText, Phone, MapPin, AlertCircle, LogOut, Package } from 'lucide-react';
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
+
+interface SelectedProduct {
+  productId: number
+  productName: string
+  quantity: number
+  price?: number
+}
 
 interface TreatmentRequest {
   id: number
@@ -16,6 +24,8 @@ interface TreatmentRequest {
   status: string
   createdAt?: string
   updatedAt?: string
+  selectedProducts?: SelectedProduct[]
+  totalPrice?: number
 }
 
 type ViewType = 'pending' | 'past'
@@ -74,30 +84,19 @@ export default function DoctorDashboard() {
   // Fetch past requests (all requests)
   const fetchPastRequests = async (authToken: string) => {
     try {
-      // Try the /all endpoint first
-      let res = await fetch(`${API_BASE}/api/doctor/requests/all`, {
+      const res = await fetch(`${API_BASE}/api/doctor/past-requests`, {
         headers: { Authorization: `Bearer ${authToken}` },
       })
       
-      // If that fails, try with a query parameter
-      if (!res.ok) {
-        res = await fetch(`${API_BASE}/api/doctor/requests?status=all`, {
-          headers: { Authorization: `Bearer ${authToken}` },
-        })
-      }
-      
       const data = await res.json()
       if (res.ok) {
-        // Filter out pending requests to show only past ones
-        const allRequests = data.requests || data.data || []
-        const past = allRequests.filter((req: TreatmentRequest) => 
-          req.status && req.status.toLowerCase() !== 'pending'
-        )
-        setPastRequests(past)
+        setPastRequests(data.requests || [])
+      } else {
+        console.error('Failed to fetch past requests:', data.message)
+        setPastRequests([])
       }
     } catch (err) {
-      // If endpoint doesn't exist, we'll just show empty state
-      console.log('Past requests endpoint not available, showing empty state')
+      console.error('Past requests fetch error:', err)
       setPastRequests([])
     }
   }
@@ -358,6 +357,33 @@ export default function DoctorDashboard() {
                             <p className="text-sm text-gray-600">{req.symptoms}</p>
                           </div>
                         </div>
+                        {/* ⬇️ NEW: Selected Products ⬇️ */}
+                        {req.selectedProducts && req.selectedProducts.length > 0 && (
+                          <div className="flex items-start gap-2 pt-3 border-t border-gray-100">
+                            <Package size={16} className="text-gray-400 mt-0.5 flex-shrink-0" />
+                            <div className="flex-1">
+                              <p className="text-sm font-medium text-gray-700 mb-2">Ausgewählte Produkte</p>
+                              <div className="space-y-1">
+                                {req.selectedProducts.map((product, index) => (
+                                  <div key={index} className="text-sm text-gray-600 flex justify-between">
+                                    <span>{product.productName} × {product.quantity}</span>
+                                    {product.price && (
+                                      <span className="font-medium">
+                                        €{(product.price * product.quantity).toFixed(2)}
+                                      </span>
+                                    )}
+                                  </div>
+                                ))}
+                              </div>
+                              {req.totalPrice && req.totalPrice > 0 && (
+                                <div className="mt-2 pt-2 border-t border-gray-100 flex justify-between text-sm font-semibold">
+                                  <span>Gesamt:</span>
+                                  <span>€{req.totalPrice.toFixed(2)}</span>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        )}
                         {(req.createdAt || req.updatedAt) && (
                           <div className="mt-3 pt-3 border-t border-gray-100">
                             <p className="text-xs text-gray-500">

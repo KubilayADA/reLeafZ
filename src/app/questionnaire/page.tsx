@@ -6,176 +6,128 @@ import Step1 from '@/form/step1'
 import Step2 from '@/form/step2'
 import Step3 from '@/form/step3'
 import Step4 from '@/form/step4'
-import Step5 from '@/form/step5'
-import Step6 from '@/form/step6'
-import Step7 from '@/form/step7'
 
 export default function QuestionnairePage() {
   const router = useRouter()
-  const [currentStep, setCurrentStep] = useState<'step1' | 'step2' | 'step3' | 'step4' | 'step5' | 'step6' | 'step7'>('step1')
-  const [selectedConsultation, setSelectedConsultation] = useState<string>('')
-  const [selectedDelivery, setSelectedDelivery] = useState<string>('')
-  const [selectedCondition, setSelectedCondition] = useState<string>('')
-  const [symptomDetails, setSymptomDetails] = useState<{ onset: string; frequency: string } | null>(null)
-  const [treatmentStatus, setTreatmentStatus] = useState<string>('')
-  const [prescriptionHistory, setPrescriptionHistory] = useState<string>('')
-  const [positiveEffect, setPositiveEffect] = useState<string>('')
+  const [currentStep, setCurrentStep] = useState(1)
+  const [loading, setLoading] = useState(false)
+  const [formData, setFormData] = useState({
+    consultationType: '',
+    deliveryMethod: '',
+    condition: '',
+    onset: '',
+    frequency: ''
+  })
 
-  const handleStep1Next = (option: string) => {
-    setSelectedConsultation(option)
-    // Store the selected consultation type
-    const treatmentRequest = localStorage.getItem('treatmentRequest')
-    if (treatmentRequest) {
-      const request = JSON.parse(treatmentRequest)
-      request.consultationType = option
-      localStorage.setItem('treatmentRequest', JSON.stringify(request))
-    }
+  const API_BASE = process.env.NEXT_PUBLIC_API_URL
+
+  // Step1: Consultation type
+  const handleStep1Next = (consultationType: string) => {
+    console.log('✅ Step1 completed:', consultationType)
+    setFormData(prev => ({ ...prev, consultationType }))
+    setCurrentStep(2)
+  }
+
+  // Step2: Delivery method
+  const handleStep2Next = (deliveryMethod: string) => {
+    console.log('✅ Step2 completed:', deliveryMethod)
+    setFormData(prev => ({ ...prev, deliveryMethod }))
+    setCurrentStep(3)
+  }
+
+  // Step3: Condition
+  const handleStep3Next = (condition: string) => {
+    console.log('✅ Step3 completed:', condition)
+    setFormData(prev => ({ ...prev, condition }))
+    setCurrentStep(4)
+  }
+
+  // Step4: FINAL - Send to backend!
+  const handleStep4Next = async (answers: { onset: string; frequency: string }) => {
+    console.log('✅ Step4 completed:', answers)
     
-    // If questionnaire is selected, go to step2, otherwise go to marketplace
-    if (option === 'questionnaire') {
-      setCurrentStep('step2')
+    const completeData = {
+      ...formData,
+      onset: answers.onset,
+      frequency: answers.frequency
+    }
+    setFormData(completeData)
+    setLoading(true)
+
+    try {
+      const treatmentData = localStorage.getItem('treatmentRequest')
+      if (!treatmentData) {
+        alert('Behandlungsanfrage nicht gefunden. Bitte beginnen Sie von vorne.')
+        router.push('/')
+        return
+      }
+
+      const treatmentRequest = JSON.parse(treatmentData)
+      console.log('📤 Sending symptoms for treatment request ID:', treatmentRequest.id)
+      console.log('📦 Complete data:', completeData)
+
+      // PATCH request to update symptoms
+      const response = await fetch(`${API_BASE}/api/treatment/${treatmentRequest.id}/symptoms`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(completeData),
+      })
+
+      const result = await response.json()
+
+      if (response.ok) {
+        console.log('✅ Symptoms updated successfully!')
+        console.log('Backend response:', result)
+        router.push('/marketplace')
+      } else {
+        console.error('❌ Failed to update symptoms:', result)
+        alert(`Fehler: ${result.message || 'Symptome konnten nicht aktualisiert werden'}`)
+      }
+    } catch (error) {
+      console.error('❌ Error updating symptoms:', error)
+      alert('Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut.')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleBack = () => {
+    if (currentStep > 1) {
+      setCurrentStep(currentStep - 1)
     } else {
-      // For video or onsite, go directly to marketplace
-      router.push('/marketplace')
+      router.back()
     }
   }
 
-  const handleStep2Next = (option: string) => {
-    setSelectedDelivery(option)
-    // Store the selected delivery method
-    const treatmentRequest = localStorage.getItem('treatmentRequest')
-    if (treatmentRequest) {
-      const request = JSON.parse(treatmentRequest)
-      request.deliveryMethod = option
-      localStorage.setItem('treatmentRequest', JSON.stringify(request))
-    }
-    
-    setCurrentStep('step3')
-  }
-
-  const handleStep3Next = (option: string) => {
-    setSelectedCondition(option)
-    const treatmentRequest = localStorage.getItem('treatmentRequest')
-    if (treatmentRequest) {
-      const request = JSON.parse(treatmentRequest)
-      request.condition = option
-      localStorage.setItem('treatmentRequest', JSON.stringify(request))
-    }
-
-    setCurrentStep('step4')
-  }
-
-  const handleStep4Next = (answers: { onset: string; frequency: string }) => {
-    setSymptomDetails(answers)
-    const treatmentRequest = localStorage.getItem('treatmentRequest')
-    if (treatmentRequest) {
-      const request = JSON.parse(treatmentRequest)
-      request.symptomOnset = answers.onset
-      request.symptomFrequency = answers.frequency
-      localStorage.setItem('treatmentRequest', JSON.stringify(request))
-    }
-
-    setCurrentStep('step5')
-  }
-
-  const handleStep5Next = (option: string) => {
-    setTreatmentStatus(option)
-    const treatmentRequest = localStorage.getItem('treatmentRequest')
-    if (treatmentRequest) {
-      const request = JSON.parse(treatmentRequest)
-      request.previousTreatment = option
-      localStorage.setItem('treatmentRequest', JSON.stringify(request))
-    }
-
-    setCurrentStep('step6')
-  }
-
-  const handleStep6Next = (option: string) => {
-    setPrescriptionHistory(option)
-    const treatmentRequest = localStorage.getItem('treatmentRequest')
-    if (treatmentRequest) {
-      const request = JSON.parse(treatmentRequest)
-      request.pastPrescriptionInGermany = option
-      localStorage.setItem('treatmentRequest', JSON.stringify(request))
-    }
-
-    setCurrentStep('step7')
-  }
-
-  const handleStep7Next = (option: string) => {
-    setPositiveEffect(option)
-    const treatmentRequest = localStorage.getItem('treatmentRequest')
-    if (treatmentRequest) {
-      const request = JSON.parse(treatmentRequest)
-      request.positiveEffect = option
-      localStorage.setItem('treatmentRequest', JSON.stringify(request))
-    }
-
-    router.push('/marketplace')
-  }
-
-  const handleStep2Back = () => {
-    setCurrentStep('step1')
-  }
-
-  const handleStep3Back = () => {
-    setCurrentStep('step2')
-  }
-
-  const handleStep4Back = () => {
-    setCurrentStep('step3')
-  }
-
-  const handleStep5Back = () => {
-    setCurrentStep('step4')
-  }
-
-  const handleStep6Back = () => {
-    setCurrentStep('step5')
-  }
-
-  const handleStep7Back = () => {
-    setCurrentStep('step6')
-  }
-
-  const handleStep1Back = () => {
-    // Get postcode from localStorage to navigate back to form
-    const postcode = localStorage.getItem('formPostcode')
-    if (postcode) {
-      // Navigate back to form page with postcode
-      router.push(`/form?postcode=${postcode}`)
-    } else {
-      // Fallback: go to home page
-      router.push('/')
-    }
-  }
-
-  if (currentStep === 'step2') {
-    return <Step2 onNext={handleStep2Next} onBack={handleStep2Back} />
-  }
-
-  if (currentStep === 'step3') {
-    return <Step3 onNext={handleStep3Next} onBack={handleStep3Back} />
-  }
-
-  if (currentStep === 'step4') {
-    return <Step4 onNext={handleStep4Next} onBack={handleStep4Back} />
-  }
-
-  if (currentStep === 'step5') {
-    return <Step5 onNext={handleStep5Next} onBack={handleStep5Back} />
-  }
-
-  if (currentStep === 'step6') {
-    return <Step6 onNext={handleStep6Next} onBack={handleStep6Back} />
-  }
-
-  if (currentStep === 'step7') {
-    return <Step7 onNext={handleStep7Next} onBack={handleStep7Back} />
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-beige flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-emerald-600 mx-auto mb-6"></div>
+          <p className="text-xl text-gray-700 font-semibold">Symptome werden aktualisiert...</p>
+          <p className="text-sm text-gray-500 mt-2">Einen Moment bitte</p>
+        </div>
+      </div>
+    )
   }
 
   return (
-    <Step1 onNext={handleStep1Next} onBack={handleStep1Back} />
+    <>
+      {currentStep === 1 && (
+        <Step1 onNext={handleStep1Next} onBack={handleBack} />
+      )}
+      {currentStep === 2 && (
+        <Step2 onNext={handleStep2Next} onBack={handleBack} />
+      )}
+      {currentStep === 3 && (
+        <Step3 onNext={handleStep3Next} onBack={handleBack} />
+      )}
+      {currentStep === 4 && (
+        <Step4 onNext={handleStep4Next} onBack={handleBack} />
+      )}
+    </>
   )
 }
 

@@ -69,7 +69,7 @@ const FloatingMonkey = () => {
 }
 
 export default function LandingPage() {
-
+  
   const router = useRouter()
   const [testimonialIdx, setTestimonialIdx] = useState(0)
   const [openCity, setOpenCity] = useState<string | null>(null)
