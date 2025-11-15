@@ -37,10 +37,24 @@ export default function MashallahForm({ postcode, onBack }: MashallahFormProps) 
                      formData.street.trim() !== '' &&
                      formData.city.trim() !== ''
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target
-    setFormData(prev => ({ ...prev, [name]: value }))
-  }
+                     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+                      const { name, value } = e.target
+                      
+                      // 🔒 SECURITY: Clear authentication tokens when email changes
+                      // This prevents using old tokens with new email addresses
+                      if (name === 'email') {
+                        console.log('🧹 Clearing tokens due to email change')
+                        localStorage.removeItem('token')
+                        localStorage.removeItem('treatmentRequest')
+                        localStorage.removeItem('assignedPharmacyId')
+                        // Reset OTP modal state if it was open
+                        setOtpModalOpen(false)
+                        setOtpCode('')
+                        setOtpError('')
+                      }
+                      
+                      setFormData(prev => ({ ...prev, [name]: value }))
+                    }
 
   // Handle OTP input - only allow 6 digits
   const handleOtpChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -183,17 +197,25 @@ export default function MashallahForm({ postcode, onBack }: MashallahFormProps) 
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: formData.email })
       })
-
+  
       const loginResult = await loginResponse.json()
       console.log('Login result:', loginResult)
-
+  
+      // ✅ SECURITY CHECK: Invalid email
+      if (loginResult.invalidEmail || !loginResponse.ok) {
+        console.error('❌ Invalid email or request failed:', loginResult.message)
+        alert(loginResult.message || 'Bitte geben Sie eine gültige E-Mail-Adresse ein.')
+        setLoading(false)
+        return
+      }
+  
       // Case 1: New user (first order)
       if (loginResult.firstOrder === true) {
         console.log('🆕 New user - proceeding with registration')
         await createTreatmentRequest()
         return
       }
-
+  
       // Case 2: Existing user - known device (same IP)
       if (loginResult.token && !loginResult.otpRequired) {
         console.log('✅ Known device - auto-login successful')
@@ -209,7 +231,7 @@ export default function MashallahForm({ postcode, onBack }: MashallahFormProps) 
         await createTreatmentRequest(loginResult.token)
         return
       }
-
+  
       // Case 3: Existing user - new device (different IP) - OTP required
       if (loginResult.otpRequired === true) {
         console.log('🔐 OTP required - new device detected')
@@ -218,15 +240,16 @@ export default function MashallahForm({ postcode, onBack }: MashallahFormProps) 
         // OTP email already sent by backend
         return
       }
-
-      // Fallback: Something unexpected happened
-      console.warn('Unexpected login response:', loginResult)
-      await createTreatmentRequest()
-
+  
+      // Fallback: Something unexpected happened - DON'T proceed without auth!
+      console.error('Unexpected login response:', loginResult)
+      alert('Ein unerwarteter Fehler ist aufgetreten. Bitte versuchen Sie es erneut.')
+      setLoading(false)
+  
     } catch (error) {
       console.error('Error during login check:', error)
-      // On error, proceed anyway
-      await createTreatmentRequest()
+      alert('Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut.')
+      setLoading(false)
     }
   }
 
