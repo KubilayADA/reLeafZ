@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { ArrowRight, ArrowDown, ListCheck, MousePointer, ZapIcon, Sparkles, Brain, Users, Shield, Clock, MapPin, ChevronRight, ChevronDown, Star, BikeIcon, LucideBike, Hospital, HospitalIcon } from 'lucide-react'
+import { ArrowRight, ArrowDown, MousePointer, ZapIcon, Sparkles, Brain, Users, Shield, Clock, MapPin, ChevronRight, ChevronDown, Star, BikeIcon, LucideBike, Hospital, HospitalIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import MashallahForm from '@/form/mashallah'
@@ -344,7 +344,11 @@ export default function LandingPage() {
             {/* Step 1 - removed all the fancy hover stuff, was too much */}
             <div className="text-center">
               <div className="w-16 h-16 rounded-2xl flex items-center justify-center mb-6 mx-auto icon-container">
-                <ListCheck className="w-8 h-8 text-white" />
+                <img
+                  src="/icons/edit-document-icon.png"
+                  alt="Edit document icon"
+                  className="w-10 h-10 object-contain"
+                />
               </div>
               <h3 className="text-xl sm:text-2xl md:text-3xl font-bold title-gradient mb-4 italic">FRAGENBOGEN AUSFULLEN</h3>
               <p className="text-base sm:text-lg subtitle-text inconsolata font-thin px-4">
@@ -355,7 +359,11 @@ export default function LandingPage() {
             {/* Step 2 */}
             <div className="text-center">
               <div className="w-16 h-16 rounded-2xl flex items-center justify-center mb-6 mx-auto icon-container">
-                <Hospital className="w-8 h-8 text-white" />
+                <img
+                  src="/icons/leaf-environment-care-icon.png"
+                  alt="Medical certificate green"
+                  className="w-10 h-10 object-contain"
+                />
               </div>
               <h3 className="text-xl sm:text-2xl md:text-3xl font-bold title-gradient mb-4 italic">BEHANDLUNG ERHALTEN</h3>
               <p className="text-base sm:text-lg subtitle-text inconsolata font-thin px-4">
@@ -366,7 +374,11 @@ export default function LandingPage() {
             {/* Step 3 */}
             <div className="text-center">
               <div className="w-16 h-16 rounded-2xl flex items-center justify-center mb-6 mx-auto icon-container">
-                <LucideBike className="w-8 h-8 text-white" />
+                <img
+                src="/icons/product-timebox-icon.png"
+                alt="delivery icon"
+                className="w-10 h-10 object-contain"
+                />
               </div>
               <h3 className="text-xl sm:text-2xl md:text-3xl font-bold title-gradient mb-4 italic">EXPRESSLIEFERUNG ERHALTEN</h3>
               <p className="text-base sm:text-lg subtitle-text mb-4 inconsolata font-thin px-4">
