@@ -214,7 +214,7 @@ export default function MashallahForm({ postcode, onBack }: MashallahFormProps) 
                 className={`w-full pr-3 p-2.5 sm:p-3.5 border border-gray-300 rounded-lg inconsolata text-base sm:text-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none disabled:bg-gray-100 transition-all duration-200 ${
                     formData.street ? 'pl-3' : 'pl-12 sm:pl-16'
                   }`}
-                  placeholder="   z.B. Grassstraße 42"
+                  placeholder="z.B. Grassstraße 42"
                 />
               </div>
             </div>
@@ -239,7 +239,7 @@ export default function MashallahForm({ postcode, onBack }: MashallahFormProps) 
                     className={`w-full pr-3 p-2.5 sm:p-3 border border-gray-300 rounded-lg inconsolata text-base sm:text-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none disabled:bg-gray-100 transition-all duration-200 ${
                     formData.city ? 'pl-3' : 'pl-12 sm:pl-16'
                     }`}
-                    placeholder="   Berlin"
+                    placeholder="Berlin"
                   />
                 </div>
               </div>
