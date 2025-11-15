@@ -11,7 +11,7 @@ import Header from './header'
 import '@/components/ui/Hero/Words-Sliding-Smooth.css' 
 import ComingSoon from '@/components/ComingSoon'  
 
-const COMING_SOON_MODE = true;
+const COMING_SOON_MODE = false;
 
 // Font setup - using Inconsolata
 const inconsolataStyle = {
@@ -161,7 +161,7 @@ export default function LandingPage() {
   
   return (
     <>
-      <div className="min-h-screen inconsolata" style={inconsolataStyle}>
+      <div className="min-h-screen bg-beige inconsolata" style={inconsolataStyle}>
       {/* Header */}
       <Header 
         dialogOpen={dialogOpen}
