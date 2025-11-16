@@ -161,7 +161,7 @@ export default function LandingPage() {
   
   return (
     <>
-      <div className="min-h-screen inconsolata" style={inconsolataStyle}>
+      <div className="min-h-screen bg-beige inconsolata" style={inconsolataStyle}>
       {/* Header */}
       <Header 
         dialogOpen={dialogOpen}
