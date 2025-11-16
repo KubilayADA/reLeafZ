@@ -1,8 +1,6 @@
 'use client'
 
-export const dynamic = 'force-dynamic'
-
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { loadStripe } from '@stripe/stripe-js'
 import { Elements, PaymentElement, useStripe, useElements } from '@stripe/react-stripe-js'
@@ -91,7 +89,7 @@ function PaymentForm({ treatmentRequestId }: { treatmentRequestId: string }) {
   )
 }
 
-export default function ProductPaymentPage() {
+function ProductPaymentContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const treatmentRequestId = searchParams.get('requestId')
@@ -99,7 +97,6 @@ export default function ProductPaymentPage() {
   const [clientSecret, setClientSecret] = useState<string>('')
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
-  const [requestData, setRequestData] = useState<any>(null)
 
   const API_BASE = process.env.NEXT_PUBLIC_API_URL
 
@@ -120,7 +117,6 @@ export default function ProductPaymentPage() {
         return
       }
 
-      // Create product payment intent
       const response = await fetch(`${API_BASE}/api/payments/product-payment`, {
         method: 'POST',
         headers: {
@@ -136,8 +132,6 @@ export default function ProductPaymentPage() {
 
       if (response.ok && data.clientSecret) {
         setClientSecret(data.clientSecret)
-        // Optionally fetch treatment request details to show products
-        fetchRequestDetails(token)
       } else {
         setError(data.message || 'Failed to initialize payment')
       }
@@ -145,15 +139,6 @@ export default function ProductPaymentPage() {
       setError(err.message || 'Failed to initialize payment')
     } finally {
       setLoading(false)
-    }
-  }
-
-  const fetchRequestDetails = async (token: string) => {
-    try {
-      // You'll need to add this endpoint or fetch from existing data
-      // For now, we'll skip this
-    } catch (err) {
-      console.error('Failed to fetch request details:', err)
     }
   }
 
@@ -191,8 +176,6 @@ export default function ProductPaymentPage() {
   return (
     <div className="min-h-screen bg-beige inconsolata py-12 px-4">
       <div className="max-w-2xl mx-auto">
-        
-        {/* Header */}
         <div className="text-center mb-8">
           <div className="inline-flex items-center px-4 py-2 bg-gradient-to-r-custom mb-4">
             <Package className="w-4 h-4 mr-2" />
@@ -206,7 +189,6 @@ export default function ProductPaymentPage() {
           </p>
         </div>
 
-        {/* Success Notice */}
         <div className="bg-green-50 border-2 border-green-500 rounded-2xl p-6 mb-8">
           <div className="flex items-start gap-4">
             <CheckCircle2 className="w-6 h-6 text-green-600 flex-shrink-0 mt-1" />
@@ -223,7 +205,6 @@ export default function ProductPaymentPage() {
           </div>
         </div>
 
-        {/* Payment Form */}
         <div className="bg-white rounded-2xl border-2 border-black p-6 sm:p-8 shadow-xl">
           {clientSecret && (
             <Elements stripe={stripePromise} options={{ clientSecret }}>
@@ -232,7 +213,6 @@ export default function ProductPaymentPage() {
           )}
         </div>
 
-        {/* What's Next */}
         <div className="mt-8 bg-blue-50 border-2 border-blue-200 rounded-2xl p-6">
           <h3 className="font-bold text-lg mb-3 text-blue-900">📦 What Happens Next?</h3>
           <ol className="space-y-2 text-sm subtitle-text">
@@ -256,5 +236,17 @@ export default function ProductPaymentPage() {
         </div>
       </div>
     </div>
+  )
+}
+
+export default function ProductPaymentPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-beige inconsolata flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-4 border-green-600 border-t-transparent mx-auto mb-4"></div>
+      </div>
+    }>
+      <ProductPaymentContent />
+    </Suspense>
   )
 }
