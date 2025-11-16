@@ -114,48 +114,25 @@ export default function MarketplacePage() {
       alert('Please add at least one product to cart')
       return
     }
-
+  
     if (!treatmentRequest) {
       alert('Treatment request not found')
       return
     }
-
-    setSubmitting(true)
-
-    try {
-      // Send finalized request to doctor with selected strains
-      const response = await fetch(`${API_BASE}/api/treatment/finalize`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          treatmentRequestId: treatmentRequest.id,
-          selectedProducts: cart.map(item => ({
-            productId: item.product.id,
-            quantity: item.quantity,
-            productName: item.product.name,
-          })),
-          totalPrice: cartTotal,
-        }),
-      })
-
-      const result = await response.json()
-
-      if (response.ok) {
-        alert('Request sent to doctor for approval!')
-        // Clear localStorage and redirect
-        localStorage.removeItem('treatmentRequest')
-        router.push('/doctor-approval-pending') // Or wherever you want to redirect
-      } else {
-        alert(result.message || 'Checkout failed')
-      }
-    } catch (error) {
-      console.error('Checkout error:', error)
-      alert('An error occurred during checkout')
-    } finally {
-      setSubmitting(false)
-    }
+  
+    // Store data for payment page
+    localStorage.setItem('pendingTreatmentRequestId', treatmentRequest.id)
+    localStorage.setItem('selectedProducts', JSON.stringify(
+      cart.map(item => ({
+        productId: item.product.id,
+        quantity: item.quantity,
+        productName: item.product.name,
+      }))
+    ))
+    localStorage.setItem('totalPrice', cartTotal.toString())
+  
+    // Redirect to prescription payment
+    router.push('/payment/prescription')
   }
 
   const cartTotal = cart.reduce((sum, item) => sum + (item.product.price * item.quantity), 0)
