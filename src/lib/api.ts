@@ -253,6 +253,113 @@ export async function fetchPharmacyDashboard(token: string): Promise<any> {
   }
 }
 
+export async function pharmacyLogin(email: string, password: string): Promise<any> {
+  try {
+    const response = await fetch(`${API_BASE}/api/pharmacy/login`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ email, password }),
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || 'Login failed');
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Error logging in pharmacy:', error);
+    throw error;
+  }
+}
+
+export interface PharmacyOrder {
+  id: number;
+  patientName: string;
+  patientEmail: string;
+  patientPhone: string;
+  status: string;
+  symptoms: string;
+  createdAt: string;
+  prescriptionPdfPath?: string;  
+  selectedProducts?: Array<{     
+    productName: string;
+    quantity: number;
+  }>;
+  totalPrice?: number;         
+}
+
+export async function fetchPharmacyOrders(pharmacyId: number, token: string): Promise<PharmacyOrder[]> {
+  try {
+    const response = await fetch(`${API_BASE}/api/pharmacy/${pharmacyId}/orders`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!response.ok) throw new Error('Failed to fetch orders');
+    const data = await response.json();
+    return data.data || [];
+  } catch (error) {
+    console.error('Error fetching pharmacy orders:', error);
+    throw error;
+  }
+}
+
+export async function updateOrderStatus(
+  pharmacyId: number,
+  orderId: number,
+  status: string,
+  token: string
+): Promise<any> {
+  try {
+    const response = await fetch(`${API_BASE}/api/pharmacy/${pharmacyId}/orders/${orderId}/status`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ status }),
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || 'Failed to update order status');
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Error updating order status:', error);
+    throw error;
+  }
+}
+
+export async function markOrderReady(pharmacyId: number, orderId: number, token: string): Promise<any> {
+  try {
+    const response = await fetch(`${API_BASE}/api/pharmacy/${pharmacyId}/orders/${orderId}/mark-ready`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || 'Failed to mark order as ready');
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Error marking order as ready:', error);
+    throw error;
+  }
+}
+
 // ============================================
 // AUTHENTICATION ENDPOINTS
 // ============================================
