@@ -4,6 +4,10 @@
 @import "tw-animate-css";
 @import "./main.css";
 
+html {
+  scroll-behavior: smooth;
+}
+
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
