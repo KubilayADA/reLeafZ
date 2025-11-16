@@ -1,26 +1,22 @@
 'use client'
 
-export const dynamic = 'force-dynamic'
-
-import { useEffect, useState } from 'react'
+import { useEffect, useState, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { CheckCircle2, Package, FileText, Clock } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
-export default function PaymentSuccessPage() {
+function PaymentSuccessContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const paymentType = searchParams.get('type') // 'prescription' or 'products'
+  const paymentType = searchParams.get('type')
   const requestId = searchParams.get('requestId')
   
   const [loading, setLoading] = useState(true)
-  const [finalized, setFinalized] = useState(false)
 
   const API_BASE = process.env.NEXT_PUBLIC_API_URL
 
   useEffect(() => {
     if (paymentType === 'prescription' && requestId) {
-      // After prescription payment, finalize the request (send to doctor)
       finalizeRequest()
     } else {
       setLoading(false)
@@ -52,8 +48,6 @@ export default function PaymentSuccessPage() {
       })
 
       if (response.ok) {
-        setFinalized(true)
-        // Clear localStorage
         localStorage.removeItem('pendingTreatmentRequestId')
         localStorage.removeItem('selectedProducts')
         localStorage.removeItem('totalPrice')
@@ -76,13 +70,10 @@ export default function PaymentSuccessPage() {
     )
   }
 
-  // PRESCRIPTION PAYMENT SUCCESS
   if (paymentType === 'prescription') {
     return (
       <div className="min-h-screen bg-beige inconsolata py-12 px-4">
         <div className="max-w-2xl mx-auto">
-          
-          {/* Success Icon */}
           <div className="text-center mb-8">
             <div className="inline-flex items-center justify-center w-20 h-20 bg-green-500 rounded-full mb-4 animate-bounce">
               <CheckCircle2 className="w-12 h-12 text-white" />
@@ -95,11 +86,8 @@ export default function PaymentSuccessPage() {
             </p>
           </div>
 
-          {/* Success Card */}
           <div className="bg-white rounded-2xl border-2 border-black p-8 shadow-xl mb-6">
             <div className="space-y-6">
-              
-              {/* Payment Details */}
               <div className="flex items-center gap-4 p-4 bg-green-50 rounded-lg border-2 border-green-500">
                 <CheckCircle2 className="w-6 h-6 text-green-600" />
                 <div>
@@ -108,11 +96,9 @@ export default function PaymentSuccessPage() {
                 </div>
               </div>
 
-              {/* What's Next */}
               <div>
                 <h3 className="font-bold text-xl mb-4 title-gradient italic">What Happens Next?</h3>
                 <div className="space-y-4">
-                  
                   <div className="flex gap-4">
                     <div className="flex-shrink-0 w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
                       <Clock className="w-4 h-4 text-blue-600" />
@@ -148,21 +134,17 @@ export default function PaymentSuccessPage() {
                       </p>
                     </div>
                   </div>
-
                 </div>
               </div>
 
-              {/* Email Notice */}
               <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
                 <p className="text-sm subtitle-text">
                   📧 <strong>Check your email</strong> - You'll receive updates about your request status.
                 </p>
               </div>
-
             </div>
           </div>
 
-          {/* Actions */}
           <div className="text-center">
             <Button 
               onClick={() => router.push('/')}
@@ -171,18 +153,14 @@ export default function PaymentSuccessPage() {
               Return to Home
             </Button>
           </div>
-
         </div>
       </div>
     )
   }
 
-  // PRODUCT PAYMENT SUCCESS
   return (
     <div className="min-h-screen bg-beige inconsolata py-12 px-4">
       <div className="max-w-2xl mx-auto">
-        
-        {/* Success Icon */}
         <div className="text-center mb-8">
           <div className="inline-flex items-center justify-center w-20 h-20 bg-green-500 rounded-full mb-4 animate-bounce">
             <Package className="w-12 h-12 text-white" />
@@ -195,9 +173,7 @@ export default function PaymentSuccessPage() {
           </p>
         </div>
 
-        {/* Success Card */}
         <div className="bg-white rounded-2xl border-2 border-black p-8 shadow-xl mb-6">
-          
           <div className="flex items-center gap-4 p-4 bg-green-50 rounded-lg border-2 border-green-500 mb-6">
             <CheckCircle2 className="w-6 h-6 text-green-600" />
             <div>
@@ -208,7 +184,6 @@ export default function PaymentSuccessPage() {
 
           <div className="space-y-4">
             <h3 className="font-bold text-xl mb-4 title-gradient italic">Next Steps</h3>
-            
             <div className="space-y-3 text-sm subtitle-text">
               <div className="flex gap-3">
                 <span className="font-bold text-green-600">✓</span>
@@ -228,10 +203,8 @@ export default function PaymentSuccessPage() {
               </div>
             </div>
           </div>
-
         </div>
 
-        {/* Actions */}
         <div className="text-center">
           <Button 
             onClick={() => router.push('/')}
@@ -240,8 +213,19 @@ export default function PaymentSuccessPage() {
             Return to Home
           </Button>
         </div>
-
       </div>
     </div>
+  )
+}
+
+export default function PaymentSuccessPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-beige inconsolata flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-4 border-green-600 border-t-transparent mx-auto mb-4"></div>
+      </div>
+    }>
+      <PaymentSuccessContent />
+    </Suspense>
   )
 }

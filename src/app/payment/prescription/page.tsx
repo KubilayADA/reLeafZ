@@ -1,14 +1,11 @@
 'use client'
 
-export const dynamic = 'force-dynamic'
-
-import { useState, useEffect } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useState, useEffect, Suspense } from 'react'
+import { useRouter } from 'next/navigation'
 import { loadStripe } from '@stripe/stripe-js'
 import { Elements, PaymentElement, useStripe, useElements } from '@stripe/react-stripe-js'
 import { Button } from '@/components/ui/button'
 import { CreditCard, CheckCircle2, AlertCircle } from 'lucide-react'
-
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!)
 
@@ -66,7 +63,6 @@ function PaymentForm({ treatmentRequestId, selectedProducts, totalPrice }: {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      {/* Payment Summary */}
       <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl border-2 border-black p-6">
         <h3 className="text-lg font-bold mb-4 title-gradient italic">Order Summary</h3>
         
@@ -97,7 +93,6 @@ function PaymentForm({ treatmentRequestId, selectedProducts, totalPrice }: {
         </div>
       </div>
 
-      {/* Stripe Payment Element */}
       <div className="bg-white rounded-xl border-2 border-black p-6">
         <PaymentElement />
       </div>
@@ -134,9 +129,8 @@ function PaymentForm({ treatmentRequestId, selectedProducts, totalPrice }: {
   )
 }
 
-export default function PrescriptionPaymentPage() {
+function PrescriptionPaymentContent() {
   const router = useRouter()
-  const searchParams = useSearchParams()
   const [clientSecret, setClientSecret] = useState<string>('')
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
@@ -152,7 +146,6 @@ export default function PrescriptionPaymentPage() {
 
   const initializePayment = async () => {
     try {
-      // Get data from localStorage (passed from marketplace)
       const requestId = localStorage.getItem('pendingTreatmentRequestId')
       const products = localStorage.getItem('selectedProducts')
       const total = localStorage.getItem('totalPrice')
@@ -167,14 +160,12 @@ export default function PrescriptionPaymentPage() {
       setSelectedProducts(JSON.parse(products))
       setTotalPrice(parseFloat(total))
 
-      // Get token
       const token = localStorage.getItem('token')
       if (!token) {
         router.push('/login')
         return
       }
 
-      // Create payment intent
       const response = await fetch(`${API_BASE}/api/payments/prescription-fee`, {
         method: 'POST',
         headers: {
@@ -234,8 +225,6 @@ export default function PrescriptionPaymentPage() {
   return (
     <div className="min-h-screen bg-beige inconsolata py-12 px-4">
       <div className="max-w-2xl mx-auto">
-        
-        {/* Header */}
         <div className="text-center mb-8">
           <div className="inline-flex items-center px-4 py-2 bg-gradient-to-r-custom mb-4">
             <CreditCard className="w-4 h-4 mr-2" />
@@ -249,7 +238,6 @@ export default function PrescriptionPaymentPage() {
           </p>
         </div>
 
-        {/* Payment Form */}
         <div className="bg-white rounded-2xl border-2 border-black p-6 sm:p-8 shadow-xl">
           {clientSecret && (
             <Elements stripe={stripePromise} options={{ clientSecret }}>
@@ -262,7 +250,6 @@ export default function PrescriptionPaymentPage() {
           )}
         </div>
 
-        {/* Trust Badges */}
         <div className="mt-8 text-center">
           <div className="flex items-center justify-center gap-4 text-sm subtitle-text">
             <div className="flex items-center gap-2">
@@ -277,5 +264,17 @@ export default function PrescriptionPaymentPage() {
         </div>
       </div>
     </div>
+  )
+}
+
+export default function PrescriptionPaymentPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-beige inconsolata flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-4 border-green-600 border-t-transparent mx-auto mb-4"></div>
+      </div>
+    }>
+      <PrescriptionPaymentContent />
+    </Suspense>
   )
 }
