@@ -347,7 +347,7 @@ export default function LandingPage() {
                 <img
                   src="/icons/edit-document-icon.png"
                   alt="Edit document icon"
-                  className="w-10 h-10 object-contain"
+                  className="w-10 h-10 object-contain icon-leaf-white"
                 />
               </div>
               <h3 className="text-xl sm:text-2xl md:text-3xl font-bold title-gradient mb-4 italic">FRAGENBOGEN AUSFULLEN</h3>
@@ -362,7 +362,7 @@ export default function LandingPage() {
                 <img
                   src="/icons/leaf-environment-care-icon.png"
                   alt="Medical certificate green"
-                  className="w-10 h-10 object-contain"
+                  className="w-10 h-10 object-contain icon-leaf-white"
                 />
               </div>
               <h3 className="text-xl sm:text-2xl md:text-3xl font-bold title-gradient mb-4 italic">BEHANDLUNG ERHALTEN</h3>
@@ -375,9 +375,9 @@ export default function LandingPage() {
             <div className="text-center">
               <div className="w-16 h-16 rounded-2xl flex items-center justify-center mb-6 mx-auto icon-container">
                 <img
-                src="/icons/product-timebox-icon.png"
-                alt="delivery icon"
-                className="w-10 h-10 object-contain"
+                  src="/icons/product-timebox-icon.png"
+                  alt="delivery icon"
+                  className="w-10 h-10 object-contain icon-leaf-white"
                 />
               </div>
               <h3 className="text-xl sm:text-2xl md:text-3xl font-bold title-gradient mb-4 italic">EXPRESSLIEFERUNG ERHALTEN</h3>
