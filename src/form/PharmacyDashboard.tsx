@@ -520,6 +520,25 @@ export default function PharmacyDashboard() {
                         </div>
                       </div>
                       <div className="flex gap-3 pt-4 border-t border-gray-100">
+                        {/* NEW: PAID status - Products paid, ready to process */}
+                        {order.status === 'PAID' && (
+                          <>
+                            <button
+                              onClick={() => handleUpdateStatus(order.id, 'PROCESSING')}
+                              className="btn-primary flex-1 flex items-center justify-center gap-2 px-4 py-2.5 font-medium rounded-lg"
+                            >
+                              <Loader2 size={18} />
+                              In Bearbeitung
+                            </button>
+                            <button
+                              onClick={() => handleMarkReady(order.id)}
+                              className="bg-green-600 hover:bg-green-700 text-white flex-1 flex items-center justify-center gap-2 px-4 py-2.5 font-medium rounded-lg"
+                            >
+                              <CheckCircle size={18} />
+                              Als Bereit markieren
+                            </button>
+                          </>
+                        )}
                         {order.status === 'APPROVED' && (
                           <>
                             <button
