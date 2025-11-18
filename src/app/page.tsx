@@ -11,7 +11,7 @@ import Header from './header'
 import '@/components/ui/Hero/Words-Sliding-Smooth.css' 
 import ComingSoon from '@/components/ComingSoon'  
 
-const COMING_SOON_MODE = false;
+const COMING_SOON_MODE = true;
 
 // Font setup - using Inconsolata
 const inconsolataStyle = {
@@ -60,7 +60,7 @@ const FloatingMonkey = () => {
           <div className="text-4xl transform rotate-12">🐒💨</div>
           <div className="flex-1">
             <div className="text-sm font-semibold text-emerald-700 mb-1">Feeling Relaxed?</div>
-            <div className="text-xs text-gray-600">Luna found the perfect strain for your sleep schedule</div>
+            <div className="text-xs text-gray-600">Weedo found the perfect strain for your sleep schedule</div>
           </div>
         </div>
       </div>
@@ -439,7 +439,7 @@ export default function LandingPage() {
               variant="outline" 
               className="border-2 border-gray-900 text-gray-900 hover:bg-gray-100 px-6 sm:px-10 py-4 sm:py-6 rounded-2xl text-base sm:text-lg font-bold subtitle-text"
             >
-              Speak with Luna
+              Speak with Weedo, the best budtender in town
             </Button>
           </div>
 
