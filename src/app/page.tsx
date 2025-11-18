@@ -331,7 +331,7 @@ export default function LandingPage() {
       </section>
 
       {/* How it works section */}
-      <section className="section-container">
+      <section id="ablauf" className="section-container">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16 px-4">
             <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold title-gradient mb-4 italic">SO FUNKTIONIERT'S</h2>
@@ -378,7 +378,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-     <section className="py-12 sm:py-16 md:py-24 bg-gradient-to-r-custom section-container">
+     <section id="vorteile" className="py-12 sm:py-16 md:py-24 bg-gradient-to-r-custom section-container">
   <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center md:items-start text-center md:text-left">
     {/* city descr. on the left */}
     <div className="w-full md:w-1/2 mt-8 md:mt-0 md:pr-12 flex flex-col justify-center">
@@ -421,7 +421,7 @@ export default function LandingPage() {
 </section>
 
       {/* Bottom CTA section */}
-      <section className="py-12 sm:py-16 md:py-24 section-container">
+      <section id="chat" className="py-12 sm:py-16 md:py-24 section-container">
         <div className="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-6 title-gradient">
             Ready to Transform Your<br className="hidden sm:block" />Medical Cannabis Experience?
