@@ -73,9 +73,8 @@ export default function Header({
           {/* Desktop Nav */}
           <nav className="hidden md:flex absolute left-1/2 top-flex mt-12 transform -translate-x-1/2 -translate-y-1/2 space-x-8 inconsolata font-normal ">
             <a href="#ablauf" className="text-mg md:text-xl   leading-relaxed">Ablauf</a>
-            <a href="vorteile" className="text-lg md:text-xl   leading-relaxed">Vorteile</a>
-            <a href="faq" className="text-lg md:text-xl   leading-relaxed">FAQ</a>
-            <a href="chat" className="text-lg md:text-xl leading-relaxed">Chat with us!</a>
+            <a href="#vorteile" className="text-lg md:text-xl   leading-relaxed">Vorteile</a>
+            <a href="#chat" className="text-lg md:text-xl leading-relaxed">Chat with us!</a>
           </nav>
           
           {/* Desktop Button - Hidden on mobile, only in hamburger menu wish i believe is better let me know if you see this UwUwuu*/}
@@ -134,9 +133,8 @@ export default function Header({
           <div className="lg:hidden absolute top-full left-0 w-full bg-white shadow-lg border-t border-emerald-200 z-50">
             <nav className="flex flex-col items-center py-6 space-y-6">
               <a href="#ablauf" className="text-xl text-black-800 inconsolata" onClick={() => setMobileNavOpen(false)}>Ablauf</a>
-              <a href="vorteile" className="text-xl text-black-800 inconsolata" onClick={() => setMobileNavOpen(false)}>Vorteile</a>
-              <a href="faq" className="text-xl text-black-800 inconsolata" onClick={() => setMobileNavOpen(false)}>FAQ</a>
-              <a href="chat" className="text-xl text-black-800 inconsolata" onClick={() => setMobileNavOpen(false)}>Chat with us!</a>
+              <a href="#vorteile" className="text-xl text-black-800 inconsolata" onClick={() => setMobileNavOpen(false)}>Vorteile</a>
+              <a href="#chat" className="text-xl text-black-800 inconsolata" onClick={() => setMobileNavOpen(false)}>Chat with us!</a>
               <div className="w-full px-4">
                 <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
                   <DialogTrigger asChild>
