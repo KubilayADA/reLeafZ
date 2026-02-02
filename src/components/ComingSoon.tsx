@@ -176,8 +176,8 @@ const ComingSoon: React.FC = () => {
             color: 'rgba(255, 255, 255, 0.8)',
           }}
         >
-          Be among the first to experience our AI-powered strain matching. Waiting list goes live soon{' '}
-          <strong style={{ color: '#22d3ee' }}>Coming Soon</strong> .the coolest.  </strong>  .ever made.
+          Be among the first to experience our AI-powered strain matching. Waiting list goes live soon.{' '}
+          <strong style={{ color: '#22d3ee' }}>Coming Soon</strong>.
         </p>
 
         {/* Email form - responsive layout */} 
