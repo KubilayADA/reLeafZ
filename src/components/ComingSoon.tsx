@@ -176,12 +176,11 @@ const ComingSoon: React.FC = () => {
             color: 'rgba(255, 255, 255, 0.8)',
           }}
         >
-          Be among the first to experience our AI-powered strain matching. Waiting list goes live{' '}
-          <strong style={{ color: '#22d3ee' }}>20 December Saturday at 12:00 PM </strong>. First 30 registrations receive{' '}
-          <strong style={{ color: '#22d3ee' }}>free prescription</strong> instead of €14.99.
+          Be among the first to experience our AI-powered strain matching. Waiting list goes live soon{' '}
+          <strong style={{ color: '#22d3ee' }}>Coming Soon</strong> .the coolest.  </strong>  .ever made.
         </p>
 
-        {/* Email form - responsive layout */}
+        {/* Email form - responsive layout */} 
         <form onSubmit={handleSubmit} className="max-w-2xl mx-auto px-4 relative z-10">
           {/* Desktop/Tablet: Horizontal layout */}
           <div className="hidden sm:flex items-center gap-4 justify-center">
