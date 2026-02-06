@@ -412,3 +412,96 @@ export async function patientLogin(email: string, postcode: string): Promise<any
     throw error;
   }
 }
+
+// ============================================
+// PRODUCT MANAGEMENT ENDPOINTS (Pharmacy Auth Required)
+// ============================================
+
+export interface ProductFormData {
+  name: string;
+  form: 'FLOWER' | 'OIL' | 'EXTRACT' | 'CAPSULE' | 'SPRAY';
+  thcPercent: number;
+  cbdPercent: number;
+  price: number;
+  unit: string;
+  stock: number;
+}
+
+export async function createProduct(productData: ProductFormData, token: string): Promise<Product> {
+  try {
+    const response = await fetch(`${API_BASE}/api/products`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(productData),
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || 'Failed to create product');
+    }
+
+    const data = await response.json();
+    return data.data;
+  } catch (error) {
+    console.error('Error creating product:', error);
+    throw error;
+  }
+}
+
+export async function updateProduct(
+  productId: number,
+  productData: Partial<ProductFormData>,
+  token: string
+): Promise<Product> {
+  try {
+    const response = await fetch(`${API_BASE}/api/products/${productId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(productData),
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || 'Failed to update product');
+    }
+
+    const data = await response.json();
+    return data.data;
+  } catch (error) {
+    console.error('Error updating product:', error);
+    throw error;
+  }
+}
+
+export async function deleteProduct(productId: number, token: string): Promise<void> {
+  try {
+    const response = await fetch(`${API_BASE}/api/products/${productId}`, {
+      method: 'DELETE',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || 'Failed to delete product');
+    }
+  } catch (error) {
+    console.error('Error deleting product:', error);
+    throw error;
+  }
+}
+
+export async function updateProductStock(
+  productId: number,
+  stock: number,
+  token: string
+): Promise<Product> {
+  return updateProduct(productId, { stock }, token);
+}
