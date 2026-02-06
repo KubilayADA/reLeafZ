@@ -12,6 +12,7 @@ export interface Product {
   unit: string;
   stock: number;
   pharmacyId: number;
+  imageUrl?: string;
   productTags?: Array<{ tag: { id: number; name: string } }>;
 }
 
@@ -425,6 +426,7 @@ export interface ProductFormData {
   price: number;
   unit: string;
   stock: number;
+  imageUrl?: string;
 }
 
 export async function createProduct(productData: ProductFormData, token: string): Promise<Product> {

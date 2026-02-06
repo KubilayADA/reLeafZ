@@ -51,7 +51,8 @@ const initialProductForm: ProductFormData = {
   cbdPercent: 0,
   price: 0,
   unit: 'gram',
-  stock: 0
+  stock: 0,
+  imageUrl: ''
 };
 
 export default function PharmacyDashboard() {
@@ -203,7 +204,8 @@ export default function PharmacyDashboard() {
       cbdPercent: product.cbdPercent,
       price: product.price,
       unit: product.unit,
-      stock: product.stock
+      stock: product.stock,
+      imageUrl: product.imageUrl || ''
     })
     setShowProductModal(true)
   }
@@ -1114,6 +1116,36 @@ export default function PharmacyDashboard() {
                         placeholder="Verfügbare Menge"
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"
                       />
+                    </div>
+
+                    {/* Image URL */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Bild URL
+                      </label>
+                      <input
+                        type="url"
+                        value={productForm.imageUrl || ''}
+                        onChange={(e) => handleFormChange('imageUrl', e.target.value)}
+                        placeholder="https://example.com/product-image.jpg"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"
+                      />
+                      <p className="mt-1 text-xs text-gray-500">
+                        Optional: URL zum Produktbild (Cloudinary, imgbb, etc.)
+                      </p>
+                      {productForm.imageUrl && (
+                        <div className="mt-2 p-2 bg-gray-50 rounded-lg">
+                          <p className="text-xs text-gray-500 mb-2">Vorschau:</p>
+                          <img 
+                            src={productForm.imageUrl} 
+                            alt="Produktvorschau" 
+                            className="h-20 w-20 object-cover rounded-lg border border-gray-200"
+                            onError={(e) => {
+                              (e.target as HTMLImageElement).style.display = 'none'
+                            }}
+                          />
+                        </div>
+                      )}
                     </div>
                   </div>
 

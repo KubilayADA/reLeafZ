@@ -6,14 +6,72 @@ import { useRouter } from 'next/navigation'
 import { Check, Leaf, ArrowRight, Sparkles, ShieldCheck, Clock, Package, Loader2 } from 'lucide-react'
 
 // =====================================================
-// STRAIN IMAGES - Replace placeholder URLs with real ones
+// CENTRALIZED STRAIN IMAGE LIBRARY
 // =====================================================
-// Format: [productId]: 'your-image-url'
-// Example: 1: 'https://example.com/strain1.jpg'
-const STRAIN_IMAGES: Record<number, string> = {
-  // Add your image URLs here, keyed by product ID
-  // 1: 'https://your-image-url.com/strain1.jpg',
-  // 2: 'https://your-image-url.com/strain2.jpg',
+// Images are matched by strain name - works across ALL pharmacies
+// Add strain names (or partial matches) with their image URLs
+// These are shared across all pharmacies automatically
+//
+// Format: 'strain name pattern': 'image-url'
+// Matching is case-insensitive and checks if product name contains the pattern
+// =====================================================
+const STRAIN_IMAGE_LIBRARY: Record<string, string> = {
+  // =====================================================
+  // LOCAL STRAIN IMAGES - stored in /public/strains/
+  // =====================================================
+  // Add images to /public/strains/ folder, then reference here
+  // Format: 'strain name pattern': '/strains/filename.webp',
+  // =====================================================
+  'Mac Driver': '/strains/mac-driver.webp',
+  'Black Cherry Punch': '/strains/black-cherry-punch.webp',
+  'White Widow': '/strains/white-widow-cheese.jpg',
+  'Slurricane': '/strains/slurricane.webp',
+  
+  // Hi Society (27/1) DFR
+  'Hi Society': '/strains/hi-society-dfr.webp',
+  'DFR': '/strains/hi-society-dfr.webp',
+  
+  // Madrecan (18/1) GDY - Granddaddy OG
+  'Madrecan': '/strains/madrecan-granddaddy-og.webp',
+  'GDY': '/strains/madrecan-granddaddy-og.webp',
+  'Granddaddy': '/strains/madrecan-granddaddy-og.webp',
+  
+  // Medical Saints (18/1) LSK - Lemon Skunk Kush
+  'Medical Saints': '/strains/medical-saints-lemon-skunk.jpg',
+  'LSK': '/strains/medical-saints-lemon-skunk.jpg',
+  'Lemon Skunk': '/strains/medical-saints-lemon-skunk.jpg',
+  
+  // Organic Sweetgrass (21/1) MCC - Mint Chocolate Chip
+  'Organic Sweetgrass': '/strains/organic-sweetgrass-mint-chocolate.webp',
+  'MCC': '/strains/organic-sweetgrass-mint-chocolate.webp',
+  'Mint Chocolate': '/strains/organic-sweetgrass-mint-chocolate.webp',
+  
+  // Remexian (30/1) ARR
+  'Remexian': '/strains/remexian-arr.webp',
+  'ARR': '/strains/remexian-arr.webp',
+  
+  // Slouw PS3 (22/1) OGK - OG Kush
+  'Slouw': '/strains/slouw-ps3-og-kush.webp',
+  'PS3': '/strains/slouw-ps3-og-kush.webp',
+  'OGK': '/strains/slouw-ps3-og-kush.webp',
+  
+  // ZOIKS (26/1) BB - Ben and B
+  'ZOIKS': '/strains/zoiks-bb.webp',
+  'BB': '/strains/zoiks-bb.webp',
+  
+  // ZOIKS Space Rider
+  'Space Rider': '/strains/zoiks-space-rider.webp',
+}
+
+// Find matching strain image from library (case-insensitive partial match)
+const findStrainImage = (productName: string): string | null => {
+  const nameLower = productName.toLowerCase()
+  for (const [strainPattern, imageUrl] of Object.entries(STRAIN_IMAGE_LIBRARY)) {
+    if (nameLower.includes(strainPattern.toLowerCase())) {
+      return imageUrl
+    }
+  }
+  return null
 }
 
 // Placeholder SVG for products without images
@@ -43,10 +101,20 @@ const getStrainType = (name: string): { type: string; color: string } => {
 }
 
 // Get image for product
+// Priority: 1) Backend imageUrl (pharmacy override), 2) Strain library match, 3) Placeholder
 const getProductImage = (product: Product): string => {
-  if (STRAIN_IMAGES[product.id]) {
-    return STRAIN_IMAGES[product.id]
+  // 1. Check if product has specific imageUrl from backend (pharmacy can override)
+  if (product.imageUrl) {
+    return product.imageUrl
   }
+  
+  // 2. Check centralized strain library (shared across all pharmacies)
+  const strainImage = findStrainImage(product.name)
+  if (strainImage) {
+    return strainImage
+  }
+  
+  // 3. Default placeholder
   return PLACEHOLDER_IMAGE
 }
 
@@ -355,7 +423,7 @@ export default function MarketplacePage() {
       </div>
 
       {/* Main Content */}
-      <div className="max-w-6xl mx-auto px-4 py-8 pb-48">
+      <div className="max-w-6xl mx-auto px-4 py-8 pb-32">
         {/* Header */}
         <div className="mb-8">
           <div className="inline-flex items-center px-4 py-2 bg-gradient-to-r-custom rounded-full mb-4">
@@ -497,108 +565,115 @@ export default function MarketplacePage() {
         </div>
       </div>
 
-      {/* Fixed Bottom Bar with Summary */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white border-t-2 border-black shadow-2xl z-50">
-        <div className="max-w-6xl mx-auto px-4 py-4">
-          <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
+      {/* Floating Cart Balloon */}
+      <div className={`
+        fixed bottom-6 right-6 z-50 transition-all duration-300 ease-out
+        ${selectedProducts.size > 0 ? 'translate-y-0 opacity-100' : 'translate-y-20 opacity-0 pointer-events-none'}
+      `}>
+        {/* Expandable Card */}
+        <div className="group relative">
+          {/* Main Balloon */}
+          <div className="bg-white rounded-2xl shadow-2xl border border-gray-200 overflow-hidden
+                          transition-all duration-300 ease-out
+                          hover:shadow-[0_20px_60px_-15px_rgba(16,185,129,0.3)]">
             
-            {/* Left: Selected Products Summary */}
-            <div className="flex-1 w-full lg:w-auto">
-              {selectedProducts.size === 0 ? (
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-gray-100 border-2 border-dashed border-gray-300 flex items-center justify-center">
-                    <Leaf className="w-5 h-5 text-gray-400" />
-                  </div>
-                  <p className="text-gray-500">Bitte wähle mindestens ein Produkt aus</p>
+            {/* Compact Header - Always Visible */}
+            <div className="flex items-center gap-3 p-4">
+              {/* Selection Badge */}
+              <div className="relative">
+                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-emerald-500 to-green-600 
+                                flex items-center justify-center shadow-lg">
+                  <Leaf className="w-6 h-6 text-white" />
                 </div>
-              ) : (
-                <div className="space-y-1">
-                  <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Deine Auswahl:</p>
-                  <div className="flex flex-wrap gap-2">
-                    {Array.from(selectedProducts).map(id => {
-                      const product = products.find(p => p.id === id)
-                      if (!product) return null
-                      return (
-                        <div
-                          key={id}
-                          className="inline-flex items-center gap-1.5 bg-emerald-50 border border-emerald-200 rounded-full px-3 py-1"
-                        >
-                          <Leaf className="w-3 h-3 text-emerald-600" />
-                          <span className="text-xs font-medium text-emerald-800 max-w-[120px] truncate">
-                            {product.name.split(' - ')[1] || product.name.split(' ')[0]}
-                          </span>
-                          <span className="text-xs text-emerald-600">
-                            {quantities[id] || getDefaultQuantity(product)}g
-                          </span>
-                        </div>
-                      )
-                    })}
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* Right: Price Breakdown & Button */}
-            <div className="flex flex-col sm:flex-row items-end sm:items-center gap-4 w-full lg:w-auto">
-              
-              {/* Price Breakdown */}
-              <div className="bg-gray-50 rounded-xl px-4 py-3 min-w-[220px]">
-                <div className="space-y-1.5 text-sm">
-                  <div className="flex justify-between items-center">
-                    <span className="text-gray-600">Produkte:</span>
-                    <span className="font-medium">€{totalPrice.toFixed(2)}</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-gray-600">Rezeptgebühr:</span>
-                    <span className="font-medium">€{PRESCRIPTION_FEE.toFixed(2).replace('.', ',')}</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-gray-600">Lieferung:</span>
-                    <span className="font-medium">€{DELIVERY_FEE.toFixed(2).replace('.', ',')}</span>
-                  </div>
-                  <div className="border-t border-gray-200 pt-2 mt-2">
-                    <div className="flex justify-between items-center">
-                      <span className="font-bold text-gray-900">Gesamt:</span>
-                      <span className="font-bold text-lg text-emerald-700">
-                        €{(totalPrice + PRESCRIPTION_FEE + DELIVERY_FEE).toFixed(2)}
-                      </span>
-                    </div>
-                  </div>
+                <div className="absolute -top-1 -right-1 w-5 h-5 bg-emerald-700 rounded-full 
+                                flex items-center justify-center text-[10px] font-bold text-white
+                                ring-2 ring-white">
+                  {selectedProducts.size}
                 </div>
               </div>
-
+              
+              {/* Price & Info */}
+              <div className="flex-1 min-w-0">
+                <p className="text-xs text-gray-500 font-medium">Gesamtsumme</p>
+                <p className="text-xl font-bold text-gray-900">
+                  €{(totalPrice + PRESCRIPTION_FEE + DELIVERY_FEE).toFixed(2)}
+                </p>
+              </div>
+              
               {/* Continue Button */}
-              <div className="flex flex-col items-end gap-1">
+              <button
+                onClick={handleCheckout}
+                disabled={isSubmitDisabled() || submitting}
+                className={`
+                  flex items-center justify-center gap-2 px-5 py-3 rounded-xl font-bold text-sm
+                  transition-all duration-200 whitespace-nowrap
+                  ${!isSubmitDisabled()
+                    ? 'bg-gradient-to-r from-emerald-600 to-green-600 text-white hover:shadow-lg hover:scale-105 active:scale-95'
+                    : 'bg-gray-200 text-gray-500 cursor-not-allowed'
+                  }
+                `}
+              >
+                {submitting ? (
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                ) : (
+                  <>
+                    <span>Weiter</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </>
+                )}
+              </button>
+            </div>
+            
+            {/* Expandable Details - Shows on Hover */}
+            <div className="max-h-0 overflow-hidden transition-all duration-300 ease-out
+                            group-hover:max-h-[300px] border-t-0 group-hover:border-t border-gray-100">
+              <div className="p-4 pt-3 space-y-3">
+                {/* Selected Products */}
+                <div className="flex flex-wrap gap-1.5">
+                  {Array.from(selectedProducts).map(id => {
+                    const product = products.find(p => p.id === id)
+                    if (!product) return null
+                    return (
+                      <span
+                        key={id}
+                        className="inline-flex items-center gap-1 bg-emerald-50 text-emerald-700 
+                                   text-xs font-medium px-2 py-1 rounded-full"
+                      >
+                        {product.name.split(' - ')[1]?.split(' ')[0] || product.name.split(' ')[0]}
+                        <span className="text-emerald-500">
+                          {quantities[id] || getDefaultQuantity(product)}g
+                        </span>
+                      </span>
+                    )
+                  })}
+                </div>
+                
+                {/* Price Breakdown */}
+                <div className="text-xs space-y-1 text-gray-600">
+                  <div className="flex justify-between">
+                    <span>Produkte</span>
+                    <span className="font-medium text-gray-900">€{totalPrice.toFixed(2)}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Rezeptgebühr</span>
+                    <span>€{PRESCRIPTION_FEE.toFixed(2)}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Lieferung</span>
+                    <span>€{DELIVERY_FEE.toFixed(2)}</span>
+                  </div>
+                </div>
+                
                 {validationError && (
                   <p className="text-xs text-red-600 font-medium">{validationError}</p>
                 )}
-                <button
-                  onClick={handleCheckout}
-                  disabled={isSubmitDisabled() || submitting}
-                  className={`
-                    flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-bold text-base
-                    transition-all duration-200 whitespace-nowrap
-                    ${!isSubmitDisabled()
-                      ? 'bg-gradient-to-r from-emerald-600 to-green-600 text-white hover:shadow-lg hover:scale-[1.02] active:scale-[0.98]'
-                      : 'bg-gray-200 text-gray-500 cursor-not-allowed'
-                    }
-                  `}
-                >
-                  {submitting ? (
-                    <>
-                      <Loader2 className="w-5 h-5 animate-spin" />
-                      <span>Wird gesendet...</span>
-                    </>
-                  ) : (
-                    <>
-                      <span>Weiter</span>
-                      <ArrowRight className="w-5 h-5" />
-                    </>
-                  )}
-                </button>
               </div>
             </div>
           </div>
+          
+          {/* Subtle glow effect */}
+          <div className="absolute inset-0 -z-10 bg-gradient-to-r from-emerald-400 to-green-400 
+                          rounded-2xl blur-xl opacity-20 group-hover:opacity-30 transition-opacity" />
         </div>
       </div>
     </div>
