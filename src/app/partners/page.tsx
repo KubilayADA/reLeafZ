@@ -1,7 +1,9 @@
 'use client'
 
-import React, { useState, useEffect, useRef, useCallback } from 'react'
+import React, { useState, useEffect, useRef, useCallback, type FormEvent } from 'react'
 import Link from 'next/link'
+
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/
 
 /* ------------------------------------------------------------------ */
 /*  Intersection-Observer fade-in hook                                 */
@@ -54,11 +56,14 @@ function FadeIn({
 /* ------------------------------------------------------------------ */
 /*  Page                                                               */
 /* ------------------------------------------------------------------ */
+type FieldErrors = Partial<Record<'fullName' | 'organization' | 'role' | 'email', string>>
+
 export default function PartnersPage() {
   const [scrolled, setScrolled] = useState(false)
   const [activeTab, setActiveTab] = useState<'pharmacy' | 'doctor'>('pharmacy')
-  const [formState, setFormState] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle')
+  const [formState, setFormState] = useState<'idle' | 'submitting' | 'success' | 'duplicate' | 'error'>('idle')
   const [formError, setFormError] = useState('')
+  const [fieldErrors, setFieldErrors] = useState<FieldErrors>({})
   const [form, setForm] = useState({
     fullName: '',
     organization: '',
@@ -67,6 +72,7 @@ export default function PartnersPage() {
     phone: '',
     message: '',
   })
+  const successRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     const html = document.documentElement
@@ -87,32 +93,75 @@ export default function PartnersPage() {
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
+  useEffect(() => {
+    if ((formState === 'success' || formState === 'duplicate') && successRef.current) {
+      successRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    }
+  }, [formState])
+
   const set = useCallback(
-    (key: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) =>
-      setForm((p) => ({ ...p, [key]: e.target.value })),
+    (key: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+      setForm((p) => ({ ...p, [key]: e.target.value }))
+      setFieldErrors((p) => ({ ...p, [key]: undefined }))
+    },
     [],
   )
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const validate = (): boolean => {
+    const errs: FieldErrors = {}
+    if (!form.fullName.trim()) errs.fullName = 'Full name is required.'
+    if (!form.organization.trim()) errs.organization = 'Organization is required.'
+    if (!form.role) errs.role = 'Please select your role.'
+    if (!form.email.trim()) {
+      errs.email = 'Email is required.'
+    } else if (!EMAIL_RE.test(form.email.trim())) {
+      errs.email = 'Please enter a valid email address.'
+    }
+    setFieldErrors(errs)
+    return Object.keys(errs).length === 0
+  }
+
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault()
-    setFormState('submitting')
     setFormError('')
+    if (!validate()) return
+
+    setFormState('submitting')
     try {
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/api/partners/inquiry`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(form),
+          body: JSON.stringify({
+            ...form,
+            fullName: form.fullName.trim(),
+            organization: form.organization.trim(),
+            email: form.email.trim(),
+            phone: form.phone.trim(),
+            message: form.message.trim(),
+          }),
         },
       )
+
+      const data = await res.json().catch(() => null)
+
       if (!res.ok) {
-        const data = await res.json().catch(() => null)
         throw new Error(data?.error || 'Something went wrong. Please try again.')
       }
+
+      if (data?.alreadySubmitted) {
+        setFormState('duplicate')
+        return
+      }
+
       setFormState('success')
     } catch (err) {
-      setFormError(err instanceof Error ? err.message : 'Something went wrong.')
+      if (err instanceof TypeError) {
+        setFormError('Something went wrong. Please try again or email us at hello@releafz.de')
+      } else {
+        setFormError(err instanceof Error ? err.message : 'Something went wrong. Please try again.')
+      }
       setFormState('error')
     }
   }
@@ -380,6 +429,7 @@ export default function PartnersPage() {
               {(['pharmacy', 'doctor'] as const).map((tab) => (
                 <button
                   key={tab}
+                  type="button"
                   onClick={() => setActiveTab(tab)}
                   className="px-5 py-2 rounded-md text-sm font-medium transition-all"
                   style={{
@@ -521,102 +571,124 @@ export default function PartnersPage() {
             </p>
           </FadeIn>
 
-          {formState === 'success' ? (
-            <FadeIn>
-              <div
-                className="rounded-xl p-10 text-center"
-                style={{
-                  background: 'rgba(16,185,129,0.06)',
-                  border: '1px solid rgba(16,185,129,0.2)',
-                }}
-              >
-                <img src="/logo1.png" alt="releafZ" className="h-10 mx-auto mb-4" style={{ filter: 'drop-shadow(0 0 14px rgba(34,211,238,0.3))' }} />
-                <h3 className="text-xl font-bold mb-2" style={{ fontFamily: syne }}>Request received!</h3>
-                <p className="text-sm" style={{ color: 'rgba(255,255,255,0.6)' }}>
-                  The releafZ team will reach out within 48&nbsp;hours.
-                </p>
-              </div>
-            </FadeIn>
-          ) : (
-            <FadeIn delay={120}>
-              <form onSubmit={handleSubmit} className="space-y-5">
-                {/* Row 1 */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                  <input
-                    type="text"
-                    required
-                    placeholder="Full Name"
-                    value={form.fullName}
-                    onChange={set('fullName')}
-                    className={inputCls}
-                    style={{ ...inputStyle, ...inputFocusBorder }}
-                  />
-                  <input
-                    type="text"
-                    required
-                    placeholder="Organization"
-                    value={form.organization}
-                    onChange={set('organization')}
-                    className={inputCls}
-                    style={{ ...inputStyle, ...inputFocusBorder }}
-                  />
-                </div>
-
-                {/* Role */}
-                <select
-                  required
-                  value={form.role}
-                  onChange={set('role')}
-                  className={`${inputCls} appearance-none cursor-pointer`}
+          {formState === 'success' || formState === 'duplicate' ? (
+            <div ref={successRef}>
+              <FadeIn>
+                <div
+                  className="rounded-xl p-10 text-center"
                   style={{
-                    ...inputStyle,
-                    ...inputFocusBorder,
-                    color: form.role ? '#fff' : 'rgba(255,255,255,0.4)',
-                    backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='rgba(255,255,255,0.4)' viewBox='0 0 16 16'%3E%3Cpath d='M4.646 5.646a.5.5 0 0 1 .708 0L8 8.293l2.646-2.647a.5.5 0 0 1 .708.708l-3 3a.5.5 0 0 1-.708 0l-3-3a.5.5 0 0 1 0-.708z'/%3E%3C/svg%3E")`,
-                    backgroundRepeat: 'no-repeat',
-                    backgroundPosition: 'right 1rem center',
-                    paddingRight: '2.5rem',
+                    background: formState === 'duplicate' ? 'rgba(34,211,238,0.06)' : 'rgba(16,185,129,0.06)',
+                    border: `1px solid ${formState === 'duplicate' ? 'rgba(34,211,238,0.2)' : 'rgba(16,185,129,0.2)'}`,
                   }}
                 >
-                  <option value="" disabled>Select your role</option>
-                  <option value="pharmacy">Pharmacy owner / manager</option>
-                  <option value="physician">Licensed physician (Arzt)</option>
-                  <option value="group">Both / Healthcare group</option>
-                </select>
-
-                {/* Row 3 */}
+                  <img src="/logo1.png" alt="releafZ" className="h-10 mx-auto mb-4" style={{ filter: 'drop-shadow(0 0 14px rgba(34,211,238,0.3))' }} />
+                  <h3 className="text-xl font-bold mb-2" style={{ fontFamily: syne }}>
+                    {formState === 'duplicate' ? 'We already have your inquiry' : 'Request received!'}
+                  </h3>
+                  <p className="text-sm" style={{ color: 'rgba(255,255,255,0.6)' }}>
+                    {formState === 'duplicate'
+                      ? "We already have your inquiry — we'll be in touch soon."
+                      : <>The releafZ team will reach out within 48&nbsp;hours.</>}
+                  </p>
+                </div>
+              </FadeIn>
+            </div>
+          ) : (
+            <FadeIn delay={120}>
+              <form onSubmit={handleSubmit} className="space-y-5" noValidate>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                  <input
-                    type="email"
-                    required
-                    placeholder="Email"
-                    value={form.email}
-                    onChange={set('email')}
-                    className={inputCls}
-                    style={{ ...inputStyle, ...inputFocusBorder }}
-                  />
+                  <div>
+                    <input
+                      type="text"
+                      placeholder="Full Name"
+                      value={form.fullName}
+                      onChange={set('fullName')}
+                      aria-label="Full name"
+                      autoComplete="name"
+                      className={`${inputCls}${fieldErrors.fullName ? ' ring-1 ring-red-400/60' : ''}`}
+                      style={{ ...inputStyle, ...inputFocusBorder }}
+                    />
+                    {fieldErrors.fullName && <p className="mt-1.5 text-xs text-red-400">{fieldErrors.fullName}</p>}
+                  </div>
+                  <div>
+                    <input
+                      type="text"
+                      placeholder="Organization"
+                      value={form.organization}
+                      onChange={set('organization')}
+                      aria-label="Organization"
+                      autoComplete="organization"
+                      className={`${inputCls}${fieldErrors.organization ? ' ring-1 ring-red-400/60' : ''}`}
+                      style={{ ...inputStyle, ...inputFocusBorder }}
+                    />
+                    {fieldErrors.organization && <p className="mt-1.5 text-xs text-red-400">{fieldErrors.organization}</p>}
+                  </div>
+                </div>
+
+                <div>
+                  <select
+                    value={form.role}
+                    onChange={set('role')}
+                    aria-label="Your role"
+                    className={`${inputCls} appearance-none cursor-pointer${fieldErrors.role ? ' ring-1 ring-red-400/60' : ''}`}
+                    style={{
+                      ...inputStyle,
+                      ...inputFocusBorder,
+                      color: form.role ? '#fff' : 'rgba(255,255,255,0.4)',
+                      backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='rgba(255,255,255,0.4)' viewBox='0 0 16 16'%3E%3Cpath d='M4.646 5.646a.5.5 0 0 1 .708 0L8 8.293l2.646-2.647a.5.5 0 0 1 .708.708l-3 3a.5.5 0 0 1-.708 0l-3-3a.5.5 0 0 1 0-.708z'/%3E%3C/svg%3E")`,
+                      backgroundRepeat: 'no-repeat',
+                      backgroundPosition: 'right 1rem center',
+                      paddingRight: '2.5rem',
+                    }}
+                  >
+                    <option value="" disabled>Select your role</option>
+                    <option value="pharmacy">Pharmacy owner / manager</option>
+                    <option value="physician">Licensed physician (Arzt)</option>
+                    <option value="group">Both / Healthcare group</option>
+                  </select>
+                  {fieldErrors.role && <p className="mt-1.5 text-xs text-red-400">{fieldErrors.role}</p>}
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                  <div>
+                    <input
+                      type="email"
+                      placeholder="Email"
+                      value={form.email}
+                      onChange={set('email')}
+                      aria-label="Email address"
+                      autoComplete="email"
+                      className={`${inputCls}${fieldErrors.email ? ' ring-1 ring-red-400/60' : ''}`}
+                      style={{ ...inputStyle, ...inputFocusBorder }}
+                    />
+                    {fieldErrors.email && <p className="mt-1.5 text-xs text-red-400">{fieldErrors.email}</p>}
+                  </div>
                   <input
                     type="tel"
                     placeholder="Phone (optional)"
                     value={form.phone}
                     onChange={set('phone')}
+                    aria-label="Phone number"
+                    autoComplete="tel"
+                    pattern="[\+]?[\d\s\-\(\)]{6,20}"
+                    title="Phone number (digits, spaces, dashes, 6-20 characters)"
                     className={inputCls}
                     style={{ ...inputStyle, ...inputFocusBorder }}
                   />
                 </div>
 
-                {/* Message */}
                 <textarea
                   rows={4}
                   placeholder="Tell us about your practice, patient volume, or any questions about releafZ"
                   value={form.message}
                   onChange={set('message')}
+                  aria-label="Message"
                   className={`${inputCls} resize-none`}
                   style={{ ...inputStyle, ...inputFocusBorder }}
                 />
 
                 {formState === 'error' && formError && (
-                  <p className="text-sm text-red-400">{formError}</p>
+                  <p className="text-sm text-red-400" role="alert">{formError}</p>
                 )}
 
                 <button
