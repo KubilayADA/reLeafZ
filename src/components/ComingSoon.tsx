@@ -223,7 +223,7 @@ const ComingSoon: React.FC = () => {
               You&apos;re on the list!
             </p>
             <p className="text-sm md:text-base" style={{ color: 'rgba(255, 255, 255, 0.7)' }}>
-              We&apos;ll notify you as soon as reLeafZ launches.
+              We&apos;ll notify you as soon as releafZ launches.
             </p>
           </div>
         ) : (
