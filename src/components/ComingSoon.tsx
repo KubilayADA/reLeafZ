@@ -4,6 +4,8 @@ import React, { useState, useEffect } from 'react';
 import { ZapIcon, Brain, Leaf, CheckCircle } from 'lucide-react';
 
 const ComingSoon: React.FC = () => {
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
@@ -26,7 +28,7 @@ const ComingSoon: React.FC = () => {
       const res = await fetch('/api/waitlist', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({ firstName, lastName, email }),
       });
 
       const data = await res.json().catch(() => null);
@@ -41,6 +43,8 @@ const ComingSoon: React.FC = () => {
       }
 
       setIsSuccess(true);
+      setFirstName('');
+      setLastName('');
       setEmail('');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Something went wrong. Please try again.');
@@ -228,36 +232,86 @@ const ComingSoon: React.FC = () => {
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="max-w-2xl mx-auto px-4 relative z-10">
-            {/* Desktop/Tablet: Horizontal layout */}
-            <div className="hidden sm:flex items-center gap-4 justify-center">
-              <div className="relative flex-1 max-w-md">
+            {/* Desktop/Tablet layout */}
+            <div className="hidden sm:flex flex-col gap-4">
+              <div className="flex gap-4 justify-center">
                 <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="Your Email Address"
+                  type="text"
+                  value={firstName}
+                  onChange={(e) => setFirstName(e.target.value)}
+                  placeholder="First Name"
                   required
-                  className="w-full px-4 py-3 md:py-4 bg-[#1a1a1a] border border-white/20 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-[#22d3ee] focus:ring-1 focus:ring-[#22d3ee] transition-all text-center"
+                  className="flex-1 max-w-[240px] px-4 py-3 md:py-4 bg-[#1a1a1a] border border-white/20 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-[#22d3ee] focus:ring-1 focus:ring-[#22d3ee] transition-all text-center"
+                  style={{
+                    background: 'rgba(26, 26, 26, 0.8)',
+                    backdropFilter: 'blur(10px)',
+                  }}
+                />
+                <input
+                  type="text"
+                  value={lastName}
+                  onChange={(e) => setLastName(e.target.value)}
+                  placeholder="Last Name"
+                  required
+                  className="flex-1 max-w-[240px] px-4 py-3 md:py-4 bg-[#1a1a1a] border border-white/20 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-[#22d3ee] focus:ring-1 focus:ring-[#22d3ee] transition-all text-center"
                   style={{
                     background: 'rgba(26, 26, 26, 0.8)',
                     backdropFilter: 'blur(10px)',
                   }}
                 />
               </div>
-              <button
-                type="submit"
-                disabled={isSubmitting}
-                className="px-6 md:px-8 py-3 md:py-4 bg-transparent border border-white/20 rounded-lg text-white font-medium hover:border-[#22d3ee] hover:text-[#22d3ee] transition-all whitespace-nowrap disabled:opacity-60 disabled:cursor-not-allowed"
-                style={{
-                  backdropFilter: 'blur(10px)',
-                }}
-              >
-                {isSubmitting ? 'Submitting...' : 'Get Notified'}
-              </button>
+              <div className="flex gap-4 justify-center">
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="Your Email Address"
+                  required
+                  className="flex-1 max-w-md px-4 py-3 md:py-4 bg-[#1a1a1a] border border-white/20 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-[#22d3ee] focus:ring-1 focus:ring-[#22d3ee] transition-all text-center"
+                  style={{
+                    background: 'rgba(26, 26, 26, 0.8)',
+                    backdropFilter: 'blur(10px)',
+                  }}
+                />
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="px-6 md:px-8 py-3 md:py-4 bg-transparent border border-white/20 rounded-lg text-white font-medium hover:border-[#22d3ee] hover:text-[#22d3ee] transition-all whitespace-nowrap disabled:opacity-60 disabled:cursor-not-allowed"
+                  style={{
+                    backdropFilter: 'blur(10px)',
+                  }}
+                >
+                  {isSubmitting ? 'Submitting...' : 'Get Notified'}
+                </button>
+              </div>
             </div>
 
             {/* Mobile: Vertical layout */}
             <div className="flex flex-col gap-4 sm:hidden">
+              <input
+                type="text"
+                value={firstName}
+                onChange={(e) => setFirstName(e.target.value)}
+                placeholder="First Name"
+                required
+                className="w-full px-4 py-4 bg-[#1a1a1a] border border-white/20 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-[#22d3ee] focus:ring-1 focus:ring-[#22d3ee] transition-all text-center"
+                style={{
+                  background: 'rgba(26, 26, 26, 0.8)',
+                  backdropFilter: 'blur(10px)',
+                }}
+              />
+              <input
+                type="text"
+                value={lastName}
+                onChange={(e) => setLastName(e.target.value)}
+                placeholder="Last Name"
+                required
+                className="w-full px-4 py-4 bg-[#1a1a1a] border border-white/20 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-[#22d3ee] focus:ring-1 focus:ring-[#22d3ee] transition-all text-center"
+                style={{
+                  background: 'rgba(26, 26, 26, 0.8)',
+                  backdropFilter: 'blur(10px)',
+                }}
+              />
               <input
                 type="email"
                 value={email}
