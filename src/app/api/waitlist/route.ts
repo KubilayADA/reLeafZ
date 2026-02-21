@@ -1,9 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-const BACKEND_URL =
-  process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+const BACKEND_URL = process.env.NEXT_PUBLIC_API_URL;
 
 export async function POST(req: NextRequest) {
+  if (!BACKEND_URL) {
+    return NextResponse.json(
+      { error: 'Server configuration error.' },
+      { status: 500 },
+    );
+  }
+
   try {
     const body = await req.json();
 
