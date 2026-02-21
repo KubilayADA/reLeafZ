@@ -1,10 +1,13 @@
 'use client'
 
 import React, { useState, useEffect } from 'react';
-import { ZapIcon, Brain, Leaf, Lock } from 'lucide-react';
+import { ZapIcon, Brain, Leaf, CheckCircle } from 'lucide-react';
 
 const ComingSoon: React.FC = () => {
   const [email, setEmail] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
+  const [error, setError] = useState('');
   const [particles, setParticles] = useState<Array<{
     id: number;
     size: number;
@@ -14,10 +17,36 @@ const ComingSoon: React.FC = () => {
     delay: number;
   }>>([]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle email submission here
-    console.log('Email submitted:', email);
+    setError('');
+    setIsSubmitting(true);
+
+    try {
+      const res = await fetch('/api/waitlist', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      });
+
+      const data = await res.json().catch(() => null);
+
+      if (!res.ok) {
+        throw new Error(data?.error || 'Something went wrong. Please try again.');
+      }
+
+      if (data?.alreadyRegistered) {
+        setError('This email is already on the waiting list.');
+        return;
+      }
+
+      setIsSuccess(true);
+      setEmail('');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Something went wrong. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   // Generate particle positions only on client side to avoid hydration mismatch
@@ -180,82 +209,84 @@ const ComingSoon: React.FC = () => {
           <strong style={{ color: '#22d3ee' }}>Coming Soon</strong>.
         </p>
 
-        {/* Email form - responsive layout */} 
-        <form onSubmit={handleSubmit} className="max-w-2xl mx-auto px-4 relative z-10">
-          {/* Desktop/Tablet: Horizontal layout */}
-          <div className="hidden sm:flex items-center gap-4 justify-center">
-            <div className="relative flex-1 max-w-md">
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="Your Email Address"
-                required
-                disabled
-                className="w-full px-4 py-3 md:py-4 bg-[#1a1a1a] border border-white/20 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-[#22d3ee] focus:ring-1 focus:ring-[#22d3ee] transition-all cursor-not-allowed opacity-70 text-center"
-                style={{
-                  background: 'rgba(26, 26, 26, 0.8)',
-                  backdropFilter: 'blur(10px)',
-                }}
-              />
-              <Lock 
-                className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-6 h-6"
-                style={{ 
-                  color: '#22d3ee',
-                  filter: 'drop-shadow(0 0 12px rgba(34, 211, 238, 0.8))',
-                  pointerEvents: 'none',
-                }}
-              />
-            </div>
-            <button
-              type="submit"
-              disabled
-              className="px-6 md:px-8 py-3 md:py-4 bg-transparent border border-white/20 rounded-lg text-white font-medium hover:border-[#22d3ee] hover:text-[#22d3ee] transition-all whitespace-nowrap cursor-not-allowed opacity-70"
-                  style={{
-                backdropFilter: 'blur(10px)',
-                  }}
-                >
-              Get Notified
-            </button>
-                </div>
-
-          {/* Mobile: Vertical layout */}
-          <div className="flex flex-col gap-4 sm:hidden">
-            <div className="relative w-full">
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="Your Email Address"
-                required
-                disabled
-                className="w-full px-4 py-4 bg-[#1a1a1a] border border-white/20 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-[#22d3ee] focus:ring-1 focus:ring-[#22d3ee] transition-all cursor-not-allowed opacity-70 text-center"
-                style={{
-                  background: 'rgba(26, 26, 26, 0.8)',
-                  backdropFilter: 'blur(10px)',
-                }}
-              />
-              <Lock 
-                className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-6 h-6"
-                style={{ 
-                  color: '#22d3ee',
-                  filter: 'drop-shadow(0 0 12px rgba(34, 211, 238, 0.8))',
-                  pointerEvents: 'none',
-                }}
-              />
-            </div>
-            <button
-              type="submit"
-              disabled
-              className="w-full px-6 py-4 bg-transparent border border-white/20 rounded-lg text-white font-medium hover:border-[#22d3ee] hover:text-[#22d3ee] transition-all cursor-not-allowed opacity-70"
+        {/* Email form / Success state */}
+        {isSuccess ? (
+          <div className="max-w-2xl mx-auto px-4 relative z-10 flex flex-col items-center gap-4 animate-in fade-in">
+            <CheckCircle
+              className="w-12 h-12 md:w-14 md:h-14"
               style={{
-                backdropFilter: 'blur(10px)',
+                color: '#10b981',
+                filter: 'drop-shadow(0 0 14px rgba(16, 185, 129, 0.7))',
               }}
-            >
-              Get Notified
-            </button>
+            />
+            <p className="text-lg md:text-xl font-semibold" style={{ color: '#ffffff' }}>
+              You&apos;re on the list!
+            </p>
+            <p className="text-sm md:text-base" style={{ color: 'rgba(255, 255, 255, 0.7)' }}>
+              We&apos;ll notify you as soon as reLeafZ launches.
+            </p>
           </div>
-        </form>
+        ) : (
+          <form onSubmit={handleSubmit} className="max-w-2xl mx-auto px-4 relative z-10">
+            {/* Desktop/Tablet: Horizontal layout */}
+            <div className="hidden sm:flex items-center gap-4 justify-center">
+              <div className="relative flex-1 max-w-md">
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="Your Email Address"
+                  required
+                  className="w-full px-4 py-3 md:py-4 bg-[#1a1a1a] border border-white/20 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-[#22d3ee] focus:ring-1 focus:ring-[#22d3ee] transition-all text-center"
+                  style={{
+                    background: 'rgba(26, 26, 26, 0.8)',
+                    backdropFilter: 'blur(10px)',
+                  }}
+                />
+              </div>
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className="px-6 md:px-8 py-3 md:py-4 bg-transparent border border-white/20 rounded-lg text-white font-medium hover:border-[#22d3ee] hover:text-[#22d3ee] transition-all whitespace-nowrap disabled:opacity-60 disabled:cursor-not-allowed"
+                style={{
+                  backdropFilter: 'blur(10px)',
+                }}
+              >
+                {isSubmitting ? 'Submitting...' : 'Get Notified'}
+              </button>
+            </div>
+
+            {/* Mobile: Vertical layout */}
+            <div className="flex flex-col gap-4 sm:hidden">
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Your Email Address"
+                required
+                className="w-full px-4 py-4 bg-[#1a1a1a] border border-white/20 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-[#22d3ee] focus:ring-1 focus:ring-[#22d3ee] transition-all text-center"
+                style={{
+                  background: 'rgba(26, 26, 26, 0.8)',
+                  backdropFilter: 'blur(10px)',
+                }}
+              />
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className="w-full px-6 py-4 bg-transparent border border-white/20 rounded-lg text-white font-medium hover:border-[#22d3ee] hover:text-[#22d3ee] transition-all disabled:opacity-60 disabled:cursor-not-allowed"
+                style={{
+                  backdropFilter: 'blur(10px)',
+                }}
+              >
+                {isSubmitting ? 'Submitting...' : 'Get Notified'}
+              </button>
+            </div>
+
+            {error && (
+              <p className="mt-3 text-sm text-red-400 text-center">{error}</p>
+            )}
+          </form>
+        )}
 
         {/* Features grid - 3 icons */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 md:gap-8 mt-12 md:mt-16 max-w-2xl mx-auto px-4">
