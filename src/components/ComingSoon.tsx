@@ -4,6 +4,8 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { ZapIcon, Brain, Leaf, CheckCircle, ArrowRight } from 'lucide-react';
 
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+
 const ComingSoon: React.FC = () => {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
@@ -23,13 +25,27 @@ const ComingSoon: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+
+    const trimmedFirst = firstName.trim();
+    const trimmedLast = lastName.trim();
+    const trimmedEmail = email.trim();
+
+    if (!trimmedFirst || !trimmedLast) {
+      setError('Please enter your first and last name.');
+      return;
+    }
+    if (!EMAIL_RE.test(trimmedEmail)) {
+      setError('Please enter a valid email address.');
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
       const res = await fetch('/api/waitlist', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ firstName, lastName, email }),
+        body: JSON.stringify({ firstName: trimmedFirst, lastName: trimmedLast, email: trimmedEmail }),
       });
 
       const data = await res.json().catch(() => null);
@@ -48,7 +64,11 @@ const ComingSoon: React.FC = () => {
       setLastName('');
       setEmail('');
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Something went wrong. Please try again.');
+      if (err instanceof TypeError) {
+        setError('Unable to connect. Please check your internet connection and try again.');
+      } else {
+        setError(err instanceof Error ? err.message : 'Something went wrong. Please try again.');
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -242,6 +262,8 @@ const ComingSoon: React.FC = () => {
                   onChange={(e) => setFirstName(e.target.value)}
                   placeholder="First Name"
                   required
+                  aria-label="First name"
+                  autoComplete="given-name"
                   className="flex-1 max-w-[240px] px-4 py-3 md:py-4 bg-[#1a1a1a] border border-white/20 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-[#22d3ee] focus:ring-1 focus:ring-[#22d3ee] transition-all text-center"
                   style={{
                     background: 'rgba(26, 26, 26, 0.8)',
@@ -254,6 +276,8 @@ const ComingSoon: React.FC = () => {
                   onChange={(e) => setLastName(e.target.value)}
                   placeholder="Last Name"
                   required
+                  aria-label="Last name"
+                  autoComplete="family-name"
                   className="flex-1 max-w-[240px] px-4 py-3 md:py-4 bg-[#1a1a1a] border border-white/20 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-[#22d3ee] focus:ring-1 focus:ring-[#22d3ee] transition-all text-center"
                   style={{
                     background: 'rgba(26, 26, 26, 0.8)',
@@ -268,6 +292,8 @@ const ComingSoon: React.FC = () => {
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="Your Email Address"
                   required
+                  aria-label="Email address"
+                  autoComplete="email"
                   className="flex-1 max-w-md px-4 py-3 md:py-4 bg-[#1a1a1a] border border-white/20 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-[#22d3ee] focus:ring-1 focus:ring-[#22d3ee] transition-all text-center"
                   style={{
                     background: 'rgba(26, 26, 26, 0.8)',
@@ -295,6 +321,8 @@ const ComingSoon: React.FC = () => {
                 onChange={(e) => setFirstName(e.target.value)}
                 placeholder="First Name"
                 required
+                aria-label="First name"
+                autoComplete="given-name"
                 className="w-full px-4 py-4 bg-[#1a1a1a] border border-white/20 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-[#22d3ee] focus:ring-1 focus:ring-[#22d3ee] transition-all text-center"
                 style={{
                   background: 'rgba(26, 26, 26, 0.8)',
@@ -307,6 +335,8 @@ const ComingSoon: React.FC = () => {
                 onChange={(e) => setLastName(e.target.value)}
                 placeholder="Last Name"
                 required
+                aria-label="Last name"
+                autoComplete="family-name"
                 className="w-full px-4 py-4 bg-[#1a1a1a] border border-white/20 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-[#22d3ee] focus:ring-1 focus:ring-[#22d3ee] transition-all text-center"
                 style={{
                   background: 'rgba(26, 26, 26, 0.8)',
@@ -319,6 +349,8 @@ const ComingSoon: React.FC = () => {
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="Your Email Address"
                 required
+                aria-label="Email address"
+                autoComplete="email"
                 className="w-full px-4 py-4 bg-[#1a1a1a] border border-white/20 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-[#22d3ee] focus:ring-1 focus:ring-[#22d3ee] transition-all text-center"
                 style={{
                   background: 'rgba(26, 26, 26, 0.8)',
