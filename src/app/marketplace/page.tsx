@@ -198,7 +198,8 @@ export default function MarketplacePage() {
         return
       }
 
-      const data = await fetchPharmacyProducts(parseInt(request.pharmacyId))
+      const token = localStorage.getItem('token') || undefined
+      const data = await fetchPharmacyProducts(parseInt(request.pharmacyId), false, token)
       setProducts(data)
       
       // Initialize quantities based on product form (5g for flowers, 1 for others)

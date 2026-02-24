@@ -97,12 +97,15 @@ export async function fetchProductById(productId: number): Promise<Product> {
 
 export async function fetchPharmacyProducts(
   pharmacyId: number,
-  inStockOnly: boolean = false
+  inStockOnly: boolean = false,
+  token?: string
 ): Promise<Product[]> {
   try {
     const endpoint = inStockOnly ? 'available' : '';
     const url = `${API_BASE}/api/products/pharmacy/${pharmacyId}${endpoint ? '/' + endpoint : ''}`;
-    const response = await fetch(url);
+    const response = await fetch(url, {
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+    });
 
     if (!response.ok) throw new Error('Failed to fetch pharmacy products');
     const data = await response.json();
