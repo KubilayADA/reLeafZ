@@ -63,14 +63,15 @@ export default function QuestionnairePage() {
       }
 
       const treatmentRequest = JSON.parse(treatmentData)
+      const token = localStorage.getItem('token')
       console.log('📤 Sending symptoms for treatment request ID:', treatmentRequest.id)
       console.log('📦 Complete data:', completeData)
 
-      // PATCH request to update symptoms
       const response = await fetch(`${API_BASE}/api/treatment/${treatmentRequest.id}/symptoms`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
+          ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
         },
         body: JSON.stringify(completeData),
       })
