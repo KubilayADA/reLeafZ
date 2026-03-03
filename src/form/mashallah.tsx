@@ -22,6 +22,7 @@ export default function MashallahForm({ postcode, onBack }: MashallahFormProps) 
     city: '',
   })
   const [loading, setLoading] = useState(false)
+  const [submitError, setSubmitError] = useState('')
   const [otpModalOpen, setOtpModalOpen] = useState(false)
   const [otpCode, setOtpCode] = useState('')
   const [otpError, setOtpError] = useState('')
@@ -39,7 +40,7 @@ export default function MashallahForm({ postcode, onBack }: MashallahFormProps) 
 
                      const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
                       const { name, value } = e.target
-                      
+                      setSubmitError('')
                       // 🔒 SECURITY: Clear authentication tokens when email changes
                       // This prevents using old tokens with new email addresses
                       if (name === 'email') {
@@ -52,7 +53,6 @@ export default function MashallahForm({ postcode, onBack }: MashallahFormProps) 
                         setOtpCode('')
                         setOtpError('')
                       }
-                      
                       setFormData(prev => ({ ...prev, [name]: value }))
                     }
 
@@ -88,13 +88,9 @@ export default function MashallahForm({ postcode, onBack }: MashallahFormProps) 
       const result = await response.json()
 
       if (response.ok && result.token) {
-        // OTP verified! Store token and continue
         localStorage.setItem('token', result.token)
-        console.log('✅ OTP verified, token stored')
-        
-        // Close modal and proceed with treatment request
         setOtpModalOpen(false)
-        await createTreatmentRequest(result.token)
+        router.push('/questionnaire')
       } else {
         setOtpError(result.message || 'Ungültiger Code. Bitte versuchen Sie es erneut.')
       }
@@ -106,149 +102,125 @@ export default function MashallahForm({ postcode, onBack }: MashallahFormProps) 
     }
   }
 
-  // Create treatment request (used for both new and returning users)
-  const createTreatmentRequest = async (token?: string) => {
+  // Submit treatment request first (before any login). Only stores data on success.
+  // Returns success + optional error message so caller can show validation errors.
+  const submitTreatmentRequest = async (): Promise<{ success: true } | { success: false; message: string }> => {
     try {
-      const headers: HeadersInit = {
-        'Content-Type': 'application/json',
-      }
-      
-      if (token) {
-        headers['Authorization'] = `Bearer ${token}`
-      }
-
       const response = await fetch(`${API_BASE}/api/treatment/submit`, {
         method: 'POST',
-        headers,
-        body: JSON.stringify({ 
-          ...formData, 
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...formData,
           postcode,
         }),
       })
 
-      let result
+      let result: {
+        data?: { id?: number; patientId?: number; pharmacyId?: number }
+        message?: string
+        error?: string
+        errors?: string[] | { message?: string }[]
+      } = {}
       try {
         result = await response.json()
-      } catch (parseError) {
-        console.error('Error parsing response:', parseError)
-        result = { data: {} }
+      } catch {
+        return { success: false, message: 'Ungültige Antwort vom Server. Bitte versuchen Sie es erneut.' }
       }
 
-      if (response.ok && result.data) {
-        // Store pharmacyId for marketplace
-        if (result.data.pharmacyId) {
-          localStorage.setItem('assignedPharmacyId', result.data.pharmacyId.toString())
-          console.log('✅ Pharmacy ID stored:', result.data.pharmacyId)
+      if (!response.ok) {
+        let message = result.message || result.error
+        if (!message && Array.isArray(result.errors) && result.errors.length > 0) {
+          message = result.errors
+            .map((e: string | { message?: string }) => (typeof e === 'string' ? e : e.message))
+            .filter(Boolean)
+            .join(' ')
         }
-
-        // Store treatment request data
-        const treatmentRequestData = {
-          id: result.data?.id || `temp-${Date.now()}`,
-          patientId: result.data?.patientId || null,
-          pharmacyId: result.data?.pharmacyId || null,
-          postcode,
-          ...formData
-        }
-        localStorage.setItem('treatmentRequest', JSON.stringify(treatmentRequestData))
-        localStorage.setItem('formPostcode', postcode)
-
-        // Redirect to questionnaire
-        router.push('/questionnaire')
-      } else {
-        // Fallback: store data and continue
-        console.warn('API call failed, but proceeding to questionnaire')
-        localStorage.setItem('treatmentRequest', JSON.stringify({
-          id: `temp-${Date.now()}`,
-          patientId: null,
-          pharmacyId: null,
-          postcode,
-          ...formData
-        }))
-        localStorage.setItem('formPostcode', postcode)
-        router.push('/questionnaire')
+        if (!message) message = 'Ihre Angaben konnten nicht übermittelt werden. Bitte prüfen Sie das Formular.'
+        return { success: false, message }
       }
+
+      if (!result.data || result.data.id == null) {
+        return { success: false, message: 'Ungültige Antwort vom Server. Bitte versuchen Sie es erneut.' }
+      }
+
+      // Only store when API returned a real treatment request
+      if (result.data.pharmacyId != null) {
+        localStorage.setItem('assignedPharmacyId', result.data.pharmacyId.toString())
+      }
+      const treatmentRequestData = {
+        id: result.data.id,
+        patientId: result.data.patientId ?? null,
+        pharmacyId: result.data.pharmacyId ?? null,
+        postcode,
+        ...formData,
+      }
+      localStorage.setItem('treatmentRequest', JSON.stringify(treatmentRequestData))
+      localStorage.setItem('formPostcode', postcode)
+      return { success: true }
     } catch (error) {
       console.error('Error creating treatment request:', error)
-      // Even on error, allow user to continue
-      localStorage.setItem('treatmentRequest', JSON.stringify({
-        id: `temp-${Date.now()}`,
-        patientId: null,
-        pharmacyId: null,
-        postcode,
-        ...formData
-      }))
-      localStorage.setItem('formPostcode', postcode)
-      router.push('/questionnaire')
-    } finally {
-      setLoading(false)
+      return {
+        success: false,
+        message: 'Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut.',
+      }
     }
   }
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     setLoading(true)
-    
+    setSubmitError('')
+
     try {
-      // Step 1: Check if user exists and if OTP is required
-      console.log('📧 Checking user status for email:', formData.email)
-      
+      // Step 1: Submit treatment request first (validates form, creates request). Only then auth/OTP.
+      const treatmentResult = await submitTreatmentRequest()
+      if (!treatmentResult.success) {
+        setSubmitError(treatmentResult.message)
+        setLoading(false)
+        return
+      }
+
+      // Step 2: Check if user exists and if OTP is required (may send OTP email)
       const loginResponse = await fetch(`${API_BASE}/api/auth/patient-login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: formData.email })
+        body: JSON.stringify({ email: formData.email }),
       })
-  
       const loginResult = await loginResponse.json()
-      console.log('Login result:', loginResult)
-  
-      // ✅ SECURITY CHECK: Invalid email
+
       if (loginResult.invalidEmail || !loginResponse.ok) {
-        console.error('❌ Invalid email or request failed:', loginResult.message)
-        alert(loginResult.message || 'Bitte geben Sie eine gültige E-Mail-Adresse ein.')
+        setSubmitError(loginResult.message || 'Bitte geben Sie eine gültige E-Mail-Adresse ein.')
         setLoading(false)
         return
       }
-  
-      // Case 1: New user (first order)
+
+      // Case 1: New user (first order) — treatment already created and stored
       if (loginResult.firstOrder === true) {
-        console.log('🆕 New user - proceeding with registration')
-        await createTreatmentRequest()
+        router.push('/questionnaire')
         return
       }
-  
+
       // Case 2: Existing user - known device (same IP)
       if (loginResult.token && !loginResult.otpRequired) {
-        console.log('✅ Known device - auto-login successful')
         localStorage.setItem('token', loginResult.token)
-        
-        // Show welcome back notification
         setShowWelcomeNotification(true)
-        // Auto-hide after 3 seconds
-        setTimeout(() => {
-          setShowWelcomeNotification(false)
-        }, 3000)
-        
-        await createTreatmentRequest(loginResult.token)
+        setTimeout(() => setShowWelcomeNotification(false), 3000)
+        router.push('/questionnaire')
         return
       }
-  
-      // Case 3: Existing user - new device (different IP) - OTP required
+
+      // Case 3: Existing user - new device - OTP required
       if (loginResult.otpRequired === true) {
-        console.log('🔐 OTP required - new device detected')
-        setLoading(false)
         setOtpModalOpen(true)
-        // OTP email already sent by backend
+        setLoading(false)
         return
       }
-  
-      // Fallback: Something unexpected happened - DON'T proceed without auth!
-      console.error('Unexpected login response:', loginResult)
-      alert('Ein unerwarteter Fehler ist aufgetreten. Bitte versuchen Sie es erneut.')
+
+      setSubmitError('Ein unerwarteter Fehler ist aufgetreten. Bitte versuchen Sie es erneut.')
       setLoading(false)
-  
     } catch (error) {
-      console.error('Error during login check:', error)
-      alert('Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut.')
+      console.error('Error during submit:', error)
+      setSubmitError('Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut.')
       setLoading(false)
     }
   }
@@ -427,6 +399,12 @@ export default function MashallahForm({ postcode, onBack }: MashallahFormProps) 
                   />
                 </div>
               </div>
+
+              {submitError && (
+                <div className="p-3 rounded-lg bg-red-50 border border-red-200">
+                  <p className="text-sm text-red-700">{submitError}</p>
+                </div>
+              )}
 
               <Button
                 type="submit"
