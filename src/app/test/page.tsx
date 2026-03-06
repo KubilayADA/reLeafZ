@@ -80,8 +80,8 @@ export default function TestPage() {
   const testLogin = async () => {
     setLoading(true)
     try {
-      const data = await patientLogin('testpatient@example.com', '10115')
-      log('patientLogin', { ...data, token: data.token?.slice(0, 20) + '...' || 'N/A' })
+      const data = await patientLogin('testpatient@example.com', '10115') as Record<string, unknown>
+      log('patientLogin', { ...data, token: typeof data.token === 'string' ? data.token.slice(0, 20) + '...' : 'N/A' })
     } catch (error: any) {
       log('patientLogin', { error: error.message })
     }
