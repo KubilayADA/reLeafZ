@@ -153,4 +153,11 @@
   html:has(.partners-page) {
     background: #080b0f;
   }
+  /* Pharmacy dashboard dark glass styles */
+  body:has(.pharmacy-dashboard) {
+    background: #0a0f0a;
+  }
+  html:has(.pharmacy-dashboard) {
+    background: #0a0f0a;
+  }
 }
