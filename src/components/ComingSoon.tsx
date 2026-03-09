@@ -202,12 +202,12 @@ const ComingSoon: React.FC = () => {
           paddingRight: 'max(env(safe-area-inset-right, 0px), 1rem)',
         }}
       >
-        {/* Logo */}
-        <div className="flex justify-center mb-8 md:mb-12">
+        {/* Logo - mobile: halo, pulse, entrance via mobileSoon.css */}
+        <div className="coming-soon-logo-wrap flex justify-center mb-8 md:mb-12">
           <img
             src="/logo1.png"
             alt="reLeafZ Logo"
-            className="w-40 h-auto sm:w-56 md:w-64 lg:w-72"
+            className="coming-soon-logo-img w-60 h-auto sm:w-[21rem] md:w-96 lg:w-[27rem]"
             style={{ 
               filter: 'drop-shadow(0 0 20px rgba(34, 211, 238, 0.3))',
             }}
