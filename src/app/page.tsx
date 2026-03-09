@@ -11,7 +11,7 @@ import Header from './header'
 import '@/components/ui/Hero/Words-Sliding-Smooth.css' 
 import ComingSoon from '@/components/ComingSoon'  
 
-const COMING_SOON_MODE = true;
+const COMING_SOON_MODE = false;
 
 // Font setup - using Inconsolata
 const inconsolataStyle = {
@@ -24,7 +24,7 @@ const inconsolataStyle = {
 const LeafLogo = ({ className = 'w-80 h-40 sm:w-56 sm:h-24 md:w-72 md:h-32' }) => (
   <div className={`relative overflow-hidden ${className}`}>
     <img
-      src="/logo.png"
+      src="/logo1.png"
       alt="reLeafZ Logo"
       className="w-full h-full object-contain"
     />
