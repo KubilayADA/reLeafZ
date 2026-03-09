@@ -24,7 +24,7 @@ const inconsolataStyle = {
 const LeafLogo = ({ className = 'w-80 h-40 sm:w-56 sm:h-24 md:w-72 md:h-32' }) => (
   <div className={`relative overflow-hidden ${className}`}>
     <img
-      src="/logo.png"
+      src="/logo1.png"
       alt="reLeafZ Logo"
       className="w-full h-full object-contain"
     />
