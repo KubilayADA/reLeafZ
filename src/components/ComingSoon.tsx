@@ -3,7 +3,6 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { ZapIcon, Brain, Leaf, CheckCircle, ArrowRight } from 'lucide-react';
-import './mobileSoon.css';
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
@@ -130,11 +129,9 @@ const ComingSoon: React.FC = () => {
           zIndex: 0,
         }}
       >
-        {/* Mobile-only background image - styled in mobileSoon.css */}
-        <div className="coming-soon-mobile-bg" />
-        {/* Base dark background (desktop only; mobile uses image + overlay) */}
+        {/* Base dark background */}
         <div 
-          className="absolute hidden md:block"
+          className="absolute"
           style={{
             top: 0,
             left: 0,
@@ -202,12 +199,12 @@ const ComingSoon: React.FC = () => {
           paddingRight: 'max(env(safe-area-inset-right, 0px), 1rem)',
         }}
       >
-        {/* Logo - mobile: halo, pulse, entrance via mobileSoon.css */}
-        <div className="coming-soon-logo-wrap flex justify-center mb-8 md:mb-12">
+        {/* Logo */}
+        <div className="flex justify-center mb-8 md:mb-12">
           <img
             src="/logo1.png"
             alt="reLeafZ Logo"
-            className="coming-soon-logo-img w-60 h-auto sm:w-[21rem] md:w-96 lg:w-[27rem]"
+            className="w-40 h-auto sm:w-56 md:w-64 lg:w-72"
             style={{ 
               filter: 'drop-shadow(0 0 20px rgba(34, 211, 238, 0.3))',
             }}
@@ -379,12 +376,12 @@ const ComingSoon: React.FC = () => {
         )}
 
         {/* Features grid - 3 icons */}
-        <div className="grid grid-cols-3 gap-4 md:gap-8 mt-12 md:mt-16 max-w-2xl mx-auto px-4 items-stretch">
+        <div className="grid grid-cols-3 gap-4 sm:gap-6 md:gap-8 mt-12 md:mt-16 max-w-2xl mx-auto px-4">
           {/* Feature 1 - AI Strain Matching */}
-          <div className="flex flex-col items-center text-center transition-all duration-300 hover:scale-105">
-            <div className="flex justify-center items-center min-h-10 md:min-h-12 mb-2 md:mb-4 w-10 h-10 md:w-12 md:h-12">
+          <div className="text-center transition-all duration-300 hover:scale-105">
+            <div className="flex justify-center mb-4">
               <Brain 
-                className="w-10 h-10 md:w-12 md:h-12 shrink-0" 
+                className="w-10 h-10 md:w-12 md:h-12" 
                 style={{ 
                   color: '#10b981',
                   filter: 'drop-shadow(0 0 10px rgba(16, 185, 129, 0.6))',
@@ -392,49 +389,24 @@ const ComingSoon: React.FC = () => {
               />
             </div>
             <h3 
-              className="text-sm md:text-base font-semibold mb-1 md:mb-2 min-h-[2.5em] flex items-center justify-center"
+              className="text-sm md:text-base font-semibold mb-2"
               style={{ color: '#ffffff' }}
             >
               AI STRAIN MATCHING
             </h3>
             <p 
-              className="text-xs md:text-sm font-light min-h-[2.5em] flex items-center justify-center"
+              className="text-xs md:text-sm font-light"
               style={{ color: 'rgba(255, 255, 255, 0.7)' }}
             >
               Personalized recommendations
             </p>
           </div>
 
-          {/* Feature 2 - Medical Cannabis */}
-          <div className="flex flex-col items-center text-center transition-all duration-300 hover:scale-105">
-            <div className="flex justify-center items-center min-h-10 md:min-h-12 mb-2 md:mb-4 w-10 h-10 md:w-12 md:h-12">
-              <Leaf 
-                className="w-10 h-10 md:w-12 md:h-12 shrink-0" 
-                style={{ 
-                  color: '#22d3ee',
-                  filter: 'drop-shadow(0 0 10px rgba(34, 211, 238, 0.6))',
-                }} 
-              />
-            </div>
-            <h3 
-              className="text-sm md:text-base font-semibold mb-1 md:mb-2 min-h-[2.5em] flex items-center justify-center"
-              style={{ color: '#ffffff' }}
-            >
-              MEDICAL CANNABIS
-            </h3>
-            <p 
-              className="text-xs md:text-sm font-light min-h-[2.5em] flex items-center justify-center"
-              style={{ color: 'rgba(255, 255, 255, 0.7)' }}
-            >
-              Premium quality
-            </p>
-          </div>
-
-          {/* Feature 3 - Fast Delivery */}
-          <div className="flex flex-col items-center text-center transition-all duration-300 hover:scale-105">
-            <div className="flex justify-center items-center min-h-10 md:min-h-12 mb-2 md:mb-4 w-10 h-10 md:w-12 md:h-12">
+          {/* Feature 2 - Fast Delivery */}
+          <div className="text-center transition-all duration-300 hover:scale-105">
+            <div className="flex justify-center mb-4">
               <ZapIcon 
-                className="w-10 h-10 md:w-12 md:h-12 shrink-0" 
+                className="w-10 h-10 md:w-12 md:h-12" 
                 style={{ 
                   color: '#22d3ee',
                   filter: 'drop-shadow(0 0 10px rgba(34, 211, 238, 0.6))',
@@ -442,16 +414,41 @@ const ComingSoon: React.FC = () => {
               />
             </div>
             <h3 
-              className="text-sm md:text-base font-semibold mb-1 md:mb-2 min-h-[2.5em] flex items-center justify-center"
+              className="text-sm md:text-base font-semibold mb-2"
               style={{ color: '#ffffff' }}
             >
               FAST DELIVERY
             </h3>
             <p 
-              className="text-xs md:text-sm font-light min-h-[2.5em] flex items-center justify-center"
+              className="text-xs md:text-sm font-light"
               style={{ color: 'rgba(255, 255, 255, 0.7)' }}
             >
               Ultra quick service
+            </p>
+          </div>
+
+          {/* Feature 3 - Medical Cannabis */}
+          <div className="text-center transition-all duration-300 hover:scale-105">
+            <div className="flex justify-center mb-4">
+              <Leaf 
+                className="w-10 h-10 md:w-12 md:h-12" 
+                style={{ 
+                  color: '#22d3ee',
+                  filter: 'drop-shadow(0 0 10px rgba(34, 211, 238, 0.6))',
+                }} 
+              />
+            </div>
+            <h3 
+              className="text-sm md:text-base font-semibold mb-2"
+              style={{ color: '#ffffff' }}
+            >
+              MEDICAL CANNABIS
+            </h3>
+            <p 
+              className="text-xs md:text-sm font-light"
+              style={{ color: 'rgba(255, 255, 255, 0.7)' }}
+            >
+              Premium quality
             </p>
           </div>
         </div>
