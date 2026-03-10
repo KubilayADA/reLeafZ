@@ -210,8 +210,9 @@ export default function MarketplacePage() {
       setQuantities(initialQuantities)
       
       setError('')
-    } catch (err: any) {
-      setError('Fehler beim Laden der Produkte: ' + err.message)
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Unknown error'
+      setError('Fehler beim Laden der Produkte: ' + message)
       console.error(err)
     } finally {
       setLoading(false)

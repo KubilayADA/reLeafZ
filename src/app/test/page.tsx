@@ -10,10 +10,10 @@ import {
 } from '@/lib/api'
 
 export default function TestPage() {
-  const [results, setResults] = useState<Record<string, any>>({})
+  const [results, setResults] = useState<Record<string, unknown>>({})
   const [loading, setLoading] = useState(false)
 
-  const log = (key: string, data: any) => {
+  const log = (key: string, data: unknown) => {
     setResults(prev => ({ ...prev, [key]: data }))
     console.log(`[${key}]`, data)
   }
@@ -24,8 +24,8 @@ export default function TestPage() {
     try {
       const data = await fetchAllProducts()
       log('allProducts', { success: true, count: data.length, sample: data[0] })
-    } catch (error: any) {
-      log('allProducts', { error: error.message })
+    } catch (error: unknown) {
+      log('allProducts', { error: error instanceof Error ? error.message : 'Unknown error' })
     }
     setLoading(false)
   }
@@ -36,8 +36,8 @@ export default function TestPage() {
     try {
       const data = await fetchPharmacyProducts(8)
       log('pharmacyProducts', { success: true, count: data.length, sample: data[0] })
-    } catch (error: any) {
-      log('pharmacyProducts', { error: error.message })
+    } catch (error: unknown) {
+      log('pharmacyProducts', { error: error instanceof Error ? error.message : 'Unknown error' })
     }
     setLoading(false)
   }
@@ -51,8 +51,8 @@ export default function TestPage() {
         { productId: 2, quantity: 10 }
       ])
       log('checkAvailability', result)
-    } catch (error: any) {
-      log('checkAvailability', { error: error.message })
+    } catch (error: unknown) {
+      log('checkAvailability', { error: error instanceof Error ? error.message : 'Unknown error' })
     }
     setLoading(false)
   }
@@ -70,8 +70,8 @@ export default function TestPage() {
         symptoms: 'Test symptoms'
       })
       log('patientRegister', { success: true, token: data.token.slice(0, 20) + '...', patientId: data.treatmentRequest.patientId })
-    } catch (error: any) {
-      log('patientRegister', { error: error.message })
+    } catch (error: unknown) {
+      log('patientRegister', { error: error instanceof Error ? error.message : 'Unknown error' })
     }
     setLoading(false)
   }
@@ -82,8 +82,8 @@ export default function TestPage() {
     try {
       const data = await patientLogin('testpatient@example.com', '10115') as Record<string, unknown>
       log('patientLogin', { ...data, token: typeof data.token === 'string' ? data.token.slice(0, 20) + '...' : 'N/A' })
-    } catch (error: any) {
-      log('patientLogin', { error: error.message })
+    } catch (error: unknown) {
+      log('patientLogin', { error: error instanceof Error ? error.message : 'Unknown error' })
     }
     setLoading(false)
   }
@@ -143,7 +143,7 @@ export default function TestPage() {
             <p className="text-gray-500">Click buttons to run tests...</p>
           ) : (
             <div className="space-y-4">
-              {Object.entries(results).map(([key, value]: [string, any]) => (
+              {Object.entries(results).map(([key, value]: [string, unknown]) => (
                 <div key={key} className="border-l-4 border-blue-500 pl-4">
                   <h3 className="font-semibold text-lg mb-2">{key}</h3>
                   <pre className="bg-gray-100 p-3 rounded text-sm overflow-auto">

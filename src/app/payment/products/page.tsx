@@ -45,8 +45,8 @@ function PaymentForm({ treatmentRequestId }: { treatmentRequestId: string }) {
         setError(confirmError.message || 'Payment failed')
         setProcessing(false)
       }
-    } catch (err: any) {
-      setError(err.message || 'An error occurred')
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Payment failed')
       setProcessing(false)
     }
   }
@@ -135,8 +135,8 @@ function ProductPaymentContent() {
       } else {
         setError(data.message || 'Failed to initialize payment')
       }
-    } catch (err: any) {
-      setError(err.message || 'Failed to initialize payment')
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Failed to initialize payment')
     } finally {
       setLoading(false)
     }
@@ -226,7 +226,7 @@ function ProductPaymentContent() {
             </li>
             <li className="flex gap-2">
               <span className="font-bold text-blue-700">3.</span>
-              <span>You'll receive tracking information via email</span>
+              <span>You&apos;ll receive tracking information via email</span>
             </li>
             <li className="flex gap-2">
               <span className="font-bold text-blue-700">4.</span>

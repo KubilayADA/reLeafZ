@@ -69,10 +69,6 @@ const FloatingMonkey = () => {
 }
 
 export default function LandingPage() {
-  // Show coming soon page if flag is true
-  if (COMING_SOON_MODE) {
-    return <ComingSoon />;
-  }
   const router = useRouter()
   const [testimonialIdx, setTestimonialIdx] = useState(0)
   const [openCity, setOpenCity] = useState<string | null>(null)
@@ -89,6 +85,11 @@ export default function LandingPage() {
     city: '',
     symptoms: '',
   });
+
+  // Show coming soon page if flag is true
+  if (COMING_SOON_MODE) {
+    return <ComingSoon />;
+  }
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
@@ -334,7 +335,7 @@ export default function LandingPage() {
       <section id="ablauf" className="section-container">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16 px-4">
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold title-gradient mb-4 italic">SO FUNKTIONIERT'S</h2>
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold title-gradient mb-4 italic">SO FUNKTIONIERT&apos;S</h2>
             <p className="text-lg sm:text-xl subtitle-text max-w-2xl mx-auto inconsolata font-thin">
               Jetzt loslegen und Cannabis auf Rezept blitzschnell erhalten.
             </p>
@@ -427,7 +428,7 @@ export default function LandingPage() {
             Ready to Transform Your<br className="hidden sm:block" />Medical Cannabis Experience?
           </h2>
           <p className="text-lg sm:text-xl subtitle-text mb-8 sm:mb-12 max-w-2xl mx-auto">
-            Join thousands of patients who've found better care, faster relief, and a supportive community with reLeafZ.
+            Join thousands of patients who&apos;ve found better care, faster relief, and a supportive community with reLeafZ.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 justify-center subtitle-text">
@@ -460,7 +461,7 @@ export default function LandingPage() {
                 
               </div>
               <p className="text-gray-400 mb-4 subtitle-text">
-                Germany's fastest, safest, and coolest medical cannabis platform.
+                Germany&apos;s fastest, safest, and coolest medical cannabis platform.
               </p>
             </div>
 
