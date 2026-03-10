@@ -118,7 +118,7 @@ function PaymentSuccessContent() {
                     <div>
                       <h4 className="font-bold mb-1">Prescription Approval</h4>
                       <p className="text-sm subtitle-text">
-                        If approved, you'll receive an email with your prescription and a payment link for your products.
+                        If approved, you&apos;ll receive an email with your prescription and a payment link for your products.
                       </p>
                     </div>
                   </div>
@@ -139,7 +139,7 @@ function PaymentSuccessContent() {
 
               <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
                 <p className="text-sm subtitle-text">
-                  📧 <strong>Check your email</strong> - You'll receive updates about your request status.
+                  📧 <strong>Check your email</strong> - You&apos;ll receive updates about your request status.
                 </p>
               </div>
             </div>
@@ -195,7 +195,7 @@ function PaymentSuccessContent() {
               </div>
               <div className="flex gap-3">
                 <span className="font-bold text-purple-600">📧</span>
-                <span>You'll receive tracking information via email</span>
+                <span>You&apos;ll receive tracking information via email</span>
               </div>
               <div className="flex gap-3">
                 <span className="font-bold text-orange-600">📦</span>

@@ -55,8 +55,8 @@ function PaymentForm({ treatmentRequestId, selectedProducts, totalPrice }: {
         setError(confirmError.message || 'Payment failed')
         setProcessing(false)
       }
-    } catch (err: any) {
-      setError(err.message || 'An error occurred')
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Payment failed')
       setProcessing(false)
     }
   }
@@ -88,7 +88,7 @@ function PaymentForm({ treatmentRequestId, selectedProducts, totalPrice }: {
         <div className="mt-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
           <p className="text-xs subtitle-text">
             <strong>ℹ️ Why pay now?</strong> The €14.99 consultation fee covers your doctor review. 
-            After approval, you'll pay for the products (€{totalPrice.toFixed(2)}).
+            After approval, you&apos;ll pay for the products (€{totalPrice.toFixed(2)}).
           </p>
         </div>
       </div>
@@ -184,8 +184,8 @@ function PrescriptionPaymentContent() {
       } else {
         setError(data.message || 'Failed to initialize payment')
       }
-    } catch (err: any) {
-      setError(err.message || 'Failed to initialize payment')
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Failed to initialize payment')
     } finally {
       setLoading(false)
     }

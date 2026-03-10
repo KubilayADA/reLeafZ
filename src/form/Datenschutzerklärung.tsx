@@ -35,7 +35,7 @@ export default function Datenschutzerklärung() {
           <section>
             <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4">Einleitung</h2>
             <p className="text-sm sm:text-base text-gray-700 leading-relaxed mb-4">
-              Mit der folgenden Datenschutzerklärung möchten wir Sie darüber aufklären, welche Arten Ihrer personenbezogenen Daten (nachfolgend auch kurz als „Daten" bezeichnet) wir zu welchen Zwecken und in welchem Umfang verarbeiten. Die Datenschutzerklärung gilt für alle von uns durchgeführten Verarbeitungen personenbezogener Daten, sowohl im Rahmen der Erbringung unserer Leistungen als auch innerhalb unserer Onlineangebote, wie z.B. unserer Webseiten, mobilen Applikationen, externen Onlinepräsenzen, wie z.B. unserer Social-Media-Profile (nachfolgend zusammenfassend als „Onlineangebot" bezeichnet).
+              Mit der folgenden Datenschutzerklärung möchten wir Sie darüber aufklären, welche Arten Ihrer personenbezogenen Daten (nachfolgend auch kurz als „Daten&quot; bezeichnet) wir zu welchen Zwecken und in welchem Umfang verarbeiten. Die Datenschutzerklärung gilt für alle von uns durchgeführten Verarbeitungen personenbezogener Daten, sowohl im Rahmen der Erbringung unserer Leistungen als auch innerhalb unserer Onlineangebote, wie z.B. unserer Webseiten, mobilen Applikationen, externen Onlinepräsenzen, wie z.B. unserer Social-Media-Profile (nachfolgend zusammenfassend als „Onlineangebot&quot; bezeichnet).
             </p>
             <p className="text-sm sm:text-base text-gray-700 leading-relaxed mb-4">
               Die verwendeten Begriffe sind nicht geschlechtsspezifisch.
@@ -138,7 +138,7 @@ export default function Datenschutzerklärung() {
               Sofern wir im Rahmen unserer Verarbeitung Daten gegenüber anderen Personen und Unternehmen (Auftragsverarbeitern oder Dritten) offenbaren, sie an diese übermitteln oder ihnen sonst Zugriff auf die Daten gewähren, so erfolgt dies ausschließlich auf Grundlage einer gesetzlichen Erlaubnis (z.B. wenn eine Übermittlung der Daten an Dritte, wie an Zahlungsdienstleister, zur Vertragserfüllung erforderlich ist), Sie eingewilligt haben, eine rechtliche Verpflichtung dies vorsieht oder auf Grundlage unserer berechtigten Interessen (z.B. beim Einsatz von Beauftragten, Webhostern, etc.).
             </p>
             <p className="text-sm sm:text-base text-gray-700 leading-relaxed">
-              Sofern wir Dritte mit der Verarbeitung von Daten auf Grundlage eines sog. „Auftragsverarbeitungsvertrages" beauftragen, so geschieht dies auf Grundlage des Art. 28 DSGVO.
+              Sofern wir Dritte mit der Verarbeitung von Daten auf Grundlage eines sog. „Auftragsverarbeitungsvertrages&quot; beauftragen, so geschieht dies auf Grundlage des Art. 28 DSGVO.
             </p>
           </section>
 
@@ -146,7 +146,7 @@ export default function Datenschutzerklärung() {
           <section>
             <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4">Datenverarbeitung in Drittländern</h2>
             <p className="text-sm sm:text-base text-gray-700 leading-relaxed">
-              Sofern wir Daten in einem Drittland (d.h., außerhalb der Europäischen Union (EU), des Europäischen Wirtschaftsraums (EWR)) verarbeiten oder die Verarbeitung im Rahmen der Inanspruchnahme von Diensten Dritter stattfindet, erfolgt dies nur, wenn die besonderen Voraussetzungen der Art. 44 ff. DSGVO erfüllt sind. D.h., die Verarbeitung erfolgt z.B. auf Grundlage besonderer Garantien, wie der offiziell anerkannten Feststellung eines der EU entsprechenden Datenschutzniveaus (z.B. für die USA durch den „Privacy Shield") oder Beachtung offiziell anerkannter spezieller vertraglicher Verpflichtungen (sog. „Standardvertragsklauseln").
+              Sofern wir Daten in einem Drittland (d.h., außerhalb der Europäischen Union (EU), des Europäischen Wirtschaftsraums (EWR)) verarbeiten oder die Verarbeitung im Rahmen der Inanspruchnahme von Diensten Dritter stattfindet, erfolgt dies nur, wenn die besonderen Voraussetzungen der Art. 44 ff. DSGVO erfüllt sind. D.h., die Verarbeitung erfolgt z.B. auf Grundlage besonderer Garantien, wie der offiziell anerkannten Feststellung eines der EU entsprechenden Datenschutzniveaus (z.B. für die USA durch den „Privacy Shield&quot;) oder Beachtung offiziell anerkannter spezieller vertraglicher Verpflichtungen (sog. „Standardvertragsklauseln&quot;).
             </p>
           </section>
 
