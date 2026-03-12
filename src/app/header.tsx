@@ -8,8 +8,8 @@ import CookieBanner from '@/components/ui/cookie'
 import './header.css'
 
 // logo
-const LeafLogo = ({ className = 'w-80 h-50 sm:w-56 sm:h-110 md:w-72 md:h-32' }) => (
-  <div className={`relative overflow-hidden ${className}`}>
+const LeafLogo = ({ className = 'logo-header' }) => (
+  <div className={`logo-header ${className}`}>
     <img
       src="/logo1.png"
       alt="reLeafZ Logo"
@@ -139,7 +139,7 @@ export default function Header({
                 <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
                   <DialogTrigger asChild>
                     <Button 
-                      className="behandlung-button w-full px-6 py-3 flex items-center justify-center"
+                      className="behandlung-button2 w-full px-6 py-3 flex items-center justify-center"
                     >
                       BEHANDLUNG ANFRAGEN
                     </Button>
