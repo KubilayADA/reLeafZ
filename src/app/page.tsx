@@ -11,7 +11,7 @@ import Header from './header'
 import '@/components/ui/Hero/Words-Sliding-Smooth.css' 
 import ComingSoon from '@/components/ComingSoon'  
 
-const COMING_SOON_MODE = true;
+const COMING_SOON_MODE = false;
 
 // Font setup - using Inconsolata
 const inconsolataStyle = {
@@ -227,7 +227,7 @@ export default function LandingPage() {
               <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
                 <DialogTrigger asChild>
                   <Button
-                    className="behandlung-button px-8 py-3 flex items-center justify-center min-w-64 w-auto"
+                    className="behandlung-button-hero px-8 py-3 flex items-center justify-center min-w-64 w-auto"
                   >
                     BEHANDLUNG ANFRAGEN
                     <ChevronRight className="w-5 h-5 ml-2" />
