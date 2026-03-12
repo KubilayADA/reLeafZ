@@ -43,7 +43,10 @@ function PaymentSuccessContent() {
         body: JSON.stringify({
           treatmentRequestId: parseInt(requestId!),
           selectedProducts: JSON.parse(selectedProducts),
-          totalPrice: parseFloat(totalPrice)
+          totalPrice: parseFloat(totalPrice),
+          pharmacyId: parseInt(localStorage.getItem('selectedPharmacyId') || '0'),
+          deliveryMethod: localStorage.getItem('selectedDeliveryMethod') || 'PICKUP',
+          deliveryFee: parseFloat(localStorage.getItem('deliveryFee') || '0')
         })
       })
 
