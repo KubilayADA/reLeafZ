@@ -107,7 +107,7 @@ body {
 }
 
 .subtitle-text {
-    color: #3c3d40;
+    color: #111827;
 }
 
 .form-label {
@@ -354,6 +354,26 @@ button[disabled] {
     }
     50% {
         background-position: 100% 50%;
+    }
+}
+
+.hero-section {
+    background: #fbfdfb;
+    border-left: 1px solid #000000;
+    border-right: 1px solid #000000;
+    max-width: calc(100% - 200px);
+    margin-left: 250px;
+    margin-right: 250px;
+    z-index: 1;
+}
+
+@media (max-width: 768px) {
+    .hero-section {
+        border-left: none;
+        border-right: none;
+        max-width: 100%;
+        margin-left: 0;
+        margin-right: 0;
     }
 }
 
