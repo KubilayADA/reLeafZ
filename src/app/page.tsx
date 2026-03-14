@@ -11,7 +11,7 @@ import Header from './header'
 import '@/components/ui/Hero/Words-Sliding-Smooth.css' 
 import ComingSoon from '@/components/ComingSoon'  
 
-const COMING_SOON_MODE = true;
+const COMING_SOON_MODE = false;
 
 // Font setup - using Inconsolata
 const inconsolataStyle = {
@@ -466,9 +466,10 @@ export default function LandingPage() {
             <div>
               <h4 className="font-bold mb-4">Legal & Support</h4>
               <ul className="space-y-2 text-gray-400">
-                <li><a href="#" className="hover:text-white transition-colors">Privacy Policy</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Terms of Service</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">GDPR Compliance</a></li>
+                <li><a href="/impressum" className="hover:text-white transition-colors">Impressum</a></li>
+                <li><a href="/datenschutz" className="hover:text-white transition-colors">Datenschutzerklärung</a></li>
+                <li><a href="/agb" className="hover:text-white transition-colors">AGB</a></li>
+                <li><a href="/datenschutz" className="hover:text-white transition-colors">DSGVO</a></li>
                 <li><a href="#" className="hover:text-white transition-colors">Support</a></li>
               </ul>
             </div>
