@@ -174,7 +174,7 @@ export default function LandingPage() {
       />
 
       {/* Main hero area */}
-      <section className="relative pt-20 pb-32 overflow-hidden"
+      <section className="hero-section relative pt-20 pb-32 overflow-hidden"
       
       >
         {/* Background decoration */}
@@ -227,7 +227,7 @@ export default function LandingPage() {
               <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
                 <DialogTrigger asChild>
                   <Button
-                    className="behandlung-button px-8 py-3 flex items-center justify-center min-w-64 w-auto"
+                    className="behandlung-button-hero px-8 py-3 flex items-center justify-center min-w-64 w-auto"
                   >
                     BEHANDLUNG ANFRAGEN
                     <ChevronRight className="w-5 h-5 ml-2" />
@@ -331,50 +331,26 @@ export default function LandingPage() {
         />
       </section>
 
-      {/* How it works section */}
+      {/* How it works section became pharmacy location ta dammmmm i think make sense to encourage user to walk there*/}
       <section id="ablauf" className="section-container">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16 px-4">
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold title-gradient mb-4 italic">SO FUNKTIONIERT&apos;S</h2>
-            <p className="text-lg sm:text-xl subtitle-text max-w-2xl mx-auto inconsolata font-thin">
-              Jetzt loslegen und Cannabis auf Rezept blitzschnell erhalten.
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold title-gradient mb-4 italic">FINDEN SIE UNSERE PARTNER-APOTHEKEN</h2>
+            <p className="text-lg sm:text-xl subtitle-text max-w-3xl mx-auto inconsolata font-thin">
+            Schneller als Ihre Hausschuhe zu finden – einfach klicken, abholen, fertig!
             </p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8">
-            {/* Step 1 - removed all the fancy hover stuff, was too much */}
-            <div className="text-center">
-              <div className="w-16 h-16 rounded-2xl flex items-center justify-center mb-6 mx-auto icon-container">
-                <ListCheck className="w-8 h-8 text-white" />
-              </div>
-              <h3 className="text-xl sm:text-2xl md:text-3xl font-bold title-gradient mb-4 italic">FRAGENBOGEN AUSFULLEN</h3>
-              <p className="text-base sm:text-lg subtitle-text inconsolata font-thin px-4">
-                Fülle unseren medizinischen Fragebogen aus – easy von der Couch aus.
-              </p>
-            </div>
-
-            {/* Step 2 */}
-            <div className="text-center">
-              <div className="w-16 h-16 rounded-2xl flex items-center justify-center mb-6 mx-auto icon-container">
-                <Hospital className="w-8 h-8 text-white" />
-              </div>
-              <h3 className="text-xl sm:text-2xl md:text-3xl font-bold title-gradient mb-4 italic">BEHANDLUNG ERHALTEN</h3>
-              <p className="text-base sm:text-lg subtitle-text inconsolata font-thin px-4">
-                Ein Arzt prüft deine Angaben und stellt dir bei Eignung ein Rezept aus.
-              </p>
-            </div>
-
-            {/* Step 3 */}
-            <div className="text-center">
-              <div className="w-16 h-16 rounded-2xl flex items-center justify-center mb-6 mx-auto icon-container">
-                <LucideBike className="w-8 h-8 text-white" />
-              </div>
-              <h3 className="text-xl sm:text-2xl md:text-3xl font-bold title-gradient mb-4 italic">EXPRESSLIEFERUNG ERHALTEN</h3>
-              <p className="text-base sm:text-lg subtitle-text mb-4 inconsolata font-thin px-4">
-                Medikamente in Berlin in max. 90 Min. geliefert oder in 15–30 Min. selbst in der Apotheke abholen.
-              </p>
-              <div className="text-gray-700 font-semibold italic px-4">Powered by Wolt & Uber →</div>
-            </div>
+          <div className="w-full rounded-2xl overflow-hidden shadow-lg" style={{ height: '500px' }}>
+            <iframe
+              src="https://maps.google.com/maps?q=Apotheke+in+Berlin&t=&z=11&ie=UTF8&iwloc=&output=embed"
+              width="100%"
+              height="100%"
+              style={{ border: 0 }}
+              allowFullScreen
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+            />
           </div>
         </div>
       </section>

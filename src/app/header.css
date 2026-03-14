@@ -59,3 +59,15 @@
     font-size: 10px;
   }
 }
+
+.header {
+  background-color: #fbfdfb;
+}
+
+.logo-header {
+  position: absolute;
+  top: -60px;
+  left: 50px;
+}
+
+
