@@ -178,8 +178,7 @@ button[disabled] {
     transition: all 0.3s ease;
 }
 
-/* Header button - absolute positioned in the navbar */
-.btn-primary,
+/* Header button - absolute positioned in the navbar (only the header trigger, not .btn-primary in forms) */
 .behandlung-button {
     position: absolute;
     top: 45px;
@@ -207,8 +206,6 @@ button[disabled] {
 
 /* Secondary Button - Alternative actions (same color as primary) */
 .btn-secondary {
-    position: absolute;
-    top: 300px;
     font-family: "Inconsolata", monospace;
     font-weight: 400;
     background-color: #72906F;
