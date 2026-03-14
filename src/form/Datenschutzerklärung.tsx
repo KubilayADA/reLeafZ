@@ -1,13 +1,14 @@
 'use client'
 
 import React from 'react'
+import Link from 'next/link'
 import '@/app/main.css'
 
 // Logo component
 const LeafLogo = ({ className = 'w-48 h-24 sm:w-56 sm:h-28 md:w-64 md:h-32' }) => (
   <div className={`relative overflow-hidden ${className}`}>
     <img
-      src="/logo.png"
+      src="/logo1.png"
       alt="reLeafZ Logo"
       className="w-full h-full object-contain"
     />
@@ -21,7 +22,9 @@ export default function Datenschutzerklärung() {
         {/* Header */}
         <div className="mb-6 sm:mb-8">
           <div className="flex flex-col items-center mb-6 sm:mb-8">
-            <LeafLogo className="w-48 h-24 sm:w-56 sm:h-28 md:w-64 md:h-32 mb-4 sm:mb-6" />
+            <Link href="/" className="block focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 rounded">
+              <LeafLogo className="w-48 h-24 sm:w-56 sm:h-28 md:w-64 md:h-32 mb-4 sm:mb-6" />
+            </Link>
             <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold title-gradient text-center">
               DATENSCHUTZERKLÄRUNG
             </h1>
@@ -41,7 +44,7 @@ export default function Datenschutzerklärung() {
               Die verwendeten Begriffe sind nicht geschlechtsspezifisch.
             </p>
             <p className="text-sm sm:text-base text-gray-700 leading-relaxed font-semibold">
-              Stand: 1. Januar 2024
+              Stand: März 2026
             </p>
           </section>
 
@@ -49,11 +52,10 @@ export default function Datenschutzerklärung() {
           <section>
             <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4">Verantwortlicher</h2>
             <div className="text-sm sm:text-base text-gray-700 leading-relaxed space-y-2">
-              <p><strong>Releafz</strong></p>
-              <p>Adresse: [Ihre Adresse]</p>
-              <p>E-Mail: support@releafz.com</p>
-              <p>Telefon: [Ihre Telefonnummer]</p>
-              <p>Website: www.releafz.com</p>
+              <p><strong>Name:</strong> releafZ (Plattform betrieben durch S.C. CODE UG)</p>
+              <p><strong>Adresse:</strong> Donaustraße 44, 12043 Berlin, Deutschland</p>
+              <p><strong>E-Mail:</strong> support@releafz.de</p>
+              <p><strong>Website:</strong> www.releafz.de</p>
             </div>
           </section>
 
@@ -131,6 +133,30 @@ export default function Datenschutzerklärung() {
             </p>
           </section>
 
+          {/* Hosting und Infrastruktur */}
+          <section>
+            <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4">Hosting und Infrastruktur</h2>
+            <p className="text-sm sm:text-base text-gray-700 leading-relaxed">
+              Unsere Plattform wird auf Servern von Scaleway SAS, 8 rue de la Ville l&apos;Evêque, 75008 Paris, Frankreich gehostet. Die Server befinden sich in Paris, Frankreich (EU). Scaleway ist nach ISO 27001 und HDS (Hébergeur de Données de Santé) zertifiziert. Es wurde ein Auftragsverarbeitungsvertrag gemäß Art. 28 DSGVO geschlossen.
+            </p>
+          </section>
+
+          {/* Zahlungsabwicklung */}
+          <section>
+            <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4">Zahlungsabwicklung</h2>
+            <p className="text-sm sm:text-base text-gray-700 leading-relaxed">
+              Zahlungen werden über Stripe Payments Europe Limited, 1 Grand Canal Street Lower, Dublin 2, Irland abgewickelt. Stripe ist nach Art. 6 Abs. 1 lit. b DSGVO berechtigt, die für die Zahlungsabwicklung notwendigen Daten zu verarbeiten. Es wurde ein Auftragsverarbeitungsvertrag gemäß Art. 28 DSGVO geschlossen.
+            </p>
+          </section>
+
+          {/* E-Mail-Versand */}
+          <section>
+            <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4">E-Mail-Versand</h2>
+            <p className="text-sm sm:text-base text-gray-700 leading-relaxed">
+              Transaktionale E-Mails werden über Resend (Functional Software, Inc.) versandt. Die Verarbeitung erfolgt auf Grundlage von Art. 6 Abs. 1 lit. b DSGVO. Es wurde ein Auftragsverarbeitungsvertrag gemäß Art. 28 DSGVO geschlossen.
+            </p>
+          </section>
+
           {/* Zusammenarbeit mit Auftragsverarbeitern und Dritten */}
           <section>
             <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4">Zusammenarbeit mit Auftragsverarbeitern und Dritten</h2>
@@ -146,7 +172,7 @@ export default function Datenschutzerklärung() {
           <section>
             <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4">Datenverarbeitung in Drittländern</h2>
             <p className="text-sm sm:text-base text-gray-700 leading-relaxed">
-              Sofern wir Daten in einem Drittland (d.h., außerhalb der Europäischen Union (EU), des Europäischen Wirtschaftsraums (EWR)) verarbeiten oder die Verarbeitung im Rahmen der Inanspruchnahme von Diensten Dritter stattfindet, erfolgt dies nur, wenn die besonderen Voraussetzungen der Art. 44 ff. DSGVO erfüllt sind. D.h., die Verarbeitung erfolgt z.B. auf Grundlage besonderer Garantien, wie der offiziell anerkannten Feststellung eines der EU entsprechenden Datenschutzniveaus (z.B. für die USA durch den „Privacy Shield&quot;) oder Beachtung offiziell anerkannter spezieller vertraglicher Verpflichtungen (sog. „Standardvertragsklauseln&quot;).
+              Sofern wir Daten in einem Drittland (d.h., außerhalb der Europäischen Union (EU), des Europäischen Wirtschaftsraums (EWR)) verarbeiten oder die Verarbeitung im Rahmen der Inanspruchnahme von Diensten Dritter stattfindet, erfolgt dies nur, wenn die besonderen Voraussetzungen der Art. 44 ff. DSGVO erfüllt sind. D.h., die Verarbeitung erfolgt z.B. auf Grundlage besonderer Garantien, wie der offiziell anerkannten Feststellung eines der EU entsprechenden Datenschutzniveaus (z.B. für die USA durch das Data Privacy Framework (DPF)) oder Beachtung offiziell anerkannter spezieller vertraglicher Verpflichtungen (sog. „Standardvertragsklauseln&quot;).
             </p>
           </section>
 
@@ -267,14 +293,6 @@ export default function Datenschutzerklärung() {
             <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4">Änderung und Aktualisierung der Datenschutzerklärung</h2>
             <p className="text-sm sm:text-base text-gray-700 leading-relaxed">
               Wir bitten Sie, sich regelmäßig über den Inhalt unserer Datenschutzerklärung zu informieren. Wir passen die Datenschutzerklärung an, sobald die Änderungen der von uns durchgeführten Datenverarbeitungen dies erforderlich machen. Wir informieren Sie, sobald die Änderungen eine Mitwirkungshandlung Ihrerseits (z.B. Einwilligung) oder eine sonstige individuelle Benachrichtigung erforderlich machen.
-            </p>
-          </section>
-
-          {/* Fragen an den Datenschutzbeauftragten */}
-          <section>
-            <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4">Fragen an den Datenschutzbeauftragten</h2>
-            <p className="text-sm sm:text-base text-gray-700 leading-relaxed">
-              Wenn Sie Fragen zum Datenschutz haben, senden Sie uns bitte eine E-Mail an support@releafz.com oder wenden Sie sich direkt an die für den Datenschutz verantwortliche Person in unserer Organisation.
             </p>
           </section>
 
