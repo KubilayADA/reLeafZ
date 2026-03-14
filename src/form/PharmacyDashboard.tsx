@@ -218,7 +218,7 @@ export default function PharmacyDashboard() {
   if (!isClient) return (
     <div className="pharmacy-dashboard min-h-screen flex items-center justify-center bg-[#0a0f0a]">
       <div className="flex flex-col items-center gap-4">
-        <img src="/logo.png" alt="reLeafZ" className="h-50 w-auto animate-pulse opacity-80" style={{ filter: 'brightness(1.3)' }} />
+        <img src="/logo1.png" alt="reLeafZ" className="h-50 w-auto animate-pulse opacity-80" style={{ filter: 'brightness(1.3)' }} />
         <div className="flex gap-1.5">{[0, 150, 300].map(d => <div key={d} className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-bounce" style={{ animationDelay: `${d}ms` }} />)}</div>
       </div>
     </div>
@@ -233,7 +233,7 @@ export default function PharmacyDashboard() {
       </div>
       <div className="max-w-md w-full relative z-10">
         <div className="text-center mb-8">
-          <img src="/logo.png" alt="reLeafZ" className="h-16 w-auto mb-5 mx-auto" style={{ filter: 'brightness(1.3)' }} />
+          <img src="/logo1.png" alt="reLeafZ" className="h-16 w-auto mb-5 mx-auto" style={{ filter: 'brightness(1.3)' }} />
           <h1 className="text-3xl font-bold text-white tracking-tight" style={{ fontFamily: 'DM Sans, sans-serif' }}>Willkommen zurück</h1>
           <p className="text-white/30 mt-1.5 text-sm">Melden Sie sich im Apotheken-Dashboard an</p>
         </div>
@@ -276,7 +276,7 @@ export default function PharmacyDashboard() {
         <div className="sticky top-0 z-30 pt-6 pb-4 bg-[#0a0f0a]/80 backdrop-blur-xl -mx-4 sm:-mx-6 px-4 sm:px-6">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
             <div className="flex items-center gap-3.5 min-w-0 flex-1">
-              <img src="/logo.png" alt="reLeafZ" className="h-10 w-auto flex-shrink-0" style={{ filter: 'brightness(1.3)' }} />
+              <img src="/logo1.png" alt="reLeafZ" className="h-10 w-auto flex-shrink-0" style={{ filter: 'brightness(1.3)' }} />
               <div className="min-w-0">
                 <h1 className="text-lg font-bold text-white tracking-tight truncate">{pharmacy?.name || 'Dashboard'}</h1>
                 <p className="text-[11px] text-white/30 truncate max-w-[280px]">{pharmacy?.zip}{pharmacy?.zipRange ? ` • ${pharmacy.zipRange}` : ''}</p>
