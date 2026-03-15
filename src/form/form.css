@@ -537,6 +537,16 @@
 /* ============================================
    CTA BUTTON (full-width primary action)
    ============================================ */
+/* Reset any global button positioning inside form so CTAs stay in flow */
+.form-page .form-cta,
+.form-page .btn-secondary.form-cta,
+.form-page button[type="submit"] {
+  position: relative;
+  top: auto;
+  right: auto;
+  bottom: auto;
+  left: auto;
+}
 .form-cta {
   width: 100%;
   padding: var(--form-spacing-md) var(--form-spacing-lg);
