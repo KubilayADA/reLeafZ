@@ -399,6 +399,40 @@ export default function MashallahForm({ postcode, onBack }: MashallahFormProps) 
                   />
                 </div>
               </div>
+              {/* GDPR Consent Checkboxes */}
+<div className="space-y-3">
+  <div className="flex items-start gap-3">
+    <input
+      type="checkbox"
+      id="consentTerms"
+      checked={consentTerms}
+      onChange={(e) => setConsentTerms(e.target.checked)}
+      disabled={loading}
+      className="mt-1 h-4 w-4 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500 cursor-pointer"
+    />
+    <label htmlFor="consentTerms" className="text-sm text-gray-700 cursor-pointer">
+      Ich akzeptiere die{' '}
+      <a href="/agb" target="_blank" className="text-emerald-600 underline hover:text-emerald-700">AGB</a>
+      {' '}und die{' '}
+      <a href="/datenschutz" target="_blank" className="text-emerald-600 underline hover:text-emerald-700">Datenschutzerklärung</a>
+      {' '}von releafZ. *
+    </label>
+  </div>
+
+      <div className="flex items-start gap-3">
+    <input
+      type="checkbox"
+      id="consentHealth"
+      checked={consentHealth}
+      onChange={(e) => setConsentHealth(e.target.checked)}
+      disabled={loading}
+      className="mt-1 h-4 w-4 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500 cursor-pointer"
+    />
+        <label htmlFor="consentHealth" className="text-sm text-gray-700 cursor-pointer">
+          Ich willige ausdrücklich in die Verarbeitung meiner Gesundheitsdaten (Symptome, Diagnosen, Rezepte) durch releafZ zur Vermittlung medizinischer Leistungen ein (Art. 9 Abs. 2 lit. a DSGVO). *
+        </label>
+      </div>
+    </div>
 
               <div className="space-y-3">
                 <div className="form-checkbox-row">
