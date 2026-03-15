@@ -9,7 +9,8 @@ import MashallahForm from '@/form/mashallah'
 import words from '@/constants/index'
 import Header from './header'
 import '@/components/ui/Hero/Words-Sliding-Smooth.css' 
-import ComingSoon from '@/components/ComingSoon'  
+import ComingSoon from '@/components/ComingSoon'
+import How from '@/components/ui/funktioniert/how'  
 
 const COMING_SOON_MODE = false;
 
@@ -331,8 +332,11 @@ export default function LandingPage() {
         />
       </section>
 
-      {/* How it works section became pharmacy location ta dammmmm i think make sense to encourage user to walk there*/}
-      <section id="ablauf" className="section-container">
+      {/* How to order — right under hero //let's structure this file like this g?*/}
+      <How />
+
+      {/* Partner-Apotheken map */}
+      <section id="partner-apotheken" className="section-container">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16 px-4">
             <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold title-gradient mb-4 italic">FINDEN SIE UNSERE PARTNER-APOTHEKEN</h2>
@@ -355,16 +359,14 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* Vorteile / city delivery section — commented out, replaced by How (how to order) under hero
      <section id="vorteile" className="py-12 sm:py-16 md:py-24 bg-gradient-to-r-custom section-container">
   <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center md:items-start text-center md:text-left">
-    {/* city descr. on the left */}
     <div className="w-full md:w-1/2 mt-8 md:mt-0 md:pr-12 flex flex-col justify-center">
     <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-6 md:mb-8 italic bg-gradient-to-r from-green-600 to-purple-600 bg-clip-text text-transparent">
       TO YOUR DOOR? IN MINUTES. </h2>
     <p className="text-sm sm:text-base subtitle-text mb-6">BERLIN in können deine Medikamente in 30-90 minuten geliefert werden, In folgenden Städten ansonsten per DHL in 1-3 Tagen 
     </p>
-
-    
     <div className="mt-6 text-base sm:text-lg subtitle-text">
         {cities.map(city => (
                 <div key={city.name} className="mb-4 city-dropdown-wrapper">
@@ -386,7 +388,6 @@ export default function LandingPage() {
         ))}
       </div>
     </div>
-    {/* Map on the right, half width */}
     <div className="w-full md:w-1/2 flex gap-x-6 mt-6 md:mt-0">
       <img
         src="/berlinmap.png"
@@ -396,6 +397,7 @@ export default function LandingPage() {
     </div>
   </div>
 </section>
+      */}
 
       {/* Bottom CTA section */}
       <section id="chat" className="py-12 sm:py-16 md:py-24 section-container">

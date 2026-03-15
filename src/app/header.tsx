@@ -46,7 +46,7 @@ export default function Header({
         </div>
         
         {/* Moving information banner */}
-        <div className="bg-transparent text-black py-1 overflow-hidden border-b border-black">
+        <div className="bg-transparent text-black py-0.5 overflow-hidden border-b border-black">
         <div className="moving-text">
           <span>Card payment accepted</span>
           <span>|</span>
@@ -63,26 +63,31 @@ export default function Header({
         </div>
       </div>
       
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20">
-        <div className="flex justify-between items-center h-20">
-          {/* Logo geniş, navbar sabit yükseklikte */}
-          <div className="flex items-center h-20 overflow-visible">
-            <LeafLogo className="w-45 h-52 transform translate-y-4" />
-          </div>
-          
-          {/* Desktop Nav */}
-          <nav className="hidden md:flex absolute left-1/2 top-flex mt-12 transform -translate-x-1/2 -translate-y-1/2 space-x-8 inconsolata font-normal ">
-            <a href="#ablauf" className="text-mg md:text-xl   leading-relaxed">Ablauf</a>
-            <a href="#vorteile" className="text-lg md:text-xl   leading-relaxed">Vorteile</a>
-            <a href="#chat" className="text-lg md:text-xl leading-relaxed">Chat with us!</a>
-          </nav>
-          
-          {/* Desktop Button - Hidden on mobile, only in hamburger menu wish i believe is better let me know if you see this UwUwuu*/}
-          <div className="hidden lg:block">
-            <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+      <div className="header-row-wrap relative w-full h-22">
+        {/* Vertical lines aligned with hero left/right edges (250px inset) */}
+        <span className="header-line header-line--hero-left" aria-hidden />
+        <span className="header-line header-line--hero-right" aria-hidden />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-14">
+          <div className="flex justify-between items-center h-14">
+            {/* Logo geniş, navbar sabit yükseklikte */}
+            <div className="flex items-center h-14 overflow-visible">
+              <LeafLogo className="w-45 h-52 transform translate-y-0" />
+            </div>
+            
+            {/* Desktop Nav */}
+            <nav className="header-desktop-nav hidden md:flex absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 space-x-8 inconsolata font-normal ">
+              <a href="#ablauf" className="header-nav-link text-mg md:text-xl leading-relaxed">Ablauf</a>
+              <a href="#partner-apotheken" className="header-nav-link text-mg md:text-xl leading-relaxed">Apotheke in Ihrer Nähe</a>
+              <a href="#vorteile" className="header-nav-link text-lg md:text-xl leading-relaxed">Vorteile</a>
+              <a href="#chat" className="header-nav-link text-lg md:text-xl leading-relaxed">Chat with us!</a>
+            </nav>
+            
+            {/* Desktop Button - Hidden on mobile, only in hamburger menu wish i believe is better let me know if you see this UwUwuu*/}
+            <div className="hidden lg:block">
+              <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
               <DialogTrigger asChild>
                   <Button
-                    className="behandlung-button px-4 py-2 flex items-center justify-center"
+                    className="behandlung-button px-4 py-2 flex items-center justify-center -translate-y-4"
                   >
                   BEHANDLUNG ANFRAGEN
                 </Button>
@@ -116,23 +121,25 @@ export default function Header({
                 </DialogFooter>
               </DialogContent>
             </Dialog>
+            </div>
+            {/* Hamburger for mobile and tablet */}
+            <button
+              className="lg:hidden ml-4 p-2 rounded focus:outline-none"
+              onClick={() => setMobileNavOpen(!mobileNavOpen)}
+              aria-label="Open menu"
+            >
+              {mobileNavOpen ? <X className="w-7 h-7" /> : <Menu className="w-7 h-7" />}
+            </button>
           </div>
-          
-          {/* Hamburger for mobile and tablet */}
-          <button
-            className="lg:hidden ml-4 p-2 rounded focus:outline-none"
-            onClick={() => setMobileNavOpen(!mobileNavOpen)}
-            aria-label="Open menu"
-          >
-            {mobileNavOpen ? <X className="w-7 h-7" /> : <Menu className="w-7 h-7" />}
-          </button>
         </div>
+      </div>
         
         {/* Mobile Nav Drawer */}
         {mobileNavOpen && (
           <div className="lg:hidden absolute top-full left-0 w-full bg-white shadow-lg border-t border-emerald-200 z-50">
             <nav className="flex flex-col items-center py-6 space-y-6">
               <a href="#ablauf" className="text-xl text-black-800 inconsolata" onClick={() => setMobileNavOpen(false)}>Ablauf</a>
+              <a href="#partner-apotheken" className="text-xl text-black-800 inconsolata" onClick={() => setMobileNavOpen(false)}>Apotheke in Ihrer Nähe</a>
               <a href="#vorteile" className="text-xl text-black-800 inconsolata" onClick={() => setMobileNavOpen(false)}>Vorteile</a>
               <a href="#chat" className="text-xl text-black-800 inconsolata" onClick={() => setMobileNavOpen(false)}>Chat with us!</a>
               <div className="w-full px-4">
@@ -181,7 +188,6 @@ export default function Header({
             </nav>
           </div>
         )}
-      </div>
     </header>
     </>
   )
