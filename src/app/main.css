@@ -375,29 +375,26 @@ header .behandlung-button {
     }
 }
 
-/* Section Styling */
+/* Section Styling — full-width sections, top/bottom lines only (no side borders) */
 .section-container {
     background:     #fbfdfb;
     border-top: 1px solid #000000;
     border-bottom: 1px solid #000000;
-    border-left: 1px solid #000000;
-    border-right: 1px solid #000000;
     padding: 3rem 1rem;
-    border-radius: border-box;
-    margin: 0 0.5rem;
+    margin: 0;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 @media (min-width: 640px) {
     .section-container {
         padding: 6rem 2rem;
-        margin: 0 0.75rem;
     }
 }
 
 @media (min-width: 1024px) {
     .section-container {
         padding: 8rem 4rem;
-        margin: 0 1rem;
     }
 }
 
