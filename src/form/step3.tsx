@@ -4,6 +4,7 @@ import React, { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { ArrowLeft, MoonStar, Activity, Brain, Sparkles } from 'lucide-react'
 import '@/app/main.css'
+import '@/form/form.css'
 
 interface Step3Props {
   onNext: (selectedOption: string) => void
@@ -49,72 +50,50 @@ export default function Step3({ onNext, onBack }: Step3Props) {
   }
 
   return (
-    <div className="min-h-screen bg-beige inconsolata">
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-4 sm:py-8 flex flex-col items-center">
-        {/* Header */}
+    <div className="form-page inconsolata">
+      <div className="form-container form-container--center form-container--wide">
         {onBack && (
-          <div className="w-full flex justify-start mb-4 sm:mb-6">
-            <Button
-              onClick={onBack}
-              className="btn-outline text-sm sm:text-base"
-            >
+          <div className="w-full flex justify-start form-header__back-wrap">
+            <Button onClick={onBack} className="btn-outline text-sm sm:text-base">
               <ArrowLeft className="w-4 h-4 mr-2" />
               Zurück
             </Button>
           </div>
         )}
 
-        {/* Title */}
         <div className="text-center mb-6 sm:mb-10 px-2 sm:px-8">
           <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-3">
             Diagnose für dein Rezept
           </h1>
-          <p className="text-sm sm:text-base text-gray-600">
+          <p className="form-header__subtitle">
             Folge ein paar einfachen Schritten zu deinem Rezept.
           </p>
         </div>
 
-        <div className="bg-white rounded-3xl shadow-lg p-4 sm:p-6 md:p-10 w-full max-w-5xl">
-          <h2 className="text-xl sm:text-2xl font-semibold text-center text-gray-900 mb-3">
+        <div className="form-card form-card--rounded-lg max-w-5xl">
+          <h2 className="form-section-title">
             Welche Beschwerde hast du?
           </h2>
-          <p className="text-sm sm:text-base text-gray-600 text-center mb-10 px-2 sm:px-12">
+          <p className="form-section-hint mb-10 px-2 sm:px-12">
             Wähle eine Beschwerde aus, die deinen Zustand am besten beschreibt.
           </p>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 justify-items-center mb-10">
+          <div className="form-options form-options--cols-4 form-options--center mb-10">
             {options.map((option) => {
               const Icon = option.icon
               const isSelected = selectedOption === option.id
-
               return (
                 <button
                   key={option.id}
                   type="button"
                   onClick={() => setSelectedOption(option.id)}
-                  className={`
-                    w-full max-w-xs border-2 rounded-2xl p-6 sm:p-8 text-center transition-all duration-200
-                    flex flex-col items-center gap-4
-                    ${isSelected
-                      ? 'border-emerald-500 bg-emerald-50 shadow-lg'
-                      : 'border-gray-200 bg-white hover:border-emerald-300 hover:shadow-sm'
-                    }
-                  `}
+                  className={`form-option-card form-option-card--rounded-lg form-option-card--max-width form-option-card--text-center flex flex-col items-center gap-4 ${isSelected ? 'form-option-card--selected' : ''}`}
                 >
-                  <div className={`
-                    w-16 h-16 sm:w-20 sm:h-20 mx-auto rounded-full flex items-center justify-center
-                    ${isSelected ? 'bg-emerald-100' : 'bg-gray-100'}
-                  `}>
-                    <Icon
-                      className={`w-8 h-8 sm:w-10 sm:h-10 ${isSelected ? 'text-emerald-600' : 'text-emerald-500'}`}
-                    />
+                  <div className="form-option-icon-wrap form-option-icon-wrap--circle">
+                    <Icon className="form-option-icon w-8 h-8 sm:w-10 sm:h-10" />
                   </div>
-                  <h3 className="text-base sm:text-lg font-semibold text-gray-900">
-                    {option.title}
-                  </h3>
-                  <p className="text-xs sm:text-sm text-gray-600 leading-relaxed text-center break-all">
-                    {option.description}
-                  </p>
+                  <h3 className="form-option-title">{option.title}</h3>
+                  <p className="form-option-desc leading-relaxed break-all">{option.description}</p>
                 </button>
               )
             })}
@@ -123,7 +102,7 @@ export default function Step3({ onNext, onBack }: Step3Props) {
           <Button
             onClick={handleNext}
             disabled={!selectedOption}
-            className="w-full btn-secondary py-3 sm:py-4 text-base sm:text-lg font-bold"
+            className="form-cta btn-secondary"
           >
             Weiter
           </Button>

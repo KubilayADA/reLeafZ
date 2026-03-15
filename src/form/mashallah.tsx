@@ -6,6 +6,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { ArrowLeft, MapPin, Building2, Mail, Lock, CheckCircle2, X } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import '@/app/main.css'
+import '@/form/form.css'
 
 interface MashallahFormProps {
   postcode: string
@@ -28,6 +29,8 @@ export default function MashallahForm({ postcode, onBack }: MashallahFormProps) 
   const [otpError, setOtpError] = useState('')
   const [verifyingOtp, setVerifyingOtp] = useState(false)
   const [showWelcomeNotification, setShowWelcomeNotification] = useState(false)
+  const [consentHealth, setConsentHealth] = useState(false)
+  const [consentTerms, setConsentTerms] = useState(false)
   
   const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
 
@@ -36,7 +39,9 @@ export default function MashallahForm({ postcode, onBack }: MashallahFormProps) 
                      formData.email.trim() !== '' && 
                      formData.phone.trim() !== '' && 
                      formData.street.trim() !== '' &&
-                     formData.city.trim() !== ''
+                     formData.city.trim() !== '' &&
+                     consentHealth === true &&
+                     consentTerms === true
 
                      const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
                       const { name, value } = e.target
@@ -112,6 +117,8 @@ export default function MashallahForm({ postcode, onBack }: MashallahFormProps) 
         body: JSON.stringify({
           ...formData,
           postcode,
+          healthDataConsentGiven: consentHealth,
+          termsAccepted: consentTerms,
         }),
       })
 
@@ -262,30 +269,27 @@ export default function MashallahForm({ postcode, onBack }: MashallahFormProps) 
         </div>
       )}
 
-      <div className="min-h-screen bg-beige inconsolata">
-        <div className="max-w-2xl mx-auto px-4 sm:px-6 py-4 sm:py-8">
-          {/* Header */}
-          <div className="mb-6 sm:mb-8">
-            <Button
-              onClick={onBack}
-              className="mb-4 btn-outline text-sm sm:text-base"
-            >
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Zurück
-            </Button>
-            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold title-gradient mb-2">
+      <div className="form-page inconsolata">
+        <div className="form-container form-container--narrow">
+          <div className="form-header">
+            <div className="form-header__back-wrap">
+              <Button onClick={onBack} className="btn-outline text-sm sm:text-base">
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Zurück
+              </Button>
+            </div>
+            <h1 className="form-header__title text-2xl sm:text-3xl md:text-4xl font-bold title-gradient mb-2">
               Medizinische Anfrage
             </h1>
-            <p className="text-base sm:text-lg subtitle-text">
+            <p className="form-header__subtitle text-base sm:text-lg">
               Postleitzahl: <span className="font-semibold text-emerald-600">{postcode}</span>
             </p>
           </div>
 
-          {/* Form */}
-          <div className="bg-white rounded-lg shadow-lg p-4 sm:p-6 md:p-8">
-            <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
-              <div>
-                <label htmlFor="fullName" className="block text-sm font-medium form-label mb-2">
+          <div className="form-card">
+            <form onSubmit={handleSubmit} className="form-fields">
+              <div className="form-field">
+                <label htmlFor="fullName" className="form-label">
                   Vollständiger Name
                 </label>
                 <input
@@ -296,13 +300,13 @@ export default function MashallahForm({ postcode, onBack }: MashallahFormProps) 
                   onChange={handleChange}
                   required
                   disabled={loading}
-                  className="w-full p-2.5 sm:p-3 border border-gray-300 rounded-lg inconsolata text-base sm:text-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none disabled:bg-gray-100"
+                  className="form-input inconsolata"
                   placeholder="Max Mustermann"
                 />
               </div>
 
-              <div>
-                <label htmlFor="email" className="block text-sm font-medium form-label mb-2">
+              <div className="form-field">
+                <label htmlFor="email" className="form-label">
                   E-Mail Adresse
                 </label>
                 <input
@@ -313,13 +317,13 @@ export default function MashallahForm({ postcode, onBack }: MashallahFormProps) 
                   onChange={handleChange}
                   required
                   disabled={loading}
-                  className="w-full p-2.5 sm:p-3 border border-gray-300 rounded-lg inconsolata text-base sm:text-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none disabled:bg-gray-100"
+                  className="form-input inconsolata"
                   placeholder="max@example.com"
                 />
               </div>
 
-              <div>
-                <label htmlFor="phone" className="block text-sm font-medium form-label mb-2">
+              <div className="form-field">
+                <label htmlFor="phone" className="form-label">
                   Telefonnummer
                 </label>
                 <input
@@ -330,18 +334,18 @@ export default function MashallahForm({ postcode, onBack }: MashallahFormProps) 
                   onChange={handleChange}
                   required
                   disabled={loading}
-                  className="w-full p-2.5 sm:p-3 border border-gray-300 rounded-lg inconsolata text-base sm:text-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none disabled:bg-gray-100"
+                  className="form-input inconsolata"
                   placeholder="+49 30 12345678"
                 />
               </div>
 
-              <div>
-                <label htmlFor="street" className="block text-sm font-medium form-label mb-2">
+              <div className="form-field">
+                <label htmlFor="street" className="form-label">
                   Straße + Hausnummer *
                 </label>
                 <div className="relative">
                   {!formData.street && (
-                    <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 z-10 pointer-events-none transition-opacity duration-200" size={20} />
+                    <MapPin className="form-input-icon" size={20} />
                   )}
                   <input
                     type="text"
@@ -351,22 +355,20 @@ export default function MashallahForm({ postcode, onBack }: MashallahFormProps) 
                     onChange={handleChange}
                     required
                     disabled={loading}
-                    className={`w-full pr-3 p-2.5 sm:p-3 border border-gray-300 rounded-lg inconsolata text-base sm:text-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none disabled:bg-gray-100 transition-all duration-200 ${
-                      formData.street ? 'pl-3' : 'pl-[5rem]'
-                    }`}
-                    placeholder="   z.B. Hauptstraße 42"
+                    className={`form-input inconsolata form-input--with-icon-left ${formData.street ? 'has-value' : ''}`}
+                    placeholder="z.B. Hauptstraße 42"
                   />
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label htmlFor="city" className="block text-sm font-medium form-label mb-2">
+              <div className="form-field-grid-2">
+                <div className="form-field">
+                  <label htmlFor="city" className="form-label">
                     Stadt *
                   </label>
                   <div className="relative">
                     {!formData.city && (
-                      <Building2 className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 z-10 pointer-events-none transition-opacity duration-200" size={20} />
+                      <Building2 className="form-input-icon" size={20} />
                     )}
                     <input
                       type="text"
@@ -376,16 +378,13 @@ export default function MashallahForm({ postcode, onBack }: MashallahFormProps) 
                       onChange={handleChange}
                       required
                       disabled={loading}
-                      className={`w-full pr-3 p-2.5 sm:p-3 border border-gray-300 rounded-lg inconsolata text-base sm:text-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none disabled:bg-gray-100 transition-all duration-200 ${
-                        formData.city ? 'pl-3' : 'pl-[5rem]'
-                      }`}
-                      placeholder="   Berlin"
+                      className={`form-input inconsolata form-input--with-icon-left ${formData.city ? 'has-value' : ''}`}
+                      placeholder="Berlin"
                     />
                   </div>
                 </div>
-
-                <div>
-                  <label htmlFor="postcode" className="block text-sm font-medium form-label mb-2">
+                <div className="form-field">
+                  <label htmlFor="postcode" className="form-label">
                     PLZ *
                   </label>
                   <input
@@ -394,34 +393,67 @@ export default function MashallahForm({ postcode, onBack }: MashallahFormProps) 
                     name="postcode"
                     value={postcode}
                     disabled
-                    className="w-full px-3 p-2.5 sm:p-3 border border-gray-300 rounded-lg inconsolata text-base sm:text-lg bg-gray-100 text-gray-600 cursor-not-allowed"
+                    className="form-input"
                     placeholder={postcode}
+                    readOnly
                   />
                 </div>
               </div>
 
+              <div className="space-y-3">
+                <div className="form-checkbox-row">
+                  <input
+                    type="checkbox"
+                    id="consentTerms"
+                    checked={consentTerms}
+                    onChange={(e) => setConsentTerms(e.target.checked)}
+                    disabled={loading}
+                    className="form-checkbox"
+                  />
+                  <label htmlFor="consentTerms" className="form-checkbox-label">
+                    Ich akzeptiere die{' '}
+                    <a href="/agb" target="_blank" className="form-legal-link">AGB</a>
+                    {' '}und die{' '}
+                    <a href="/datenschutz" target="_blank" className="form-legal-link">Datenschutzerklärung</a>
+                    {' '}von releafZ. *
+                  </label>
+                </div>
+                <div className="form-checkbox-row">
+                  <input
+                    type="checkbox"
+                    id="consentHealth"
+                    checked={consentHealth}
+                    onChange={(e) => setConsentHealth(e.target.checked)}
+                    disabled={loading}
+                    className="form-checkbox"
+                  />
+                  <label htmlFor="consentHealth" className="form-checkbox-label">
+                    Ich willige ausdrücklich in die Verarbeitung meiner Gesundheitsdaten (Symptome, Diagnosen, Rezepte) durch releafZ zur Vermittlung medizinischer Leistungen ein (Art. 9 Abs. 2 lit. a DSGVO). *
+                  </label>
+                </div>
+              </div>
+
               {submitError && (
-                <div className="p-3 rounded-lg bg-red-50 border border-red-200">
-                  <p className="text-sm text-red-700">{submitError}</p>
+                <div className="form-message-box form-message-box--error">
+                  <p className="form-message-box__text">{submitError}</p>
                 </div>
               )}
 
               <Button
                 type="submit"
                 disabled={loading || !isFormValid}
-                className="w-full btn-secondary py-3 sm:py-4 text-base sm:text-lg font-bold"
+                className="form-cta btn-secondary"
               >
                 {loading ? 'Wird verarbeitet...' : 'Weiter'}
               </Button>
             </form>
           </div>
 
-          {/* Info */}
-          <div className="mt-6 sm:mt-8 bg-emerald-50 border border-emerald-200 rounded-lg p-4 sm:p-6">
-            <h3 className="text-base sm:text-lg font-semibold text-emerald-800 mb-2">
+          <div className="form-message-box form-message-box--info mt-6 sm:mt-8">
+            <h3 className="form-message-box__title">
               Lieferung in Berlin
             </h3>
-            <p className="text-sm sm:text-base text-emerald-700">
+            <p className="form-message-box__text">
               Da Sie in Berlin wohnen, können wir Ihre Medikamente in 30-90 Minuten direkt zu Ihnen liefern lassen.
             </p>
           </div>

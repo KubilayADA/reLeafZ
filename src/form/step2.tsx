@@ -4,6 +4,7 @@ import React, { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { ArrowLeft, Bike, Package } from 'lucide-react'
 import '@/app/main.css'
+import '@/form/form.css'
 
 interface Step2Props {
   onNext: (selectedOption: string) => void
@@ -39,111 +40,64 @@ export default function Step2({ onNext, onBack }: Step2Props) {
   }
 
   return (
-    <div className="min-h-screen bg-beige inconsolata">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 py-4 sm:py-8 flex flex-col items-center">
-        {/* Header */}
+    <div className="form-page inconsolata">
+      <div className="form-container form-container--center">
         {onBack && (
-          <div className="mb-4 sm:mb-6">
-            <Button
-              onClick={onBack}
-              className="btn-outline text-sm sm:text-base"
-            >
+          <div className="form-header__back-wrap">
+            <Button onClick={onBack} className="btn-outline text-sm sm:text-base">
               <ArrowLeft className="w-4 h-4 mr-2" />
               Zurück
             </Button>
           </div>
         )}
 
-        {/* Progress Indicator */}
-        <div className="mb-6 sm:mb-8 w-full">
-          <div className="flex items-center justify-center gap-2 sm:gap-4 mb-4 overflow-x-auto">
-            <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
-              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gray-300 text-gray-600 flex items-center justify-center font-bold text-sm sm:text-base">
-                1
-              </div>
-              <span className="font-medium text-gray-500 text-xs sm:text-sm md:text-base hidden sm:inline">Anfrage</span>
+        <div className="form-progress w-full">
+          <div className="form-progress__track">
+            <div className="form-progress__step">
+              <div className="form-progress__dot form-progress__dot--inactive">1</div>
+              <span className="form-progress__label form-progress__label--inactive hidden sm:inline">Anfrage</span>
             </div>
-            <div className="w-8 sm:w-16 h-0.5 bg-gray-300 flex-shrink-0"></div>
-            <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
-              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-emerald-600 text-white flex items-center justify-center font-bold text-sm sm:text-base">
-                2
-              </div>
-              <span className="font-medium text-emerald-600 text-xs sm:text-sm md:text-base hidden sm:inline">Produktauswahl</span>
-              <span className="font-medium text-emerald-600 text-xs sm:hidden">Produkt</span>
+            <div className="form-progress__connector" />
+            <div className="form-progress__step">
+              <div className="form-progress__dot form-progress__dot--active">2</div>
+              <span className="form-progress__label form-progress__label--active hidden sm:inline">Produktauswahl</span>
+              <span className="form-progress__label form-progress__label--active sm:hidden">Produkt</span>
             </div>
-            <div className="w-8 sm:w-16 h-0.5 bg-gray-300 flex-shrink-0"></div>
-            <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
-              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gray-300 text-gray-600 flex items-center justify-center font-bold text-sm sm:text-base">
-                3
-              </div>
-              <span className="font-medium text-gray-500 text-xs sm:text-sm md:text-base hidden sm:inline">Anfrage absenden</span>
-              <span className="font-medium text-gray-500 text-xs sm:hidden">Absenden</span>
+            <div className="form-progress__connector" />
+            <div className="form-progress__step">
+              <div className="form-progress__dot form-progress__dot--inactive">3</div>
+              <span className="form-progress__label form-progress__label--inactive hidden sm:inline">Anfrage absenden</span>
+              <span className="form-progress__label form-progress__label--inactive sm:hidden">Absenden</span>
             </div>
           </div>
         </div>
 
-        {/* Main Content */}
-        <div className="bg-white rounded-lg shadow-lg p-4 sm:p-6 md:p-8 w-full">
-          <h2 className="text-xl sm:text-2xl md:text-2xl font-bold title-gradient mb-4 sm:mb-6 text-center">
+        <div className="form-card">
+          <h2 className="form-question form-question--center title-gradient">
             Falls ein Rezept ausgestellt wird, wie möchtest du deine Medikamente erhalten?
           </h2>
-          
-          <p className="text-sm sm:text-base text-gray-600 mb-6 sm:mb-8 text-center">
+          <p className="form-question-hint">
             Berlin: Wähle deine Versandart und Apotheke aus *
           </p>
 
-          {/* Options Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 mb-6 sm:mb-8 justify-items-center">
+          <div className="form-options form-options--cols-2 form-options--center">
             {options.map((option) => {
               const Icon = option.icon
               const isSelected = selectedOption === option.id
-              
               return (
                 <div
                   key={option.id}
-                  onClick={() => {
-                    setSelectedOption(option.id)
-                  }}
-                  className={`
-                    relative border-2 rounded-lg p-4 sm:p-6 cursor-pointer transition-all duration-200 text-center w-full max-w-xs
-                    ${isSelected 
-                      ? 'border-emerald-500 bg-emerald-50 shadow-md' 
-                      : 'border-gray-200 bg-white hover:border-emerald-300 hover:shadow-sm'
-                    }
-                  `}
+                  onClick={() => setSelectedOption(option.id)}
+                  className={`form-option-card form-option-card--max-width form-option-card--text-center ${isSelected ? 'form-option-card--selected' : ''}`}
                 >
-                  {/* Icon Area */}
-                  <div className={`
-                    w-full h-32 sm:h-40 rounded-lg flex items-center justify-center mb-4
-                    ${isSelected ? 'bg-emerald-100' : 'bg-gray-100'}
-                  `}>
-                    <Icon 
-                      className={`w-16 h-16 sm:w-20 sm:h-20 ${isSelected ? 'text-emerald-600' : 'text-gray-600'}`}
-                    />
+                  <div className="form-option-icon-wrap form-option-icon-wrap--large">
+                    <Icon className={`form-option-icon w-16 h-16 sm:w-20 sm:h-20`} />
                   </div>
-
-                  {/* Title */}
-                  <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-2">
-                    {option.title}
-                  </h3>
-
-                  {/* Description */}
-                  <p className="text-xs sm:text-sm text-gray-600 mb-3 sm:mb-4">
-                    {option.description}
-                  </p>
-
-                  {/* Radio Button */}
+                  <h3 className="form-option-title">{option.title}</h3>
+                  <p className="form-option-desc">{option.description}</p>
                   <div className="flex items-center justify-center mt-4">
-                    <div className={`
-                      w-5 h-5 rounded-full border-2 flex items-center justify-center
-                      ${isSelected 
-                        ? 'border-emerald-500 bg-emerald-500' 
-                        : 'border-gray-300 bg-white'
-                      }
-                    `}>
-                      {isSelected && (
-                        <div className="w-2.5 h-2.5 rounded-full bg-white"></div>
-                      )}
+                    <div className="form-option-radio">
+                      {isSelected && <div className="form-option-radio__inner" />}
                     </div>
                   </div>
                 </div>
@@ -151,18 +105,16 @@ export default function Step2({ onNext, onBack }: Step2Props) {
             })}
           </div>
 
-          {/* Disclaimer */}
-          <div className="mb-6 sm:mb-8 pt-4 sm:pt-6 border-t border-gray-200 text-center">
-            <p className="text-xs sm:text-sm text-gray-600">
+          <div className="form-disclaimer form-disclaimer--center">
+            <p className="form-disclaimer__text">
               * Die Versandart kann nach der Rezeptausstellung ausgewählt werden.
             </p>
           </div>
 
-          {/* Next Button */}
           <Button
             onClick={handleNext}
             disabled={!selectedOption}
-            className="w-full btn-secondary py-3 sm:py-4 text-base sm:text-lg font-bold"
+            className="form-cta btn-secondary"
           >
             Weiter
           </Button>
