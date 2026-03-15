@@ -178,9 +178,9 @@ button[disabled] {
     transition: all 0.3s ease;
 }
 
-/* Header button - absolute positioned in the navbar */
-.btn-primary,
-.behandlung-button {
+/* Header button - absolute positioned only when inside the site header */
+header .btn-primary,
+header .behandlung-button {
     position: absolute;
     top: 45px;
     right: 50px;
@@ -205,10 +205,8 @@ button[disabled] {
     box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.1);
 }
 
-/* Secondary Button - Alternative actions (same color as primary) */
+/* Secondary Button - Alternative actions (same color as primary). No position: form uses this for CTAs. */
 .btn-secondary {
-    position: absolute;
-    top: 300px;
     font-family: "Inconsolata", monospace;
     font-weight: 400;
     background-color: #72906F;
