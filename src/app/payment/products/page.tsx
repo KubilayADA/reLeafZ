@@ -111,18 +111,12 @@ function ProductPaymentContent() {
 
   const initializePayment = async () => {
     try {
-      const token = localStorage.getItem('token')
-      if (!token) {
-        router.push('/login')
-        return
-      }
-
       const response = await fetch(`${API_BASE}/api/payments/product-payment`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
         },
+        credentials: 'include',
         body: JSON.stringify({
           treatmentRequestId: parseInt(treatmentRequestId!)
         })
