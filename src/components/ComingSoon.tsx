@@ -454,7 +454,30 @@ const ComingSoon: React.FC = () => {
         </div>
 
         {/* Partner CTA */}
-        <div className="mt-14 md:mt-20 px-4">
+        <div className="mt-14 md:mt-20 px-4 flex flex-wrap items-center justify-center gap-4">
+          <Link
+            href="/pharmacies"
+            className="group inline-flex items-center gap-3 px-6 py-3 rounded-full text-sm font-medium transition-all duration-300 hover:scale-[1.03]"
+            style={{
+              color: 'rgba(255, 255, 255, 0.6)',
+              border: '1px solid rgba(255, 255, 255, 0.1)',
+              background: 'rgba(255, 255, 255, 0.03)',
+              backdropFilter: 'blur(10px)',
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.borderColor = 'rgba(34, 211, 238, 0.4)';
+              e.currentTarget.style.color = '#22d3ee';
+              e.currentTarget.style.boxShadow = '0 0 20px rgba(34, 211, 238, 0.1)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.1)';
+              e.currentTarget.style.color = 'rgba(255, 255, 255, 0.6)';
+              e.currentTarget.style.boxShadow = 'none';
+            }}
+          >
+            Für Apotheken
+            <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
+          </Link>
           <Link
             href="/partners"
             className="group inline-flex items-center gap-3 px-6 py-3 rounded-full text-sm font-medium transition-all duration-300 hover:scale-[1.03]"
@@ -475,7 +498,7 @@ const ComingSoon: React.FC = () => {
               e.currentTarget.style.boxShadow = 'none';
             }}
           >
-            Are you a pharmacy or doctor?
+            Für Ärzte & Partner
             <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
           </Link>
         </div>
