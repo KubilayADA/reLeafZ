@@ -62,6 +62,7 @@
 
 .header {
   background-color: #fbfdfb;
+  z-index: 100;
 }
 
 .logo-header {

@@ -112,8 +112,9 @@ export default function Step1({ onNext, onBack }: Step1Props) {
             })}
           </div>
 
-          <div className="form-disclaimer">
-            <p className="form-disclaimer__text">
+          {/* Disclaimer */}
+          <div className="mb-6 sm:mb-8 pt-4 sm:pt-6 border-t border-gray-200">
+            <p className="text-xs sm:text-sm text-gray-600">
               * Die ärztlichen Leistungen werden nach der aktuell gültigen Gebührenordnung für Ärzte (GoÄ) berechnet.
             </p>
           </div>

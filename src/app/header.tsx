@@ -4,7 +4,6 @@ import React, { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Menu, X } from 'lucide-react'
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
-import CookieBanner from '@/components/ui/cookie'
 import './header.css'
 
 // logo
@@ -40,11 +39,6 @@ export default function Header({
   return (
     <>
       <header className="relative z-50 bg-#E9E6DE/50 backdrop-blur-md border-b border-black">
-        {/* Cookie Banner - positioned above everything */}
-        <div className="relative z-[90]">
-          <CookieBanner />
-        </div>
-        
         {/* Moving information banner */}
         <div className="bg-transparent text-black py-0.5 overflow-hidden border-b border-black">
         <div className="moving-text">
