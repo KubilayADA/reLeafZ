@@ -34,6 +34,12 @@ function PaymentSuccessContent() {
         return
       }
 
+      if (!token || typeof token !== 'string' || token.trim() === '') {
+        setLoading(false)
+        router.push('/')
+        return
+      }
+
       const response = await fetch(`${API_BASE}/api/treatment/finalize`, {
         method: 'POST',
         headers: {

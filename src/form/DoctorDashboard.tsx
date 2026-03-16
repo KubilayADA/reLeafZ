@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import {Eye, EyeOff, Lock, Mail, User, Clock, CheckCircle, XCircle, FileText, Phone, MapPin, AlertCircle, LogOut, Package } from 'lucide-react';
 
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
+const API_BASE = process.env.NEXT_PUBLIC_API_URL
 
 interface SelectedProduct {
   productId: number
@@ -55,10 +55,12 @@ export default function DoctorDashboard() {
         fetchRequests(data.token)
         fetchPastRequests(data.token)
       } else {
-        alert(data.message || 'Login failed')
+        alert('Login failed. Please try again.')
       }
     } catch (err) {
-      console.error(err)
+      if (process.env.NODE_ENV === 'development') {
+        console.error(err)
+      }
       alert('Login error')
     }
   }
@@ -72,9 +74,11 @@ export default function DoctorDashboard() {
       })
       const data = await res.json()
       if (res.ok) setRequests(data.requests || [])
-      else alert(data.message || 'Failed to fetch requests')
+      else alert('Failed to load requests. Please refresh.')
     } catch (err) {
-      console.error(err)
+      if (process.env.NODE_ENV === 'development') {
+        console.error(err)
+      }
       alert('Fetch error')
     } finally {
       setLoading(false)
@@ -92,11 +96,15 @@ export default function DoctorDashboard() {
       if (res.ok) {
         setPastRequests(data.requests || [])
       } else {
-        console.error('Failed to fetch past requests:', data.message)
+        if (process.env.NODE_ENV === 'development') {
+          console.error('Failed to fetch past requests:', data.message)
+        }
         setPastRequests([])
       }
     } catch (err) {
-      console.error('Past requests fetch error:', err)
+      if (process.env.NODE_ENV === 'development') {
+        console.error('Past requests fetch error:', err)
+      }
       setPastRequests([])
     }
   }
@@ -113,10 +121,12 @@ export default function DoctorDashboard() {
         fetchRequests(token)
         fetchPastRequests(token)
       } else {
-        alert(data.message || `Failed to ${action}`)
+        alert('Action failed. Please try again.')
       }
     } catch (err) {
-      console.error(err)
+      if (process.env.NODE_ENV === 'development') {
+        console.error(err)
+      }
       alert('Update error')
     }
   }
