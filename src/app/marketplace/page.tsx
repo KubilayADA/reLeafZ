@@ -166,10 +166,9 @@ export default function MarketplacePage() {
         setLoading(false)
         return
       }
-      const token = localStorage.getItem('token') || undefined
       const url = `${API_BASE}/api/marketplace?city=${encodeURIComponent(city)}&patientZip=${encodeURIComponent(zip)}`
       const res = await fetch(url, {
-        headers: token ? { Authorization: `Bearer ${token}` } : {},
+        credentials: 'include',
       })
       if (!res.ok) throw new Error('Marketplace-Anfrage fehlgeschlagen')
       const json = await res.json()

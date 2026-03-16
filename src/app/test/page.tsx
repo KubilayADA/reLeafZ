@@ -69,7 +69,7 @@ export default function TestPage() {
         city: 'Berlin',
         symptoms: 'Test symptoms'
       })
-      log('patientRegister', { success: true, token: data.token.slice(0, 20) + '...', patientId: data.treatmentRequest.patientId })
+      log('patientRegister', { success: true, patientId: data.treatmentRequest.patientId })
     } catch (error: unknown) {
       log('patientRegister', { error: error instanceof Error ? error.message : 'Unknown error' })
     }
@@ -81,7 +81,7 @@ export default function TestPage() {
     setLoading(true)
     try {
       const data = await patientLogin('testpatient@example.com', '10115') as Record<string, unknown>
-      log('patientLogin', { ...data, token: typeof data.token === 'string' ? data.token.slice(0, 20) + '...' : 'N/A' })
+      log('patientLogin', { ...data, token: '[httpOnly cookie]' })
     } catch (error: unknown) {
       log('patientLogin', { error: error instanceof Error ? error.message : 'Unknown error' })
     }
