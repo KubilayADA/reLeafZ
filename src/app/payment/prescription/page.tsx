@@ -56,7 +56,7 @@ function PaymentForm({ treatmentRequestId, selectedProducts, totalPrice }: {
         setProcessing(false)
       }
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Payment failed')
+      setError('Payment failed. Please try again.')
       setProcessing(false)
     }
   }
@@ -182,10 +182,10 @@ function PrescriptionPaymentContent() {
       if (response.ok && data.clientSecret) {
         setClientSecret(data.clientSecret)
       } else {
-        setError(data.message || 'Failed to initialize payment')
+        setError('Failed to initialize payment. Please try again.')
       }
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Failed to initialize payment')
+      setError('Failed to initialize payment. Please try again.')
     } finally {
       setLoading(false)
     }

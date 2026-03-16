@@ -55,7 +55,7 @@ export default function DoctorDashboard() {
         fetchRequests(data.token)
         fetchPastRequests(data.token)
       } else {
-        alert(data.message || 'Login failed')
+        alert('Login failed. Please try again.')
       }
     } catch (err) {
       if (process.env.NODE_ENV === 'development') {
@@ -74,7 +74,7 @@ export default function DoctorDashboard() {
       })
       const data = await res.json()
       if (res.ok) setRequests(data.requests || [])
-      else alert(data.message || 'Failed to fetch requests')
+      else alert('Failed to load requests. Please refresh.')
     } catch (err) {
       if (process.env.NODE_ENV === 'development') {
         console.error(err)
@@ -121,7 +121,7 @@ export default function DoctorDashboard() {
         fetchRequests(token)
         fetchPastRequests(token)
       } else {
-        alert(data.message || `Failed to ${action}`)
+        alert('Action failed. Please try again.')
       }
     } catch (err) {
       if (process.env.NODE_ENV === 'development') {
