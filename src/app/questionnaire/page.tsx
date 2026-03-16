@@ -23,29 +23,24 @@ export default function QuestionnairePage() {
 
   // Step1: Consultation type
   const handleStep1Next = (consultationType: string) => {
-    console.log('✅ Step1 completed:', consultationType)
     setFormData(prev => ({ ...prev, consultationType }))
     setCurrentStep(2)
   }
 
   // Step2: Delivery method
   const handleStep2Next = (deliveryMethod: string) => {
-    console.log('✅ Step2 completed:', deliveryMethod)
     setFormData(prev => ({ ...prev, deliveryMethod }))
     setCurrentStep(3)
   }
 
   // Step3: Condition
   const handleStep3Next = (condition: string) => {
-    console.log('✅ Step3 completed:', condition)
     setFormData(prev => ({ ...prev, condition }))
     setCurrentStep(4)
   }
 
   // Step4: FINAL - Send to backend!
   const handleStep4Next = async (answers: { onset: string; frequency: string }) => {
-    console.log('✅ Step4 completed:', answers)
-    
     const completeData = {
       ...formData,
       onset: answers.onset,
@@ -57,15 +52,16 @@ export default function QuestionnairePage() {
     try {
       const treatmentData = localStorage.getItem('treatmentRequest')
       if (!treatmentData) {
-        alert('Behandlungsanfrage nicht gefunden. Bitte beginnen Sie von vorne.')
         router.push('/')
         return
       }
-
       const treatmentRequest = JSON.parse(treatmentData)
+      if (!treatmentRequest?.id) {
+        localStorage.removeItem('treatmentRequest')
+        router.push('/')
+        return
+      }
       const token = localStorage.getItem('token')
-      console.log('📤 Sending symptoms for treatment request ID:', treatmentRequest.id)
-      console.log('📦 Complete data:', completeData)
 
       const response = await fetch(`${API_BASE}/api/treatment/${treatmentRequest.id}/symptoms`, {
         method: 'PATCH',
@@ -80,15 +76,14 @@ export default function QuestionnairePage() {
 
       if (response.ok) {
         console.log('✅ Symptoms updated successfully!')
-        console.log('Backend response:', result)
         router.push('/marketplace')
       } else {
-        console.error('❌ Failed to update symptoms:', result)
         alert(`Fehler: ${result.message || 'Symptome konnten nicht aktualisiert werden'}`)
       }
-    } catch (error) {
-      console.error('❌ Error updating symptoms:', error)
-      alert('Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut.')
+    } catch (e) {
+      localStorage.removeItem('treatmentRequest')
+      router.push('/')
+      return
     } finally {
       setLoading(false)
     }

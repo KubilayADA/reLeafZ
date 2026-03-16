@@ -32,7 +32,7 @@ export default function MashallahForm({ postcode, onBack }: MashallahFormProps) 
   const [consentHealth, setConsentHealth] = useState(false)
   const [consentTerms, setConsentTerms] = useState(false)
   
-  const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
+  const API_BASE = process.env.NEXT_PUBLIC_API_URL
 
   // Validate form fields
   const isFormValid = formData.fullName.trim() !== '' && 
@@ -100,7 +100,9 @@ export default function MashallahForm({ postcode, onBack }: MashallahFormProps) 
         setOtpError(result.message || 'Ungültiger Code. Bitte versuchen Sie es erneut.')
       }
     } catch (error) {
-      console.error('OTP verification error:', error)
+      if (process.env.NODE_ENV === 'development') {
+        console.error('OTP verification error:', error)
+      }
       setOtpError('Fehler bei der Verifizierung. Bitte versuchen Sie es erneut.')
     } finally {
       setVerifyingOtp(false)
@@ -156,16 +158,16 @@ export default function MashallahForm({ postcode, onBack }: MashallahFormProps) 
       }
       const treatmentRequestData = {
         id: result.data.id,
-        patientId: result.data.patientId ?? null,
-        pharmacyId: result.data.pharmacyId ?? null,
+        city: formData.city,
         postcode,
-        ...formData,
       }
       localStorage.setItem('treatmentRequest', JSON.stringify(treatmentRequestData))
       localStorage.setItem('formPostcode', postcode)
       return { success: true }
     } catch (error) {
-      console.error('Error creating treatment request:', error)
+      if (process.env.NODE_ENV === 'development') {
+        console.error('Error creating treatment request:', error)
+      }
       return {
         success: false,
         message: 'Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut.',
@@ -226,7 +228,9 @@ export default function MashallahForm({ postcode, onBack }: MashallahFormProps) 
       setSubmitError('Ein unerwarteter Fehler ist aufgetreten. Bitte versuchen Sie es erneut.')
       setLoading(false)
     } catch (error) {
-      console.error('Error during submit:', error)
+      if (process.env.NODE_ENV === 'development') {
+        console.error('Error during submit:', error)
+      }
       setSubmitError('Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut.')
       setLoading(false)
     }
@@ -299,6 +303,7 @@ export default function MashallahForm({ postcode, onBack }: MashallahFormProps) 
                   value={formData.fullName}
                   onChange={handleChange}
                   required
+                  maxLength={100}
                   disabled={loading}
                   className="form-input inconsolata"
                   placeholder="Max Mustermann"
@@ -316,6 +321,7 @@ export default function MashallahForm({ postcode, onBack }: MashallahFormProps) 
                   value={formData.email}
                   onChange={handleChange}
                   required
+                  maxLength={254}
                   disabled={loading}
                   className="form-input inconsolata"
                   placeholder="max@example.com"
@@ -333,6 +339,7 @@ export default function MashallahForm({ postcode, onBack }: MashallahFormProps) 
                   value={formData.phone}
                   onChange={handleChange}
                   required
+                  maxLength={20}
                   disabled={loading}
                   className="form-input inconsolata"
                   placeholder="+49 30 12345678"
@@ -354,6 +361,7 @@ export default function MashallahForm({ postcode, onBack }: MashallahFormProps) 
                     value={formData.street}
                     onChange={handleChange}
                     required
+                    maxLength={200}
                     disabled={loading}
                     className={`form-input inconsolata form-input--with-icon-left ${formData.street ? 'has-value' : ''}`}
                     placeholder="z.B. Hauptstraße 42"
@@ -377,6 +385,7 @@ export default function MashallahForm({ postcode, onBack }: MashallahFormProps) 
                       value={formData.city}
                       onChange={handleChange}
                       required
+                      maxLength={100}
                       disabled={loading}
                       className={`form-input inconsolata form-input--with-icon-left ${formData.city ? 'has-value' : ''}`}
                       placeholder="Berlin"
@@ -574,7 +583,9 @@ export default function MashallahForm({ postcode, onBack }: MashallahFormProps) 
                     setOtpCode('')
                     setOtpError('')
                   } catch (error) {
-                    console.error('Resend OTP error:', error)
+                    if (process.env.NODE_ENV === 'development') {
+                      console.error('Resend OTP error:', error)
+                    }
                   }
                 }}
                 className="text-sm text-emerald-600 hover:text-emerald-700 underline"

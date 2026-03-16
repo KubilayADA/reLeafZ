@@ -1,5 +1,5 @@
 // lib/api.ts
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+const API_BASE = process.env.NEXT_PUBLIC_API_URL;
 
 // Types
 export interface Product {
@@ -270,7 +270,9 @@ export async function fetchAllProducts(filters?: {
     const data = await response.json();
     return data.data || [];
   } catch (error) {
-    console.error('Error fetching products:', error);
+    if (process.env.NODE_ENV === 'development') {
+      console.error('Error fetching products:', error);
+    }
     throw error;
   }
 }
@@ -282,7 +284,9 @@ export async function fetchProductById(productId: number): Promise<Product> {
     const data = await response.json();
     return data.data;
   } catch (error) {
-    console.error('Error fetching product:', error);
+    if (process.env.NODE_ENV === 'development') {
+      console.error('Error fetching product:', error);
+    }
     throw error;
   }
 }
@@ -303,7 +307,9 @@ export async function fetchPharmacyProducts(
     const data = await response.json();
     return data.data || [];
   } catch (error) {
-    console.error('Error fetching pharmacy products:', error);
+    if (process.env.NODE_ENV === 'development') {
+      console.error('Error fetching pharmacy products:', error);
+    }
     throw error;
   }
 }
@@ -345,7 +351,9 @@ export async function createOrder(
     const data = await response.json();
     return data.data;
   } catch (error) {
-    console.error('Error creating order:', error);
+    if (process.env.NODE_ENV === 'development') {
+      console.error('Error creating order:', error);
+    }
     throw error;
   }
 }
@@ -362,7 +370,9 @@ export async function getOrderDetails(orderId: number, token: string): Promise<O
     const data = await response.json();
     return data.data;
   } catch (error) {
-    console.error('Error fetching order:', error);
+    if (process.env.NODE_ENV === 'development') {
+      console.error('Error fetching order:', error);
+    }
     throw error;
   }
 }
@@ -379,7 +389,9 @@ export async function getPatientOrders(patientId: number, token: string): Promis
     const data = await response.json();
     return data.data || [];
   } catch (error) {
-    console.error('Error fetching patient orders:', error);
+    if (process.env.NODE_ENV === 'development') {
+      console.error('Error fetching patient orders:', error);
+    }
     throw error;
   }
 }
@@ -395,7 +407,9 @@ export async function cancelOrder(orderId: number, token: string): Promise<void>
 
     if (!response.ok) throw new Error('Failed to cancel order');
   } catch (error) {
-    console.error('Error cancelling order:', error);
+    if (process.env.NODE_ENV === 'development') {
+      console.error('Error cancelling order:', error);
+    }
     throw error;
   }
 }
@@ -423,7 +437,9 @@ export async function checkProductAvailability(
       items: data.data || [],
     };
   } catch (error) {
-    console.error('Error checking availability:', error);
+    if (process.env.NODE_ENV === 'development') {
+      console.error('Error checking availability:', error);
+    }
     throw error;
   }
 }
@@ -444,7 +460,9 @@ export async function fetchPharmacyDashboard(token: string): Promise<DashboardRe
     const data = await response.json();
     return data;
   } catch (error) {
-    console.error('Error fetching pharmacy dashboard:', error);
+    if (process.env.NODE_ENV === 'development') {
+      console.error('Error fetching pharmacy dashboard:', error);
+    }
     throw error;
   }
 }
@@ -467,7 +485,9 @@ export async function pharmacyLogin(email: string, password: string): Promise<{ 
     const data = await response.json();
     return data;
   } catch (error) {
-    console.error('Error logging in pharmacy:', error);
+    if (process.env.NODE_ENV === 'development') {
+      console.error('Error logging in pharmacy:', error);
+    }
     throw error;
   }
 }
@@ -504,7 +524,9 @@ export async function fetchPharmacyOrders(
       statusCounts: data.statusCounts || {},
     };
   } catch (error) {
-    console.error('Error fetching pharmacy orders:', error);
+    if (process.env.NODE_ENV === 'development') {
+      console.error('Error fetching pharmacy orders:', error);
+    }
     throw error;
   }
 }
@@ -525,7 +547,9 @@ export async function fetchPharmacyOrderDetail(
     const data = await response.json();
     return data.order ?? data.data ?? data;
   } catch (error) {
-    console.error('Error fetching order detail:', error);
+    if (process.env.NODE_ENV === 'development') {
+      console.error('Error fetching order detail:', error);
+    }
     throw error;
   }
 }
@@ -557,7 +581,9 @@ export async function updateOrderStatus(
     const data = await response.json();
     return data;
   } catch (error) {
-    console.error('Error updating order status:', error);
+    if (process.env.NODE_ENV === 'development') {
+      console.error('Error updating order status:', error);
+    }
     throw error;
   }
 }
@@ -579,7 +605,9 @@ export async function markOrderReady(pharmacyId: number, orderId: number, token:
     // deliveryLink is now always null — no UI to show
     await response.json();
   } catch (error) {
-    console.error('Error marking order as ready:', error);
+    if (process.env.NODE_ENV === 'development') {
+      console.error('Error marking order as ready:', error);
+    }
     throw error;
   }
 }
@@ -615,7 +643,9 @@ export async function fetchPharmacyInventory(
       summary: data.summary || { totalProducts: 0, lowStock: 0, outOfStock: 0, totalValue: 0 },
     };
   } catch (error) {
-    console.error('Error fetching inventory:', error);
+    if (process.env.NODE_ENV === 'development') {
+      console.error('Error fetching inventory:', error);
+    }
     throw error;
   }
 }
@@ -639,7 +669,9 @@ export async function fetchPharmacyAnalytics(
     const data = await response.json();
     return data;
   } catch (error) {
-    console.error('Error fetching analytics:', error);
+    if (process.env.NODE_ENV === 'development') {
+      console.error('Error fetching analytics:', error);
+    }
     throw error;
   }
 }
@@ -659,7 +691,9 @@ export async function fetchPendingOrders(
     const data = await response.json();
     return data.data || [];
   } catch (error) {
-    console.error('Error fetching pending orders:', error);
+    if (process.env.NODE_ENV === 'development') {
+      console.error('Error fetching pending orders:', error);
+    }
     throw error;
   }
 }
@@ -693,7 +727,9 @@ export async function patientRegister(formData: {
     const data = await response.json();
     return data;
   } catch (error) {
-    console.error('Error registering patient:', error);
+    if (process.env.NODE_ENV === 'development') {
+      console.error('Error registering patient:', error);
+    }
     throw error;
   }
 }
@@ -712,7 +748,9 @@ export async function patientLogin(email: string, postcode: string): Promise<unk
     const data = await response.json();
     return data;
   } catch (error) {
-    console.error('Error logging in:', error);
+    if (process.env.NODE_ENV === 'development') {
+      console.error('Error logging in:', error);
+    }
     throw error;
   }
 }
@@ -751,7 +789,9 @@ export async function createProduct(productData: ProductFormData, token: string)
     const data = await response.json();
     return data.data;
   } catch (error) {
-    console.error('Error creating product:', error);
+    if (process.env.NODE_ENV === 'development') {
+      console.error('Error creating product:', error);
+    }
     throw error;
   }
 }
@@ -779,7 +819,9 @@ export async function updateProduct(
     const data = await response.json();
     return data.data;
   } catch (error) {
-    console.error('Error updating product:', error);
+    if (process.env.NODE_ENV === 'development') {
+      console.error('Error updating product:', error);
+    }
     throw error;
   }
 }
@@ -798,7 +840,9 @@ export async function deleteProduct(productId: number, token: string): Promise<v
       throw new Error(error.message || 'Failed to delete product');
     }
   } catch (error) {
-    console.error('Error deleting product:', error);
+    if (process.env.NODE_ENV === 'development') {
+      console.error('Error deleting product:', error);
+    }
     throw error;
   }
 }
