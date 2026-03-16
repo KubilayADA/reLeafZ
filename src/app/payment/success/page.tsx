@@ -25,7 +25,6 @@ function PaymentSuccessContent() {
 
   const finalizeRequest = async () => {
     try {
-      const token = localStorage.getItem('token')
       const selectedProducts = localStorage.getItem('selectedProducts')
       const totalPrice = localStorage.getItem('totalPrice')
 
@@ -34,18 +33,12 @@ function PaymentSuccessContent() {
         return
       }
 
-      if (!token || typeof token !== 'string' || token.trim() === '') {
-        setLoading(false)
-        router.push('/')
-        return
-      }
-
       const response = await fetch(`${API_BASE}/api/treatment/finalize`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
         },
+        credentials: 'include',
         body: JSON.stringify({
           treatmentRequestId: parseInt(requestId!),
           selectedProducts: JSON.parse(selectedProducts),

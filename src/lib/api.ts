@@ -293,14 +293,13 @@ export async function fetchProductById(productId: number): Promise<Product> {
 
 export async function fetchPharmacyProducts(
   pharmacyId: number,
-  inStockOnly: boolean = false,
-  token?: string
+  inStockOnly: boolean = false
 ): Promise<Product[]> {
   try {
     const endpoint = inStockOnly ? 'available' : '';
     const url = `${API_BASE}/api/products/pharmacy/${pharmacyId}${endpoint ? '/' + endpoint : ''}`;
     const response = await fetch(url, {
-      headers: token ? { Authorization: `Bearer ${token}` } : {},
+      credentials: 'include',
     });
 
     if (!response.ok) throw new Error('Failed to fetch pharmacy products');
@@ -321,8 +320,7 @@ export async function fetchPharmacyProducts(
 export async function createOrder(
   items: OrderItem[],
   deliveryMethod: 'PICKUP' | 'DELIVERY',
-  deliveryAddress: string | null,
-  token: string
+  deliveryAddress: string | null
 ): Promise<Order> {
   try {
     const body: Record<string, unknown> = {
@@ -338,8 +336,8 @@ export async function createOrder(
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
       },
+      credentials: 'include',
       body: JSON.stringify(body),
     });
 
@@ -358,12 +356,10 @@ export async function createOrder(
   }
 }
 
-export async function getOrderDetails(orderId: number, token: string): Promise<Order> {
+export async function getOrderDetails(orderId: number): Promise<Order> {
   try {
     const response = await fetch(`${API_BASE}/api/orders/${orderId}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
+      credentials: 'include',
     });
 
     if (!response.ok) throw new Error('Failed to fetch order');
@@ -377,12 +373,10 @@ export async function getOrderDetails(orderId: number, token: string): Promise<O
   }
 }
 
-export async function getPatientOrders(patientId: number, token: string): Promise<Order[]> {
+export async function getPatientOrders(patientId: number): Promise<Order[]> {
   try {
     const response = await fetch(`${API_BASE}/api/orders/patient/${patientId}/orders`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
+      credentials: 'include',
     });
 
     if (!response.ok) throw new Error('Failed to fetch orders');
@@ -396,13 +390,11 @@ export async function getPatientOrders(patientId: number, token: string): Promis
   }
 }
 
-export async function cancelOrder(orderId: number, token: string): Promise<void> {
+export async function cancelOrder(orderId: number): Promise<void> {
   try {
     const response = await fetch(`${API_BASE}/api/orders/${orderId}/cancel`, {
       method: 'POST',
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
+      credentials: 'include',
     });
 
     if (!response.ok) throw new Error('Failed to cancel order');
@@ -448,12 +440,10 @@ export async function checkProductAvailability(
 // PHARMACY ENDPOINTS
 // ============================================
 
-export async function fetchPharmacyDashboard(token: string): Promise<DashboardResponse> {
+export async function fetchPharmacyDashboard(): Promise<DashboardResponse> {
   try {
     const response = await fetch(`${API_BASE}/api/pharmacy/dashboard`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
+      credentials: 'include',
     });
 
     if (!response.ok) throw new Error('Failed to fetch pharmacy dashboard');
@@ -474,6 +464,7 @@ export async function pharmacyLogin(email: string, password: string): Promise<{ 
       headers: {
         'Content-Type': 'application/json',
       },
+      credentials: 'include',
       body: JSON.stringify({ email, password }),
     });
 
@@ -494,7 +485,6 @@ export async function pharmacyLogin(email: string, password: string): Promise<{ 
 
 export async function fetchPharmacyOrders(
   pharmacyId: number,
-  token: string,
   filters?: OrderFilters
 ): Promise<OrdersResponse> {
   try {
@@ -511,9 +501,7 @@ export async function fetchPharmacyOrders(
     const queryString = params.toString();
     const url = `${API_BASE}/api/pharmacy/${pharmacyId}/orders${queryString ? '?' + queryString : ''}`;
     const response = await fetch(url, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
+      credentials: 'include',
     });
 
     if (!response.ok) throw new Error('Failed to fetch orders');
@@ -533,14 +521,11 @@ export async function fetchPharmacyOrders(
 
 export async function fetchPharmacyOrderDetail(
   pharmacyId: number,
-  orderId: number,
-  token: string
+  orderId: number
 ): Promise<OrderDetail> {
   try {
     const response = await fetch(`${API_BASE}/api/pharmacy/${pharmacyId}/orders/${orderId}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
+      credentials: 'include',
     });
 
     if (!response.ok) throw new Error('Failed to fetch order detail');
@@ -557,16 +542,15 @@ export async function fetchPharmacyOrderDetail(
 export async function updateOrderStatus(
   pharmacyId: number,
   orderId: number,
-  status: string,
-  token: string
+  status: string
 ): Promise<{ success: boolean; allowedTransitions?: string[] }> {
   try {
     const response = await fetch(`${API_BASE}/api/pharmacy/${pharmacyId}/orders/${orderId}/status`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
       },
+      credentials: 'include',
       body: JSON.stringify({ status }),
     });
 
@@ -588,13 +572,11 @@ export async function updateOrderStatus(
   }
 }
 
-export async function markOrderReady(pharmacyId: number, orderId: number, token: string): Promise<void> {
+export async function markOrderReady(pharmacyId: number, orderId: number): Promise<void> {
   try {
     const response = await fetch(`${API_BASE}/api/pharmacy/${pharmacyId}/orders/${orderId}/mark-ready`, {
       method: 'POST',
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
+      credentials: 'include',
     });
 
     if (!response.ok) {
@@ -614,7 +596,6 @@ export async function markOrderReady(pharmacyId: number, orderId: number, token:
 
 export async function fetchPharmacyInventory(
   pharmacyId: number,
-  token: string,
   filters?: InventoryFilters
 ): Promise<InventoryResponse> {
   try {
@@ -630,9 +611,7 @@ export async function fetchPharmacyInventory(
     const queryString = params.toString();
     const url = `${API_BASE}/api/pharmacy/${pharmacyId}/inventory${queryString ? '?' + queryString : ''}`;
     const response = await fetch(url, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
+      credentials: 'include',
     });
 
     if (!response.ok) throw new Error('Failed to fetch inventory');
@@ -652,16 +631,13 @@ export async function fetchPharmacyInventory(
 
 export async function fetchPharmacyAnalytics(
   pharmacyId: number,
-  token: string,
   period: '7d' | '30d' | '90d' | '12m' = '30d'
 ): Promise<AnalyticsResponse> {
   try {
     const response = await fetch(
       `${API_BASE}/api/pharmacy/${pharmacyId}/analytics?period=${period}`,
       {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        credentials: 'include',
       }
     );
 
@@ -677,14 +653,11 @@ export async function fetchPharmacyAnalytics(
 }
 
 export async function fetchPendingOrders(
-  pharmacyId: number,
-  token: string
+  pharmacyId: number
 ): Promise<PharmacyOrder[]> {
   try {
     const response = await fetch(`${API_BASE}/api/pharmacy/${pharmacyId}/pending-orders`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
+      credentials: 'include',
     });
 
     if (!response.ok) throw new Error('Failed to fetch pending orders');
@@ -716,6 +689,7 @@ export async function patientRegister(formData: {
       headers: {
         'Content-Type': 'application/json',
       },
+      credentials: 'include',
       body: JSON.stringify(formData),
     });
 
@@ -741,6 +715,7 @@ export async function patientLogin(email: string, postcode: string): Promise<unk
       headers: {
         'Content-Type': 'application/json',
       },
+      credentials: 'include',
       body: JSON.stringify({ email, postcode }),
     });
 
@@ -770,14 +745,14 @@ export interface ProductFormData {
   imageUrl?: string;
 }
 
-export async function createProduct(productData: ProductFormData, token: string): Promise<Product> {
+export async function createProduct(productData: ProductFormData): Promise<Product> {
   try {
     const response = await fetch(`${API_BASE}/api/products`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
       },
+      credentials: 'include',
       body: JSON.stringify(productData),
     });
 
@@ -798,16 +773,15 @@ export async function createProduct(productData: ProductFormData, token: string)
 
 export async function updateProduct(
   productId: number,
-  productData: Partial<ProductFormData>,
-  token: string
+  productData: Partial<ProductFormData>
 ): Promise<Product> {
   try {
     const response = await fetch(`${API_BASE}/api/products/${productId}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
       },
+      credentials: 'include',
       body: JSON.stringify(productData),
     });
 
@@ -826,13 +800,11 @@ export async function updateProduct(
   }
 }
 
-export async function deleteProduct(productId: number, token: string): Promise<void> {
+export async function deleteProduct(productId: number): Promise<void> {
   try {
     const response = await fetch(`${API_BASE}/api/products/${productId}`, {
       method: 'DELETE',
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
+      credentials: 'include',
     });
 
     if (!response.ok) {
@@ -849,8 +821,7 @@ export async function deleteProduct(productId: number, token: string): Promise<v
 
 export async function updateProductStock(
   productId: number,
-  stock: number,
-  token: string
+  stock: number
 ): Promise<Product> {
-  return updateProduct(productId, { stock }, token);
+  return updateProduct(productId, { stock });
 }

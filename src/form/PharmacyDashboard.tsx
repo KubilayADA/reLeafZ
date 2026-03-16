@@ -140,7 +140,7 @@ function EmptyState({ icon: Icon, title, description, action }: { icon: React.El
 // ── Main Component ──
 export default function PharmacyDashboard() {
   const [email, setEmail] = useState(''); const [password, setPassword] = useState(''); const [showPassword, setShowPassword] = useState(false)
-  const [token, setToken] = useState(''); const [pharmacyId, setPharmacyId] = useState<number | null>(null); const [isClient, setIsClient] = useState(false)
+  const [pharmacyId, setPharmacyId] = useState<number | null>(null); const [isClient, setIsClient] = useState(false)
   const [activeView, setActiveView] = useState<ViewType>('dashboard'); const [loading, setLoading] = useState(false)
   const [dashboardData, setDashboardData] = useState<DashboardResponse | null>(null)
   const [ordersResponse, setOrdersResponse] = useState<OrdersResponse | null>(null)
@@ -170,38 +170,39 @@ export default function PharmacyDashboard() {
   useEffect(() => { setIsClient(true) }, [])
   useEffect(() => {
     if (!isClient) return
-    try { const t = localStorage.getItem('pharmacy_token'), p = localStorage.getItem('pharmacy_id')
-      if (t && p) { setToken(t); setPharmacyId(parseInt(p)); loadDashboard(t) }
+    try {
+      const p = localStorage.getItem('pharmacy_id')
+      if (p) { setPharmacyId(parseInt(p)); loadDashboard() }
     } catch (e) { console.error(e) }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isClient])
   useEffect(() => { if (error) { const t = setTimeout(() => setError(null), 6000); return () => clearTimeout(t) } }, [error])
 
-  const loadDashboard = async (t: string) => { try { setLoading(true); setError(null); setDashboardData(await fetchPharmacyDashboard(t)) } catch (e: unknown) { setError(e instanceof Error ? e.message : 'Laden fehlgeschlagen') } finally { setLoading(false) } }
-  const loadOrders = useCallback(async (p: number, t: string, f?: OrderFilters) => { try { setOrdersLoading(true); setError(null); setOrdersResponse(await fetchPharmacyOrders(p, t, f)) } catch (e: unknown) { setError(e instanceof Error ? e.message : 'Laden fehlgeschlagen') } finally { setOrdersLoading(false) } }, [])
-  const loadOrderDetail = async (id: number) => { if (!pharmacyId || !token) return; try { setOrderDetailLoading(true); setSelectedOrderDetail(await fetchPharmacyOrderDetail(pharmacyId, id, token)); setShowOrderDetail(true) } catch (e: unknown) { setError(e instanceof Error ? e.message : 'Laden fehlgeschlagen') } finally { setOrderDetailLoading(false) } }
-  const loadInventory = useCallback(async (p: number, t: string, f?: InventoryFilters) => { try { setInventoryLoading(true); setError(null); setInventoryResponse(await fetchPharmacyInventory(p, t, f)) } catch (e: unknown) { setError(e instanceof Error ? e.message : 'Laden fehlgeschlagen') } finally { setInventoryLoading(false) } }, [])
-  const loadAnalytics = useCallback(async (p: number, t: string, period: '7d' | '30d' | '90d' | '12m') => { try { setAnalyticsLoading(true); setError(null); setAnalyticsData(await fetchPharmacyAnalytics(p, t, period)) } catch (e: unknown) { setError(e instanceof Error ? e.message : 'Laden fehlgeschlagen') } finally { setAnalyticsLoading(false) } }, [])
+  const loadDashboard = async () => { try { setLoading(true); setError(null); setDashboardData(await fetchPharmacyDashboard()) } catch (e: unknown) { setError(e instanceof Error ? e.message : 'Laden fehlgeschlagen') } finally { setLoading(false) } }
+  const loadOrders = useCallback(async (p: number, f?: OrderFilters) => { try { setOrdersLoading(true); setError(null); setOrdersResponse(await fetchPharmacyOrders(p, f)) } catch (e: unknown) { setError(e instanceof Error ? e.message : 'Laden fehlgeschlagen') } finally { setOrdersLoading(false) } }, [])
+  const loadOrderDetail = async (id: number) => { if (!pharmacyId) return; try { setOrderDetailLoading(true); setSelectedOrderDetail(await fetchPharmacyOrderDetail(pharmacyId, id)); setShowOrderDetail(true) } catch (e: unknown) { setError(e instanceof Error ? e.message : 'Laden fehlgeschlagen') } finally { setOrderDetailLoading(false) } }
+  const loadInventory = useCallback(async (p: number, f?: InventoryFilters) => { try { setInventoryLoading(true); setError(null); setInventoryResponse(await fetchPharmacyInventory(p, f)) } catch (e: unknown) { setError(e instanceof Error ? e.message : 'Laden fehlgeschlagen') } finally { setInventoryLoading(false) } }, [])
+  const loadAnalytics = useCallback(async (p: number, period: '7d' | '30d' | '90d' | '12m') => { try { setAnalyticsLoading(true); setError(null); setAnalyticsData(await fetchPharmacyAnalytics(p, period)) } catch (e: unknown) { setError(e instanceof Error ? e.message : 'Laden fehlgeschlagen') } finally { setAnalyticsLoading(false) } }, [])
 
-  const handleViewChange = (v: ViewType) => { setActiveView(v); setError(null); if (v === 'orders' && pharmacyId && token) loadOrders(pharmacyId, token, buildOrderFilters()); if (v === 'inventory' && pharmacyId && token) loadInventory(pharmacyId, token, buildInventoryFilters()); if (v === 'analytics' && pharmacyId && token) loadAnalytics(pharmacyId, token, analyticsPeriod) }
+  const handleViewChange = (v: ViewType) => { setActiveView(v); setError(null); if (v === 'orders' && pharmacyId) loadOrders(pharmacyId, buildOrderFilters()); if (v === 'inventory' && pharmacyId) loadInventory(pharmacyId, buildInventoryFilters()); if (v === 'analytics' && pharmacyId) loadAnalytics(pharmacyId, analyticsPeriod) }
   const buildOrderFilters = useCallback((): OrderFilters => { const [sortBy, sortOrder] = orderSort.split(':') as [OrderFilters['sortBy'], OrderFilters['sortOrder']]; return { status: orderStatusTab !== 'ALL' ? orderStatusTab : undefined, search: orderSearch || undefined, from: orderDateFrom || undefined, to: orderDateTo || undefined, sortBy, sortOrder } }, [orderStatusTab, orderSearch, orderDateFrom, orderDateTo, orderSort])
   const buildInventoryFilters = useCallback((): InventoryFilters => ({ search: inventorySearch || undefined, form: inventoryFormFilter || undefined, availability: (inventoryAvailability as InventoryFilters['availability']) || undefined, sortBy: inventorySortBy as InventoryFilters['sortBy'], sortOrder: inventorySortOrder }), [inventorySearch, inventoryFormFilter, inventoryAvailability, inventorySortBy, inventorySortOrder])
 
-  useEffect(() => { if (activeView !== 'orders' || !pharmacyId || !token) return; const t = setTimeout(() => loadOrders(pharmacyId, token, buildOrderFilters()), 300); return () => clearTimeout(t) }, [orderStatusTab, orderSearch, orderDateFrom, orderDateTo, orderSort, activeView, pharmacyId, token, loadOrders, buildOrderFilters])
-  useEffect(() => { if (activeView !== 'inventory' || !pharmacyId || !token) return; const t = setTimeout(() => loadInventory(pharmacyId, token, buildInventoryFilters()), 300); return () => clearTimeout(t) }, [inventorySearch, inventoryFormFilter, inventoryAvailability, inventorySortBy, inventorySortOrder, activeView, pharmacyId, token, loadInventory, buildInventoryFilters])
-  useEffect(() => { if (activeView !== 'analytics' || !pharmacyId || !token) return; loadAnalytics(pharmacyId, token, analyticsPeriod) }, [analyticsPeriod, activeView, pharmacyId, token, loadAnalytics])
+  useEffect(() => { if (activeView !== 'orders' || !pharmacyId) return; const t = setTimeout(() => loadOrders(pharmacyId, buildOrderFilters()), 300); return () => clearTimeout(t) }, [orderStatusTab, orderSearch, orderDateFrom, orderDateTo, orderSort, activeView, pharmacyId, loadOrders, buildOrderFilters])
+  useEffect(() => { if (activeView !== 'inventory' || !pharmacyId) return; const t = setTimeout(() => loadInventory(pharmacyId, buildInventoryFilters()), 300); return () => clearTimeout(t) }, [inventorySearch, inventoryFormFilter, inventoryAvailability, inventorySortBy, inventorySortOrder, activeView, pharmacyId, loadInventory, buildInventoryFilters])
+  useEffect(() => { if (activeView !== 'analytics' || !pharmacyId) return; loadAnalytics(pharmacyId, analyticsPeriod) }, [analyticsPeriod, activeView, pharmacyId, loadAnalytics])
 
-  const handleLogin = async () => { try { setLoading(true); setError(null); const d = await pharmacyLogin(email, password); if (d.token && d.pharmacy) { setToken(d.token); setPharmacyId(d.pharmacy.id); localStorage?.setItem('pharmacy_token', d.token); localStorage?.setItem('pharmacy_id', d.pharmacy.id.toString()); await loadDashboard(d.token) } else setError('Login fehlgeschlagen') } catch (e: unknown) { setError(e instanceof Error ? e.message : 'Anmeldung fehlgeschlagen') } finally { setLoading(false) } }
-  const handleLogout = () => { setToken(''); setPharmacyId(null); setDashboardData(null); setOrdersResponse(null); setInventoryResponse(null); setAnalyticsData(null); setEmail(''); setPassword(''); setActiveView('dashboard'); setError(null); localStorage?.removeItem('pharmacy_token'); localStorage?.removeItem('pharmacy_id') }
-  const handleUpdateStatus = async (id: number, s: string) => { if (!pharmacyId || !token) return; try { setOrdersLoading(true); await updateOrderStatus(pharmacyId, id, s, token); await loadOrders(pharmacyId, token, buildOrderFilters()); await loadDashboard(token) } catch (e: unknown) { setError(e instanceof Error ? e.message : 'Fehler') } finally { setOrdersLoading(false) } }
-  const handleMarkReady = async (id: number) => { if (!pharmacyId || !token) return; try { setOrdersLoading(true); await markOrderReady(pharmacyId, id, token); await loadOrders(pharmacyId, token, buildOrderFilters()); await loadDashboard(token) } catch (e: unknown) { setError(e instanceof Error ? e.message : 'Fehler') } finally { setOrdersLoading(false) } }
+  const handleLogin = async () => { try { setLoading(true); setError(null); const d = await pharmacyLogin(email, password); if (d.pharmacy) { setPharmacyId(d.pharmacy.id); localStorage?.setItem('pharmacy_id', d.pharmacy.id.toString()); await loadDashboard() } else setError('Login fehlgeschlagen') } catch (e: unknown) { setError(e instanceof Error ? e.message : 'Anmeldung fehlgeschlagen') } finally { setLoading(false) } }
+  const handleLogout = () => { setPharmacyId(null); setDashboardData(null); setOrdersResponse(null); setInventoryResponse(null); setAnalyticsData(null); setEmail(''); setPassword(''); setActiveView('dashboard'); setError(null); localStorage?.removeItem('pharmacy_id') }
+  const handleUpdateStatus = async (id: number, s: string) => { if (!pharmacyId) return; try { setOrdersLoading(true); await updateOrderStatus(pharmacyId, id, s); await loadOrders(pharmacyId, buildOrderFilters()); await loadDashboard() } catch (e: unknown) { setError(e instanceof Error ? e.message : 'Fehler') } finally { setOrdersLoading(false) } }
+  const handleMarkReady = async (id: number) => { if (!pharmacyId) return; try { setOrdersLoading(true); await markOrderReady(pharmacyId, id); await loadOrders(pharmacyId, buildOrderFilters()); await loadDashboard() } catch (e: unknown) { setError(e instanceof Error ? e.message : 'Fehler') } finally { setOrdersLoading(false) } }
 
   const handleAddProduct = () => { setEditingProduct(null); setProductForm(initialProductForm); setShowProductModal(true) }
   const handleEditProduct = (p: Product) => { setEditingProduct(p); setProductForm({ name: p.name, form: p.form, thcPercent: p.thcPercent, cbdPercent: p.cbdPercent, price: p.price, unit: p.unit, stock: p.stock, imageUrl: p.imageUrl || '' }); setShowProductModal(true) }
   const handleFormChange = (field: keyof ProductFormData, value: string | number) => { setProductForm(prev => { const u = { ...prev, [field]: value }; if (field === 'form') u.unit = PRODUCT_UNITS[value as string] || 'gram'; return u }) }
-  const handleSaveProduct = async () => { if (!token || !pharmacyId) return; if (!productForm.name.trim()) { setError('Bitte Produktname eingeben'); return }; if (productForm.price <= 0) { setError('Bitte gültigen Preis eingeben'); return }; try { setProductLoading(true); if (editingProduct) await updateProduct(editingProduct.id, productForm, token); else await createProduct(productForm, token); setShowProductModal(false); setEditingProduct(null); setProductForm(initialProductForm); await loadInventory(pharmacyId, token, buildInventoryFilters()); await loadDashboard(token) } catch (e: unknown) { setError(e instanceof Error ? e.message : 'Fehler') } finally { setProductLoading(false) } }
-  const handleDeleteProduct = async (id: number) => { if (!token || !pharmacyId) return; try { setProductLoading(true); await deleteProduct(id, token); setShowDeleteConfirm(null); await loadInventory(pharmacyId, token, buildInventoryFilters()); await loadDashboard(token) } catch (e: unknown) { setError(e instanceof Error ? e.message : 'Fehler') } finally { setProductLoading(false) } }
-  const handleStockUpdate = async () => { if (!editingStock || !token || !pharmacyId) return; try { setProductLoading(true); await updateProduct(editingStock.id, { stock: editingStock.value }, token); setEditingStock(null); await loadInventory(pharmacyId, token, buildInventoryFilters()) } catch (e: unknown) { setError(e instanceof Error ? e.message : 'Fehler') } finally { setProductLoading(false) } }
+  const handleSaveProduct = async () => { if (!pharmacyId) return; if (!productForm.name.trim()) { setError('Bitte Produktname eingeben'); return }; if (productForm.price <= 0) { setError('Bitte gültigen Preis eingeben'); return }; try { setProductLoading(true); if (editingProduct) await updateProduct(editingProduct.id, productForm); else await createProduct(productForm); setShowProductModal(false); setEditingProduct(null); setProductForm(initialProductForm); await loadInventory(pharmacyId, buildInventoryFilters()); await loadDashboard() } catch (e: unknown) { setError(e instanceof Error ? e.message : 'Fehler') } finally { setProductLoading(false) } }
+  const handleDeleteProduct = async (id: number) => { if (!pharmacyId) return; try { setProductLoading(true); await deleteProduct(id); setShowDeleteConfirm(null); await loadInventory(pharmacyId, buildInventoryFilters()); await loadDashboard() } catch (e: unknown) { setError(e instanceof Error ? e.message : 'Fehler') } finally { setProductLoading(false) } }
+  const handleStockUpdate = async () => { if (!editingStock || !pharmacyId) return; try { setProductLoading(true); await updateProduct(editingStock.id, { stock: editingStock.value }); setEditingStock(null); await loadInventory(pharmacyId, buildInventoryFilters()) } catch (e: unknown) { setError(e instanceof Error ? e.message : 'Fehler') } finally { setProductLoading(false) } }
   const handleInventorySortToggle = (col: string) => { if (inventorySortBy === col) setInventorySortOrder(p => p === 'asc' ? 'desc' : 'asc'); else { setInventorySortBy(col); setInventorySortOrder('asc') } }
 
   const renderNextStatusButton = (order: { id: number; status: string }) => {
@@ -225,7 +226,7 @@ export default function PharmacyDashboard() {
   )
 
   // ── Login ──
-  if (!token) return (
+  if (!pharmacyId) return (
     <div className="pharmacy-dashboard min-h-screen flex items-center justify-center px-4 bg-[#0a0f0a] relative overflow-hidden">
       <div className="absolute inset-0">
         <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-emerald-600/10 rounded-full blur-[120px]" />
@@ -283,7 +284,7 @@ export default function PharmacyDashboard() {
               </div>
             </div>
             <div className="flex items-center gap-2 flex-shrink-0">
-              <button onClick={() => token && loadDashboard(token)} className="p-2.5 text-white/40 hover:text-emerald-400 hover:bg-white/[0.06] rounded-xl transition-all" title="Aktualisieren"><RefreshCw size={15} /></button>
+              <button onClick={() => loadDashboard()} className="p-2.5 text-white/40 hover:text-emerald-400 hover:bg-white/[0.06] rounded-xl transition-all" title="Aktualisieren"><RefreshCw size={15} /></button>
               <button onClick={handleLogout} className={`flex items-center gap-2 px-4 py-2.5 ${G.btn} text-white/60 bg-white/[0.06] border border-white/[0.10] hover:bg-white/[0.10] hover:text-white/80 rounded-xl`}><LogOut size={13} /> Abmelden</button>
             </div>
           </div>
@@ -418,8 +419,8 @@ export default function PharmacyDashboard() {
                 </table>
               </div>
               {ordersResponse.pagination.totalPages > 1 && <div className="flex items-center justify-between"><p className="text-xs text-white/25">Seite {ordersResponse.pagination.page}/{ordersResponse.pagination.totalPages} • {ordersResponse.pagination.total} Ergebnisse</p><div className="flex gap-1.5">
-                <button disabled={ordersResponse.pagination.page <= 1} onClick={() => { if (pharmacyId && token) { const f = buildOrderFilters(); f.page = ordersResponse.pagination.page - 1; loadOrders(pharmacyId, token, f) } }} className={`p-2 ${G.card} !rounded-xl disabled:opacity-30 hover:bg-white/[0.06]`}><ChevronLeft size={14} className="text-white/40" /></button>
-                <button disabled={ordersResponse.pagination.page >= ordersResponse.pagination.totalPages} onClick={() => { if (pharmacyId && token) { const f = buildOrderFilters(); f.page = ordersResponse.pagination.page + 1; loadOrders(pharmacyId, token, f) } }} className={`p-2 ${G.card} !rounded-xl disabled:opacity-30 hover:bg-white/[0.06]`}><ChevronRight size={14} className="text-white/40" /></button>
+                <button disabled={ordersResponse.pagination.page <= 1} onClick={() => { if (pharmacyId) { const f = buildOrderFilters(); f.page = ordersResponse.pagination.page - 1; loadOrders(pharmacyId, f) } }} className={`p-2 ${G.card} !rounded-xl disabled:opacity-30 hover:bg-white/[0.06]`}><ChevronLeft size={14} className="text-white/40" /></button>
+                <button disabled={ordersResponse.pagination.page >= ordersResponse.pagination.totalPages} onClick={() => { if (pharmacyId) { const f = buildOrderFilters(); f.page = ordersResponse.pagination.page + 1; loadOrders(pharmacyId, f) } }} className={`p-2 ${G.card} !rounded-xl disabled:opacity-30 hover:bg-white/[0.06]`}><ChevronRight size={14} className="text-white/40" /></button>
               </div></div>}
             </>}
           </div>
@@ -507,8 +508,8 @@ export default function PharmacyDashboard() {
               ))}</tbody></table></div>}
 
             {inventoryResponse?.pagination && inventoryResponse.pagination.totalPages > 1 && <div className="flex items-center justify-between"><p className="text-xs text-white/25">Seite {inventoryResponse.pagination.page}/{inventoryResponse.pagination.totalPages}</p><div className="flex gap-1.5">
-              <button disabled={inventoryResponse.pagination.page <= 1} onClick={() => { if (pharmacyId && token) { const f = buildInventoryFilters(); f.page = inventoryResponse.pagination.page - 1; loadInventory(pharmacyId, token, f) } }} className={`p-2 ${G.card} !rounded-xl disabled:opacity-30`}><ChevronLeft size={14} className="text-white/40" /></button>
-              <button disabled={inventoryResponse.pagination.page >= inventoryResponse.pagination.totalPages} onClick={() => { if (pharmacyId && token) { const f = buildInventoryFilters(); f.page = inventoryResponse.pagination.page + 1; loadInventory(pharmacyId, token, f) } }} className={`p-2 ${G.card} !rounded-xl disabled:opacity-30`}><ChevronRight size={14} className="text-white/40" /></button>
+              <button disabled={inventoryResponse.pagination.page <= 1} onClick={() => { if (pharmacyId) { const f = buildInventoryFilters(); f.page = inventoryResponse.pagination.page - 1; loadInventory(pharmacyId, f) } }} className={`p-2 ${G.card} !rounded-xl disabled:opacity-30`}><ChevronLeft size={14} className="text-white/40" /></button>
+              <button disabled={inventoryResponse.pagination.page >= inventoryResponse.pagination.totalPages} onClick={() => { if (pharmacyId) { const f = buildInventoryFilters(); f.page = inventoryResponse.pagination.page + 1; loadInventory(pharmacyId, f) } }} className={`p-2 ${G.card} !rounded-xl disabled:opacity-30`}><ChevronRight size={14} className="text-white/40" /></button>
             </div></div>}
           </div>
         )}
