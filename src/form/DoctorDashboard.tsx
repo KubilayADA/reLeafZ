@@ -34,7 +34,7 @@ export default function DoctorDashboard() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
-  const [token, setToken] = useState('')
+  const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [requests, setRequests] = useState<TreatmentRequest[]>([])
   const [pastRequests, setPastRequests] = useState<TreatmentRequest[]>([])
   const [activeView, setActiveView] = useState<ViewType>('pending')
@@ -47,13 +47,14 @@ export default function DoctorDashboard() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
+        credentials: 'include',
       })
 
       const data = await res.json()
       if (res.ok) {
-        setToken(data.token)
-        fetchRequests(data.token)
-        fetchPastRequests(data.token)
+        setIsLoggedIn(true)
+        fetchRequests()
+        fetchPastRequests()
       } else {
         alert('Login failed. Please try again.')
       }
@@ -66,11 +67,11 @@ export default function DoctorDashboard() {
   }
 
   // Fetch pending requests
-  const fetchRequests = async (authToken: string) => {
+  const fetchRequests = async () => {
     try {
       setLoading(true)
       const res = await fetch(`${API_BASE}/api/doctor/requests`, {
-        headers: { Authorization: `Bearer ${authToken}` },
+        credentials: 'include',
       })
       const data = await res.json()
       if (res.ok) setRequests(data.requests || [])
@@ -86,10 +87,10 @@ export default function DoctorDashboard() {
   }
 
   // Fetch past requests (all requests)
-  const fetchPastRequests = async (authToken: string) => {
+  const fetchPastRequests = async () => {
     try {
       const res = await fetch(`${API_BASE}/api/doctor/past-requests`, {
-        headers: { Authorization: `Bearer ${authToken}` },
+        credentials: 'include',
       })
       
       const data = await res.json()
@@ -114,12 +115,12 @@ export default function DoctorDashboard() {
     try {
       const res = await fetch(`${API_BASE}/api/doctor/requests/${id}/${action}`, {
         method: 'POST',
-        headers: { Authorization: `Bearer ${token}` },
+        credentials: 'include',
       })
       const data = await res.json()
       if (res.ok) {
-        fetchRequests(token)
-        fetchPastRequests(token)
+        fetchRequests()
+        fetchPastRequests()
       } else {
         alert('Action failed. Please try again.')
       }
@@ -133,7 +134,7 @@ export default function DoctorDashboard() {
 
   // Handle logout
   const handleLogout = () => {
-    setToken('')
+    setIsLoggedIn(false)
     setRequests([])
     setPastRequests([])
     setEmail('')
@@ -172,7 +173,7 @@ export default function DoctorDashboard() {
   // go back to home page To do
   
   // If not logged in, show login form
-  if (!token) {
+  if (!isLoggedIn) {
     return (
       <div className="min-h-screen flex items-center justify-center px-4 inconsolata">
         <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-8">
