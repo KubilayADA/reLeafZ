@@ -58,7 +58,9 @@ export default function DoctorDashboard() {
         alert(data.message || 'Login failed')
       }
     } catch (err) {
-      console.error(err)
+      if (process.env.NODE_ENV === 'development') {
+        console.error(err)
+      }
       alert('Login error')
     }
   }
@@ -74,7 +76,9 @@ export default function DoctorDashboard() {
       if (res.ok) setRequests(data.requests || [])
       else alert(data.message || 'Failed to fetch requests')
     } catch (err) {
-      console.error(err)
+      if (process.env.NODE_ENV === 'development') {
+        console.error(err)
+      }
       alert('Fetch error')
     } finally {
       setLoading(false)
@@ -92,11 +96,15 @@ export default function DoctorDashboard() {
       if (res.ok) {
         setPastRequests(data.requests || [])
       } else {
-        console.error('Failed to fetch past requests:', data.message)
+        if (process.env.NODE_ENV === 'development') {
+          console.error('Failed to fetch past requests:', data.message)
+        }
         setPastRequests([])
       }
     } catch (err) {
-      console.error('Past requests fetch error:', err)
+      if (process.env.NODE_ENV === 'development') {
+        console.error('Past requests fetch error:', err)
+      }
       setPastRequests([])
     }
   }
@@ -116,7 +124,9 @@ export default function DoctorDashboard() {
         alert(data.message || `Failed to ${action}`)
       }
     } catch (err) {
-      console.error(err)
+      if (process.env.NODE_ENV === 'development') {
+        console.error(err)
+      }
       alert('Update error')
     }
   }
