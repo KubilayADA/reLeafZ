@@ -50,7 +50,6 @@ export default function MashallahForm({ postcode, onBack }: MashallahFormProps) 
                       // This prevents using old tokens with new email addresses
                       if (name === 'email') {
                         console.log('🧹 Clearing tokens due to email change')
-                        localStorage.removeItem('token')
                         localStorage.removeItem('treatmentRequest')
                         localStorage.removeItem('assignedPharmacyId')
                         // Reset OTP modal state if it was open
@@ -84,6 +83,7 @@ export default function MashallahForm({ postcode, onBack }: MashallahFormProps) 
       const response = await fetch(`${API_BASE}/api/auth/verify-otp`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({
           email: formData.email,
           otpCode: otpCode
@@ -92,8 +92,7 @@ export default function MashallahForm({ postcode, onBack }: MashallahFormProps) 
 
       const result = await response.json()
 
-      if (response.ok && result.token) {
-        localStorage.setItem('token', result.token)
+      if (response.ok) {
         setOtpModalOpen(false)
         router.push('/questionnaire')
       } else {
@@ -193,6 +192,7 @@ export default function MashallahForm({ postcode, onBack }: MashallahFormProps) 
       const loginResponse = await fetch(`${API_BASE}/api/auth/patient-login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({ email: formData.email }),
       })
       const loginResult = await loginResponse.json()
@@ -210,8 +210,7 @@ export default function MashallahForm({ postcode, onBack }: MashallahFormProps) 
       }
 
       // Case 2: Existing user - known device (same IP)
-      if (loginResult.token && !loginResult.otpRequired) {
-        localStorage.setItem('token', loginResult.token)
+      if (!loginResult.otpRequired) {
         setShowWelcomeNotification(true)
         setTimeout(() => setShowWelcomeNotification(false), 3000)
         router.push('/questionnaire')
@@ -577,6 +576,7 @@ export default function MashallahForm({ postcode, onBack }: MashallahFormProps) 
                     await fetch(`${API_BASE}/api/auth/patient-login`, {
                       method: 'POST',
                       headers: { 'Content-Type': 'application/json' },
+                      credentials: 'include',
                       body: JSON.stringify({ email: formData.email })
                     })
                     alert('Neuer Code wurde gesendet!')
