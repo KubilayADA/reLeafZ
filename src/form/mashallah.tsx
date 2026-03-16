@@ -99,7 +99,9 @@ export default function MashallahForm({ postcode, onBack }: MashallahFormProps) 
         setOtpError(result.message || 'Ungültiger Code. Bitte versuchen Sie es erneut.')
       }
     } catch (error) {
-      console.error('OTP verification error:', error)
+      if (process.env.NODE_ENV === 'development') {
+        console.error('OTP verification error:', error)
+      }
       setOtpError('Fehler bei der Verifizierung. Bitte versuchen Sie es erneut.')
     } finally {
       setVerifyingOtp(false)
@@ -162,7 +164,9 @@ export default function MashallahForm({ postcode, onBack }: MashallahFormProps) 
       localStorage.setItem('formPostcode', postcode)
       return { success: true }
     } catch (error) {
-      console.error('Error creating treatment request:', error)
+      if (process.env.NODE_ENV === 'development') {
+        console.error('Error creating treatment request:', error)
+      }
       return {
         success: false,
         message: 'Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut.',
@@ -223,7 +227,9 @@ export default function MashallahForm({ postcode, onBack }: MashallahFormProps) 
       setSubmitError('Ein unerwarteter Fehler ist aufgetreten. Bitte versuchen Sie es erneut.')
       setLoading(false)
     } catch (error) {
-      console.error('Error during submit:', error)
+      if (process.env.NODE_ENV === 'development') {
+        console.error('Error during submit:', error)
+      }
       setSubmitError('Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut.')
       setLoading(false)
     }
@@ -546,7 +552,9 @@ export default function MashallahForm({ postcode, onBack }: MashallahFormProps) 
                     setOtpCode('')
                     setOtpError('')
                   } catch (error) {
-                    console.error('Resend OTP error:', error)
+                    if (process.env.NODE_ENV === 'development') {
+                      console.error('Resend OTP error:', error)
+                    }
                   }
                 }}
                 className="text-sm text-emerald-600 hover:text-emerald-700 underline"
