@@ -62,12 +62,57 @@
 
 .header {
   background-color: #fbfdfb;
+  z-index: 100;
 }
 
 .logo-header {
   position: absolute;
   top: -60px;
   left: 50px;
+}
+
+/* Vertical lines aligned with hero — float (inset from top/bottom) */
+.header-line--hero-left,
+.header-line--hero-right {
+  position: absolute;
+  top: 0.5rem;
+  bottom: 0.5rem;
+  width: 1px;
+  background: rgba(0, 0, 0, 0.2);
+  pointer-events: none;
+}
+.header-line--hero-left {
+  left: 250px;
+}
+.header-line--hero-right {
+  right: 250px;
+}
+
+@media (max-width: 768px) {
+  .header-line--hero-left,
+  .header-line--hero-right {
+    display: none;
+  }
+}
+
+/* Desktop nav link — hover underline (line draws underneath) */
+.header-desktop-nav .header-nav-link {
+  position: relative;
+  color: inherit;
+  text-decoration: none;
+}
+.header-desktop-nav .header-nav-link::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -2px;
+  width: 0;
+  height: 1px;
+  background: currentColor;
+  transition: width 0.25s ease;
+}
+.header-desktop-nav .header-nav-link:hover::after {
+  width: 100%;
 }
 
 
