@@ -43,4 +43,6 @@ DOOH SAKITO has a plug know the guys from HYGH
 elevator pitch 
 
 for marketplace dual side card user hover other side shows with strain relevabt info 
-for mobile “i” then back of card shows with info 
+for mobile “i” then back of card shows with info
+
+listen option explaining the strains  
