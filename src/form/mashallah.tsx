@@ -305,6 +305,7 @@ export default function MashallahForm({ postcode, onBack }: MashallahFormProps) 
                   value={formData.fullName}
                   onChange={handleChange}
                   required
+                  maxLength={100}
                   disabled={loading}
                   className="w-full p-2.5 sm:p-3 border border-gray-300 rounded-lg inconsolata text-base sm:text-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none disabled:bg-gray-100"
                   placeholder="Max Mustermann"
@@ -322,6 +323,7 @@ export default function MashallahForm({ postcode, onBack }: MashallahFormProps) 
                   value={formData.email}
                   onChange={handleChange}
                   required
+                  maxLength={254}
                   disabled={loading}
                   className="w-full p-2.5 sm:p-3 border border-gray-300 rounded-lg inconsolata text-base sm:text-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none disabled:bg-gray-100"
                   placeholder="max@example.com"
@@ -339,6 +341,7 @@ export default function MashallahForm({ postcode, onBack }: MashallahFormProps) 
                   value={formData.phone}
                   onChange={handleChange}
                   required
+                  maxLength={20}
                   disabled={loading}
                   className="w-full p-2.5 sm:p-3 border border-gray-300 rounded-lg inconsolata text-base sm:text-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none disabled:bg-gray-100"
                   placeholder="+49 30 12345678"
@@ -360,6 +363,7 @@ export default function MashallahForm({ postcode, onBack }: MashallahFormProps) 
                     value={formData.street}
                     onChange={handleChange}
                     required
+                    maxLength={200}
                     disabled={loading}
                     className={`w-full pr-3 p-2.5 sm:p-3 border border-gray-300 rounded-lg inconsolata text-base sm:text-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none disabled:bg-gray-100 transition-all duration-200 ${
                       formData.street ? 'pl-3' : 'pl-[5rem]'
@@ -385,6 +389,7 @@ export default function MashallahForm({ postcode, onBack }: MashallahFormProps) 
                       value={formData.city}
                       onChange={handleChange}
                       required
+                      maxLength={100}
                       disabled={loading}
                       className={`w-full pr-3 p-2.5 sm:p-3 border border-gray-300 rounded-lg inconsolata text-base sm:text-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none disabled:bg-gray-100 transition-all duration-200 ${
                         formData.city ? 'pl-3' : 'pl-[5rem]'
