@@ -57,12 +57,15 @@ export default function QuestionnairePage() {
     try {
       const treatmentData = localStorage.getItem('treatmentRequest')
       if (!treatmentData) {
-        alert('Behandlungsanfrage nicht gefunden. Bitte beginnen Sie von vorne.')
         router.push('/')
         return
       }
-
       const treatmentRequest = JSON.parse(treatmentData)
+      if (!treatmentRequest?.id) {
+        localStorage.removeItem('treatmentRequest')
+        router.push('/')
+        return
+      }
       const token = localStorage.getItem('token')
       console.log('📤 Sending symptoms for treatment request ID:', treatmentRequest.id)
       console.log('📦 Complete data:', completeData)
@@ -86,9 +89,10 @@ export default function QuestionnairePage() {
         console.error('❌ Failed to update symptoms:', result)
         alert(`Fehler: ${result.message || 'Symptome konnten nicht aktualisiert werden'}`)
       }
-    } catch (error) {
-      console.error('❌ Error updating symptoms:', error)
-      alert('Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut.')
+    } catch (e) {
+      localStorage.removeItem('treatmentRequest')
+      router.push('/')
+      return
     } finally {
       setLoading(false)
     }
