@@ -31,7 +31,7 @@ export default function MashallahForm({ postcode, onBack }: MashallahFormProps) 
   const [consentHealth, setConsentHealth] = useState(false)
   const [consentTerms, setConsentTerms] = useState(false)
   
-  const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
+  const API_BASE = process.env.NEXT_PUBLIC_API_URL
 
   // Validate form fields
   const isFormValid = formData.fullName.trim() !== '' && 
