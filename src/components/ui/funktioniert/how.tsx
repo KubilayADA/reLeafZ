@@ -237,7 +237,6 @@ export default function How(): React.JSX.Element {
               Online. Sicher. Bis zur Apotheke.
             </p>
           </div>
-          <p className="carousel-hint carousel-hint-desktop">Pfeiltasten ← → zum Wechseln</p>
           <p className="carousel-hint carousel-hint-mobile" aria-hidden="true">Wischen oder Pfeile nutzen</p>
 
           <div className="progress-wrap">

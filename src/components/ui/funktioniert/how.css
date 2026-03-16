@@ -8,9 +8,9 @@
   --how-card: #ffffff;
   --how-accent: #72906F;
   --how-accent-mid: #72906F;
-  --how-text: #1a1a1a;
-  --how-muted: #525252;
-  --how-muted-light: #737373;
+  --how-text: #111827;         /* darker body text */
+  --how-muted: #374151;       /* darker muted text */
+  --how-muted-light: #4b5563; /* darker secondary text */
   --how-border: #e5e5e5;
   --how-mono: 'Inconsolata', monospace;
   --how-sans: 'Geist Sans', sans-serif;
@@ -115,8 +115,9 @@
     margin-bottom: var(--how-space-sm);
   }
   .how-funktioniert .subtitle {
-    font-size: 1.0625rem;
+    font-size: 1.2rem;
     color: var(--how-muted);
+    font-weight: 500;
     max-width: 32rem;
     margin: 0 auto;
     line-height: 1.55;
@@ -291,7 +292,7 @@
 
   .how-funktioniert .step-card {
     display: block;
-    background: var(--how-card);
+    background: var(--how-card); /* neutral card; grid carries green */
     border: 1px solid var(--how-border);
     border-radius: var(--how-radius-lg);
     padding: var(--how-space-2xl) 2rem;
@@ -307,7 +308,7 @@
     position: absolute;
     inset: 0;
     border-radius: inherit;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%231a1a1a' opacity='0.06'%3E%3Ccircle cx='4' cy='4' r='0.8'/%3E%3Ccircle cx='12' cy='4' r='0.8'/%3E%3Ccircle cx='20' cy='4' r='0.8'/%3E%3Ccircle cx='4' cy='12' r='0.8'/%3E%3Ccircle cx='12' cy='12' r='0.8'/%3E%3Ccircle cx='20' cy='12' r='0.8'/%3E%3Ccircle cx='4' cy='20' r='0.8'/%3E%3Ccircle cx='12' cy='20' r='0.8'/%3E%3Ccircle cx='20' cy='20' r='0.8'/%3E%3C/g%3E%3C/svg%3E");
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%2372906F' opacity='0.3'%3E%3Ccircle cx='4' cy='4' r='0.8'/%3E%3Ccircle cx='12' cy='4' r='0.8'/%3E%3Ccircle cx='20' cy='4' r='0.8'/%3E%3Ccircle cx='4' cy='12' r='0.8'/%3E%3Ccircle cx='12' cy='12' r='0.8'/%3E%3Ccircle cx='20' cy='12' r='0.8'/%3E%3Ccircle cx='4' cy='20' r='0.8'/%3E%3Ccircle cx='12' cy='20' r='0.8'/%3E%3Ccircle cx='20' cy='20' r='0.8'/%3E%3C/g%3E%3C/svg%3E");
     background-size: 24px 24px;
     pointer-events: none;
     z-index: 0;
@@ -371,8 +372,9 @@
   }
   .how-funktioniert .card-hero .card-desc {
     margin-bottom: 0;
-    font-size: 1rem;
+    font-size: 1.125rem;
     color: var(--how-muted);
+    font-weight: 500;
     line-height: 1.5;
     max-width: 24rem;
   }
@@ -424,15 +426,16 @@
   }
   .how-funktioniert .card-title {
     font-family: var(--how-mono);
-    font-size: 1.125rem;
+    font-size: 1.3rem;
     font-weight: 600;
     color: var(--how-text);
     margin-bottom: var(--how-space-sm);
     line-height: 1.35;
   }
   .how-funktioniert .card-desc {
-    font-size: 1rem;
+    font-size: 1.125rem;
     color: var(--how-muted);
+    font-weight: 500;
     line-height: 1.6;
     margin-bottom: var(--how-space-lg);
   }
@@ -448,8 +451,9 @@
     display: flex;
     align-items: flex-start;
     gap: var(--how-space-xs);
-    font-size: 0.9375rem;
-    color: var(--how-muted);
+    font-size: 1.0625rem;
+    color: var(--how-text);
+    font-weight: 500;
   }
   .how-funktioniert .detail-list li::before {
     content: '';
@@ -545,8 +549,9 @@
   }
   .how-funktioniert .carousel-step-label {
     font-family: var(--how-mono);
-    font-size: 0.8125rem;
+    font-size: 0.9rem;
     color: var(--how-muted);
+    font-weight: 500;
     text-align: center;
     margin: var(--how-space-sm) auto 0;
     max-width: 48rem;
@@ -597,7 +602,7 @@
   }
   .how-funktioniert .carousel-hint {
     font-family: var(--how-mono);
-    font-size: 0.75rem;
+    font-size: 0.85rem;
     color: var(--how-muted-light);
     text-align: center;
     margin: var(--how-space-sm) auto 0;
