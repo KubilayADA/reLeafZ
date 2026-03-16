@@ -160,18 +160,12 @@ function PrescriptionPaymentContent() {
       setSelectedProducts(JSON.parse(products))
       setTotalPrice(parseFloat(total))
 
-      const token = localStorage.getItem('token')
-      if (!token) {
-        router.push('/login')
-        return
-      }
-
       const response = await fetch(`${API_BASE}/api/payments/prescription-fee`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
         },
+        credentials: 'include',
         body: JSON.stringify({
           treatmentRequestId: parseInt(requestId)
         })
