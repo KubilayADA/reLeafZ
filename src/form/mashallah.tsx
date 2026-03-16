@@ -155,10 +155,8 @@ export default function MashallahForm({ postcode, onBack }: MashallahFormProps) 
       }
       const treatmentRequestData = {
         id: result.data.id,
-        patientId: result.data.patientId ?? null,
-        pharmacyId: result.data.pharmacyId ?? null,
+        city: formData.city,
         postcode,
-        ...formData,
       }
       localStorage.setItem('treatmentRequest', JSON.stringify(treatmentRequestData))
       localStorage.setItem('formPostcode', postcode)
