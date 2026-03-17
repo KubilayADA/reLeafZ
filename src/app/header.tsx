@@ -24,6 +24,7 @@ interface HeaderProps {
   setZipInput: (input: string) => void
   handlePostcodeSubmit: () => void
   isValidBerlinPostcode: (postcode: string) => boolean
+  isVisible: boolean
 }
 
 export default function Header({ 
@@ -32,13 +33,18 @@ export default function Header({
   zipInput, 
   setZipInput, 
   handlePostcodeSubmit, 
-  isValidBerlinPostcode 
+  isValidBerlinPostcode,
+  isVisible
 }: HeaderProps) {
   const [mobileNavOpen, setMobileNavOpen] = useState(false)
 
   return (
     <>
-      <header className="relative z-50 bg-#E9E6DE/50 backdrop-blur-md border-b border-black">
+      <header
+        className={`fixed top-0 left-0 right-0 z-50 bg-[#E9E6DE]/50 backdrop-blur-md border-b border-black transition-transform duration-500 ease-out ${
+          isVisible ? 'translate-y-0 opacity-100' : '-translate-y-full opacity-0 pointer-events-none'
+        }`}
+      >
         {/* Moving information banner */}
         <div className="bg-transparent text-black py-0.5 overflow-hidden border-b border-black">
         <div className="moving-text">
@@ -58,15 +64,29 @@ export default function Header({
       </div>
       
       <div className="header-row-wrap relative w-full h-22">
-        {/* Vertical lines aligned with hero left/right edges (250px inset) */}
-        <span className="header-line header-line--hero-left" aria-hidden />
-        <span className="header-line header-line--hero-right" aria-hidden />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-14">
           <div className="flex justify-between items-center h-14">
             {/* Logo geniş, navbar sabit yükseklikte */}
-            <div className="flex items-center h-14 overflow-visible">
+            <button
+              type="button"
+              className="flex items-center h-14 overflow-visible"
+              onClick={() => {
+                if (typeof window === 'undefined') return;
+                (window as any)._releafzAllowHeroScroll = true;
+                const hero = document.querySelector('.hero-section') as HTMLElement | null;
+                if (hero) {
+                  hero.scrollIntoView({ behavior: 'smooth' });
+                } else {
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }
+                setTimeout(() => {
+                  (window as any)._releafzAllowHeroScroll = false;
+                }, 1200);
+              }}
+              aria-label="Zurück zum Seitenanfang"
+            >
               <LeafLogo className="w-45 h-52 transform translate-y-0" />
-            </div>
+            </button>
             
             {/* Desktop Nav */}
             <nav className="header-desktop-nav hidden md:flex absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 space-x-8 inconsolata font-normal ">

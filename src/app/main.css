@@ -165,17 +165,54 @@ button[disabled] {
 
 /* Shared button styling - colors, font, shadows */
 .btn-primary,
-.behandlung-button,
-.behandlung-button-hero {
+.behandlung-button {
     font-family: "Inconsolata", monospace;
     font-weight: 550;
     font-size: 14px;
     line-height: 24px;
     background-color: #72906F;
     color: white;
-    border: 1.1px solid #000000;
+    border: 2px solid #ffffff;
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
     transition: all 0.3s ease;
+}
+
+@property --border-angle {
+    syntax: '<angle>';
+    initial-value: 0deg;
+    inherits: false;
+}
+
+.behandlung-button-hero {
+    font-family: "Inconsolata", monospace;
+    font-weight: 550;
+    font-size: 14px;
+    line-height: 24px;
+    color: white;
+    border: 2px solid transparent;
+    background-clip: padding-box, border-box;
+    background-origin: padding-box, border-box;
+    background-image:
+        linear-gradient(#72906F, #72906F),
+        conic-gradient(
+            from var(--border-angle),
+            #72906F 0deg,
+            #8aaa87 45deg,
+            #b8d9b5 90deg,
+            #e8f5e8 135deg,
+            #ffffff 180deg,
+            #e8f5e8 225deg,
+            #b8d9b5 270deg,
+            #8aaa87 315deg,
+            #72906F 360deg
+        );
+    box-shadow: 0 0 8px 1px rgba(168, 213, 162, 0.2), 0 4px 6px -1px rgba(0, 0, 0, 0.12);
+    animation: spin-border 6s linear infinite;
+    transition: box-shadow 0.4s ease, transform 0.3s ease;
+}
+
+@keyframes spin-border {
+    to { --border-angle: 360deg; }
 }
 
 /* Header button - absolute positioned only when inside the site header */
@@ -192,9 +229,13 @@ header .behandlung-button {
 }
 
 .btn-primary:hover:not(:disabled),
-.behandlung-button:hover:not(:disabled),
-.behandlung-button-hero:hover:not(:disabled) {
+.behandlung-button:hover:not(:disabled) {
     box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    transform: translateY(-1px);
+}
+
+.behandlung-button-hero:hover:not(:disabled) {
+    box-shadow: 0 0 22px 6px rgba(168, 213, 162, 0.6), 0 10px 15px -3px rgba(0, 0, 0, 0.15);
     transform: translateY(-1px);
 }
 
@@ -356,22 +397,139 @@ header .behandlung-button {
 }
 
 .hero-section {
-    background: #fbfdfb;
-    border-left: 1px solid #000000;
-    border-right: 1px solid #000000;
-    max-width: calc(100% - 200px);
-    margin-left: 250px;
-    margin-right: 250px;
+    background: transparent;
+    width: 100%;
+    max-width: none;
+    margin-left: 0;
+    margin-right: 0;
     z-index: 1;
 }
 
-@media (max-width: 768px) {
-    .hero-section {
-        border-left: none;
-        border-right: none;
-        max-width: 100%;
-        margin-left: 0;
-        margin-right: 0;
+
+/* Hero CTA: text+arrow = one block; button = independent, centered */
+.hero-cta-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1.5rem;
+    margin-bottom: 3rem;
+    width: 100%;
+    overflow: visible;
+}
+
+/* Text block — left of screen (detached from arrow) */
+.hero-cta-text-block {
+    position: relative;
+    left: 1rem;
+    margin-top: 1.5rem;
+    overflow: visible;
+}
+
+/* Arrow block — left of screen (detached from text) */
+.hero-cta-arrow-block {
+    position: relative;
+    left: 20rem;
+    top: -10rem;
+    overflow: visible;
+}
+
+/* Button independent, stays centered */
+.hero-cta-center {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+}
+
+.hero-cta-text {
+    font-family: var(--font-inconsolata), "Inconsolata", monospace;
+    font-size: 0.875rem;
+    font-weight: 500;
+    line-height: 1.1;
+    position: relative;
+    left: 1rem;
+    top: 4rem;
+    margin-top: 0;
+    text-align: left;
+    color: #ffffff;
+    max-width: 18rem;
+}
+
+.hero-cta-text-img {
+    position: relative;
+    left: -13rem;
+    top: 4rem;
+    margin-top: 0;
+    display: block;
+}
+@media (min-width: 640px) {
+    .hero-cta-text {
+        font-size: 1rem;
+    }
+}
+
+/* Hero scroll CTA ("Entdecke wie es funktioniert") */
+.hero-scroll-cta {
+    position: absolute;
+    left: 50%;
+    bottom: 8rem; /* similar to bottom-24 */
+    transform: translateX(-50%);
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    text-decoration: none;
+    color: inherit;
+    transition: opacity 150ms ease;
+}
+
+.hero-scroll-cta:hover {
+    opacity: 0.9;
+}
+
+.hero-scroll-cta-text {
+    font-family: var(--font-inconsolata), "Inconsolata", monospace;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.95);
+    text-shadow: 0 1px 2px rgba(0,0,0,0.8);
+}
+
+@media (min-width: 640px) {
+    .hero-scroll-cta-text {
+        font-size: 1rem;
+    }
+}
+
+.hero-cta-arrow {
+    width: 7rem;
+    min-width: 7rem;
+    height: auto;
+    flex-shrink: 0;
+    object-fit: contain;
+    display: block;
+}
+@media (min-width: 640px) {
+    .hero-cta-arrow {
+        width: 10rem;
+        min-width: 10rem;
+    }
+}
+
+/* Main view enter animation after hero */
+.main-view-enter {
+    animation: mainViewEnter 500ms ease-out forwards;
+}
+
+@keyframes mainViewEnter {
+    from {
+        opacity: 0;
+        transform: translateY(40px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
     }
 }
 

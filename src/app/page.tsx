@@ -8,6 +8,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import MashallahForm from '@/form/mashallah'
 import words from '@/constants/index'
 import Header from './header'
+import Hero from './hero'
 import CookieBanner from '@/components/ui/cookie'
 import '@/components/ui/Hero/Words-Sliding-Smooth.css' 
 import ComingSoon from '@/components/ComingSoon'
@@ -41,34 +42,34 @@ const cities = [
   { name: "Frankfurt am Main", explanation: "Coming soon" }
 ];
 
-// Fun monkey easter egg - for now I like it lol
-const FloatingMonkey = () => {
-  const [show, setShow] = useState(false)
-  const [mounted, setMounted] = useState(false)
+// Fun monkey easter egg - for now I like it lol // had to go sorry boss - for now...
+// const FloatingMonkey = () => {
+//   const [show, setShow] = useState(false)
+//   const [mounted, setMounted] = useState(false)
 
-  useEffect(() => {
-    setMounted(true)
-    setShow(true)
-    const timer = setInterval(() => setShow(prev => !prev), 8000)
-    return () => clearInterval(timer)
-  }, [])
+//   useEffect(() => {
+//     setMounted(true)
+//     setShow(true)
+//     const timer = setInterval(() => setShow(prev => !prev), 8000)
+//     return () => clearInterval(timer)
+//   }, [])
 
-  if (!mounted || !show) return null
+//   if (!mounted || !show) return null
 
-  return (
-    <div className="fixed bottom-8 right-8 z-40 transition-opacity duration-1000">
-      <div className="bg-white/90 backdrop-blur-sm rounded-3xl p-6 shadow-2xl border border-emerald-200 max-w-xs">
-        <div className="flex items-center space-x-4">
-          <div className="text-4xl transform rotate-12">🐒💨</div>
-          <div className="flex-1">
-            <div className="text-sm font-semibold text-emerald-700 mb-1">Feeling Relaxed?</div>
-            <div className="text-xs text-gray-600">Weedo found the perfect strain for your sleep schedule</div>
-          </div>
-        </div>
-      </div>
-    </div>
-  )
-}
+//   return (
+//     <div className="fixed bottom-8 right-8 z-40 transition-opacity duration-1000">
+//       <div className="bg-white/90 backdrop-blur-sm rounded-3xl p-6 shadow-2xl border border-emerald-200 max-w-xs">
+//         <div className="flex items-center space-x-4">
+//           <div className="text-4xl transform rotate-12">🐒💨</div>
+//           <div className="flex-1">
+//             <div className="text-sm font-semibold text-emerald-700 mb-1">Feeling Relaxed?</div>
+//             <div className="text-xs text-gray-600">Weedo found the perfect strain for your sleep schedule</div>
+//           </div>
+//         </div>
+//       </div>
+//     </div>
+//   )
+// }
 
 export default function LandingPage() {
   const router = useRouter()
@@ -76,6 +77,8 @@ export default function LandingPage() {
   const [openCity, setOpenCity] = useState<string | null>(null)
   const [dialogOpen, setDialogOpen] = useState(false)
   const [showForm, setShowForm] = useState(false)
+  const [showHeader, setShowHeader] = useState(false)
+  const [inHeroView, setInHeroView] = useState(true)
   // --- Begin zip code state and form state ---
   const [zipEntered, setZipEntered] = useState(false);
   const [zipInput, setZipInput] = useState('');
@@ -157,6 +160,22 @@ export default function LandingPage() {
   };
   // --- End zip code state and form state ---
   
+  useEffect(() => {
+    const handleScroll = () => {
+      const hero = document.querySelector('.hero-section') as HTMLElement | null;
+      if (!hero) {
+        setShowHeader(true);
+        return;
+      }
+      const rect = hero.getBoundingClientRect();
+      setShowHeader(rect.bottom <= 0);
+    };
+
+    handleScroll();
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
   // Show form if valid Berlin postcode was entered
   if (showForm) {
     return <MashallahForm postcode={zipInput} onBack={handleBackToMain} />
@@ -174,103 +193,26 @@ export default function LandingPage() {
         setZipInput={setZipInput}
         handlePostcodeSubmit={handlePostcodeSubmit}
         isValidBerlinPostcode={isValidBerlinPostcode}
+        isVisible={showHeader}
       />
 
-      {/* Main hero area */}
-      <section className="hero-section relative pt-20 pb-32 overflow-hidden"
-      
-      >
-        {/* Background decoration */}
-        <div className="absolute inset-0 overflow-hidden">
-          {/* <div className="absolute top-40 left-20 w-72 h-72 bg-purple-500/40 -full blur-3xl" />
-          <div className="absolute top-60 right-20 w-96 h-96 bg-green-500/30 -full blur-3xl" />
-          <div className="absolute bottom-20 left-1/2 w-90 h-80 bg-green-600/35 -full blur-3xl" /> */}
-        </div>
-
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            {/* Badge */}
-            <div className="inline-flex items-center px-4 py-2 bg-gradient-to-r-custom mb-8">
-              <Sparkles className="w-4 h-4 mr-5" />
-              <span className="text-sm font-medium subtitle-text">
-                AI-Powered, Ultra fast Medical Cannabis Service
-              </span>
-            </div>
-
-            {/* Main heading */}
-            <h1 className="text-3xl sm:text-5xl md:text-7xl font-bold title-gradient mb-5 leading-tight italic">
-              MEDIZINAL CANNABIS
-            </h1>
-            <div className="animated-words-container">
-                <div className="words-wrapper">
-                    {words.map((word, index) => (
-                        <div 
-                            key={index} 
-                            className="word-item text-3xl sm:text-5xl md:text-7xl font-bold title-gradient leading-tight italic"
-                        >
-                            {word}
-                        </div>
-                    ))}
-                </div>
-            </div>
-
-            {/* - messy HTML */}
-            <div className="text-sm sm:text-base md:text-lg subtitle-text inconsolata mb-6 max-w-4xl mx-auto leading-relaxed px-4">
-              BER | HAM | MUC | COL | DUS | FFM <br />Lieferung in 30-90 Minuten in Berlin<br />
-              Ganz Deutschland in 1-2 Tagen<br /><br />
-              </div>
-            <div className="text-sm sm:text-base md:text-lg subtitle-text inconsolata mb-6 max-w-4xl mx-auto leading-relaxed font-thin px-4">
-              ✓ Blüten ab 4,99€*<br />
-              ✓ Rezept digital austellen lassen<br />
-              ✓ Medikamente aus der Apotheke abholen oder liefern lassen<br />
-            </div>
-
-            {/* CTA button - Visible on all devices */}
-            <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
-              <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-                <DialogTrigger asChild>
-                  <Button
-                    className="behandlung-button-hero px-8 py-3 flex items-center justify-center min-w-64 w-auto"
-                  >
-                    BEHANDLUNG ANFRAGEN
-                    <ChevronRight className="w-5 h-5 ml-2" />
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="sm:max-w-md">
-                  <DialogHeader>
-                    <DialogTitle className="inconsolata text-xl font-bold">Postleitzahl eingeben</DialogTitle>
-                    <DialogDescription className="inconsolata text-gray-600">
-                      Bitte geben Sie Ihre Postleitzahl ein, um zu prüfen, ob wir in Ihrer Region liefern können.
-                    </DialogDescription>
-                  </DialogHeader>
-                  <div className="py-4">
-                    <input
-                      type="text"
-                      name="zip"
-                      placeholder="z.B. 10115"
-                      value={zipInput}
-                      onChange={(e) => setZipInput(e.target.value)}
-                      className="w-full p-3 border border-gray-300 rounded-lg inconsolata text-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"
-                      maxLength={5}
-                    />
-                  </div>
-                  <DialogFooter>
-                    <Button
-                      onClick={handlePostcodeSubmit}
-                      disabled={!zipInput.trim() || !isValidBerlinPostcode(zipInput)}
-                      className={`w-full inconsolata text-white font-medium py-3 ${
-                        !zipInput.trim() || !isValidBerlinPostcode(zipInput) 
-                          ? 'opacity-50 cursor-not-allowed bg-gray-400' 
-                          : 'animated-button'
-                      }`}
-                    >
-                      Weiter
-                    </Button>
-                  </DialogFooter>
-                </DialogContent>
-              </Dialog>
-            </div>
-
+      {inHeroView ? (
+        <Hero
+          dialogOpen={dialogOpen}
+          setDialogOpen={setDialogOpen}
+          zipInput={zipInput}
+          setZipInput={setZipInput}
+          handlePostcodeSubmit={handlePostcodeSubmit}
+          isValidBerlinPostcode={isValidBerlinPostcode}
+          onEnterMain={() => {
+            setInHeroView(false);
+            window.requestAnimationFrame(() => {
+              window.scrollTo({ top: 0 });
+            });
+          }}
+        />
+      ) : (
+        <div className="main-view-enter">
             {/* --- Zip code entry & form conditional rendering --- */}
             {/* COMMENTED OUT - Survey/Form Elements
             {zipEntered && !formData.zip && (
@@ -308,31 +250,6 @@ export default function LandingPage() {
               </form>
             )}
             */}
-
-            {/* Trust badges */}
-            <div className="flex flex-wrap items-center justify-center gap-8 text-sm text-gray-600">
-              <div className="flex items-center">
-                <Shield className="w-5 h-5 text-green-700 mr-2" />
-                GDPR Compliant
-              </div>
-              <div className="flex items-center">
-                <Clock className="w-5 h-5 text-green-700 mr-2" />
-                Licensed Doctors
-              </div>
-              <div className="flex items-center">
-                <MapPin className="w-5 h-5 text-green-700 mr-2" />
-                Berlin Pharmacies
-              </div>
-            </div>
-          </div>
-        </div>
-        <img
-          src="/payy.png"
-          alt="Payy"
-          className="absolute bottom-10 left-1/2 -translate-x-1/2 w-90 h-10 opacity-80"
-          style={{ zIndex: 10 }}
-        />
-      </section>
 
       {/* How to order — right under hero //let's structure this file like this g?*/}
       <How />
@@ -410,8 +327,8 @@ export default function LandingPage() {
           <p className="text-lg sm:text-xl subtitle-text mb-8 sm:mb-12 max-w-2xl mx-auto">
             Join thousands of patients who&apos;ve found better care, faster relief, and a supportive community with reLeafZ.
           </p>
-
-          <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 justify-center subtitle-text">
+          {/* WEEDO needed to go sorry boss */} 
+          {/* <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 justify-center subtitle-text">
             <Button className="bg-white text-gray-900 hover:bg-gray-50 px-6 sm:px-10 py-4 sm:py-6 rounded-2xl text-base sm:text-lg font-bold shadow-xl hover:shadow-2xl">
               Start Your Journey Today
               <ChevronRight className="w-5 h-5 ml-2" />
@@ -422,7 +339,7 @@ export default function LandingPage() {
             >
               Speak with Weedo, the best budtender in town
             </Button>
-          </div>
+          </div> */}
 
           <p className="subtitle-text text-xs sm:text-sm mt-6 sm:mt-8 px-4">
             No commitment required • Speak with licensed doctors • GDPR compliant
@@ -480,12 +397,14 @@ export default function LandingPage() {
           </div>
 
           <div className="border-t border-gray-800 mt-12 pt-8 text-center text-gray-400">
-            <p>© 2025 reLeafZ. All rights reserved. Licensed medical cannabis platform serving Berlin.</p>
+            <p>© 2026 reLeafZ. All rights reserved. Licensed medical cannabis platform serving Berlin.</p>
           </div>
         </div>
       </footer>
 
-      <FloatingMonkey />
+      {/* <FloatingMonkey /> */}
+      </div>
+      )}
       </div>
     </>
   )
