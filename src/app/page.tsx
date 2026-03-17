@@ -135,7 +135,6 @@ export default function LandingPage() {
 
       if (response.ok) {
         alert('Request submitted successfully!');
-        console.log(result.data); // optional
         // Reset form
         setFormData({
           zip: '',
@@ -151,7 +150,7 @@ export default function LandingPage() {
         alert(result.message || 'Submission failed.');
       }
     } catch (error) {
-      console.error('Error submitting form:', error);
+      if (process.env.NODE_ENV === 'development') console.error('Error submitting form:', error);
       alert('An error occurred.');
     }
   };

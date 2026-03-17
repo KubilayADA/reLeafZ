@@ -192,6 +192,9 @@ export default function PharmacyDashboard() {
   useEffect(() => { if (activeView !== 'inventory' || !pharmacyId) return; const t = setTimeout(() => loadInventory(pharmacyId, buildInventoryFilters()), 300); return () => clearTimeout(t) }, [inventorySearch, inventoryFormFilter, inventoryAvailability, inventorySortBy, inventorySortOrder, activeView, pharmacyId, loadInventory, buildInventoryFilters])
   useEffect(() => { if (activeView !== 'analytics' || !pharmacyId) return; loadAnalytics(pharmacyId, analyticsPeriod) }, [analyticsPeriod, activeView, pharmacyId, loadAnalytics])
 
+  // pharmacy_id in localStorage is UI-only — it restores the dashboard view on reload.
+  // All actual auth is enforced via the httpOnly session cookie on every API call.
+  // The backend must verify that the session matches the requested pharmacyId on every endpoint.
   const handleLogin = async () => { try { setLoading(true); setError(null); const d = await pharmacyLogin(email, password); if (d.pharmacy) { setPharmacyId(d.pharmacy.id); localStorage?.setItem('pharmacy_id', d.pharmacy.id.toString()); await loadDashboard() } else setError('Login fehlgeschlagen') } catch (e: unknown) { setError(e instanceof Error ? e.message : 'Anmeldung fehlgeschlagen') } finally { setLoading(false) } }
   const handleLogout = () => { setPharmacyId(null); setDashboardData(null); setOrdersResponse(null); setInventoryResponse(null); setAnalyticsData(null); setEmail(''); setPassword(''); setActiveView('dashboard'); setError(null); localStorage?.removeItem('pharmacy_id') }
   const handleUpdateStatus = async (id: number, s: string) => { if (!pharmacyId) return; try { setOrdersLoading(true); await updateOrderStatus(pharmacyId, id, s); await loadOrders(pharmacyId, buildOrderFilters()); await loadDashboard() } catch (e: unknown) { setError(e instanceof Error ? e.message : 'Fehler') } finally { setOrdersLoading(false) } }

@@ -49,7 +49,6 @@ export default function MashallahForm({ postcode, onBack }: MashallahFormProps) 
                       // 🔒 SECURITY: Clear authentication tokens when email changes
                       // This prevents using old tokens with new email addresses
                       if (name === 'email') {
-                        console.log('🧹 Clearing tokens due to email change')
                         localStorage.removeItem('treatmentRequest')
                         localStorage.removeItem('assignedPharmacyId')
                         // Reset OTP modal state if it was open
