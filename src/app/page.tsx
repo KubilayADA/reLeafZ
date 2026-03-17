@@ -79,6 +79,7 @@ export default function LandingPage() {
   const [showForm, setShowForm] = useState(false)
   const [showHeader, setShowHeader] = useState(false)
   const [inHeroView, setInHeroView] = useState(true)
+  const [isTransitioning, setIsTransitioning] = useState(false)
   // --- Begin zip code state and form state ---
   const [zipEntered, setZipEntered] = useState(false);
   const [zipInput, setZipInput] = useState('');
@@ -160,6 +161,20 @@ export default function LandingPage() {
   // --- End zip code state and form state ---
   
   useEffect(() => {
+    if (window.location.hash === '#home') {
+      setInHeroView(false);
+    }
+
+    const handlePopState = () => {
+      setInHeroView(window.location.hash !== '#home');
+      window.scrollTo({ top: 0 });
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
+
+  useEffect(() => {
     const handleScroll = () => {
       const hero = document.querySelector('.hero-section') as HTMLElement | null;
       if (!hero) {
@@ -195,7 +210,7 @@ export default function LandingPage() {
         isVisible={showHeader}
       />
 
-      {inHeroView ? (
+      {(inHeroView || isTransitioning) && (
         <Hero
           dialogOpen={dialogOpen}
           setDialogOpen={setDialogOpen}
@@ -204,14 +219,23 @@ export default function LandingPage() {
           handlePostcodeSubmit={handlePostcodeSubmit}
           isValidBerlinPostcode={isValidBerlinPostcode}
           onEnterMain={() => {
-            setInHeroView(false);
+            document.body.style.overflow = 'hidden';
+            setIsTransitioning(true);
+            window.history.pushState({}, '', '/#home');
             window.requestAnimationFrame(() => {
               window.scrollTo({ top: 0 });
             });
+            setTimeout(() => {
+              setInHeroView(false);
+              setIsTransitioning(false);
+              document.body.style.overflow = '';
+            }, 750);
           }}
         />
-      ) : (
-        <div className="main-view-enter">
+      )}
+
+      {(!inHeroView || isTransitioning) && (
+        <div className={isTransitioning ? 'main-view-enter main-view-transitioning' : 'main-view-enter'}>
             {/* --- Zip code entry & form conditional rendering --- */}
             {/* COMMENTED OUT - Survey/Form Elements
             {zipEntered && !formData.zip && (
