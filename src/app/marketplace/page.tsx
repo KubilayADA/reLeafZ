@@ -157,7 +157,15 @@ export default function MarketplacePage() {
         setLoading(false)
         return
       }
-      const request: TreatmentRequest = JSON.parse(treatmentData)
+      let request: TreatmentRequest
+      try {
+        request = JSON.parse(treatmentData)
+      } catch {
+        localStorage.removeItem('treatmentRequest')
+        setError('Your session data is corrupted. Please return to the home page and start over.')
+        setLoading(false)
+        return
+      }
       setTreatmentRequest(request)
       const city = request.city ?? ''
       const zip = request.zip ?? request.postcode ?? ''
@@ -166,10 +174,9 @@ export default function MarketplacePage() {
         setLoading(false)
         return
       }
-      const token = localStorage.getItem('token') || undefined
       const url = `${API_BASE}/api/marketplace?city=${encodeURIComponent(city)}&patientZip=${encodeURIComponent(zip)}`
       const res = await fetch(url, {
-        headers: token ? { Authorization: `Bearer ${token}` } : {},
+        credentials: 'include',
       })
       if (!res.ok) throw new Error('Marketplace-Anfrage fehlgeschlagen')
       const json = await res.json()

@@ -14,7 +14,7 @@ import '@/components/ui/Hero/Words-Sliding-Smooth.css'
 import ComingSoon from '@/components/ComingSoon'
 import How from '@/components/ui/funktioniert/how'  
 
-const COMING_SOON_MODE = false;
+const COMING_SOON_MODE = true;
 
 // Font setup - using Inconsolata
 const inconsolataStyle = {
@@ -138,7 +138,6 @@ export default function LandingPage() {
 
       if (response.ok) {
         alert('Request submitted successfully!');
-        console.log(result.data); // optional
         // Reset form
         setFormData({
           zip: '',
@@ -154,7 +153,7 @@ export default function LandingPage() {
         alert(result.message || 'Submission failed.');
       }
     } catch (error) {
-      console.error('Error submitting form:', error);
+      if (process.env.NODE_ENV === 'development') console.error('Error submitting form:', error);
       alert('An error occurred.');
     }
   };

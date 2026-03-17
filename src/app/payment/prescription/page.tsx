@@ -156,22 +156,25 @@ function PrescriptionPaymentContent() {
         return
       }
 
-      setTreatmentRequestId(requestId)
-      setSelectedProducts(JSON.parse(products))
-      setTotalPrice(parseFloat(total))
-
-      const token = localStorage.getItem('token')
-      if (!token) {
-        router.push('/login')
+      let parsedProducts
+      try {
+        parsedProducts = JSON.parse(products)
+      } catch {
+        setError('Missing payment information. Please go back and try again.')
+        setLoading(false)
         return
       }
+
+      setTreatmentRequestId(requestId)
+      setSelectedProducts(parsedProducts)
+      setTotalPrice(parseFloat(total))
 
       const response = await fetch(`${API_BASE}/api/payments/prescription-fee`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
         },
+        credentials: 'include',
         body: JSON.stringify({
           treatmentRequestId: parseInt(requestId)
         })

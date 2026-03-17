@@ -61,21 +61,18 @@ export default function QuestionnairePage() {
         router.push('/')
         return
       }
-      const token = localStorage.getItem('token')
-
       const response = await fetch(`${API_BASE}/api/treatment/${treatmentRequest.id}/symptoms`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
-          ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
         },
+        credentials: 'include',
         body: JSON.stringify(completeData),
       })
 
       const result = await response.json()
 
       if (response.ok) {
-        console.log('✅ Symptoms updated successfully!')
         router.push('/marketplace')
       } else {
         alert(`Fehler: ${result.message || 'Symptome konnten nicht aktualisiert werden'}`)

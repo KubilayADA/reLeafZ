@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, Suspense } from 'react'
+import { useEffect, useState, useCallback, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { CheckCircle2, Package, FileText, Clock } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -12,31 +12,25 @@ function PaymentSuccessContent() {
   const requestId = searchParams.get('requestId')
   
   const [loading, setLoading] = useState(true)
+  const [sessionError, setSessionError] = useState(false)
 
   const API_BASE = process.env.NEXT_PUBLIC_API_URL
 
-  useEffect(() => {
-    if (paymentType === 'prescription' && requestId) {
-      finalizeRequest()
-    } else {
-      setLoading(false)
-    }
-  }, [paymentType, requestId])
-
-  const finalizeRequest = async () => {
+  const finalizeRequest = useCallback(async () => {
     try {
-      const token = localStorage.getItem('token')
       const selectedProducts = localStorage.getItem('selectedProducts')
-      const totalPrice = localStorage.getItem('totalPrice')
 
-      if (!selectedProducts || !totalPrice) {
+      if (!selectedProducts) {
         setLoading(false)
         return
       }
 
-      if (!token || typeof token !== 'string' || token.trim() === '') {
+      let parsedProducts
+      try {
+        parsedProducts = JSON.parse(selectedProducts)
+      } catch {
+        setSessionError(true)
         setLoading(false)
-        router.push('/')
         return
       }
 
@@ -44,15 +38,13 @@ function PaymentSuccessContent() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
         },
+        credentials: 'include',
         body: JSON.stringify({
           treatmentRequestId: parseInt(requestId!),
-          selectedProducts: JSON.parse(selectedProducts),
-          totalPrice: parseFloat(totalPrice),
+          selectedProducts: parsedProducts,
           pharmacyId: parseInt(localStorage.getItem('selectedPharmacyId') || '0'),
           deliveryMethod: localStorage.getItem('selectedDeliveryMethod') || 'PICKUP',
-          deliveryFee: parseFloat(localStorage.getItem('deliveryFee') || '0')
         })
       })
 
@@ -60,12 +52,32 @@ function PaymentSuccessContent() {
         localStorage.removeItem('pendingTreatmentRequestId')
         localStorage.removeItem('selectedProducts')
         localStorage.removeItem('totalPrice')
+        localStorage.removeItem('deliveryFee')
       }
     } catch (err) {
       console.error('Finalize error:', err)
     } finally {
       setLoading(false)
     }
+  }, [API_BASE, requestId])
+
+  useEffect(() => {
+    if (paymentType === 'prescription' && requestId) {
+      finalizeRequest()
+    } else {
+      setLoading(false)
+    }
+  }, [paymentType, requestId, finalizeRequest])
+
+  if (sessionError) {
+    return (
+      <div className="min-h-screen bg-beige inconsolata flex items-center justify-center px-4">
+        <div className="text-center max-w-md">
+          <p className="text-lg font-bold text-red-600 mb-2">Something went wrong with your session</p>
+          <p className="subtitle-text text-sm">Please contact support — your payment may still have been processed.</p>
+        </div>
+      </div>
+    )
   }
 
   if (loading) {

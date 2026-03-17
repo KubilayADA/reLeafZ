@@ -60,7 +60,6 @@ type FieldErrors = Partial<Record<'fullName' | 'organization' | 'role' | 'email'
 
 export default function PartnersPage() {
   const [scrolled, setScrolled] = useState(false)
-  const [activeTab, setActiveTab] = useState<'pharmacy' | 'doctor'>('pharmacy')
   const [formState, setFormState] = useState<'idle' | 'submitting' | 'success' | 'duplicate' | 'error'>('idle')
   const [formError, setFormError] = useState('')
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({})
@@ -286,9 +285,9 @@ export default function PartnersPage() {
               className="text-base sm:text-lg md:text-xl leading-relaxed max-w-3xl mb-10"
               style={{ color: 'rgba(255,255,255,0.65)' }}
             >
-              releafZ connects pharmacies and licensed doctors to patients via a fully digital prescription
-              platform built for Germany&apos;s regulatory framework. Streamline operations, reach
-              more patients, and grow your cannabis business&nbsp;— without the overhead.
+              releafZ connects licensed doctors to patients via a fully digital prescription
+              platform built for Germany&apos;s regulatory framework. Streamline your practice, reach
+              more patients, and grow your cannabis prescribing workflow&nbsp;— without the overhead.
             </p>
           </FadeIn>
 
@@ -361,7 +360,7 @@ export default function PartnersPage() {
               className="text-2xl sm:text-3xl md:text-4xl font-bold mb-14 tracking-tight"
               style={{ fontFamily: syne }}
             >
-              From patient to pharmacy&nbsp;—{' '}
+              From patient to prescription&nbsp;—{' '}
               <span style={{ color: cyan }}>fully digital</span>
             </h2>
           </FadeIn>
@@ -369,10 +368,10 @@ export default function PartnersPage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 grid-rows-[1fr_1fr]">
             {[
               { n: 1, title: 'Patient submits questionnaire', desc: 'Symptoms, medical history, preferences' },
-              { n: 2, title: 'AI matches optimal strains', desc: "From the pharmacy's live inventory on releafZ" },
+              { n: 2, title: 'AI matches optimal strains', desc: 'From live inventory on releafZ' },
               { n: 3, title: 'Doctor reviews & approves', desc: 'Digital workflow on releafZ, avg. 10 minutes' },
               { n: 4, title: 'Payment collected', desc: '€14.99 consultation fee + product cost, pre-authorized via releafZ' },
-              { n: 5, title: 'Pharmacy receives order', desc: 'releafZ dashboard notification, structured prescription PDF' },
+              { n: 5, title: 'Prescription issued & order routed', desc: 'Structured prescription PDF, fulfillment via releafZ' },
               { n: 6, title: 'Delivery to patient', desc: 'Tracked, compliant, last-mile handled' },
             ].map((step, i) => (
               <FadeIn key={step.n} delay={i * 80} className="h-full">
@@ -420,78 +419,13 @@ export default function PartnersPage() {
             </h2>
           </FadeIn>
 
-          {/* Tab toggle */}
-          <FadeIn delay={60}>
-            <div
-              className="inline-flex rounded-lg p-1 mb-10"
-              style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)' }}
-            >
-              {(['pharmacy', 'doctor'] as const).map((tab) => (
-                <button
-                  key={tab}
-                  type="button"
-                  onClick={() => setActiveTab(tab)}
-                  className="px-5 py-2 rounded-md text-sm font-medium transition-all"
-                  style={{
-                    fontFamily: dm,
-                    background: activeTab === tab ? 'rgba(255,255,255,0.08)' : 'transparent',
-                    color: activeTab === tab ? '#fff' : 'rgba(255,255,255,0.5)',
-                  }}
-                >
-                  {tab === 'pharmacy' ? 'Pharmacies' : 'Doctors'}
-                </button>
-              ))}
-            </div>
-          </FadeIn>
-
-          {/* Tab content */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-            {(activeTab === 'pharmacy'
-              ? [
-                  {
-                    
-                    title: 'Real-time Inventory Sync',
-                    desc: 'Your product catalog on releafZ updates instantly. Patients only see what\u2019s in stock.',
-                  },
-                  {
-                    
-                    title: 'Digital Prescription Intake',
-                    desc: 'Receive structured, validated prescriptions directly into your releafZ dashboard. No faxes, no paper.',
-                  },
-                  {
-                    
-                    title: 'Pre-authorized Payments',
-                    desc: 'Payment is collected by releafZ before the order reaches you. Zero payment risk.',
-                  },
-                  {
-                    
-                    title: 'Delivery Integration',
-                    desc: 'Built-in last-mile coordination through releafZ. You prepare, we handle delivery.',
-                  },
-                ]
-              : [
-                  {
-                    
-                    title: 'AI Pre-screening',
-                    desc: 'Patients arrive on releafZ with completed questionnaires and AI-matched strain suggestions. You review, not intake.',
-                  },
-                  {
-                    
-                    title: 'One-click Approvals',
-                    desc: 'Review symptoms, history, and product selection inside releafZ. Approve with full audit trail.',
-                  },
-                  {
-                    
-                    title: 'Auto-generated Prescription PDFs',
-                    desc: 'releafZ generates and sends prescriptions automatically upon your approval.',
-                  },
-                  {
-                    
-                    title: 'Patient History Dashboard',
-                    desc: 'Track treatment outcomes and maintain comprehensive digital records inside releafZ.',
-                  },
-                ]
-            ).map((card, i) => (
+            {[
+              { title: 'AI Pre-screening', desc: 'Patients arrive on releafZ with completed questionnaires and AI-matched strain suggestions. You review, not intake.' },
+              { title: 'One-click Approvals', desc: 'Review symptoms, history, and product selection inside releafZ. Approve with full audit trail.' },
+              { title: 'Auto-generated Prescription PDFs', desc: 'releafZ generates and sends prescriptions automatically upon your approval.' },
+              { title: 'Patient History Dashboard', desc: 'Track treatment outcomes and maintain comprehensive digital records inside releafZ.' },
+            ].map((card, i) => (
               <div
                 key={card.title}
                 style={{ animation: `partnerCardIn 0.4s ${i * 60}ms both` }}
@@ -566,7 +500,7 @@ export default function PartnersPage() {
           </FadeIn>
           <FadeIn delay={60}>
             <p className="text-sm md:text-base mb-10" style={{ color: 'rgba(255,255,255,0.55)' }}>
-              We&apos;re selectively onboarding pharmacies and doctors for the releafZ launch
+              We&apos;re selectively onboarding doctors for the releafZ launch
               cohort. We&apos;ll be in touch within 48&nbsp;hours.
             </p>
           </FadeIn>
@@ -642,9 +576,8 @@ export default function PartnersPage() {
                     }}
                   >
                     <option value="" disabled>Select your role</option>
-                    <option value="pharmacy">Pharmacy owner / manager</option>
                     <option value="physician">Licensed physician (Arzt)</option>
-                    <option value="group">Both / Healthcare group</option>
+                    <option value="group">Healthcare group</option>
                   </select>
                   {fieldErrors.role && <p className="mt-1.5 text-xs text-red-400">{fieldErrors.role}</p>}
                 </div>
