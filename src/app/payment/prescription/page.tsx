@@ -156,8 +156,17 @@ function PrescriptionPaymentContent() {
         return
       }
 
+      let parsedProducts
+      try {
+        parsedProducts = JSON.parse(products)
+      } catch {
+        setError('Missing payment information. Please go back and try again.')
+        setLoading(false)
+        return
+      }
+
       setTreatmentRequestId(requestId)
-      setSelectedProducts(JSON.parse(products))
+      setSelectedProducts(parsedProducts)
       setTotalPrice(parseFloat(total))
 
       const response = await fetch(`${API_BASE}/api/payments/prescription-fee`, {
