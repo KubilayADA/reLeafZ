@@ -73,7 +73,6 @@ export default function QuestionnairePage() {
       const result = await response.json()
 
       if (response.ok) {
-        console.log('✅ Symptoms updated successfully!')
         router.push('/marketplace')
       } else {
         alert(`Fehler: ${result.message || 'Symptome konnten nicht aktualisiert werden'}`)

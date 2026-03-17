@@ -4,13 +4,19 @@ import React, { Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import MashallahForm from '@/form/mashallah'
 
+const isValidBerlinPostcode = (postcode: string) => {
+  if (!/^\d{5}$/.test(postcode)) return false
+  const zip = parseInt(postcode)
+  return zip >= 10115 && zip <= 14199
+}
+
 // Child component (useSearchParams burada) ⬇
 function FormContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const postcode = searchParams.get('postcode') || ''
 
-  if (!postcode) {
+  if (!postcode || !isValidBerlinPostcode(postcode)) {
     router.push('/')
     return null
   }
