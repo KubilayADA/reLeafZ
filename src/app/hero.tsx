@@ -43,7 +43,7 @@ export default function Hero({
       {/* reLeafZ logo — top left (back to hero) */}
       <a
         href="#top"
-        className="absolute scale-150 top-12 left-15 z-10 flex items-center gap-2 no-underline text-inherit hover:opacity-100 transition-opacity"
+        className="absolute top-5 left-1/2 -translate-x-1/2 sm:left-8 sm:translate-x-0 sm:top-8 md:top-12 md:left-14 md:scale-150 z-10 flex items-center gap-2 no-underline text-inherit hover:opacity-100 transition-opacity"
         onClick={(e) => {
           e.preventDefault()
           const hero = document.querySelector('.hero-section') as HTMLElement | null
@@ -74,7 +74,7 @@ export default function Hero({
         <img
           src="/arrow-down.png"
           alt=""
-          className="w-15 h-15 object-contain drop-shadow-md animate-bounce"
+          className="hero-scroll-cta-arrow w-15 h-15 object-contain drop-shadow-md animate-bounce"
           aria-hidden
         />
       </a>
@@ -125,7 +125,7 @@ export default function Hero({
               <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
                 <DialogTrigger asChild>
                   <Button
-                    className="behandlung-button-hero scale-150 px-8 py-3 flex items-center justify-center min-w-64 w-auto"
+                    className="behandlung-button-hero px-5 py-2 sm:px-7 sm:py-2.5 md:scale-125 lg:scale-150 md:px-8 md:py-3 flex items-center justify-center min-w-44 sm:min-w-56 md:min-w-64 w-auto"
                   >
                     BEHANDLUNG ANFRAGEN
                     <ChevronRight className="w-5 h-5 ml-2" />
