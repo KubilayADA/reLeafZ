@@ -43,7 +43,7 @@ export default function Hero({
       {/* reLeafZ logo — top left (back to hero) */}
       <a
         href="#top"
-        className="absolute top-6 left-6 z-10 flex items-center gap-2 no-underline text-inherit hover:opacity-90 transition-opacity"
+        className="absolute scale-150 top-12 left-15 z-10 flex items-center gap-2 no-underline text-inherit hover:opacity-100 transition-opacity"
         onClick={(e) => {
           e.preventDefault()
           const hero = document.querySelector('.hero-section') as HTMLElement | null
@@ -70,13 +70,7 @@ export default function Hero({
           onEnterMain()
         }}
       >
-        <img
-          src="/hero-text-2.png"
-          alt="Entdecke wie es funktioniert"
-          className="hero-scroll-cta-text w-90 h-10"
-          style={{ filter: 'drop-shadow(0 0 0.4px white) drop-shadow(0 0 0.4px white) drop-shadow(0 0 0.4px white)' }}
-
-        />
+        <span className="hero-scroll-cta-text">Entdecke wie es funktioniert</span>
         <img
           src="/arrow-down.png"
           alt=""
@@ -88,7 +82,7 @@ export default function Hero({
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 overflow-visible">
         <div className="text-center overflow-visible">
           {/* Main heading */}
-          <h1 className="text-3xl sm:text-5xl md:text-7xl font-bold title-gradient mb-5 leading-tight italic">
+          <h1 className="title-gradient">
             MEDIZINAL CANNABIS
           </h1>
           <div className="animated-words-container">
@@ -104,22 +98,22 @@ export default function Hero({
             </div>
           </div>
 
-          <div className="text-sm sm:text-base md:text-lg subtitle-text inconsolata mb-1 max-w-4xl mx-auto leading-relaxed px-4">
+          <div className="subtitle-text-hero">
             Lieferung in 30-90 Minuten in Berlin<br />
             Ganz Deutschland in 1-2 Tagen<br /><br />
           </div>
 
           {/* Trust badges */}
-          <div className="flex flex-wrap items-center justify-center gap-8 text-sm text-black-600 mb-40">
-            <div className="flex items-center">
+          <div className="trust-badges">
+            <div className="trust-badge-item">
               <Shield className="w-5 h-5 text-black-700 mr-2" />
               GDPR Compliant
             </div>
-            <div className="flex items-center">
+            <div className="trust-badge-item">
               <Clock className="w-5 h-5 text-black-700 mr-2" />
               Licensed Doctors
             </div>
-            <div className="flex items-center">
+            <div className="trust-badge-item">
               <MapPin className="w-5 h-5 text-black-700 mr-2" />
               Berlin Pharmacies
             </div>
@@ -172,18 +166,14 @@ export default function Hero({
               </Dialog>
             </div>
             <div className="hero-cta-text-block">
-              <img
-                src="/text-hero-1.png"
-                alt="Weißt du schon was du willst? Worauf wartest du noch ;)"
-                className="hero-cta-text-img max-w-[32rem] w-full h-auto"
-                style={{ filter: 'drop-shadow(0 0 0.4px white) drop-shadow(0 0 0.4px white) drop-shadow(0 0 0.4px white)' }}
-              />
+              <span className="hero-cta-text">Weißt du schon was du willst? Worauf wartest du noch ;)</span>
             </div>
             <div className="hero-cta-arrow-block">
               <img
-                src="/arroww-w.png"
+                src="/arrow-down.png"
                 alt=""
-                className="hero-cta-arrow w-10 full-height color-white"
+                className="w-15 h-15 object-contain drop-shadow-md"
+                style={{ transform: 'rotate(75deg)' }}
                 aria-hidden
               />
             </div>
