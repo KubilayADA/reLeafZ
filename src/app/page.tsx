@@ -14,7 +14,7 @@ import ComingSoon from '@/components/ComingSoon'
 import How from '@/components/ui/funktioniert/how'
 import { API_BASE } from '@/lib/api'
 
-const COMING_SOON_MODE = false;
+const COMING_SOON_MODE = true;
 
 // Font setup - using Inconsolata
 const inconsolataStyle = {
