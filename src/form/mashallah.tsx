@@ -7,6 +7,7 @@ import { ArrowLeft, MapPin, Building2, Mail, Lock, CheckCircle2, X } from 'lucid
 import { useRouter } from 'next/navigation'
 import '@/app/main.css'
 import '@/form/form.css'
+import { API_BASE } from '@/lib/api'
 
 interface MashallahFormProps {
   postcode: string
@@ -31,8 +32,6 @@ export default function MashallahForm({ postcode, onBack }: MashallahFormProps) 
   const [showWelcomeNotification, setShowWelcomeNotification] = useState(false)
   const [consentHealth, setConsentHealth] = useState(false)
   const [consentTerms, setConsentTerms] = useState(false)
-  
-  const API_BASE = process.env.NEXT_PUBLIC_API_URL
 
   // Validate form fields
   const isFormValid = formData.fullName.trim() !== '' && 

@@ -11,9 +11,10 @@ import Header from './header'
 import CookieBanner from '@/components/ui/cookie'
 import '@/components/ui/Hero/Words-Sliding-Smooth.css' 
 import ComingSoon from '@/components/ComingSoon'
-import How from '@/components/ui/funktioniert/how'  
+import How from '@/components/ui/funktioniert/how'
+import { API_BASE } from '@/lib/api'
 
-const COMING_SOON_MODE = true;
+const COMING_SOON_MODE = false;
 
 // Font setup - using Inconsolata
 const inconsolataStyle = {
@@ -121,8 +122,6 @@ export default function LandingPage() {
     e.preventDefault();
 
     try {
-      // Add this at the top of the file
-      const API_BASE = process.env.NEXT_PUBLIC_API_URL
       const response = await fetch(`${API_BASE}/api/treatment/submit`, {
         method: 'POST',
         headers: {

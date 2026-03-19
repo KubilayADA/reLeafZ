@@ -6,6 +6,7 @@ import { loadStripe } from '@stripe/stripe-js'
 import { Elements, PaymentElement, useStripe, useElements } from '@stripe/react-stripe-js'
 import { Button } from '@/components/ui/button'
 import { CreditCard, CheckCircle2, AlertCircle } from 'lucide-react'
+import { API_BASE } from '@/lib/api'
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!)
 
@@ -137,8 +138,6 @@ function PrescriptionPaymentContent() {
   const [treatmentRequestId, setTreatmentRequestId] = useState<string>('')
   const [selectedProducts, setSelectedProducts] = useState<CartItem[]>([])
   const [totalPrice, setTotalPrice] = useState<number>(0)
-
-  const API_BASE = process.env.NEXT_PUBLIC_API_URL
 
   useEffect(() => {
     initializePayment()
