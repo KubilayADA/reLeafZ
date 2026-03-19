@@ -1,11 +1,9 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Product } from '@/lib/api'
+import { Product, API_BASE } from '@/lib/api'
 import { useRouter } from 'next/navigation'
 import { Check, Leaf, ArrowRight, ChevronDown, ChevronUp, Package, Loader2 } from 'lucide-react'
-
-const API_BASE = process.env.NEXT_PUBLIC_API_URL
 
 // =====================================================
 // CENTRALIZED STRAIN IMAGE LIBRARY
