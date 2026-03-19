@@ -1,5 +1,5 @@
 // lib/api.ts
-const API_BASE = process.env.NEXT_PUBLIC_API_URL;
+export const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? '';
 
 // Types
 export interface Product {
