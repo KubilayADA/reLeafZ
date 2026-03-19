@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef, useCallback, type FormEvent } from 'react'
 import Link from 'next/link'
+import { API_BASE } from '@/lib/api'
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/
 
@@ -128,7 +129,7 @@ export default function PartnersPage() {
     setFormState('submitting')
     try {
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/partners/inquiry`,
+        `${API_BASE}/api/partners/inquiry`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },

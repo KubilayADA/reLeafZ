@@ -21,9 +21,8 @@ import {
   type OrdersResponse, type OrderFilters, type OrderDetail, type InventoryResponse,
   type InventoryFilters, type AnalyticsResponse,
   STATUS_TRANSITIONS, STATUS_TRANSITION_LABELS,
+  API_BASE,
 } from '@/lib/api'
-
-const API_BASE = process.env.NEXT_PUBLIC_API_URL
 
 // ── design tokens ──
 const G = {
