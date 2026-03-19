@@ -6,6 +6,7 @@ import { loadStripe } from '@stripe/stripe-js'
 import { Elements, PaymentElement, useStripe, useElements } from '@stripe/react-stripe-js'
 import { Button } from '@/components/ui/button'
 import { Package, CreditCard, CheckCircle2, AlertCircle, FileText } from 'lucide-react'
+import { API_BASE } from '@/lib/api'
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!)
 
@@ -97,8 +98,6 @@ function ProductPaymentContent() {
   const [clientSecret, setClientSecret] = useState<string>('')
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
-
-  const API_BASE = process.env.NEXT_PUBLIC_API_URL
 
   useEffect(() => {
     if (treatmentRequestId) {

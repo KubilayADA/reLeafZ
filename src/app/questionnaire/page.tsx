@@ -6,6 +6,7 @@ import Step1 from '@/form/step1'
 import Step2 from '@/form/step2'
 import Step3 from '@/form/step3'
 import Step4 from '@/form/step4'
+import { API_BASE } from '@/lib/api'
 
 export default function QuestionnairePage() {
   const router = useRouter()
@@ -18,8 +19,6 @@ export default function QuestionnairePage() {
     onset: '',
     frequency: ''
   })
-
-  const API_BASE = process.env.NEXT_PUBLIC_API_URL
 
   // Step1: Consultation type
   const handleStep1Next = (consultationType: string) => {
