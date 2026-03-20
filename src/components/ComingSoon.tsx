@@ -112,8 +112,6 @@ const ComingSoon: React.FC = () => {
         fontFamily: '"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
         margin: 0,
         padding: 0,
-        width: '100vw',
-        minHeight: '100dvh',
       }}
     >
       {/* Futuristic glowing background elements */}
@@ -124,8 +122,6 @@ const ComingSoon: React.FC = () => {
           left: 0,
           right: 0,
           bottom: 0,
-          width: '100vw',
-          height: '100dvh',
           zIndex: 0,
         }}
       >
