@@ -267,6 +267,13 @@ export default function LandingPage() {
                   </DialogFooter>
                 </DialogContent>
               </Dialog>
+              <button
+                type="button"
+                onClick={() => router.push('/verify-prescription')}
+                className="inconsolata px-8 py-3 flex items-center justify-center min-w-64 w-auto box-border text-[14px] leading-[24px] font-[550] bg-transparent text-black border-[1.1px] border-black shadow-[0_4px_6px_-1px_rgba(0,0,0,0.1),0_2px_4px_-1px_rgba(0,0,0,0.06)] transition-all hover:shadow-[0_10px_15px_-3px_rgba(0,0,0,0.1),0_4px_6px_-2px_rgba(0,0,0,0.05)] hover:-translate-y-px active:translate-y-0 active:shadow-[0_2px_4px_-1px_rgba(0,0,0,0.1)] focus:outline-none focus-visible:ring-2 focus-visible:ring-black/25 focus-visible:ring-offset-2"
+              >
+                Ich habe ein Rezept
+              </button>
             </div>
 
             {/* --- Zip code entry & form conditional rendering --- */}
