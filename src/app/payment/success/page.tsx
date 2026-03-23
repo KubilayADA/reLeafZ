@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { CheckCircle2, Package, FileText, Clock } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { API_BASE } from '@/lib/api'
 
 function PaymentSuccessContent() {
   const router = useRouter()
@@ -13,8 +14,6 @@ function PaymentSuccessContent() {
   
   const [loading, setLoading] = useState(true)
   const [sessionError, setSessionError] = useState(false)
-
-  const API_BASE = process.env.NEXT_PUBLIC_API_URL
 
   const finalizeRequest = useCallback(async () => {
     try {

@@ -112,8 +112,6 @@ const ComingSoon: React.FC = () => {
         fontFamily: '"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
         margin: 0,
         padding: 0,
-        width: '100vw',
-        minHeight: '100dvh',
       }}
     >
       {/* Futuristic glowing background elements */}
@@ -124,8 +122,6 @@ const ComingSoon: React.FC = () => {
           left: 0,
           right: 0,
           bottom: 0,
-          width: '100vw',
-          height: '100dvh',
           zIndex: 0,
         }}
       >
@@ -219,7 +215,7 @@ const ComingSoon: React.FC = () => {
             textShadow: '0 0 30px rgba(255, 255, 255, 0.1)',
           }}
         >
-          AI-powered strain recommendations analyzes based on{' '}
+          Strain recommendations tailored based on {' '}
           <span style={{ color: '#22d3ee' }}>your medical needs</span>.
         </h1>
 
@@ -230,8 +226,8 @@ const ComingSoon: React.FC = () => {
             color: 'rgba(255, 255, 255, 0.8)',
           }}
         >
-          Be among the first to experience our personalized AI-powered strain recommendations. Waiting list goes live soon.{' '}
-          <strong style={{ color: '#22d3ee' }}>Coming Soon</strong>.
+          Be among the first to find the perfect strain matched to you.{' '} <br />
+          <strong style={{ color: '#22d3ee' }}>Waiting list is live !</strong>
         </p>
 
         {/* Email form / Success state */}
@@ -392,7 +388,7 @@ const ComingSoon: React.FC = () => {
               className="text-sm md:text-base font-semibold mb-2"
               style={{ color: '#ffffff' }}
             >
-              AI STRAIN MATCHING
+              STRAIN MATCHING
             </h3>
             <p 
               className="text-xs md:text-sm font-light"

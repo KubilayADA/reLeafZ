@@ -3,9 +3,7 @@
 import React, { useState } from 'react'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import {Eye, EyeOff, Lock, Mail, User, Clock, CheckCircle, XCircle, FileText, Phone, MapPin, AlertCircle, LogOut, Package } from 'lucide-react';
-
-
-const API_BASE = process.env.NEXT_PUBLIC_API_URL
+import { API_BASE } from '@/lib/api'
 
 interface SelectedProduct {
   productId: number
