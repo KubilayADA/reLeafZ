@@ -3,28 +3,21 @@
  * .words-wrapper must have height:auto so translateY percentages are relative
  * to the full stacked content (7 × --word-h), making each step exactly one word.
  */
-@keyframes wordSlider {
+ @keyframes wordSlider {
   0%   { transform: translateY(0%); }
-  12%  { transform: translateY(0%);         animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1); }
-
+  11%  { transform: translateY(0%);        animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1); }
   14%  { transform: translateY(-14.285%); }
-  26%  { transform: translateY(-14.285%);   animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1); }
-
+  25%  { transform: translateY(-14.285%);  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1); }
   28%  { transform: translateY(-28.571%); }
-  40%  { transform: translateY(-28.571%);   animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1); }
-
+  39%  { transform: translateY(-28.571%);  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1); }
   42%  { transform: translateY(-42.857%); }
-  54%  { transform: translateY(-42.857%);   animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1); }
-
+  53%  { transform: translateY(-42.857%);  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1); }
   56%  { transform: translateY(-57.142%); }
-  68%  { transform: translateY(-57.142%);   animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1); }
-
+  67%  { transform: translateY(-57.142%);  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1); }
   70%  { transform: translateY(-71.428%); }
-  82%  { transform: translateY(-71.428%);   animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1); }
-
+  81%  { transform: translateY(-71.428%);  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1); }
   84%  { transform: translateY(-85.714%); }
-  96%  { transform: translateY(-85.714%);   animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1); }
-
+  95%  { transform: translateY(-85.714%);  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1); }
   100% { transform: translateY(0%); }
 }
 

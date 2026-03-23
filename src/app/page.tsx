@@ -207,6 +207,12 @@ export default function LandingPage() {
         handlePostcodeSubmit={handlePostcodeSubmit}
         isValidBerlinPostcode={isValidBerlinPostcode}
         isVisible={showHeader}
+        onLogoClick={() => {
+          setInHeroView(true);
+          setShowHeader(false);
+          window.history.replaceState(null, '', '/');
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }}
       />
 
       {(inHeroView || isTransitioning) && (

@@ -71,12 +71,15 @@ export default function Hero({
         }}
       >
         <span className="hero-scroll-cta-text">Entdecke wie es funktioniert</span>
-        <img
-          src="/arrow-down.png"
-          alt=""
-          className="hero-scroll-cta-arrow w-15 h-15 object-contain drop-shadow-md animate-bounce"
-          aria-hidden
-        />
+        <div style={{ transform: 'rotate(-33deg)' }}>
+          <img
+            src="/arrow-down-uploaded.png"
+            alt=""
+            className="hero-scroll-cta-arrow gap-10 w-15 h-15 object-contain drop-shadow-md animate-bounce"
+            style={{ animationDuration: '6s', }}
+            aria-hidden
+          /> 
+        </div>
       </a>
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 overflow-visible">
@@ -118,6 +121,10 @@ export default function Hero({
               Berlin Pharmacies
             </div>
           </div>
+
+          {/* payy png */}
+
+          <img src="/payy.png" alt="payy" className="w-88 h-10 object-contain mx-auto mb-4 sm:mb-6 md:mb-10" />
 
           {/* CTA: button above, then text+arrow block below */}
           <div className="hero-cta-wrap">

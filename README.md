@@ -46,3 +46,5 @@ for marketplace dual side card user hover other side shows with strain relevabt 
 for mobile “i” then back of card shows with info
 
 listen option explaining the strains  
+
+for section how it works make and effect when user arrive on page the text get typed (first loading) typo effect 

@@ -25,6 +25,7 @@ interface HeaderProps {
   handlePostcodeSubmit: () => void
   isValidBerlinPostcode: (postcode: string) => boolean
   isVisible: boolean
+  onLogoClick?: () => void
 }
 
 export default function Header({ 
@@ -34,7 +35,8 @@ export default function Header({
   setZipInput, 
   handlePostcodeSubmit, 
   isValidBerlinPostcode,
-  isVisible
+  isVisible,
+  onLogoClick,
 }: HeaderProps) {
   const [mobileNavOpen, setMobileNavOpen] = useState(false)
 
@@ -71,6 +73,10 @@ export default function Header({
               type="button"
               className="flex items-center h-14 overflow-visible"
               onClick={() => {
+                if (onLogoClick) {
+                  onLogoClick();
+                  return;
+                }
                 if (typeof window === 'undefined') return;
                 (window as any)._releafzAllowHeroScroll = true;
                 const hero = document.querySelector('.hero-section') as HTMLElement | null;

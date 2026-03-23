@@ -4,6 +4,7 @@
    ============================================ */
 /* Match hero: max-w-7xl = 80rem, padding px-4 sm:px-6 lg:px-8 */
 .how-funktioniert {
+  scroll-margin-top: 88px;
   --how-bg: #fafafa;
   --how-card: #ffffff;
   --how-accent: #72906F;
@@ -14,6 +15,8 @@
   --how-border: #e5e5e5;
   --how-mono: 'Inconsolata', monospace;
   --how-sans: 'Geist Sans', sans-serif;
+  --how-marker: 'Inconsolata', monospace;
+  --how-hand:   'Inconsolata', monospace;
   --how-ease: cubic-bezier(0.4, 0, 0.2, 1);
   --how-radius-sm: 0.375rem;
   --how-radius-md: 0.5rem;
@@ -29,7 +32,22 @@
   -webkit-font-smoothing: antialiased;
 }
 
-.how-funktioniert .section {
+/* Push content below the 88px fixed header on all screen sizes */
+.how-funktioniert.section-container {
+  padding-top: calc(88px + 2rem);
+}
+@media (min-width: 640px) {
+  .how-funktioniert.section-container {
+    padding-top: calc(88px + 3rem);
+  }
+}
+@media (min-width: 1024px) {
+  .how-funktioniert.section-container {
+    padding-top: calc(88px + 4rem);
+  }
+}
+
+  .how-funktioniert .section {
     max-width: 80rem;
     margin: 0 auto;
     padding: 2.5rem 1rem 3.5rem;
@@ -71,7 +89,8 @@
     .how-funktioniert .how-left {
       gap: 1.75rem;
       position: sticky;
-      top: 1.5rem;
+      top: calc(88px + 1.5rem);
+      align-self: start;
     }
   }
 
@@ -98,7 +117,7 @@
   }
   .how-funktioniert .eyebrow {
     font-family: var(--how-mono);
-    font-size: 0.8125rem;
+    font-size: 0.9995rem;
     font-weight: 500;
     letter-spacing: 0.12em;
     text-transform: uppercase;
@@ -108,7 +127,7 @@
   .how-funktioniert .title {
     font-family: var(--how-mono);
     font-size: clamp(1.75rem, 4vw, 2.5rem);
-    font-weight: 600;
+    font-weight: 900;
     line-height: 1.25;
     letter-spacing: -0.02em;
     color: var(--how-text);
@@ -150,19 +169,19 @@
   .how-funktioniert .prog-step.active { opacity: 1; }
   .how-funktioniert .prog-step.done { opacity: 0.7; }
   .how-funktioniert .prog-dot {
-    width: 2.25rem;
-    height: 2.25rem;
+    width: 3rem;
+    height: 3rem;
     border-radius: 50%;
-    border: 1px solid var(--how-border);
+    border: 3px solid var(--how-border);
     background: var(--how-card);
     display: flex;
     align-items: center;
     justify-content: center;
     font-family: var(--how-mono);
-    font-size: 0.75rem;
-    font-weight: 600;
+    font-size: 0.9rem;
+    font-weight: 700;
     color: var(--how-muted-light);
-    transition: background 0.2s var(--how-ease), border-color 0.2s var(--how-ease), color 0.2s var(--how-ease);
+    transition: background 0.25s var(--how-ease), border-color 0.25s var(--how-ease), color 0.25s var(--how-ease), transform 0.25s var(--how-ease), box-shadow 0.25s var(--how-ease);
     position: relative;
     z-index: 1;
   }
@@ -170,42 +189,99 @@
     background: var(--how-accent-mid);
     border-color: var(--how-accent-mid);
     color: #fff;
+    transform: scale(1.25);
+    box-shadow: 0 0 0 5px rgba(114, 144, 111, 0.2);
   }
   .how-funktioniert .prog-step.done .prog-dot {
     background: var(--how-accent-mid);
     border-color: var(--how-accent-mid);
     color: #fff;
-    opacity: 0.5;
+    opacity: 0.6;
   }
   .how-funktioniert .prog-label {
     font-family: var(--how-mono);
-    font-size: 0.6875rem;
-    font-weight: 500;
-    letter-spacing: 0.04em;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
     text-transform: uppercase;
     color: var(--how-muted-light);
     text-align: center;
-    max-width: 4.5rem;
+    max-width: 5rem;
     line-height: 1.2;
   }
-  .how-funktioniert .prog-step.active .prog-label { color: var(--how-text); }
+  .how-funktioniert .prog-step.active .prog-label {
+    color: var(--how-text);
+    font-weight: 800;
+  }
   .how-funktioniert .prog-connector {
-    height: 1px;
+    height: 3px;
     flex: 1;
     background: var(--how-border);
+    border-radius: 999px;
     transition: background 0.3s var(--how-ease);
-    margin-bottom: 1.125rem;
+    margin-bottom: 1.5rem;
   }
-  .how-funktioniert .prog-connector.done { background: var(--how-accent-mid); opacity: 0.5; }
+  .how-funktioniert .prog-connector.done { background: var(--how-accent-mid); opacity: 0.6; }
 
-  /* —— Carousel —— */
+  /* —— Carousel: fax paper roll —— */
   .how-funktioniert .carousel-viewport {
     position: relative;
     overflow: hidden;
     min-height: 300px;
     max-width: 48rem;
     margin: 0 auto;
+    /* horizontal padding = sprocket strip width so cards sit between the strips */
+    padding: 0.5rem 2rem 0.5rem 2rem;
     -webkit-overflow-scrolling: touch;
+    /* continuous dot-paper background — same texture as the cards */
+    background-color: #fdfcfb;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%2372906F' opacity='0.22'%3E%3Ccircle cx='4' cy='4' r='0.8'/%3E%3Ccircle cx='12' cy='4' r='0.8'/%3E%3Ccircle cx='20' cy='4' r='0.8'/%3E%3Ccircle cx='4' cy='12' r='0.8'/%3E%3Ccircle cx='12' cy='12' r='0.8'/%3E%3Ccircle cx='20' cy='12' r='0.8'/%3E%3Ccircle cx='4' cy='20' r='0.8'/%3E%3Ccircle cx='12' cy='20' r='0.8'/%3E%3Ccircle cx='20' cy='20' r='0.8'/%3E%3C/g%3E%3C/svg%3E");
+    background-size: 24px 24px;
+    border-radius: 0.375rem; /* fax machine slot — barely any radius */
+    border: 4px solid #111827;
+  }
+
+  /* LEFT sprocket-hole strip */
+  .how-funktioniert .carousel-viewport::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 1.75rem;
+    background-color: #e8e3d8;
+    border-right: 2px solid rgba(17, 24, 39, 0.3);
+    /* repeating punch holes: white circle + dark ring edge */
+    background-image: radial-gradient(
+      circle 5px at 14px 14px,
+      #fdfcfb 55%, rgba(17,24,39,0.25) 55%, rgba(17,24,39,0.25) 65%, transparent 65%
+    );
+    background-size: 28px 28px;
+    background-repeat: repeat-y;
+    background-position: 0 8px;
+    z-index: 5;
+    pointer-events: none;
+  }
+
+  /* RIGHT sprocket-hole strip */
+  .how-funktioniert .carousel-viewport::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    width: 1.75rem;
+    background-color: #e8e3d8;
+    border-left: 2px solid rgba(17, 24, 39, 0.3);
+    background-image: radial-gradient(
+      circle 5px at 14px 14px,
+      #fdfcfb 55%, rgba(17,24,39,0.25) 55%, rgba(17,24,39,0.25) 65%, transparent 65%
+    );
+    background-size: 28px 28px;
+    background-repeat: repeat-y;
+    background-position: 0 8px;
+    z-index: 5;
+    pointer-events: none;
   }
   /* Mobile: horizontal scroll, one card per view — swipe/scroll to change step */
   @media (max-width: 1023px) {
@@ -224,7 +300,7 @@
     .how-funktioniert .carousel-hint-mobile { order: 2; display: block; }
     .how-funktioniert .carousel-viewport { order: 3; }
     .how-funktioniert .nav-row.nav-row-under-slides { order: 4; }
-    .how-funktioniert .carousel-step-label { order: 5; margin-top: 0; }
+    .how-funktioniert .carousel-step-label { display: none; }
     .how-funktioniert .carousel-progress { order: 6; }
     .how-funktioniert .progress-wrap { order: 7; }
     .how-funktioniert .summary-grid { order: 8; }
@@ -266,7 +342,7 @@
       min-width: 16.666%;
       scroll-snap-align: start;
       scroll-snap-stop: always;
-      padding: 0 var(--how-space-sm);
+      padding: 0.5rem 0 0.5rem 0;
       box-sizing: border-box;
     }
   }
@@ -285,24 +361,41 @@
       flex: 0 0 100%;
       width: 100%;
       min-width: 0;
-      padding: 0 var(--how-space-xs);
+      padding: 0.5rem 0 0.5rem 0;
       box-sizing: border-box;
     }
   }
 
+  /* ── Slide wrapper ── */
+  .how-funktioniert .carousel-slide {
+    position: relative;
+  }
+
+  /* ── Fax paper card: flat thermal paper, notes written in marker ── */
   .how-funktioniert .step-card {
     display: block;
-    background: var(--how-card); /* neutral card; grid carries green */
-    border: 1px solid var(--how-border);
-    border-radius: var(--how-radius-lg);
-    padding: var(--how-space-2xl) 2rem;
+    border-top: 2.5px dashed rgba(17, 24, 39, 0.38);
+    border-bottom: 2.5px dashed rgba(17, 24, 39, 0.38);
+    border-left: none;
+    border-right: none;
+    border-radius: 0;
+    padding: 2rem 2rem 1.75rem;
     max-width: 48rem;
     margin: 0 auto;
     position: relative;
-    min-height: 300px;
+    min-height: 320px;
     overflow: hidden;
+    background: transparent;
+    box-shadow: none;
+    filter: none;
   }
-  /* Dot pattern texture — subtle paper-like */
+
+  /* Uniform ink color across all cards — project accent green */
+  .how-funktioniert .step-card {
+    --step-color: #72906F;
+    --step-light: rgba(114, 144, 111, 0.12);
+  }
+  /* Dot pattern texture — visible paper-like grain */
   .how-funktioniert .step-card::before {
     content: '';
     position: absolute;
@@ -348,35 +441,43 @@
     gap: var(--how-space-md);
   }
   .how-funktioniert .card-icon-wrap {
-    width: 4rem;
-    height: 4rem;
-    border-radius: var(--how-radius-md);
-    background: var(--how-bg);
-    border: 1px solid var(--how-border);
+    width: 5.5rem;
+    height: 5.5rem;
+    border-radius: 0.875rem;
+    background: var(--step-light, rgba(61,122,56,0.1));
+    border: 3.5px solid var(--step-color, #3d7a38);
     display: flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
+    animation: icon-pop 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) both;
   }
   .how-funktioniert .card-icon-wrap .step-icon {
-    width: 1.75rem;
-    height: 1.75rem;
-    color: var(--how-accent-mid);
+    width: 2.75rem;
+    height: 2.75rem;
+    color: var(--step-color, #72906F);
+    stroke-width: 2;
   }
+
+  @keyframes icon-pop {
+    0%   { transform: scale(0.35); opacity: 0; }
+    65%  { transform: scale(1.1); opacity: 1; }
+    100% { transform: scale(1); }
+  }
+
   .how-funktioniert .card-hero .card-num {
     margin-bottom: 0;
   }
   .how-funktioniert .card-hero .card-title {
     margin-bottom: 0;
-    font-size: 1.375rem;
+    font-size: clamp(1.7rem, 3.5vw, 2.1rem);
   }
   .how-funktioniert .card-hero .card-desc {
     margin-bottom: 0;
-    font-size: 1.125rem;
-    color: var(--how-muted);
-    font-weight: 500;
+    font-size: 1.35rem;
+    font-weight: 600;
     line-height: 1.5;
-    max-width: 24rem;
+    max-width: 26rem;
   }
   
   /* Visual block: icon pills + flow diagram */
@@ -390,53 +491,71 @@
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    gap: var(--how-space-md);
+    gap: 1.25rem;
   }
   .how-funktioniert .detail-icon-item {
     display: flex;
     align-items: center;
-    gap: var(--how-space-xs);
-    padding: 0.5rem 0.75rem;
-    background: transparent;
-    border: none;
-    border-radius: var(--how-radius-sm);
-    font-family: var(--how-mono);
-    font-size: 0.8125rem;
-    font-weight: 500;
-    color: var(--how-muted);
+    gap: 0.5rem;
+    padding: 0.45rem 1.15rem;
+    background: var(--step-light, rgba(61,122,56,0.1));
+    border: 2.5px solid var(--step-color, #3d7a38);
+    border-radius: 0.3rem; /* slightly squarish — drawn with a marker */
+    font-family: var(--how-hand);
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--step-color, #3d7a38);
+    letter-spacing: 0.02em;
+    /* alternate slight rotations for that messy note look */
+    transition: transform 0.15s ease;
   }
+  .how-funktioniert .detail-icon-item:hover { transform: scale(1.04); }
   .how-funktioniert .detail-icon-item .detail-icon {
-    width: 1rem;
-    height: 1rem;
-    color: var(--how-accent-mid);
+    width: 1.2rem;
+    height: 1.2rem;
+    color: var(--step-color, #3d7a38);
     flex-shrink: 0;
+    stroke-width: 2.5;
   }
   .how-funktioniert .detail-icon-label {
     white-space: nowrap;
   }
 
   .how-funktioniert .card-num {
-    font-family: var(--how-mono);
-    font-size: 0.75rem;
-    font-weight: 500;
-    letter-spacing: 0.08em;
+    font-family: var(--how-hand);
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
     text-transform: uppercase;
-    color: var(--how-accent-mid);
-    margin-bottom: var(--how-space-xs);
+    color: var(--step-color, #3d7a38);
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.25rem;
+    box-shadow: none;
+    /* hand-drawn underline via border-bottom */
+    border-bottom: 2.5px solid var(--step-color, #3d7a38);
+    padding-bottom: 1px;
   }
   .how-funktioniert .card-title {
-    font-family: var(--how-mono);
-    font-size: 1.3rem;
-    font-weight: 600;
-    color: var(--how-text);
+    font-family: var(--how-marker);
+    font-size: clamp(1.7rem, 3.5vw, 2.1rem);
+    font-weight: 900;
+    color: #111827;
     margin-bottom: var(--how-space-sm);
-    line-height: 1.35;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
   }
   .how-funktioniert .card-desc {
-    font-size: 1.125rem;
-    color: var(--how-muted);
-    font-weight: 500;
-    line-height: 1.6;
+    font-family: var(--how-hand);
+    font-size: 1.35rem;
+    color: #374151;
+    font-weight: 700;
+    line-height: 1.55;
     margin-bottom: var(--how-space-lg);
   }
 
@@ -467,31 +586,49 @@
   }
 
   .how-funktioniert .status-pill {
-    font-family: var(--how-mono);
-    font-size: 0.75rem;
-    font-weight: 500;
-    letter-spacing: 0.04em;
+    font-family: var(--how-marker);
+    font-size: 1.05rem;
+    font-weight: 900;
+    letter-spacing: 0.08em;
     text-transform: uppercase;
-    color: var(--how-muted);
+    color: var(--step-color, #3d7a38);
+    background: var(--step-light, rgba(61,122,56,0.1));
+    border: 3px solid var(--step-color, #3d7a38);
+    border-radius: 0.375rem;
+    padding: 0.3rem 1.25rem;
+    display: inline-block;
+    animation: stamp-in 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) 0.25s both;
+  }
+
+  @keyframes stamp-in {
+    0%   { transform: scale(0.2); opacity: 0; }
+    60%  { transform: scale(1.18); opacity: 1; }
+    100% { transform: scale(1); }
   }
 
   .how-funktioniert .time-badge {
-    font-family: var(--how-mono);
-    font-size: 0.75rem;
-    font-weight: 500;
-    color: var(--how-muted-light);
-    margin-left: var(--how-space-xs);
+    font-family: var(--how-hand);
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--step-color, #3d7a38);
+    margin-left: 0.4rem;
+    background: var(--step-light, rgba(61,122,56,0.1));
+    border: 2px solid var(--step-color, #3d7a38);
+    border-radius: 999px;
+    padding: 0.1rem 0.65rem;
+    letter-spacing: 0.02em;
   }
 
   .how-funktioniert .mini-flow {
     display: flex;
     align-items: center;
-    gap: var(--how-space-sm);
-    background: var(--how-bg);
-    border-radius: var(--how-radius-md);
-    padding: var(--how-space-md) var(--how-space-lg);
+    gap: 0.5rem;
+    background: rgba(17, 24, 39, 0.04);
+    border: 2px dashed rgba(17, 24, 39, 0.22);
+    border-radius: 0.4rem; /* slightly square like a hand-drawn box */
+    padding: 0.6rem 1.25rem;
     width: 100%;
-    max-width: 24rem;
+    max-width: 26rem;
     justify-content: center;
     flex-wrap: wrap;
   }
@@ -499,21 +636,28 @@
     background: transparent;
     border: none;
     border-radius: 0;
-    padding: 0.2rem 0;
-    font-family: var(--how-mono);
-    font-size: 0.75rem;
-    font-weight: 500;
-    color: var(--how-muted-light);
+    padding: 0.15rem 0;
+    font-family: var(--how-hand);
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: rgba(17, 24, 39, 0.45);
     white-space: nowrap;
-    transition: color 0.2s var(--how-ease);
+    transition: all 0.2s var(--how-ease);
   }
   .how-funktioniert .mini-node.active-node {
-    color: var(--how-text);
+    font-family: var(--how-hand);
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--step-color, #3d7a38);
+    background: var(--step-light, rgba(61,122,56,0.1));
+    border: 2px solid var(--step-color, #3d7a38);
+    border-radius: 0.25rem;
+    padding: 0.1rem 0.55rem;
   }
   .how-funktioniert .mini-arrow-icon {
-    width: 0.75rem;
-    height: 0.75rem;
-    color: var(--how-border);
+    width: 1rem;
+    height: 1rem;
+    color: rgba(17, 24, 39, 0.3);
     flex-shrink: 0;
   }
   .how-funktioniert .mini-arrow {
@@ -547,16 +691,7 @@
     border-radius: 999px;
     transition: width 0.3s var(--how-ease);
   }
-  .how-funktioniert .carousel-step-label {
-    font-family: var(--how-mono);
-    font-size: 0.9rem;
-    color: var(--how-muted);
-    font-weight: 500;
-    text-align: center;
-    margin: var(--how-space-sm) auto 0;
-    max-width: 48rem;
-  }
-  .how-funktioniert .carousel-step-label strong { color: var(--how-accent-mid); }
+  .how-funktioniert .carousel-step-label { display: none; }
 
   .how-funktioniert .nav-row {
     display: flex;
@@ -566,22 +701,51 @@
     margin: 0;
     gap: var(--how-space-md);
   }
-  /* Nav directly under slides — little gap, green accent */
+  /* Nav directly under slides — clean, minimal floating row */
   .how-funktioniert .nav-row-under-slides {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 1rem auto 0;
+    padding: 0;
+    background: none;
+    border: none;
+    border-radius: 0;
+    width: 100%;
+    max-width: 48rem;
+    filter: none;
+    overflow: visible;
+  }
+  .how-funktioniert .how-right .nav-row-under-slides {
+    margin-top: 0.75rem;
+  }
+  /* Step label — small, clean, no border */
+  .how-funktioniert .nav-step-label {
+    font-family: var(--how-mono);
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--how-muted-light);
+    text-align: center;
+    padding: 0;
+    border-bottom: none;
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    letter-spacing: 0.02em;
+  }
+  .how-funktioniert .nav-step-label strong {
+    color: var(--how-accent-mid);
+    font-weight: 900;
+  }
+  /* Controls row — just the buttons + dots */
+  .how-funktioniert .nav-controls {
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: var(--how-space-sm);
-    margin: 0.5rem auto 0;
-    padding: var(--how-space-sm) var(--how-space-md);
-    background: rgba(114, 144, 111, 0.08);
-    border: 1px solid rgba(114, 144, 111, 0.35);
-    border-radius: 999px;
-    width: fit-content;
-    box-shadow: 0 1px 3px rgba(114, 144, 111, 0.12);
-  }
-  .how-funktioniert .how-right .nav-row-under-slides {
-    margin-top: -0.75rem;
+    padding: 0;
+    gap: 1rem;
   }
   .how-funktioniert .how-left .nav-row {
     margin-top: 0;
@@ -628,21 +792,33 @@
     height: 2.5rem;
     padding: 0;
     border-radius: 50%;
-    border-color: rgba(114, 144, 111, 0.4);
-    background: var(--how-card);
-    color: var(--how-accent-mid);
+    border: 2px solid rgba(17, 24, 39, 0.25);
+    background: transparent;
+    color: var(--how-text);
+    flex-shrink: 0;
+    transition: border-color 0.15s ease, background 0.15s ease, transform 0.15s ease;
   }
   .how-funktioniert .nav-row-under-slides .btn-nav .btn-nav-icon {
-    width: 1.25rem;
-    height: 1.25rem;
+    width: 1.2rem;
+    height: 1.2rem;
     pointer-events: none;
+    stroke-width: 2.5;
   }
   .how-funktioniert .nav-row-under-slides .btn-nav:hover:not(:disabled) {
-    background: rgba(114, 144, 111, 0.15);
-    border-color: var(--how-accent-mid);
+    border-color: #111827;
+    background: #111827;
+    color: #fff;
+    transform: scale(1.08);
   }
-  .how-funktioniert .nav-row-under-slides .step-counter .step-current {
-    color: var(--how-accent-mid);
+  .how-funktioniert .nav-row-under-slides .btn-nav.primary {
+    background: #111827;
+    border-color: #111827;
+    color: #fff;
+  }
+  .how-funktioniert .nav-row-under-slides .btn-nav.primary:hover:not(:disabled) {
+    background: var(--how-accent-mid);
+    border-color: var(--how-accent-mid);
+    opacity: 1;
   }
   .how-funktioniert .btn-nav:focus-visible {
     outline: 1px solid var(--how-text);
@@ -655,12 +831,12 @@
     opacity: 0.4;
     cursor: not-allowed;
   }
-  .how-funktioniert .btn-nav.primary {
+  .how-funktioniert .btn-nav.primary:not(.nav-row-under-slides .btn-nav) {
     background: var(--how-accent-mid);
     color: #fff;
     border-color: var(--how-accent-mid);
   }
-  .how-funktioniert .btn-nav.primary:hover:not(:disabled) {
+  .how-funktioniert .btn-nav.primary:not(.nav-row-under-slides .btn-nav):hover:not(:disabled) {
     opacity: 0.9;
   }
 
@@ -673,6 +849,34 @@
   .how-funktioniert .step-counter .step-current { color: var(--how-text); font-weight: 600; }
   .how-funktioniert .step-counter .step-sep { margin: 0 0.125rem; opacity: 0.7; }
   .how-funktioniert .step-counter .step-total { color: var(--how-muted-light); }
+
+  /* Step progress dots */
+  .how-funktioniert .step-dots {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    justify-content: center;
+    padding: 0;
+  }
+  .how-funktioniert .step-dot {
+    display: block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(17, 24, 39, 0.18);
+    cursor: pointer;
+    transition: width 0.25s var(--how-ease), background 0.25s var(--how-ease), border-radius 0.25s var(--how-ease);
+    flex-shrink: 0;
+  }
+  .how-funktioniert .step-dot.done {
+    background: rgba(17, 24, 39, 0.5);
+  }
+  .how-funktioniert .step-dot.active {
+    width: 2.25rem;
+    border-radius: 999px;
+    background: var(--how-accent-mid);
+  }
 
   /* Summary grid — in left column on desktop */
   .how-funktioniert .summary-grid {
@@ -688,25 +892,30 @@
     }
   }
   .how-funktioniert .summary-item {
-    background: var(--how-card);
-    border: 1px solid var(--how-border);
-    border-radius: var(--how-radius-md);
-    padding: var(--how-space-lg);
+    background: linear-gradient(145deg, #ffffff 0%, #f4f8f4 100%);
+    border: 3px solid var(--how-border);
+    border-radius: 1.25rem;
+    padding: var(--how-space-lg) var(--how-space-lg);
     cursor: pointer;
-    transition: border-color 0.2s var(--how-ease), background 0.2s var(--how-ease);
+    transition: border-color 0.2s var(--how-ease), background 0.2s var(--how-ease), transform 0.2s var(--how-ease), box-shadow 0.2s var(--how-ease);
     position: relative;
     overflow: hidden;
+    box-shadow: 0 2px 8px rgba(114, 144, 111, 0.08);
   }
   .how-funktioniert .summary-item:focus-visible {
-    outline: 1px solid var(--how-text);
+    outline: 2px solid var(--how-text);
     outline-offset: 2px;
   }
   .how-funktioniert .summary-item:hover {
-    border-color: var(--how-muted-light);
+    border-color: var(--how-accent-mid);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(114, 144, 111, 0.15);
   }
   .how-funktioniert .summary-item.current {
     border-color: var(--how-accent-mid);
-    background: rgba(114, 144, 111, 0.08);
+    border-width: 3px;
+    background: linear-gradient(145deg, #eaf2ea 0%, #dceadc 100%);
+    box-shadow: 0 4px 16px rgba(114, 144, 111, 0.2);
   }
   .how-funktioniert .summary-item::before {
     content: attr(data-num);
@@ -714,43 +923,46 @@
     top: var(--how-space-sm);
     right: var(--how-space-sm);
     font-family: var(--how-mono);
-    font-size: 0.6875rem;
-    font-weight: 500;
-    color: var(--how-muted-light);
-    letter-spacing: 0.04em;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--how-accent-mid);
+    letter-spacing: 0.06em;
+    opacity: 0.7;
   }
   .how-funktioniert .si-icon {
-    margin-bottom: var(--how-space-xs);
+    margin-bottom: var(--how-space-sm);
     display: block;
   }
   .how-funktioniert .si-icon .summary-step-icon {
-    width: 1.25rem;
-    height: 1.25rem;
+    width: 1.6rem;
+    height: 1.6rem;
     color: var(--how-accent-mid);
   }
   .how-funktioniert .si-title {
     font-family: var(--how-mono);
-    font-size: 0.75rem;
-    font-weight: 500;
+    font-size: 0.8125rem;
+    font-weight: 700;
     color: var(--how-text);
     line-height: 1.4;
+    letter-spacing: 0.01em;
   }
   .how-funktioniert .si-done {
     position: absolute;
     bottom: var(--how-space-sm);
     right: var(--how-space-sm);
-    width: 0.75rem;
-    height: 0.75rem;
+    width: 1.1rem;
+    height: 1.1rem;
     border-radius: 50%;
     background: var(--how-accent-mid);
     display: none;
     align-items: center;
     justify-content: center;
+    box-shadow: 0 2px 6px rgba(114, 144, 111, 0.35);
   }
   .how-funktioniert .si-done svg,
   .how-funktioniert .si-done .check-icon {
-    width: 0.45rem;
-    height: 0.45rem;
+    width: 0.6rem;
+    height: 0.6rem;
     color: #fff;
   }
   .how-funktioniert .summary-item.done-item .si-done { display: flex; }

@@ -105,8 +105,8 @@ body {
     -webkit-text-fill-color: transparent;
     color: #111827;
     font-size: 1.875rem;
-    font-weight: 900;
-    margin-bottom: 1.25rem;
+    font-weight: 950;
+    margin-bottom: 0.15rem;
     line-height: 1.25;
     font-style: italic;
 }
@@ -114,12 +114,16 @@ body {
 @media (min-width: 640px) {
     .title-gradient {
         font-size: 3rem;
+        font-weight: 1550;
+        margin-bottom: 0.5rem;
     }
 }
 
 @media (min-width: 768px) {
     .title-gradient {
         font-size: 4.5rem;
+        font-weight: 1550;
+        margin-bottom: 0.5rem;
     }
 }
 
@@ -264,11 +268,11 @@ button[disabled] {
 }
 
 .behandlung-button-hero {
-    font-family: "Inconsolata", monospace;
-    font-weight: 550;
+    font-family: "Inconsolata-900", monospace;
+    font-weight: 900;
     font-size: 14px;
     line-height: 24px;
-    color: white;
+    color: rgb(0, 0, 0);
     border: 2px solid transparent;
     background-clip: padding-box, border-box;
     background-origin: padding-box, border-box;
@@ -612,8 +616,8 @@ header .behandlung-button {
     }
 
     .trust-badges {
-        margin-bottom: 4rem;
-        gap: 1.25rem;
+        margin-bottom: 2rem;
+        gap: 2px;
     }
 }
 
@@ -705,7 +709,7 @@ header .behandlung-button {
 }
 
 h1 + .animated-words-container {
-    margin-top: clamp(-1.2rem, -2.5vw, -2rem);
+    margin-top: clamp(-0.5rem, -1vw, -0.75rem);
 }
 
 .words-wrapper {
