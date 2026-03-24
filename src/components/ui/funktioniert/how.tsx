@@ -9,6 +9,7 @@ interface Step {
   num: string;
   title: string;
   desc: string;
+  imageUrl: string;
 }
 
 const STEPS: Step[] = [
@@ -16,21 +17,25 @@ const STEPS: Step[] = [
     num: '01',
     title: 'Cannabis-Therapie starten.',
     desc: 'Fülle einfach unseren medizinischen Online-Fragebogen in 2 Minuten aus - unkompliziert von zuhause oder unterwegs. DSGVO-konform und geschützt.',
+    imageUrl: '/how/step-1.png',
   },
   {
     num: '02',
     title: 'Cannabis-Blüten auswählen.',
     desc: 'Entdecke unser vielfältiges Sortiment an ausgewählten medizinischen Cannabis Blüten - geprüfte Qualität ab 4,99 €',
+    imageUrl: '/how/step-2.png',
   },
   {
     num: '03',
     title: 'Cannabis-Rezept online erhalten.',
     desc: 'Ein approbierter Arzt oder Ärztin prüft digital deine Angaben und stellt dir bei Eignung ein Cannabis Rezept aus.',
+    imageUrl: '/how/step-1.png',
   },
   {
     num: '04',
     title: 'Deine Lieferung ist unterwegs.',
     desc: 'Dein medizinisches Cannabis wird aus einer Apotheke zu dir geliefert - per Cannabis Express Lieferung in 60 Minuten, per Cannabis Sofort Lieferung in 1-3 Tagen oder hole es einfach in der nächstgelegenen Apotheke ab.',
+    imageUrl: '/how/step-4.png',
   },
 ];
 
@@ -75,7 +80,6 @@ export default function How(): React.JSX.Element {
           <div className="header">
             <div className="eyebrow">So funktioniert&apos;s</div>
             <h2 className="title">Dein Rezept in 4 Schritten</h2>
-            <p className="subtitle">Online. Sicher. Bis zur Apotheke.</p>
           </div>
 
           <div className="progress-wrap">
@@ -108,6 +112,7 @@ export default function How(): React.JSX.Element {
               ref={el => { cardRefs.current[i] = el; }}
               className={`how-col-card ${i === current ? 'active' : ''}`}
             >
+              <img src={step.imageUrl} alt={step.title} className="how-col-image" />
               <span className="how-col-ghost-num" aria-hidden>{step.num}</span>
               <div className="how-col-body">
                 <span className="how-col-num">{step.num}</span>

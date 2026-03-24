@@ -43,12 +43,12 @@ export default function Header({
   return (
     <>
       <header
-        className={`fixed top-0 left-0 right-0 z-50 bg-[#E9E6DE]/50 backdrop-blur-md border-b border-black transition-transform duration-500 ease-out ${
+        className={`fixed top-0 left-0 right-0 z-50 bg-[#E9E6DE]/90 backdrop-blur-md border-b border-black transition-transform duration-500 ease-out ${
           isVisible ? 'translate-y-0 opacity-100' : '-translate-y-full opacity-0 pointer-events-none'
         }`}
       >
         {/* Moving information banner */}
-        <div className="bg-transparent text-black py-0.5 overflow-hidden border-b border-black">
+        {/* <div className="bg-transparent text-black py-0.5 overflow-hidden border-b border-black">
         <div className="moving-text">
           <span>Card payment accepted</span>
           <span>|</span>
@@ -63,7 +63,7 @@ export default function Header({
           <span>Medical Cannabis good shit</span>
           <span className="spacer px-100"></span>
         </div>
-      </div>
+      </div> */}
       
       <div className="header-row-wrap relative w-full h-22">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-14">
