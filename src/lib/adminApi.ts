@@ -89,7 +89,7 @@ export async function getAdminPatients(params?: {
   limit?: number
   search?: string
 }): Promise<{
-  patients: any[]
+  patients: unknown[]
   total: number
   page: number
   limit: number
@@ -100,7 +100,7 @@ export async function getAdminPatients(params?: {
   })
 }
 
-export async function getAdminPatient(id: number): Promise<any> {
+export async function getAdminPatient(id: number): Promise<unknown> {
   return fetchAdmin(`/api/admin/patients/${id}`)
 }
 
@@ -110,7 +110,7 @@ export async function getAdminDoctors(params?: {
   limit?: number
   search?: string
 }): Promise<{
-  doctors: any[]
+  doctors: unknown[]
   total: number
   page: number
   limit: number
@@ -121,11 +121,11 @@ export async function getAdminDoctors(params?: {
   })
 }
 
-export async function getAdminDoctor(id: number): Promise<any> {
+export async function getAdminDoctor(id: number): Promise<unknown> {
   return fetchAdmin(`/api/admin/doctors/${id}`)
 }
 
-export async function toggleDoctorActive(id: number, isActive: boolean): Promise<any> {
+export async function toggleDoctorActive(id: number, isActive: boolean): Promise<unknown> {
   return fetchAdmin(`/api/admin/doctors/${id}/active`, {
     method: 'PATCH',
     body: JSON.stringify({ isActive }),
@@ -138,7 +138,7 @@ export async function getAdminPharmacies(params?: {
   limit?: number
   search?: string
 }): Promise<{
-  pharmacies: any[]
+  pharmacies: unknown[]
   total: number
   page: number
   limit: number
@@ -149,7 +149,7 @@ export async function getAdminPharmacies(params?: {
   })
 }
 
-export async function getAdminPharmacy(id: number): Promise<any> {
+export async function getAdminPharmacy(id: number): Promise<unknown> {
   return fetchAdmin(`/api/admin/pharmacies/${id}`)
 }
 
@@ -162,7 +162,7 @@ export async function updatePharmacyDelivery(
     extendedDeliveryFee?: number
     maxDeliveryRadius?: number
   },
-): Promise<any> {
+): Promise<unknown> {
   return fetchAdmin(`/api/admin/pharmacies/${id}/delivery`, {
     method: 'PATCH',
     body: JSON.stringify(data),
@@ -176,7 +176,7 @@ export async function getAdminPrescriptions(params?: {
   search?: string
   status?: string
 }): Promise<{
-  prescriptions: any[]
+  prescriptions: unknown[]
   total: number
   page: number
   limit: number
@@ -187,11 +187,11 @@ export async function getAdminPrescriptions(params?: {
   })
 }
 
-export async function getAdminPrescription(id: number): Promise<any> {
+export async function getAdminPrescription(id: number): Promise<unknown> {
   return fetchAdmin(`/api/admin/prescriptions/${id}`)
 }
 
-export async function updatePrescriptionStatus(id: number, status: string): Promise<any> {
+export async function updatePrescriptionStatus(id: number, status: string): Promise<unknown> {
   return fetchAdmin(`/api/admin/prescriptions/${id}/status`, {
     method: 'PATCH',
     body: JSON.stringify({ status }),
@@ -203,7 +203,7 @@ export async function getAdminTeam(params?: {
   page?: number
   limit?: number
 }): Promise<{
-  members: any[]
+  members: unknown[]
   total: number
   page: number
   limit: number
@@ -218,7 +218,7 @@ export async function createAdminMember(data: {
   email: string
   name: string
   role: string
-}): Promise<any> {
+}): Promise<unknown> {
   return fetchAdmin('/api/admin/team', {
     method: 'POST',
     body: JSON.stringify(data),
@@ -232,28 +232,28 @@ export async function updateAdminMember(
     role?: string
     isActive?: boolean
   },
-): Promise<any> {
+): Promise<unknown> {
   return fetchAdmin(`/api/admin/team/${id}`, {
     method: 'PATCH',
     body: JSON.stringify(data),
   })
 }
 
-export async function deactivateAdminMember(id: number): Promise<any> {
+export async function deactivateAdminMember(id: number): Promise<unknown> {
   return fetchAdmin(`/api/admin/team/${id}`, {
     method: 'DELETE',
   })
 }
 
 // ANALYTICS
-export async function getAnalyticsOverview(): Promise<any> {
+export async function getAnalyticsOverview(): Promise<unknown> {
   return fetchAdmin('/api/admin/analytics/overview')
 }
 
-export async function getRequestsByStatus(): Promise<any> {
+export async function getRequestsByStatus(): Promise<unknown> {
   return fetchAdmin('/api/admin/analytics/requests-by-status')
 }
 
-export async function getRecentActivity(): Promise<any> {
+export async function getRecentActivity(): Promise<unknown> {
   return fetchAdmin('/api/admin/analytics/recent-activity')
 }
