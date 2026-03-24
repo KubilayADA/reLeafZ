@@ -13,6 +13,13 @@ export function middleware(req: NextRequest) {
     return NextResponse.next()
   }
 
+  // Force admin subdomain on production
+  if (isAdminRequest && !isAdminBySubdomain && hostname !== 'localhost') {
+    const adminUrl = req.nextUrl.clone()
+    adminUrl.host = 'admin.releafz.de'
+    return NextResponse.redirect(adminUrl)
+  }
+
   const adminToken = req.cookies.get('adminToken')?.value
   const isLoginPath = pathname === '/admin/login'
 
