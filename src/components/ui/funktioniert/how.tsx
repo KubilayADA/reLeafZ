@@ -78,8 +78,8 @@ export default function How(): React.JSX.Element {
         {/* ── Left: sticky progress panel ── */}
         <div className="how-left">
           <div className="how-header">
-            <div className="eyebrow">So funktioniert&apos;s</div>
-            <h2 className="title">Dein Rezept in 4 Schritten</h2>
+            <div className="eyebrow">Wie es funktioniert</div>
+            <h2 className="title">In 4 Schritten fertig</h2>
           </div>
 
           <div className="progress-wrap">
