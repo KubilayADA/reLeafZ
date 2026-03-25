@@ -5,14 +5,14 @@
 /* Match hero: max-w-7xl = 80rem, padding px-4 sm:px-6 lg:px-8 */
 .how-funktioniert {
   scroll-margin-top: 100px;
-  --how-bg: #141414;
+  --how-bg: #111111;
   --how-card: #ffffff;
   --how-accent: #72906F;
   --how-accent-mid: #72906F;
   --how-text: #ffffff;         /* darker body text */
   --how-muted: #ffffff;       /* darker muted text */
-  --how-muted-light: #4b5563; /* darker secondary text */
-  --how-border: #e5e5e5;
+  --how-muted-light: #cccccc; /* darker secondary text */
+  --how-border: #72906F;
   --how-mono: 'Inconsolata', monospace;
   --how-sans: 'Geist Sans', sans-serif;
   --how-marker: 'Inconsolata', monospace;
@@ -74,7 +74,6 @@
     display: flex;
     flex-direction: column;
     gap: 2rem;
-    background: var(--how-bg) !important;
   }
   @media (min-width: 1024px) {
     .how-funktioniert .how-layout {
@@ -111,12 +110,12 @@
     }
   }
 
-  .how-funktioniert .header {
+  .how-funktioniert .how-header {
     text-align: center;
     margin-bottom: 0;
   }
   @media (min-width: 1024px) {
-    .how-funktioniert .header {
+    .how-funktioniert .how-header {
       text-align: left;
     }
   }
@@ -127,7 +126,7 @@
     letter-spacing: 0.12em;
     text-transform: uppercase;
     color: var(--how-accent-mid);
-    margin-bottom: var(--how-space-sm);
+    margin-bottom: var(--how-space-m);
   }
   .how-funktioniert .title {
     font-family: var(--how-mono);
@@ -136,14 +135,14 @@
     line-height: 1.25;
     letter-spacing: -0.02em;
     color: var(--how-text);
-    margin-bottom: var(--how-space-sm);
+    margin-bottom: var(--how-space-lg);
   }
 
   .how-funktioniert .progress-wrap {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 0;
+    gap: var(--how-space-md);
     margin: 0;
     max-width: 42rem;
   }
@@ -175,8 +174,8 @@
     align-items: center;
     justify-content: center;
     font-family: var(--how-mono);
-    font-size: 0.9rem;
-    font-weight: 700;
+    font-size: 1rem;
+    font-weight: 900;
     color: var(--how-muted-light);
     transition: background 0.25s var(--how-ease), border-color 0.25s var(--how-ease), color 0.25s var(--how-ease), transform 0.25s var(--how-ease), box-shadow 0.25s var(--how-ease);
     position: relative;
@@ -209,6 +208,7 @@
   .how-funktioniert .prog-step.active .prog-label {
     color: var(--how-text);
     font-weight: 800;
+    font-size: 1rem;
   }
   .how-funktioniert .prog-connector {
     height: 3px;
@@ -282,8 +282,8 @@
     font-family: var(--how-mono);
     font-size: 5rem;
     font-weight: 900;
-    color: var(--how-accent-mid);
-    opacity: 0.07;
+    color: white;
+    opacity: 0.35;
     line-height: 1;
     pointer-events: none;
     user-select: none;
@@ -295,7 +295,7 @@
     font-weight: 700;
     letter-spacing: 0.06em;
     text-transform: uppercase;
-    color: var(--how-accent-mid);
+    color: white;
     border-bottom: 2px solid var(--how-accent-mid);
     padding-bottom: 1px;
     display: inline-block;

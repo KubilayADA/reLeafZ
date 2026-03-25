@@ -160,12 +160,12 @@ export default function LandingPage() {
   // --- End zip code state and form state ---
   
   useEffect(() => {
-    if (window.location.hash === '#home') {
+    if (window.location.hash === '#ablauf') {
       setInHeroView(false);
     }
 
     const handlePopState = () => {
-      setInHeroView(window.location.hash !== '#home');
+      setInHeroView(window.location.hash !== '#ablauf');
       window.scrollTo({ top: 0 });
     };
 
@@ -226,7 +226,7 @@ export default function LandingPage() {
           onEnterMain={() => {
             document.body.style.overflow = 'hidden';
             setIsTransitioning(true);
-            window.history.pushState({}, '', '/#home');
+            window.history.pushState({}, '', '/#ablauf');
             window.requestAnimationFrame(() => {
               window.scrollTo({ top: 0 });
             });

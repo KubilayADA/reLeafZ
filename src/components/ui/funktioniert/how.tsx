@@ -77,7 +77,7 @@ export default function How(): React.JSX.Element {
 
         {/* ── Left: sticky progress panel ── */}
         <div className="how-left">
-          <div className="header">
+          <div className="how-header">
             <div className="eyebrow">So funktioniert&apos;s</div>
             <h2 className="title">Dein Rezept in 4 Schritten</h2>
           </div>
@@ -115,7 +115,7 @@ export default function How(): React.JSX.Element {
               <img src={step.imageUrl} alt={step.title} className="how-col-image" />
               <span className="how-col-ghost-num" aria-hidden>{step.num}</span>
               <div className="how-col-body">
-                <span className="how-col-num">{step.num}</span>
+                <span className="how-col-num"></span>
                 <h3 className="how-col-title">{step.title}</h3>
                 <p className="how-col-desc">{step.desc}</p>
               </div>
