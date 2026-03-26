@@ -2,6 +2,7 @@
 import React, { useState, useRef, useEffect, Fragment } from 'react';
 import '@/app/main.css';
 import './how.css';
+import './how-mobile.css';
 
 const TOTAL = 4;
 
@@ -44,22 +45,44 @@ const PROG_LABELS: string[] = ['Fragebogen', 'Sortiment', 'Rezept', 'Lieferung']
 
 export default function How(): React.JSX.Element {
   const [current, setCurrent] = useState<number>(0);
+  const [dotTops, setDotTops] = useState<number[]>([]);
   const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const sectionRef = useRef<HTMLElement>(null);
+  const wrapRef = useRef<HTMLDivElement>(null);
+
+  // Measure each card's offsetTop within the wrap so dots align with card tops
+  useEffect(() => {
+    const measureDots = () => {
+      const wrap = wrapRef.current;
+      if (!wrap) return;
+      const tops = cardRefs.current.map(card => card ? card.offsetTop : 0);
+      setDotTops(tops);
+    };
+    measureDots();
+    window.addEventListener('resize', measureDots);
+    return () => window.removeEventListener('resize', measureDots);
+  }, []);
 
   useEffect(() => {
-    const observers: IntersectionObserver[] = [];
-    cardRefs.current.forEach((el, i) => {
-      if (!el) return;
-      const obs = new IntersectionObserver(
-        ([entry]) => {
-          if (entry.isIntersecting) setCurrent(i);
-        },
-        { threshold: 0.4, rootMargin: '-10% 0px -40% 0px' }
-      );
-      obs.observe(el);
-      observers.push(obs);
-    });
-    return () => observers.forEach(obs => obs.disconnect());
+    const section = sectionRef.current;
+    if (!section) return;
+
+    const handleScroll = () => {
+      const rect = section.getBoundingClientRect();
+      const total = rect.height - window.innerHeight;
+      if (total <= 0) return;
+      const progress = Math.min(1, Math.max(0, -rect.top / total));
+      section.style.setProperty('--progress', String(progress));
+      setCurrent(Math.min(TOTAL - 1, Math.floor(progress * TOTAL)));
+      for (let i = 0; i < TOTAL - 1; i++) {
+        const p = Math.min(1, Math.max(0, (progress - i / TOTAL) * TOTAL));
+        section.style.setProperty(`--conn-${i}`, String(p));
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    handleScroll();
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   const scrollToCard = (idx: number): void => {
@@ -69,6 +92,7 @@ export default function How(): React.JSX.Element {
 
   return (
     <section
+      ref={sectionRef}
       id="ablauf"
       className="how-funktioniert section-container section how-column"
       aria-label="So funktioniert der Ablauf"
@@ -78,8 +102,10 @@ export default function How(): React.JSX.Element {
         {/* ── Left: sticky progress panel ── */}
         <div className="how-left">
           <div className="how-header">
-            <div className="eyebrow">Wie es funktioniert</div>
-            <h2 className="title">In 4 Schritten fertig</h2>
+            <div className="text-2xl sm:text-3xl md:text-4xl font-bold title-gradient mb-4 italic">Wie es funktioniert</div>
+            <h2 className="title">
+              In <span className="title-num">4</span> Schritten fertig
+            </h2>
           </div>
 
           <div className="progress-wrap">
@@ -96,33 +122,17 @@ export default function How(): React.JSX.Element {
                   <div className="prog-label">{PROG_LABELS[i]}</div>
                 </div>
                 {i < TOTAL - 1 && (
-                  <div className={`prog-connector ${i < current ? 'done' : ''}`} />
+                  <div
+                    className="prog-connector"
+                    style={{ '--conn-fill': `var(--conn-${i}, 0)` } as React.CSSProperties}
+                  />
                 )}
               </Fragment>
             ))}
           </div>
 
-        </div>
-
-        {/* ── Right: static column of photo cards ── */}
-        <div className="how-right">
-          {STEPS.map((step, i) => (
-            <div
-              key={`card-${i}`}
-              ref={el => { cardRefs.current[i] = el; }}
-              className={`how-col-card ${i === current ? 'active' : ''}`}
-            >
-              <img src={step.imageUrl} alt={step.title} className="how-col-image" />
-              <span className="how-col-ghost-num" aria-hidden>{step.num}</span>
-              <div className="how-col-body">
-                <span className="how-col-num"></span>
-                <h3 className="how-col-title">{step.title}</h3>
-                <p className="how-col-desc">{step.desc}</p>
-              </div>
-            </div>
-          ))}
-
-          <div className="cta-block">
+          {/* Desktop-only CTA — inside sticky left panel */}
+          <div className="cta-block cta-block--desktop">
             <p className="cta-note">Kostenlos starten.</p>
             <a href="#" className="btn-cta">Jetzt Rezept beantragen →</a>
             <div className="trust">
@@ -131,6 +141,53 @@ export default function How(): React.JSX.Element {
               <div className="trust-item"><span className="trust-dot" />Diskrete Verpackung</div>
               <div className="trust-item"><span className="trust-dot" />CanG 2024</div>
             </div>
+          </div>
+
+        </div>
+
+        {/* ── Right: cards with scroll-driven timeline line ── */}
+        <div className="how-right">
+          <div className="how-cards-wrap" ref={wrapRef}>
+            {/* Single continuous timeline line */}
+            <div className="timeline-track" aria-hidden>
+              <div className="timeline-fill" />
+              {STEPS.map((_, i) => (
+                <div
+                  key={i}
+                  className={`timeline-dot${i <= current ? ' lit' : ''}`}
+                  style={dotTops[i] !== undefined ? { top: `${dotTops[i]}px` } : { display: 'none' }}
+                />
+              ))}
+            </div>
+
+            {STEPS.map((step, i) => (
+              <div
+                key={`card-${i}`}
+                ref={el => { cardRefs.current[i] = el; }}
+                className={`how-col-card ${i === current ? 'active' : ''}`}
+              >
+                <img src={step.imageUrl} alt={step.title} className="how-col-image" />
+                <span className="how-col-ghost-num" aria-hidden>{step.num}</span>
+                <div className="how-col-body">
+                  <span className="how-col-num"></span>
+                  <h3 className="how-col-title">{step.title}</h3>
+                  <p className="how-col-desc">{step.desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+
+        </div>
+
+        {/* Mobile-only CTA — at the very bottom of the section */}
+        <div className="cta-block cta-block--mobile">
+          <p className="cta-note">Kostenlos starten.</p>
+          <a href="#" className="btn-cta">Jetzt Rezept beantragen →</a>
+          <div className="trust">
+            <div className="trust-item"><span className="trust-dot" />Lizenzierte Ärzte</div>
+            <div className="trust-item"><span className="trust-dot" />DSGVO-konform</div>
+            <div className="trust-item"><span className="trust-dot" />Diskrete Verpackung</div>
+            <div className="trust-item"><span className="trust-dot" />CanG 2024</div>
           </div>
         </div>
 

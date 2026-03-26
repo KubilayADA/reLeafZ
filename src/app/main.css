@@ -73,6 +73,19 @@
     font-variation-settings: "wdth" 108;
 }
 
+.helvetica-neue-regular {
+    font-family: "Helvetica Neue", sans-serif;
+    font-weight: 800;
+    font-optical-sizing: auto;
+    font-style: normal;
+}
+
+.helvetica-neue-medium {
+    font-family: "Helvetica Neue", sans-serif;
+    font-weight: 400;
+    font-optical-sizing: auto;
+    font-style: normal;
+}
 /* setting background color */
 
 body {
@@ -96,14 +109,28 @@ body {
     background: linear-gradient(to left, #fbfdfb, #ffffff);
 }
 
-/* Text Color Classes for Mashallah Form */
+/* Text Color Classes for Mashallah Form and hero section */
+
+.title-gradient-hero {
+    background: linear-gradient(to bottom, rgba(255,255,255,0.95), rgba(300,300,300,0.55));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    -webkit-text-stroke: -10px #000000;
+    color: transparent;
+    font-size: 1.875rem;
+    font-weight: 950;
+    margin-bottom: 0.15rem;
+    line-height: 1.5;
+    font-style: bold italic;
+}
 
 .title-gradient {
     background: linear-gradient(to right, #111827, #000000);
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
-    color: #111827;
+    color: transparent;
     font-size: 1.875rem;
     font-weight: 950;
     margin-bottom: 0.15rem;
@@ -115,7 +142,9 @@ body {
     .title-gradient {
         font-size: 3rem;
         font-weight: 1550;
-        margin-bottom: 0.5rem;
+        margin-bottom: 1rem;
+        position: relative;
+        left: 0.5rem;
     }
 }
 
@@ -123,7 +152,17 @@ body {
     .title-gradient {
         font-size: 4.5rem;
         font-weight: 1550;
-        margin-bottom: 0.5rem;
+        margin-bottom: 1rem;
+        position: relative;
+        left: 0.5rem;
+    }
+}
+
+@media (min-width: 640px) {
+    .title-gradient-hero {
+        font-size: clamp(3rem, 6vw, 4.5rem);
+        font-weight: 950;
+        margin-bottom: 1rem;
     }
 }
 
@@ -135,8 +174,8 @@ body {
     gap: 2rem;
     font-size: 0.975rem;
     font-weight: 700;
-    color: #111827;
-    margin-bottom: 10rem;
+    color: white;
+    margin-bottom: -1rem;
 }
 
 .trust-badge-item {
@@ -170,10 +209,10 @@ body {
 }
 
 .subtitle-text-hero {
-    color: #111827;
+    color: white;
     font-size: 0.975rem;
-    font-family: 'Inconsolata-900', monospace;
-    margin-bottom: 0.25rem;
+    font-family: 'Helvetica Neue', sans-serif;
+    margin-bottom: 1rem;
     max-width: 56rem;
     margin-left: auto;
     margin-right: auto;
@@ -256,7 +295,7 @@ button[disabled] {
     line-height: 24px;
     background-color: #72906F;
     color: white;
-    border: 2px solid #ffffff;
+    border: 2px solid #000000;
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
     transition: all 0.3s ease;
 }
@@ -268,11 +307,13 @@ button[disabled] {
 }
 
 .behandlung-button-hero {
-    font-family: "Inconsolata-900", monospace;
+    font-family: "Inconsolata";
     font-weight: 900;
-    font-size: 14px;
+    font-size: 15px;
+    font-style: bold;
     line-height: 24px;
-    color: rgb(0, 0, 0);
+    margin-top: 15rem;
+    color: rgba(255, 255, 255, 0.95);
     border: 2px solid transparent;
     background-clip: padding-box, border-box;
     background-origin: padding-box, border-box;
@@ -496,7 +537,7 @@ header .behandlung-button {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 0rem;
+    gap: 2rem;
     margin-bottom: 3rem;
     width: 100%;
     overflow: visible;
@@ -508,6 +549,7 @@ header .behandlung-button {
     right: -5rem;
     top: -3rem;
     overflow: visible;
+    margin-top: 15rem;
 }
 
 /* Arrow block — absolutely positioned, right side of hero, below text */
@@ -516,6 +558,7 @@ header .behandlung-button {
     right: 22.5rem;
     top: -3rem;
     overflow: visible;
+    margin-top: 15rem;
 }
 
 /* Button independent, stays centered */
@@ -561,11 +604,36 @@ header .behandlung-button {
 }
 
 .hero-scroll-cta:hover {
-    opacity: 0.9;
+    opacity: 1;
+}
+
+.hero-scroll-cta:hover .hero-scroll-cta-icon {
+    transform: translateY(3px);
+    box-shadow: 0 0 0 6px rgba(255,255,255,0.15);
+}
+
+.hero-scroll-cta-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: 50%;
+    border: 1.5px solid rgba(255,255,255,0.55);
+    background: rgba(255,255,255,0.08);
+    color: rgba(255,255,255,0.95);
+    backdrop-filter: blur(4px);
+    transition: transform 200ms ease, box-shadow 200ms ease;
+    animation: hero-cta-pulse 2.5s ease-in-out infinite;
+}
+
+@keyframes hero-cta-pulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(255,255,255,0.25); }
+    50%       { box-shadow: 0 0 0 8px rgba(255,255,255,0); }
 }
 
 .hero-scroll-cta-text {
-    font-family: var(--font-inconsolata), "Inconsolata", monospace;
+    font-family: "Helvetica Neue", sans-serif;
     font-size: 0.995rem;
     font-weight: 900;
     text-align: center;

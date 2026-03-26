@@ -71,21 +71,27 @@ export default function Hero({
         }}
       >
         <span className="hero-scroll-cta-text">Entdecke wie es funktioniert</span>
-        <div style={{ transform: 'rotate(-33deg)' }}>
-          <img
-            src="/arrow-down-uploaded.png"
-            alt=""
-            className="hero-scroll-cta-arrow gap-10 w-15 h-15 object-contain drop-shadow-md animate-bounce"
-            style={{ animationDuration: '6s', }}
-            aria-hidden
-          /> 
+        <div className="hero-scroll-cta-icon" aria-hidden>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="40"
+            height="40"
+            viewBox="0 0 24 24"
+            fill="transparent"
+            stroke="currentColor"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <polyline points="6 9 12 15 18 9" />
+          </svg>
         </div>
       </a>
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 overflow-visible">
         <div className="text-center overflow-visible">
           {/* Main heading */}
-          <h1 className="title-gradient">
+          <h1 className="title-gradient-hero">
             MEDIZINAL CANNABIS
           </h1>
           <div className="animated-words-container">
@@ -93,7 +99,7 @@ export default function Hero({
               {words.map((word, index) => (
                 <div
                   key={index}
-                  className="word-item text-3xl sm:text-5xl md:text-7xl font-bold title-gradient leading-tight italic"
+                  className="word-item text-3xl sm:text-5xl md:text-7xl font-bold title-gradient-hero leading-tight italic"
                 >
                   {word}
                 </div>
@@ -101,13 +107,13 @@ export default function Hero({
             </div>
           </div>
 
-          <div className="subtitle-text-hero">
+          {/* <div className="subtitle-text-hero">
             Lieferung in 30-90 Minuten in Berlin<br />
             Ganz Deutschland in 1-2 Tagen<br /><br />
-          </div>
+          </div> */}
 
           {/* Trust badges */}
-          <div className="trust-badges">
+          {/* <div className="trust-badges">
             <div className="trust-badge-item">
               <Shield className="w-5 h-5 text-black-700 mr-2" />
               GDPR Compliant
@@ -120,11 +126,11 @@ export default function Hero({
               <MapPin className="w-5 h-5 text-black-700 mr-2" />
               Berlin Pharmacies
             </div>
-          </div>
+          </div> */}
 
           {/* payy png */}
 
-          <img src="/payy.png" alt="payy" className="w-88 h-10 object-contain mx-auto mb-4 sm:mb-6 md:mb-10" />
+          {/* <img src="/payy.png" alt="payy" className="w-88 h-10 object-contain mx-auto mb-4 sm:mb-6 md:mb-10" /> */}
 
           {/* CTA: button above, then text+arrow block below */}
           <div className="hero-cta-wrap">
@@ -172,6 +178,28 @@ export default function Hero({
                 </DialogContent>
               </Dialog>
             </div>
+
+            {/* Trust badges */}
+          <div className="trust-badges">
+            <div className="trust-badge-item">
+              <Shield className="w-5 h-5 text-black-700 mr-2" />
+              GDPR Compliant
+            </div>
+            <div className="trust-badge-item">
+              <Clock className="w-5 h-5 text-black-700 mr-2" />
+              Licensed Doctors
+            </div>
+            <div className="trust-badge-item">
+              <MapPin className="w-5 h-5 text-black-700 mr-2" />
+              Berlin Pharmacies
+            </div>
+          </div>
+
+          <div className="subtitle-text-hero">
+            Lieferung in 30-90 Minuten in Berlin<br />
+            Ganz Deutschland in 1-2 Tagen<br /><br />
+          </div>
+
             <div className="hero-cta-text-block">
               <span className="hero-cta-text">Weißt du schon was du willst? Worauf wartest du noch ;)</span>
             </div>

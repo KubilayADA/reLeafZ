@@ -1,0 +1,214 @@
+'use client'
+
+import React, { useState } from 'react'
+import { Button } from '@/components/ui/button'
+import { Menu, X } from 'lucide-react'
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
+import './header.css'
+
+// logo
+const LeafLogo = ({ className = 'logo-header' }) => (
+  <div className={`logo-header ${className}`}>
+    <img
+      src="/logo1.png"
+      alt="reLeafZ Logo"
+      className="w-full h-full object-contain"
+    />
+  </div>
+)
+
+interface HeaderProps {
+  dialogOpen: boolean
+  setDialogOpen: (open: boolean) => void
+  zipInput: string
+  setZipInput: (input: string) => void
+  handlePostcodeSubmit: () => void
+  isValidBerlinPostcode: (postcode: string) => boolean
+  isVisible: boolean
+  onLogoClick?: () => void
+}
+
+export default function Header({ 
+  dialogOpen, 
+  setDialogOpen, 
+  zipInput, 
+  setZipInput, 
+  handlePostcodeSubmit, 
+  isValidBerlinPostcode,
+  isVisible,
+  onLogoClick,
+}: HeaderProps) {
+  const [mobileNavOpen, setMobileNavOpen] = useState(false)
+
+  return (
+    <>
+      <header
+        className={`max-md:hidden fixed top-0 left-0 right-0 z-50 bg-[#E9E6DE]/90 backdrop-blur-md border-b border-black transition-transform duration-500 ease-out ${
+          isVisible ? 'translate-y-0 opacity-100' : '-translate-y-full opacity-0 pointer-events-none'
+        }`}
+      >
+        {/* Moving information banner */}
+        {/* <div className="bg-transparent text-black py-0.5 overflow-hidden border-b border-black">
+        <div className="moving-text">
+          <span>Card payment accepted</span>
+          <span>|</span>
+          <span>Delivery within 90 min</span>
+          <span>|</span>
+          <span>Medical Cannabis good shit</span>
+          <span className="spacer px-100"></span>
+          <span>Card payment accepted</span>
+          <span>|</span>
+          <span>Delivery within 90 min</span>
+          <span>|</span>
+          <span>Medical Cannabis good shit</span>
+          <span className="spacer px-100"></span>
+        </div>
+      </div> */}
+      
+      <div className="header-row-wrap relative w-full h-22">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-14">
+          <div className="flex justify-between items-center h-14">
+            {/* Logo geniş, navbar sabit yükseklikte */}
+            <button
+              type="button"
+              className="flex items-center h-14 overflow-visible"
+              onClick={() => {
+                if (onLogoClick) {
+                  onLogoClick();
+                  return;
+                }
+                if (typeof window === 'undefined') return;
+                (window as any)._releafzAllowHeroScroll = true;
+                const hero = document.querySelector('.hero-section') as HTMLElement | null;
+                if (hero) {
+                  hero.scrollIntoView({ behavior: 'smooth' });
+                } else {
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }
+                setTimeout(() => {
+                  (window as any)._releafzAllowHeroScroll = false;
+                }, 1200);
+              }}
+              aria-label="Zurück zum Seitenanfang"
+            >
+              <LeafLogo className="w-45 h-52 transform translate-y-0" />
+            </button>
+            
+            {/* Desktop Nav */}
+            <nav className="header-desktop-nav hidden md:flex absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 space-x-10 helvetica-neue-medium font-normal ">
+              <a href="#ablauf" className="header-nav-link text-mg md:text-xl leading-relaxed">Ablauf</a>
+              <a href="#partner-apotheken" className="header-nav-link text-mg md:text-xl leading-relaxed">Apotheke in Ihrer Nähe</a>
+              <a href="#vorteile" className="header-nav-link text-lg md:text-xl leading-relaxed">Vorteile</a>
+              <a href="#chat" className="header-nav-link text-lg md:text-xl leading-relaxed">Chat with us!</a>
+            </nav>
+            
+            {/* Desktop Button - Hidden on mobile, only in hamburger menu wish i believe is better let me know if you see this UwUwuu*/}
+            <div className="hidden lg:block">
+              <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+              <DialogTrigger asChild>
+                  <Button
+                    className="behandlung-button px-4 py-2 flex items-center justify-center -translate-y-4"
+                  >
+                  BEHANDLUNG ANFRAGEN
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-md">
+                <DialogHeader>
+                  <DialogTitle className="inconsolata text-xl font-bold">Postleitzahl eingeben</DialogTitle>
+                  <DialogDescription className="inconsolata text-gray-600">
+                    Bitte geben Sie Ihre Postleitzahl ein, um zu prüfen, ob wir in Ihrer Region liefern können.
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="py-4">
+                  <input
+                    type="text"
+                    name="zip"
+                    placeholder="z.B. 10115"
+                    value={zipInput}
+                    onChange={(e) => setZipInput(e.target.value)}
+                    className="w-full p-3 border border-gray-300 rounded-lg inconsolata text-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"
+                    maxLength={5}
+                  />
+                </div>
+                <DialogFooter>
+                  <Button
+                    onClick={handlePostcodeSubmit}
+                    disabled={!zipInput.trim() || !isValidBerlinPostcode(zipInput)}
+                    className="w-full btn-primary font-medium py-3"
+                  >
+                    Weiter
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+            </div>
+            {/* Hamburger for mobile and tablet */}
+            <button
+              className="lg:hidden ml-4 p-2 rounded focus:outline-none"
+              onClick={() => setMobileNavOpen(!mobileNavOpen)}
+              aria-label="Open menu"
+            >
+              {mobileNavOpen ? <X className="w-7 h-7" /> : <Menu className="w-7 h-7" />}
+            </button>
+          </div>
+        </div>
+      </div>
+        
+        {/* Mobile Nav Drawer */}
+        {mobileNavOpen && (
+          <div className="lg:hidden absolute top-full left-0 w-full bg-white shadow-lg border-t border-emerald-200 z-50">
+            <nav className="flex flex-col items-center py-6 space-y-6">
+              <a href="#ablauf" className="text-xl text-black-800 inconsolata" onClick={() => setMobileNavOpen(false)}>Ablauf</a>
+              <a href="#partner-apotheken" className="text-xl text-black-800 inconsolata" onClick={() => setMobileNavOpen(false)}>Apotheke in Ihrer Nähe</a>
+              <a href="#vorteile" className="text-xl text-black-800 inconsolata" onClick={() => setMobileNavOpen(false)}>Vorteile</a>
+              <a href="#chat" className="text-xl text-black-800 inconsolata" onClick={() => setMobileNavOpen(false)}>Chat with us!</a>
+              <div className="w-full px-4">
+                <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+                  <DialogTrigger asChild>
+                    <Button 
+                      className="behandlung-button2 w-full px-6 py-3 flex items-center justify-center"
+                    >
+                      BEHANDLUNG ANFRAGEN
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="sm:max-w-md">
+                    <DialogHeader>
+                      <DialogTitle className="inconsolata text-xl font-bold">Postleitzahl eingeben</DialogTitle>
+                      <DialogDescription className="inconsolata text-gray-600">
+                        Bitte geben Sie Ihre Postleitzahl ein, um zu prüfen, ob wir in Ihrer Region liefern können.
+                      </DialogDescription>
+                    </DialogHeader>
+                    <div className="py-4">
+                      <input
+                        type="text"
+                        name="zip"
+                        placeholder="z.B. 10115"
+                        value={zipInput}
+                        onChange={(e) => setZipInput(e.target.value)}
+                        className="w-full p-3 border border-gray-300 rounded-lg inconsolata text-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"
+                        maxLength={5}
+                      />
+                    </div>
+                    <DialogFooter>
+                      <Button
+                        onClick={handlePostcodeSubmit}
+                        disabled={!zipInput.trim() || !isValidBerlinPostcode(zipInput)}
+                        className={`w-full inconsolata text-white font-medium py-3 ${
+                          !zipInput.trim() || !isValidBerlinPostcode(zipInput) 
+                            ? 'opacity-50 cursor-not-allowed bg-gray-400' 
+                            : 'animated-button'
+                        }`}
+                      >
+                        Weiter
+                      </Button>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
+              </div>
+            </nav>
+          </div>
+        )}
+    </header>
+    </>
+  )
+}

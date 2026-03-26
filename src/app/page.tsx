@@ -7,7 +7,8 @@ import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import MashallahForm from '@/form/mashallah'
 import words from '@/constants/index'
-import Header from './header'
+import Header from './header/header'
+import MobileNavbar from './header/mobile-navbar'
 import Hero from './hero'
 import CookieBanner from '@/components/ui/cookie'
 import '@/components/ui/Hero/Words-Sliding-Smooth.css' 
@@ -174,19 +175,17 @@ export default function LandingPage() {
   }, []);
 
   useEffect(() => {
-    const handleScroll = () => {
-      const hero = document.querySelector('.hero-section') as HTMLElement | null;
-      if (!hero) {
-        setShowHeader(true);
-        return;
+    const checkHeaderVisibility = () => {
+      const hero = document.querySelector('.hero-section') as HTMLElement | null
+      if (hero) {
+        setShowHeader(hero.getBoundingClientRect().bottom <= 0)
+      } else {
+        setShowHeader(true)
       }
-      const rect = hero.getBoundingClientRect();
-      setShowHeader(rect.bottom <= 0);
-    };
-
-    handleScroll();
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    }
+    checkHeaderVisibility()
+    window.addEventListener('scroll', checkHeaderVisibility, { passive: true })
+    return () => window.removeEventListener('scroll', checkHeaderVisibility)
   }, []);
 
   // Show form if valid Berlin postcode was entered
@@ -214,6 +213,14 @@ export default function LandingPage() {
           window.scrollTo({ top: 0, behavior: 'smooth' });
         }}
       />
+      <MobileNavbar
+        dialogOpen={dialogOpen}
+        setDialogOpen={setDialogOpen}
+        zipInput={zipInput}
+        setZipInput={setZipInput}
+        handlePostcodeSubmit={handlePostcodeSubmit}
+        isValidBerlinPostcode={isValidBerlinPostcode}
+      />
 
       {(inHeroView || isTransitioning) && (
         <Hero
@@ -234,6 +241,8 @@ export default function LandingPage() {
               setInHeroView(false);
               setIsTransitioning(false);
               document.body.style.overflow = '';
+              setShowHeader(true);
+              window.dispatchEvent(new Event('scroll'));
             }, 750);
           }}
         />

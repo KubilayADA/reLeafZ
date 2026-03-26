@@ -1,0 +1,247 @@
+/* ============================================
+   HOW IT WORKS — Responsive overrides
+   Extracted from how.css + enhanced.
+   Breakpoints:
+     xs  < 440px
+     sm  440px – 639px
+     md  640px – 1023px  (tablet)
+     lg  ≥ 1024px        (desktop)
+   ============================================ */
+
+/* ═══════════════════════════════════
+   DESKTOP  ≥ 1024px
+   ═══════════════════════════════════ */
+
+@media (min-width: 1024px) {
+  .how-funktioniert.section-container {
+    padding-top: calc(88px + 4rem);
+  }
+
+  .how-funktioniert .section {
+    padding: 4rem 2rem 5rem;
+  }
+
+  .how-funktioniert .how-layout {
+    display: grid;
+    grid-template-columns: 1fr 1.25fr;
+    gap: 2.5rem;
+    align-items: start;
+  }
+
+  .how-funktioniert .how-left {
+    gap: 1.75rem;
+    position: sticky;
+    top: calc(88px + 1.5rem);
+    align-self: start;
+  }
+
+  .how-funktioniert .how-right {
+    gap: var(--how-space-xl);
+  }
+
+  .how-funktioniert .how-header {
+    text-align: left;
+  }
+
+  .how-funktioniert .progress-wrap {
+    max-width: 100%;
+  }
+
+  .how-funktioniert .cta-block {
+    padding-top: var(--how-space-xl);
+  }
+
+  /* Desktop: show inline CTA, hide the mobile-only one */
+  .how-funktioniert .cta-block--desktop { display: block; }
+  .how-funktioniert .cta-block--mobile  { display: none; }
+}
+
+/* ═══════════════════════════════════
+   TABLET  640px – 1023px
+   ═══════════════════════════════════ */
+
+@media (min-width: 640px) and (max-width: 1023px) {
+  .how-funktioniert.section-container {
+    padding-top: calc(88px + 3rem);
+  }
+
+  .how-funktioniert .section {
+    padding: 3rem 1.5rem 4rem;
+  }
+
+  /* Side-by-side layout but with smaller image */
+  .how-funktioniert .how-col-card {
+    flex-direction: row;
+    align-items: flex-start;
+    gap: var(--how-space-md);
+  }
+
+  .how-funktioniert .how-col-image {
+    width: 200px;
+    height: 200px;
+  }
+
+  /* Scale down progress dots slightly */
+  .how-funktioniert .prog-dot {
+    width: 2.5rem;
+    height: 2.5rem;
+    font-size: 0.9rem;
+  }
+
+  .how-funktioniert .eyebrow {
+    font-size: 1.5rem;
+  }
+
+  /* Tighter ghost numbers */
+  .how-funktioniert .how-col-ghost-num {
+    font-size: 4rem;
+  }
+}
+
+/* ═══════════════════════════════════
+   MOBILE  < 640px
+   ═══════════════════════════════════ */
+
+@media (max-width: 639px) {
+  .how-funktioniert.section-container {
+    padding-top: calc(72px + 2rem);
+  }
+
+  .how-funktioniert .section {
+    padding: 1.5rem var(--how-space-md) 2.5rem;
+  }
+
+  /* Stack layout — single column */
+  .how-funktioniert .how-layout {
+    gap: 1.5rem;
+  }
+
+  /* Mobile: hide the in-panel CTA, show the bottom one */
+  .how-funktioniert .cta-block--desktop { display: none; }
+  .how-funktioniert .cta-block--mobile  { display: block; }
+
+  /* Step tracker already visible next to photo — hide the top progress bar */
+  .how-funktioniert .progress-wrap {
+    display: none;
+  }
+
+  /* Compact header */
+  .how-funktioniert .eyebrow {
+    font-size: 1.25rem;
+    letter-spacing: 0.08em;
+  }
+
+  .how-funktioniert .title {
+    font-size: clamp(1.4rem, 5.5vw, 1.75rem);
+    margin-bottom: var(--how-space-md);
+  }
+
+  /* Cards stack vertically */
+  .how-funktioniert .how-col-card {
+    flex-direction: column;
+    gap: var(--how-space-sm);
+    padding: var(--how-space-sm) 0 var(--how-space-sm) var(--how-space-sm);
+  }
+
+  /* Full-width image — scales with viewport, capped so it doesn't dominate */
+  .how-funktioniert .how-col-image {
+    width: 100%;
+    height: clamp(240px, 65vw, 300px);
+    border-radius: var(--how-radius-md);
+  }
+
+  /* Smaller ghost number so it doesn't overflow */
+  .how-funktioniert .how-col-ghost-num {
+    font-size: 3.5rem;
+  }
+
+  /* Tighter timeline track margin */
+  .how-funktioniert .how-cards-wrap {
+    padding-left: 1rem;
+  }
+
+  /* Compact progress dots */
+  .how-funktioniert .prog-dot {
+    width: 2.25rem;
+    height: 2.25rem;
+    font-size: 0.875rem;
+  }
+
+  .how-funktioniert .prog-step.active .prog-dot {
+    transform: scale(1.15);
+  }
+
+  .how-funktioniert .prog-label {
+    font-size: 0.65rem;
+    max-width: 4rem;
+  }
+
+  .how-funktioniert .prog-step.active .prog-label {
+    font-size: 0.75rem;
+  }
+
+  /* Slightly smaller connector margin */
+  .how-funktioniert .prog-connector {
+    margin-bottom: 1rem;
+  }
+
+  /* CTA full-width button on mobile */
+  .how-funktioniert .btn-cta {
+    display: block;
+    text-align: center;
+    padding: 0.75rem 1rem;
+  }
+
+  /* Trust badges — two per row */
+  .how-funktioniert .trust {
+    gap: var(--how-space-sm);
+  }
+}
+
+/* ═══════════════════════════════════
+   EXTRA SMALL  < 440px
+   ═══════════════════════════════════ */
+
+@media (max-width: 439px) {
+  .how-funktioniert .section {
+    padding: 1.25rem var(--how-space-sm) 2rem;
+  }
+
+  /* Hide labels — not enough room */
+  .how-funktioniert .prog-label {
+    display: none;
+  }
+
+  /* Smallest dots */
+  .how-funktioniert .prog-dot {
+    width: 2rem;
+    height: 2rem;
+    font-size: 0.75rem;
+    border-width: 2px;
+  }
+
+  .how-funktioniert .progress-wrap {
+    gap: var(--how-space-xs);
+  }
+
+  /* Slightly tighter on the smallest screens */
+  .how-funktioniert .how-col-image {
+    height: clamp(200px, 60vw, 240px);
+  }
+
+  .how-funktioniert .how-cards-wrap {
+    padding-left: 0.75rem;
+  }
+
+  .how-funktioniert .how-col-ghost-num {
+    font-size: 2.75rem;
+  }
+
+  .how-funktioniert .eyebrow {
+    font-size: 1rem;
+  }
+
+  .how-funktioniert .cta-note {
+    font-size: 0.875rem;
+  }
+}
