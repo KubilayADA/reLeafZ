@@ -138,6 +138,13 @@ body {
     font-style: italic;
 }
 
+.logo-hero {
+    margin-top: -4rem;
+    width: 190px;
+    height: 190px;
+    object-fit: contain;
+}
+
 @media (min-width: 640px) {
     .title-gradient {
         font-size: 3rem;

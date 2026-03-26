@@ -10,7 +10,7 @@ import './header.css'
 const LeafLogo = ({ className = 'logo-header' }) => (
   <div className={`logo-header ${className}`}>
     <img
-      src="/logo1.png"
+      src="/logo2.png"
       alt="reLeafZ Logo"
       className="w-full h-full object-contain"
     />
@@ -43,7 +43,7 @@ export default function Header({
   return (
     <>
       <header
-        className={`max-md:hidden fixed top-0 left-0 right-0 z-50 bg-[#E9E6DE]/90 backdrop-blur-md border-b border-black transition-transform duration-500 ease-out ${
+        className={`header ${
           isVisible ? 'translate-y-0 opacity-100' : '-translate-y-full opacity-0 pointer-events-none'
         }`}
       >
@@ -68,7 +68,7 @@ export default function Header({
       <div className="header-row-wrap relative w-full h-22">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-14">
           <div className="flex justify-between items-center h-14">
-            {/* Logo geniş, navbar sabit yükseklikte */}
+            {/* Logo geniş, navbar sabit yükseklikte - your turkish is not friendly to me*/}
             <button
               type="button"
               className="flex items-center h-14 overflow-visible"

@@ -1,4 +1,4 @@
-/* Moving text banner styles */
+/* Moving text banner styles not in useeee*/
 .moving-text {
   display: flex;
   align-items: center;
@@ -61,8 +61,16 @@
 }
 
 .header {
-  background-color: #fbfdfb;
-  z-index: 100;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  z-index: 50;
+  background: linear-gradient(180deg, rgba(220, 222, 224, 0.90) 0%, rgba(185, 189, 193, 0.80) 50%, rgba(210, 213, 216, 0.85) 100%);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid #b8d8be;
+  transition: transform 0.5s ease-out, opacity 0.5s ease-out;
 }
 
 .logo-header {

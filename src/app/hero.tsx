@@ -55,9 +55,9 @@ export default function Hero({
         }}
       >
         <img
-          src="/logo1.png"
+          src="/logo2.png"
           alt="reLeafZ Logo"
-          className="h-10 w-auto object-contain opacity-90"
+          className="logo-hero"
         />
       </a>
 
