@@ -14,7 +14,7 @@
     display: block;
     position: fixed;
     top: max(12px, env(safe-area-inset-top));
-    left: max(12px, env(safe-area-inset-left));
+    right: max(12px, env(safe-area-inset-right));
     z-index: 9999;
 
     /* Full potential width — max-width does the collapsing/expanding */
@@ -23,9 +23,12 @@
     max-height: 44px;
     overflow: hidden;
 
-    background: #1d2b1e;
+    background: #fbfdfb;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(150px);
+    border: 1px solid #000000;
+    opacity: 0.5;
     border-radius: 12px;
-    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.35);
 
     /* Hidden while hero section is on screen */
     opacity: 0;
@@ -108,7 +111,7 @@
   /* Small square icon (rz mark) */
   .mnav__logo-icon {
     position: absolute;
-    left: 3px;
+    right: 3px;
     width: 26px;
     height: 26px;
     object-fit: contain;
@@ -124,11 +127,11 @@
   /* Full wordmark logo */
   .mnav__logo-full {
     position: absolute;
-    left: 0;
+    right: 0;
     width: 106px;
     height: 28px;
     object-fit: contain;
-    object-position: left center;
+    object-position: right center;
     opacity: 0;
     /* slight delay so the button width expands first */
     transition: opacity 0.28s ease 0.14s;
@@ -169,8 +172,8 @@
     font-family: "Inconsolata", monospace;
     font-variation-settings: "wdth" 108;
     font-size: 0.85rem;
-    font-weight: 500;
-    color: rgba(255, 255, 255, 0.6);
+    font-weight: 900;
+    color: black;
     text-decoration: none;
     background: none;
     display: flex;
@@ -179,7 +182,7 @@
     padding: 10px 4px;
     border-bottom: 1px solid rgba(255, 255, 255, 0.07);
     -webkit-tap-highlight-color: transparent;
-    transition: color 0.15s ease, background 0.15s ease, padding-left 0.15s ease;
+    transition: color 0.15s ease, background 0.15s ease, padding-right 0.15s ease;
   }
 
   .mnav__link:first-child {
@@ -197,7 +200,7 @@
   .mnav__link:hover,
   .mnav__link:active {
     color: rgba(255, 255, 255, 0.95);
-    padding-left: 8px;
+    padding-right: 8px;
   }
 
   .mnav__link:hover::after,
@@ -216,12 +219,12 @@
     width: 100%;
     display: block;
     padding: 10px 16px;
-    background: #3d6b4a;
+    background: #72906F;
     color: #fff;
     font-family: "Inconsolata", monospace;
     font-variation-settings: "wdth" 108;
-    font-weight: 700;
-    font-size: 0.72rem;
+    font-weight: 900;
+    font-size: 1.1rem;
     letter-spacing: 0.06em;
     text-align: center;
     border: none;
@@ -232,7 +235,7 @@
   }
 
   .mnav__cta:hover {
-    background: #4a7c59;
+    background: #72906F;
   }
 
   .mnav__cta:active {

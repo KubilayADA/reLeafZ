@@ -1,6 +1,8 @@
 'use client'
 
 import React, { useState, useEffect, useRef } from 'react'
+import { Menu } from 'lucide-react'
+
 import {
   Dialog,
   DialogContent,
@@ -119,13 +121,12 @@ export default function MobileNavbar({
           aria-expanded={isOpen}
         >
           <div className="mnav__logo-wrap">
-            <img
-              src="/icon.png"
-              alt=""
+            <Menu
+              size={24}
               className={`mnav__logo-icon${isOpen ? ' mnav__logo-icon--hidden' : ''}`}
             />
             <img
-              src="/logo1.png"
+              src="/logo2.png"
               alt="reLeafZ"
               className={`mnav__logo-full${isOpen ? ' mnav__logo-full--visible' : ''}`}
             />
