@@ -95,7 +95,7 @@ export default function Header({
             </button>
             
             {/* Desktop Nav */}
-            <nav className="header-desktop-nav hidden md:flex absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 space-x-10 helvetica-neue-medium font-normal ">
+            <nav className="header-desktop-nav header-text space-x-10 ">
               <a href="#ablauf" className="header-nav-link text-mg md:text-xl leading-relaxed">Ablauf</a>
               <a href="#partner-apotheken" className="header-nav-link text-mg md:text-xl leading-relaxed">Apotheke in Ihrer Nähe</a>
               <a href="#vorteile" className="header-nav-link text-lg md:text-xl leading-relaxed">Vorteile</a>
@@ -107,7 +107,7 @@ export default function Header({
               <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
               <DialogTrigger asChild>
                   <Button
-                    className="behandlung-button px-4 py-2 flex items-center justify-center -translate-y-4"
+                    className="header-button"
                   >
                   BEHANDLUNG ANFRAGEN
                 </Button>

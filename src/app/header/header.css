@@ -62,21 +62,52 @@
 
 .header {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  width: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: fit-content;
+  min-width: 1500px;
+  max-width: 90vw;
+  border-radius: 8px;
+  margin-top: 12px;
+  background: transparent;
+  border-top: 2.5px solid 	#333;    /* Lighter shade for the top */
+  border-left: 2.5px solid 	#333;   /* Lighter shade for the left */
+  border-right: 4px solid #333;  /* Darker shade for the right */
+  border-bottom: 4px solid 	#333;
+  /* background: linear-gradient(90deg, rgba(213, 213, 213, 0.8) 0%, rgba(220, 223, 225, 0.8) 50%, rgba(255, 255, 255, 0.967) 100%); */
+  backdrop-filter: blur(150px);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
+  transition: all 0.3s ease;
   z-index: 50;
-  background: linear-gradient(180deg, rgba(220, 222, 224, 0.90) 0%, rgba(185, 189, 193, 0.80) 50%, rgba(210, 213, 216, 0.85) 100%);
-  backdrop-filter: blur(10px);
-  border-bottom: 1px solid #b8d8be;
-  transition: transform 0.5s ease-out, opacity 0.5s ease-out;
 }
 
 .logo-header {
   position: absolute;
-  top: -60px;
+  top: -65px;
   left: 50px;
+}
+
+.header-text {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  font-family: "Inconsolata", monospace;
+  font-weight: 900;
+  font-size: 0.5rem;
+  letter-spacing: 0.1em;
+  gap: 1rem;
+  font-style: bold;
+  
+}
+
+.header-button {
+  position: absolute;
+  top: 28.5px;
+  right: 25px;
+  background: #72906F;
+  border: 1px solid #333;
+  scale: 1.1;
 }
 
 /* Desktop nav link — hover underline (line draws underneath) */
@@ -91,7 +122,8 @@
   left: 0;
   bottom: -2px;
   width: 0;
-  height: 1px;
+  height: 2px;
+  border-radius: 10px;
   background: currentColor;
   transition: width 0.25s ease;
 }
