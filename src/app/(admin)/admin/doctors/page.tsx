@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { DM_Sans } from 'next/font/google'
-import { getAdminDoctors } from '@/lib/adminApi'
+import { getAdminDoctors, createDoctor } from '@/lib/adminApi'
 
 const dmSans = DM_Sans({
   subsets: ['latin'],
@@ -31,6 +31,10 @@ export default function AdminDoctorsPage() {
   const [page, setPage] = useState(1)
   const [limit] = useState(10)
   const [totalPages, setTotalPages] = useState(1)
+  const [showAddForm, setShowAddForm] = useState(false)
+  const [adding, setAdding] = useState(false)
+  const [addError, setAddError] = useState('')
+  const [addForm, setAddForm] = useState({ name: '', email: '', licenseNumber: '', specialty: '' })
 
   useEffect(() => {
     let mounted = true
@@ -58,6 +62,28 @@ export default function AdminDoctorsPage() {
     }
   }, [page, limit, search])
 
+  async function handleAddDoctor(e: React.FormEvent) {
+    e.preventDefault()
+    setAdding(true)
+    setAddError('')
+    try {
+      await createDoctor({
+        name: addForm.name,
+        email: addForm.email,
+        licenseNumber: addForm.licenseNumber || undefined,
+        specialty: addForm.specialty || undefined,
+      })
+      setShowAddForm(false)
+      setAddForm({ name: '', email: '', licenseNumber: '', specialty: '' })
+      setPage(1)
+      setSearch('')
+    } catch (err) {
+      setAddError(err instanceof Error ? err.message : 'Failed to add doctor.')
+    } finally {
+      setAdding(false)
+    }
+  }
+
   return (
     <div className={`${dmSans.className} text-black`}>
       <div className="mb-6 md:mb-8 flex flex-col md:flex-row md:items-end md:justify-between gap-4">
@@ -65,17 +91,94 @@ export default function AdminDoctorsPage() {
           <h1 className="text-2xl md:text-3xl font-bold tracking-tight">Doctors</h1>
           <p className="mt-1 text-sm text-gray-500">Licensed medical doctors</p>
         </div>
-        <input
-          type="text"
-          value={search}
-          onChange={(e) => {
-            setPage(1)
-            setSearch(e.target.value)
-          }}
-          placeholder="Search doctors..."
-          className="w-full md:w-80 rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm text-black outline-none transition focus:border-green-600 focus:ring-2 focus:ring-green-200"
-        />
+        <div className="flex gap-3 items-center">
+          <input
+            type="text"
+            value={search}
+            onChange={(e) => {
+              setPage(1)
+              setSearch(e.target.value)
+            }}
+            placeholder="Search doctors..."
+            className="w-full md:w-64 rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm text-black outline-none transition focus:border-green-600 focus:ring-2 focus:ring-green-200"
+          />
+          <button
+            type="button"
+            onClick={() => setShowAddForm(true)}
+            className="rounded-lg bg-green-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-green-700 whitespace-nowrap"
+          >
+            + Add Doctor
+          </button>
+        </div>
       </div>
+
+      {showAddForm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+          <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl">
+            <h2 className="text-lg font-bold mb-4">Add New Doctor</h2>
+            {addError && <p className="mb-4 text-sm text-red-600">{addError}</p>}
+            <form onSubmit={handleAddDoctor} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Name *</label>
+                <input
+                  type="text"
+                  required
+                  value={addForm.name}
+                  onChange={(e) => setAddForm((f) => ({ ...f, name: e.target.value }))}
+                  className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none focus:border-green-600 focus:ring-2 focus:ring-green-200"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Email *</label>
+                <input
+                  type="email"
+                  required
+                  value={addForm.email}
+                  onChange={(e) => setAddForm((f) => ({ ...f, email: e.target.value }))}
+                  className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none focus:border-green-600 focus:ring-2 focus:ring-green-200"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">License Number</label>
+                <input
+                  type="text"
+                  value={addForm.licenseNumber}
+                  onChange={(e) => setAddForm((f) => ({ ...f, licenseNumber: e.target.value }))}
+                  className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none focus:border-green-600 focus:ring-2 focus:ring-green-200"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Specialty</label>
+                <input
+                  type="text"
+                  value={addForm.specialty}
+                  onChange={(e) => setAddForm((f) => ({ ...f, specialty: e.target.value }))}
+                  className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none focus:border-green-600 focus:ring-2 focus:ring-green-200"
+                />
+              </div>
+              <div className="flex gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowAddForm(false)
+                    setAddError('')
+                  }}
+                  className="flex-1 rounded-lg border border-gray-300 px-4 py-2 text-sm hover:bg-gray-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={adding}
+                  className="flex-1 rounded-lg bg-green-600 px-4 py-2 text-sm font-medium text-white hover:bg-green-700 disabled:opacity-50"
+                >
+                  {adding ? 'Adding...' : 'Add Doctor'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
       {error && (
         <div className="mb-6 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">

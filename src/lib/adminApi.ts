@@ -132,6 +132,18 @@ export async function toggleDoctorActive(id: number, isActive: boolean): Promise
   })
 }
 
+export async function createDoctor(data: {
+  name: string
+  email: string
+  licenseNumber?: string
+  specialty?: string
+}): Promise<unknown> {
+  return fetchAdmin('/api/admin/doctors', {
+    method: 'POST',
+    body: JSON.stringify(data),
+  })
+}
+
 // PHARMACIES
 export async function getAdminPharmacies(params?: {
   page?: number
