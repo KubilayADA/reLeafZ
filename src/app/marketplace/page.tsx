@@ -192,6 +192,8 @@ export default function MarketplacePage() {
         return
       }
 
+      // bottom to be deleted 
+      
       const treatmentData = localStorage.getItem('treatmentRequest')
       if (!treatmentData) {
         setError('Keine Behandlungsanfrage gefunden. Bitte füllen Sie zuerst das Formular aus.')
