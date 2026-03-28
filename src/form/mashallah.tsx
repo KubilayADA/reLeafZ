@@ -177,6 +177,15 @@ export default function MashallahForm({ postcode, onBack }: MashallahFormProps) 
     setLoading(true)
     setSubmitError('')
 
+    // 🔒 SECURITY: Bypass authentication for development mode MOST DELETE
+
+    if (process.env.NEXT_PUBLIC_DEV_BYPASS === 'true') {
+      localStorage.setItem('treatmentRequest', JSON.stringify({ id: 9999, city: formData.city, postcode }))
+      localStorage.setItem('formPostcode', postcode)
+      router.push('/questionnaire')
+      return
+    }
+
     try {
       // Step 1: Submit treatment request first (validates form, creates request). Only then auth/OTP.
       const treatmentResult = await submitTreatmentRequest()
@@ -251,10 +260,10 @@ export default function MashallahForm({ postcode, onBack }: MashallahFormProps) 
                 </div>
               </div>
               <div className="flex-1">
-                <h3 className="text-base sm:text-lg font-bold title-gradient mb-1 inconsolata">
+                <h3 className="text-base sm:text-lg font-bold title-gradient mb-1 helvetica">
                   Willkommen zurück!
                 </h3>
-                <p className="text-sm sm:text-base subtitle-text inconsolata">
+                <p className="text-sm sm:text-base subtitle-text helvetica">
                   Sie werden automatisch angemeldet.
                 </p>
               </div>
@@ -270,7 +279,7 @@ export default function MashallahForm({ postcode, onBack }: MashallahFormProps) 
         </div>
       )}
 
-      <div className="form-page inconsolata">
+      <div className="form-page helvetica">
         <div className="form-container form-container--narrow">
           <div className="form-header">
             <div className="form-header__back-wrap">
@@ -302,7 +311,7 @@ export default function MashallahForm({ postcode, onBack }: MashallahFormProps) 
                   required
                   maxLength={100}
                   disabled={loading}
-                  className="form-input inconsolata"
+                  className="form-input helvetica"
                   placeholder="Max Mustermann"
                 />
               </div>
@@ -320,7 +329,7 @@ export default function MashallahForm({ postcode, onBack }: MashallahFormProps) 
                   required
                   maxLength={254}
                   disabled={loading}
-                  className="form-input inconsolata"
+                  className="form-input helvetica"
                   placeholder="max@example.com"
                 />
               </div>
@@ -338,7 +347,7 @@ export default function MashallahForm({ postcode, onBack }: MashallahFormProps) 
                   required
                   maxLength={20}
                   disabled={loading}
-                  className="form-input inconsolata"
+                  className="form-input helvetica"
                   placeholder="+49 30 12345678"
                 />
               </div>
@@ -360,7 +369,7 @@ export default function MashallahForm({ postcode, onBack }: MashallahFormProps) 
                     required
                     maxLength={200}
                     disabled={loading}
-                    className={`form-input inconsolata form-input--with-icon-left ${formData.street ? 'has-value' : ''}`}
+                    className={`form-input helvetica form-input--with-icon-left ${formData.street ? 'has-value' : ''}`}
                     placeholder="z.B. Hauptstraße 42"
                   />
                 </div>
@@ -384,7 +393,7 @@ export default function MashallahForm({ postcode, onBack }: MashallahFormProps) 
                       required
                       maxLength={100}
                       disabled={loading}
-                      className={`form-input inconsolata form-input--with-icon-left ${formData.city ? 'has-value' : ''}`}
+                      className={`form-input helvetica form-input--with-icon-left ${formData.city ? 'has-value' : ''}`}
                       placeholder="Berlin"
                     />
                   </div>
@@ -440,7 +449,7 @@ export default function MashallahForm({ postcode, onBack }: MashallahFormProps) 
       </div>
     </div>
 
-              <div className="space-y-3">
+              {/* <div className="space-y-3">
                 <div className="form-checkbox-row">
                   <input
                     type="checkbox"
@@ -471,7 +480,7 @@ export default function MashallahForm({ postcode, onBack }: MashallahFormProps) 
                     Ich willige ausdrücklich in die Verarbeitung meiner Gesundheitsdaten (Symptome, Diagnosen, Rezepte) durch releafZ zur Vermittlung medizinischer Leistungen ein (Art. 9 Abs. 2 lit. a DSGVO). *
                   </label>
                 </div>
-              </div>
+              </div> */}
 
               {submitError && (
                 <div className="form-message-box form-message-box--error">

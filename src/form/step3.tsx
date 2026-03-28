@@ -50,7 +50,7 @@ export default function Step3({ onNext, onBack }: Step3Props) {
   }
 
   return (
-    <div className="form-page inconsolata">
+    <div className="form-page helvetica">
       <div className="form-container form-container--center form-container--wide">
         {onBack && (
           <div className="w-full flex justify-start form-header__back-wrap">

@@ -17,7 +17,7 @@
   --form-card-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
   --form-border: 1px solid #e5e7eb;
   --form-border-strong: 2px solid #e5e7eb;
-  --form-accent: #059669;
+  --form-accent: #72906F;
   --form-accent-light: #d1fae5;
   --form-accent-lighter: #ecfdf5;
   --form-text: #111827;
@@ -27,7 +27,7 @@
   --form-error-border: #fecaca;
   --form-error-text: #b91c1c;
   --form-info-bg: #ecfdf5;
-  --form-info-border: #a7f3d0;
+  --form-info-border: #72906F;
   --form-info-text: #065f46;
   --form-info-title: #064e3b;
   --form-spacing-xs: 0.25rem;
@@ -85,6 +85,11 @@
 .form-header__back-wrap {
   margin-bottom: var(--form-spacing-lg);
 }
+
+.form-header__next-wrap {
+  margin-bottom: var(--form-spacing-lg);
+}
+
 .form-header__title-wrap {
   display: flex;
   flex-direction: column;
@@ -114,6 +119,10 @@
   border-radius: var(--form-card-radius);
   box-shadow: var(--form-card-shadow);
   padding: var(--form-spacing-lg);
+  border-top: 2.5px solid 	#333;    /* Lighter shade for the top */
+  border-left: 2.5px solid 	#333;   /* Lighter shade for the left */
+  border-right: 4px solid #333;  /* Darker shade for the right */
+  border-bottom: 4px solid 	#333;
   width: 100%;
 }
 @media (min-width: 640px) {
@@ -327,7 +336,7 @@
   }
 }
 .form-option-card:hover {
-  border-color: #6ee7b7;
+  border-color: #72906F;
   box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
 }
 .form-option-card--selected {
@@ -667,6 +676,7 @@
   display: flex;
   flex-direction: column;
   gap: var(--form-spacing-lg);
+  text-align: left;
 }
 @media (min-width: 640px) {
   .form-fields {
@@ -682,6 +692,7 @@
   font-weight: 500;
   color: #41464f;
   margin-bottom: var(--form-spacing-sm);
+  text-align: left;
 }
 .form-input {
   width: 100%;
@@ -713,7 +724,7 @@
   cursor: not-allowed;
 }
 .form-input--with-icon-left {
-  padding-left: 5rem;
+  padding-left: 2.5rem;
 }
 .form-input--with-icon-left.has-value {
   padding-left: 0.75rem;

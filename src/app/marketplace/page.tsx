@@ -149,6 +149,49 @@ export default function MarketplacePage() {
   const loadData = async () => {
     try {
       setLoading(true)
+
+      // 🔒 SECURITY: Bypass authentication for development mode — MUST DELETE
+      if (process.env.NEXT_PUBLIC_DEV_BYPASS === 'true') {
+        const mockRequest: TreatmentRequest = { id: 'dev-bypass', city: 'Berlin', zip: '10115' }
+        setTreatmentRequest(mockRequest)
+        const mockData: MarketplacePharmacy[] = [
+          {
+            pharmacy: { id: 1, name: 'Apotheke am Ring', zip: '10115', city: 'Berlin', withinDeliveryRadius: true },
+            deliveryOptions: [
+              { method: 'BOTENDIENST_NEARBY', label: 'Lieferung (nah)', fee: 4.99, estimatedTime: '1-2 Stunden', available: true },
+              { method: 'PICKUP', label: 'Abholung', fee: 0, estimatedTime: 'Sofort', available: true },
+            ],
+            products: [
+              { id: 101, name: 'Mac Driver', form: 'FLOWER', thcPercent: 22, cbdPercent: 0.1, price: 11.5, unit: 'g', stock: 100, pharmacyId: 1 },
+              { id: 102, name: 'Black Cherry Punch', form: 'FLOWER', thcPercent: 19, cbdPercent: 0.5, price: 10.9, unit: 'g', stock: 80, pharmacyId: 1 },
+              { id: 103, name: 'Medical Saints Lemon Skunk', form: 'FLOWER', thcPercent: 18, cbdPercent: 1.0, price: 9.8, unit: 'g', stock: 60, pharmacyId: 1 },
+              { id: 104, name: 'Slurricane Oil', form: 'OIL', thcPercent: 15, cbdPercent: 5, price: 49.99, unit: 'ml', stock: 30, pharmacyId: 1 },
+            ],
+            productCount: 4,
+          },
+          {
+            pharmacy: { id: 2, name: 'GreenMed Apotheke', zip: '10117', city: 'Berlin', withinDeliveryRadius: false },
+            deliveryOptions: [
+              { method: 'BOTENDIENST_FAR', label: 'Lieferung (weit)', fee: 9.99, estimatedTime: '2-4 Stunden', available: true },
+              { method: 'PICKUP', label: 'Abholung', fee: 0, estimatedTime: 'Sofort', available: true },
+            ],
+            products: [
+              { id: 201, name: 'White Widow', form: 'FLOWER', thcPercent: 20, cbdPercent: 0.2, price: 10.5, unit: 'g', stock: 50, pharmacyId: 2 },
+              { id: 202, name: 'Organic Sweetgrass Mint Chocolate', form: 'FLOWER', thcPercent: 17, cbdPercent: 2.0, price: 9.5, unit: 'g', stock: 40, pharmacyId: 2 },
+              { id: 203, name: 'Space Rider Extract', form: 'EXTRACT', thcPercent: 60, cbdPercent: 0.5, price: 89.99, unit: 'ml', stock: 15, pharmacyId: 2 },
+            ],
+            productCount: 3,
+          },
+        ]
+        setMarketplaceData(mockData)
+        const initialQuantities: Record<number, number> = {}
+        mockData.forEach(m => m.products.forEach(p => { initialQuantities[p.id] = getDefaultQuantity(p) }))
+        setQuantities(prev => ({ ...initialQuantities, ...prev }))
+        setError('')
+        setLoading(false)
+        return
+      }
+
       const treatmentData = localStorage.getItem('treatmentRequest')
       if (!treatmentData) {
         setError('Keine Behandlungsanfrage gefunden. Bitte füllen Sie zuerst das Formular aus.')

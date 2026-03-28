@@ -48,6 +48,13 @@ export default function QuestionnairePage() {
     setFormData(completeData)
     setLoading(true)
 
+
+    // 🔒 SECURITY: Bypass authentication for development mode MOST DELETE
+    if (process.env.NEXT_PUBLIC_DEV_BYPASS === 'true') {
+      router.push('/marketplace')
+      return
+    }
+
     try {
       const treatmentData = localStorage.getItem('treatmentRequest')
       if (!treatmentData) {

@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { ArrowRight, ArrowDown, ListCheck, MousePointer, ZapIcon, Sparkles, Brain, Users, Shield, Clock, MapPin, ChevronRight, ChevronDown, Star, BikeIcon, LucideBike, Hospital, HospitalIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -16,7 +16,7 @@ import ComingSoon from '@/components/ComingSoon'
 import How from '@/components/ui/funktioniert/how'
 import { API_BASE } from '@/lib/api'
 
-const COMING_SOON_MODE = false;
+const COMING_SOON_MODE = true;
 
 // Font setup - using Inconsolata
 const inconsolataStyle = {
@@ -82,6 +82,8 @@ export default function LandingPage() {
   const [showHeader, setShowHeader] = useState(false)
   const [inHeroView, setInHeroView] = useState(true)
   const [isTransitioning, setIsTransitioning] = useState(false)
+  const [isLeavingMain, setIsLeavingMain] = useState(false)
+  const navigatingRef = useRef(false)
   // --- Begin zip code state and form state ---
   const [zipEntered, setZipEntered] = useState(false);
   const [zipInput, setZipInput] = useState('');
@@ -188,6 +190,72 @@ export default function LandingPage() {
     return () => window.removeEventListener('scroll', checkHeaderVisibility)
   }, []);
 
+  // Scroll / swipe to switch between Hero and main view
+  useEffect(() => {
+    const goToMain = () => {
+      if (navigatingRef.current || !inHeroView || isTransitioning) return;
+      navigatingRef.current = true;
+      document.body.style.overflow = 'hidden';
+      setIsTransitioning(true);
+      window.history.pushState({}, '', '/#ablauf');
+      window.requestAnimationFrame(() => window.scrollTo({ top: 0 }));
+      setTimeout(() => {
+        setInHeroView(false);
+        setIsTransitioning(false);
+        document.body.style.overflow = '';
+        setShowHeader(true);
+        window.dispatchEvent(new Event('scroll'));
+        navigatingRef.current = false;
+      }, 750);
+    };
+
+    const goToHero = () => {
+      if (navigatingRef.current || inHeroView) return;
+      navigatingRef.current = true;
+      document.body.style.overflow = 'hidden';
+      setIsLeavingMain(true);
+      window.history.replaceState(null, '', '/');
+      window.scrollTo({ top: 0 });
+      setTimeout(() => {
+        setInHeroView(true);
+        setIsLeavingMain(false);
+        setShowHeader(false);
+        document.body.style.overflow = '';
+        navigatingRef.current = false;
+      }, 750);
+    };
+
+    const handleWheel = (e: WheelEvent) => {
+      if (inHeroView && e.deltaY > 30) {
+        goToMain();
+      } else if (!inHeroView && e.deltaY < -30 && window.scrollY === 0) {
+        goToHero();
+      }
+    };
+
+    let touchStartY = 0;
+    const handleTouchStart = (e: TouchEvent) => {
+      touchStartY = e.touches[0].clientY;
+    };
+    const handleTouchEnd = (e: TouchEvent) => {
+      const dy = touchStartY - e.changedTouches[0].clientY;
+      if (inHeroView && dy > 50) {
+        goToMain();
+      } else if (!inHeroView && dy < -50 && window.scrollY === 0) {
+        goToHero();
+      }
+    };
+
+    window.addEventListener('wheel', handleWheel, { passive: true });
+    window.addEventListener('touchstart', handleTouchStart, { passive: true });
+    window.addEventListener('touchend', handleTouchEnd, { passive: true });
+    return () => {
+      window.removeEventListener('wheel', handleWheel);
+      window.removeEventListener('touchstart', handleTouchStart);
+      window.removeEventListener('touchend', handleTouchEnd);
+    };
+  }, [inHeroView, isTransitioning]);
+
   // Show form if valid Berlin postcode was entered
   if (showForm) {
     return <MashallahForm postcode={zipInput} onBack={handleBackToMain} />
@@ -207,10 +275,19 @@ export default function LandingPage() {
         isValidBerlinPostcode={isValidBerlinPostcode}
         isVisible={showHeader}
         onLogoClick={() => {
-          setInHeroView(true);
-          setShowHeader(false);
+          if (navigatingRef.current || inHeroView) return;
+          navigatingRef.current = true;
+          document.body.style.overflow = 'hidden';
+          setIsLeavingMain(true);
           window.history.replaceState(null, '', '/');
-          window.scrollTo({ top: 0, behavior: 'smooth' });
+          window.scrollTo({ top: 0 });
+          setTimeout(() => {
+            setInHeroView(true);
+            setIsLeavingMain(false);
+            setShowHeader(false);
+            document.body.style.overflow = '';
+            navigatingRef.current = false;
+          }, 750);
         }}
       />
       <MobileNavbar
@@ -222,7 +299,7 @@ export default function LandingPage() {
         isValidBerlinPostcode={isValidBerlinPostcode}
       />
 
-      {(inHeroView || isTransitioning) && (
+      {(inHeroView || isTransitioning || isLeavingMain) && (
         <Hero
           dialogOpen={dialogOpen}
           setDialogOpen={setDialogOpen}
@@ -248,8 +325,12 @@ export default function LandingPage() {
         />
       )}
 
-      {(!inHeroView || isTransitioning) && (
-        <div className={isTransitioning ? 'main-view-enter main-view-transitioning' : 'main-view-enter'}>
+      {(!inHeroView || isTransitioning || isLeavingMain) && (
+        <div className={
+          isTransitioning ? 'main-view-enter main-view-transitioning' :
+          isLeavingMain   ? 'main-view-exit main-view-transitioning' :
+          ''
+        }>
             {/* --- Zip code entry & form conditional rendering --- */}
             {/* COMMENTED OUT - Survey/Form Elements
             {zipEntered && !formData.zip && (
@@ -303,7 +384,7 @@ export default function LandingPage() {
 
           <div className="w-full rounded-2xl overflow-hidden shadow-lg" style={{ height: '500px' }}>
             <iframe
-              src="https://maps.google.com/maps?q=Apotheke+in+Berlin&t=&z=11&ie=UTF8&iwloc=&output=embed"
+              src="https://www.openstreetmap.org/export/embed.html?bbox=13.2,52.45,13.6,52.58&layer=mapnik&marker=52.52,13.405"
               width="100%"
               height="100%"
               style={{ border: 0 }}
@@ -385,18 +466,14 @@ export default function LandingPage() {
       </section>
 
       {/* Footer stuff */}
-      <footer className="bg-gray-900 text-white py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid md:grid-cols-4 gap-8">
+      <footer className="bg-gray-900 text-white py-10 md:py-16">
+        <div className="max-w-7xl mx-auto px-6 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
             {/* Company info */}
-            <div>
-              <div className="flex items-center space-x-3 mb-15">
-                <LeafLogo />
-                
+            <div className="col-span-2 md:col-span-1">
+              <div className="flex items-center mb-6">
+                <img src="/logo2.png" alt="reLeafZ Logo" className="w-32 h-auto object-contain scale-180 -translate-x-[-40px]" />
               </div>
-              <p className="text-gray-400 mb-4 subtitle-text">
-                Germany&apos;s fastest, safest, and coolest medical cannabis platform.
-              </p>
             </div>
 
             {/* Patient links */}
@@ -433,8 +510,8 @@ export default function LandingPage() {
             </div>
           </div>
 
-          <div className="border-t border-gray-800 mt-12 pt-8 text-center text-gray-400">
-            <p>© 2026 reLeafZ. All rights reserved. Licensed medical cannabis platform serving Berlin.</p>
+          <div className="border-t border-gray-800 mt-8 md:mt-12 pt-8 text-center text-gray-400">
+            <p>© 2026 reLeafZ.<span className="hidden md:inline"> All rights reserved. Licensed medical cannabis platform serving Berlin.</span></p>
           </div>
         </div>
       </footer>

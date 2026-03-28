@@ -40,7 +40,7 @@ export default function Step2({ onNext, onBack }: Step2Props) {
   }
 
   return (
-    <div className="form-page inconsolata">
+    <div className="form-page helvetica">
       <div className="form-container form-container--center">
         {onBack && (
           <div className="form-header__back-wrap">

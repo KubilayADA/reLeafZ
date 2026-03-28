@@ -31,12 +31,17 @@ export default function Hero({
       <div className="absolute inset-0 w-full overflow-hidden">
         <video
           className="absolute inset-0 w-full h-full object-cover"
-          src="/heroo.mp4"
+          src="/heroo3.mp4"
           autoPlay
           muted
           loop
           playsInline
         />
+
+        {/* idée mettre map et faire pop des petit leaf the cannabis on the map as a neuro link  */}
+    
+        {/* <img src="/hero-map.jng" alt="hero-ma" className="absolute inset-0 w-full h-full object-cover" /> */}
+        
         <div className="absolute inset-0 bg-black/20" />
       </div>
 

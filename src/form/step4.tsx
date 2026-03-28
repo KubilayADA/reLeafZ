@@ -57,7 +57,7 @@ export default function Step4({ onNext, onBack }: Step4Props) {
   }
 
   return (
-    <div className="form-page inconsolata">
+    <div className="form-page helvetica">
       <div className="form-container form-container--center">
         {onBack && (
           <div className="w-full flex justify-start form-header__back-wrap">

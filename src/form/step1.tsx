@@ -72,13 +72,22 @@ export default function Step1({ onNext, onBack }: Step1Props) {
   }
 
   return (
-    <div className="form-page inconsolata">
+    <div className="form-page helvetica">
       <div className="form-container">
         {onBack && (
           <div className="form-header__back-wrap">
             <Button onClick={onBack} className="btn-outline text-sm sm:text-base">
               <ArrowLeft className="w-4 h-4 mr-2" />
               Zurück
+            </Button>
+          </div>
+        )}
+
+        {handleNext && (
+          <div className="form-header__next-wrap">
+            <Button onClick={handleNext} className="btn-outline text-sm sm:text-base">
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Weiter
             </Button>
           </div>
         )}

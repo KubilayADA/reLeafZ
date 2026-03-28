@@ -48,3 +48,22 @@ for mobile “i” then back of card shows with info
 listen option explaining the strains  
 
 for section how it works make and effect when user arrive on page the text get typed (first loading) typo effect 
+
+
+# from hero to -> how 
+
+- user should be able to scroll down and up or tape anywhere 
+
+# add i have a receipt -> ?
+
+## form adjust the style rules 
+
+## postal with dhl when regulation 
+
+## implement icons selected in form ---> to market place so user is aware on how they can be healed 
+
+## payment done give more information
+
+## Dashboard doctor --> give more context about 
+
+## pdf get send to pdf too 

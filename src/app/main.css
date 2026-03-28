@@ -193,7 +193,7 @@ body {
 .subtitle-text {
     color: #111827;
     font-size: 0.875rem;
-    font-family: 'Inconsolata', monospace;
+    font-family: 'Helvetica Neue', sans-serif;
     margin-bottom: 0.25rem;
     max-width: 56rem;
     margin-left: auto;
@@ -830,6 +830,19 @@ h1 + .animated-words-container {
     }
     to {
         transform: translateY(0);
+    }
+}
+
+.main-view-exit {
+    animation: mainViewExit 700ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes mainViewExit {
+    from {
+        transform: translateY(0);
+    }
+    to {
+        transform: translateY(100vh);
     }
 }
 
