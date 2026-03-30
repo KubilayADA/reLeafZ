@@ -180,6 +180,33 @@ export async function updatePharmacyDelivery(
     body: JSON.stringify(data),
   })
 }
+export async function createPharmacy(data: {
+  name: string
+  email: string
+  contact: string
+  phone?: string
+  address?: string
+  zip: string
+  city?: string
+  deliveryType?: string
+  cannaleoSubdomain?: string
+  cannaleoVendorId?: string
+}): Promise<unknown> {
+  return fetchAdmin('/api/admin/pharmacies', {
+    method: 'POST',
+    body: JSON.stringify(data),
+  })
+}
+
+export async function syncCannaleoPharmacy(id: number): Promise<{
+  message: string
+  synced: number
+  errors: string[]
+}> {
+  return fetchAdmin(`/api/admin/pharmacies/${id}/sync-cannaleo`, {
+    method: 'POST',
+  })
+}
 
 // PRESCRIPTIONS
 export async function getAdminPrescriptions(params?: {
