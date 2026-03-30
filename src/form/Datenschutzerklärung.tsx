@@ -373,11 +373,27 @@ export default function Datenschutzerklärung() {
                 </p>
               </div>
             </div>
-          </section>
+            </section>
 
-        </div>
-      </div>
-    </div>
-  )
+            <section>
+  <h2 className="form-legal-h2">Recht auf Löschung (Art. 17 DSGVO)</h2>
+  <p className="form-legal-body">
+    Sie haben das Recht, die Löschung Ihrer bei uns gespeicherten personenbezogenen Daten zu verlangen. Um eine Löschung Ihrer Daten zu beantragen, senden Sie uns bitte eine E-Mail an{' '}
+    <a href="mailto:datenschutz@releafz.de" className="text-green-700 underline">
+      datenschutz@releafz.de
+    </a>{' '}
+    mit Ihrer registrierten E-Mail-Adresse und dem Betreff &bdquo;Datenlöschung&ldquo;. Wir werden Ihren Antrag innerhalb von 30 Tagen gemäß Art. 17 DSGVO bearbeiten und Ihnen eine Bestätigung zusenden.
+  </p>
+  <p className="form-legal-body mt-2">
+    Bitte beachten Sie, dass bestimmte Daten aufgrund gesetzlicher Aufbewahrungspflichten (z.B. steuerrechtliche Anforderungen) nicht sofort gelöscht werden können.
+  </p>
+</section>
+
+</div>
+</div>
+</div>
+)
 }
+
+
 

@@ -19,8 +19,7 @@ type Doctor = {
   licenseNo?: string
   licenseNumber?: string
   isActive?: boolean
-  treatmentRequestsCount?: number
-  treatmentRequestCount?: number
+  _count?: { treatmentRequests: number }
 }
 
 export default function AdminDoctorsPage() {
@@ -238,7 +237,7 @@ export default function AdminDoctorsPage() {
                         </span>
                       </td>
                       <td className="px-4 md:px-6 py-3 text-gray-700">
-                        {d.treatmentRequestsCount ?? d.treatmentRequestCount ?? 0}
+                        {d._count?.treatmentRequests ?? 0}
                       </td>
                     </tr>
                   ))}
