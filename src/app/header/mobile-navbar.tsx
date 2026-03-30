@@ -14,6 +14,7 @@ import {
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import './header-mobile.css'
+import { isLandingPastHero, scrollLandingToAblauf } from '@/lib/scroll'
 
 interface MobileNavbarProps {
   dialogOpen: boolean
@@ -50,12 +51,7 @@ export default function MobileNavbar({
 
   useEffect(() => {
     const checkVisibility = () => {
-      const hero = document.querySelector('.hero-section') as HTMLElement | null
-      if (hero) {
-        setIsVisible(hero.getBoundingClientRect().bottom <= 0)
-      } else {
-        setIsVisible(true)
-      }
+      setIsVisible(isLandingPastHero())
     }
 
     const handleScroll = () => {
@@ -97,6 +93,11 @@ export default function MobileNavbar({
   const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
     e.preventDefault()
     setIsOpen(false)
+
+    if (href === '#ablauf') {
+      scrollLandingToAblauf()
+      return
+    }
 
     const id = href.replace('#', '')
     const el = document.getElementById(id)

@@ -103,6 +103,10 @@
    ═══════════════════════════════════ */
 
 @media (max-width: 639px) {
+  .how-funktioniert {
+    scroll-margin-top: max(6rem, calc(env(safe-area-inset-top, 0px) + 4.5rem));
+  }
+
   .how-funktioniert.section-container {
     padding-top: calc(72px + 2rem);
   }

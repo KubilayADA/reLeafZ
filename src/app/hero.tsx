@@ -5,6 +5,7 @@ import { ChevronRight, Shield, Clock, MapPin } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import words from '@/constants/index'
+import { scrollToLandingTop } from '@/lib/scroll'
 
 interface HeroProps {
   dialogOpen: boolean
@@ -13,7 +14,8 @@ interface HeroProps {
   setZipInput: (value: string) => void
   handlePostcodeSubmit: () => void
   isValidBerlinPostcode: (postcode: string) => boolean
-  onEnterMain: () => void
+  /** Scroll to #ablauf; parent may sync URL with pushState (no overflow lock). */
+  onScrollToAblauf: () => void
 }
 
 export default function Hero({
@@ -23,40 +25,39 @@ export default function Hero({
   setZipInput,
   handlePostcodeSubmit,
   isValidBerlinPostcode,
-  onEnterMain,
+  onScrollToAblauf,
 }: HeroProps) {
   return (
-    <section className="hero-section relative w-full min-h-screen pt-20 pb-32">
-      {/* Background video — full screen */}
-      <div className="absolute inset-0 w-full overflow-hidden">
-        <video
+    <section
+      id="hero"
+      className="hero-section hero-section--fixed pointer-events-none fixed inset-0 z-0 flex w-full min-h-[100dvh] flex-col overflow-hidden pt-16 pb-28 sm:pt-20 sm:pb-32"
+    >
+      {/* Background — no hit target so wheel/touch scrolls the page to the next section */}
+      <div className="pointer-events-none absolute inset-0 w-full overflow-hidden">
+         <video
           className="absolute inset-0 w-full h-full object-cover"
-          src="/heroo3.mp4"
+          src="/hero-vibe.mp4"
+          preload="auto"
           autoPlay
           muted
           loop
           playsInline
-        />
+        /> 
 
         {/* idée mettre map et faire pop des petit leaf the cannabis on the map as a neuro link  */}
     
-        {/* <img src="/hero-map.jng" alt="hero-ma" className="absolute inset-0 w-full h-full object-cover" /> */}
+        {/* <img src="/map/map-1.png" alt="hero-ma" className="absolute inset-0 w-full h-full object-cover" /> */}
         
         <div className="absolute inset-0 bg-black/20" />
       </div>
 
       {/* reLeafZ logo — top left (back to hero) */}
       <a
-        href="#top"
-        className="absolute top-5 left-1/2 -translate-x-1/2 sm:left-8 sm:translate-x-0 sm:top-8 md:top-12 md:left-14 md:scale-150 z-10 flex items-center gap-2 no-underline text-inherit hover:opacity-100 transition-opacity"
+        href="#hero"
+        className="pointer-events-auto absolute top-5 left-1/2 -translate-x-1/2 sm:left-8 sm:translate-x-0 sm:top-8 md:top-12 md:left-14 md:scale-150 z-10 flex items-center gap-2 no-underline text-inherit hover:opacity-100 transition-opacity"
         onClick={(e) => {
           e.preventDefault()
-          const hero = document.querySelector('.hero-section') as HTMLElement | null
-          if (hero) {
-            hero.scrollIntoView({ behavior: 'smooth' })
-          } else {
-            window.scrollTo({ top: 0, behavior: 'smooth' })
-          }
+          scrollToLandingTop()
         }}
       >
         <img
@@ -69,10 +70,10 @@ export default function Hero({
       {/* CTA: go to next view */}
       <a
         href="#ablauf"
-        className="hero-scroll-cta"
+        className="hero-scroll-cta pointer-events-auto"
         onClick={(e) => {
           e.preventDefault()
-          onEnterMain()
+          onScrollToAblauf()
         }}
       >
         <span className="hero-scroll-cta-text">Entdecke wie es funktioniert</span>
@@ -93,8 +94,9 @@ export default function Hero({
         </div>
       </a>
 
-      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 overflow-visible">
-        <div className="text-center overflow-visible">
+      {/* `pointer-events-none` so wheel/touch reaches `.hero-scroll-spacer` under the fixed hero; only interactive chunks use `pointer-events-auto`. */}
+      <div className="pointer-events-none relative max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 overflow-visible w-full">
+        <div className="text-center overflow-visible w-full max-w-full">
           {/* Main heading */}
           <h1 className="title-gradient-hero">
             MEDIZINAL CANNABIS
@@ -104,7 +106,7 @@ export default function Hero({
               {words.map((word, index) => (
                 <div
                   key={index}
-                  className="word-item text-3xl sm:text-5xl md:text-7xl font-bold title-gradient-hero leading-tight italic"
+                  className="word-item text-base sm:text-5xl md:text-7xl font-bold title-gradient-hero leading-tight italic"
                 >
                   {word}
                 </div>
@@ -139,7 +141,7 @@ export default function Hero({
 
           {/* CTA: button above, then text+arrow block below */}
           <div className="hero-cta-wrap">
-            <div className="hero-cta-center">
+            <div className="hero-cta-center pointer-events-auto">
               <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
                 <DialogTrigger asChild>
                   <Button

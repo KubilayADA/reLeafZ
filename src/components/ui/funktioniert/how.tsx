@@ -102,7 +102,7 @@ export default function How(): React.JSX.Element {
         {/* ── Left: sticky progress panel ── */}
         <div className="how-left">
           <div className="how-header">
-            <div className="text-2xl sm:text-3xl md:text-4xl font-bold title-gradient mb-4 italic">Wie es funktioniert</div>
+            <div className="text-2xl sm:text-3xl md:text-4xl font-bold title-gradient mb-4">Wie es funktioniert</div>
             <h2 className="title">
               In <span className="title-num">4</span> Schritten fertig
             </h2>

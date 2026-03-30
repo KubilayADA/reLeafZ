@@ -15,9 +15,9 @@ import '@/components/ui/Hero/Words-Sliding-Smooth.css'
 import ComingSoon from '@/components/ComingSoon'
 import How from '@/components/ui/funktioniert/how'
 import { API_BASE } from '@/lib/api'
+import { RELEAFZ_GO_TO_ABLAUF, RELEAFZ_GO_TO_HERO } from '@/lib/scroll'
 
-const COMING_SOON_MODE = true;
-
+const COMING_SOON_MODE = false;
 // Font setup - using Inconsolata
 const inconsolataStyle = {
   fontFamily: '"Inconsolata", monospace',
@@ -225,6 +225,11 @@ export default function LandingPage() {
       }, 750);
     };
 
+    const onScrollLibGoToAblauf = () => goToMain();
+    const onScrollLibGoToHero = () => goToHero();
+    window.addEventListener(RELEAFZ_GO_TO_ABLAUF, onScrollLibGoToAblauf);
+    window.addEventListener(RELEAFZ_GO_TO_HERO, onScrollLibGoToHero);
+
     const handleWheel = (e: WheelEvent) => {
       if (inHeroView && e.deltaY > 30) {
         goToMain();
@@ -250,6 +255,8 @@ export default function LandingPage() {
     window.addEventListener('touchstart', handleTouchStart, { passive: true });
     window.addEventListener('touchend', handleTouchEnd, { passive: true });
     return () => {
+      window.removeEventListener(RELEAFZ_GO_TO_ABLAUF, onScrollLibGoToAblauf);
+      window.removeEventListener(RELEAFZ_GO_TO_HERO, onScrollLibGoToHero);
       window.removeEventListener('wheel', handleWheel);
       window.removeEventListener('touchstart', handleTouchStart);
       window.removeEventListener('touchend', handleTouchEnd);
@@ -274,21 +281,6 @@ export default function LandingPage() {
         handlePostcodeSubmit={handlePostcodeSubmit}
         isValidBerlinPostcode={isValidBerlinPostcode}
         isVisible={showHeader}
-        onLogoClick={() => {
-          if (navigatingRef.current || inHeroView) return;
-          navigatingRef.current = true;
-          document.body.style.overflow = 'hidden';
-          setIsLeavingMain(true);
-          window.history.replaceState(null, '', '/');
-          window.scrollTo({ top: 0 });
-          setTimeout(() => {
-            setInHeroView(true);
-            setIsLeavingMain(false);
-            setShowHeader(false);
-            document.body.style.overflow = '';
-            navigatingRef.current = false;
-          }, 750);
-        }}
       />
       <MobileNavbar
         dialogOpen={dialogOpen}
@@ -307,7 +299,7 @@ export default function LandingPage() {
           setZipInput={setZipInput}
           handlePostcodeSubmit={handlePostcodeSubmit}
           isValidBerlinPostcode={isValidBerlinPostcode}
-          onEnterMain={() => {
+          onScrollToAblauf={() => {
             document.body.style.overflow = 'hidden';
             setIsTransitioning(true);
             window.history.pushState({}, '', '/#ablauf');

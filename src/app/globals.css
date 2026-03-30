@@ -130,6 +130,22 @@
     overflow-x: hidden;
     scroll-behavior: smooth;
   }
+
+  /*
+   * Landing (home): free scroll in main; hero↔main bridge snap is handled in `attachLandingHeroBridgeSnap`.
+   */
+  html:has(.landing-page) {
+    scroll-behavior: auto;
+    overscroll-behavior-y: none;
+  }
+
+  body:has(.landing-page) {
+    overscroll-behavior-y: none;
+  }
+
+  .landing-page {
+    touch-action: pan-y;
+  }
   body {
     @apply bg-background text-foreground;
     margin: 0;

@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Menu, X } from 'lucide-react'
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import './header.css'
+import { scrollToLandingTop, scrollLandingToAblauf } from '@/lib/scroll'
 
 // logo
 const LeafLogo = ({ className = 'logo-header' }) => (
@@ -25,7 +26,6 @@ interface HeaderProps {
   handlePostcodeSubmit: () => void
   isValidBerlinPostcode: (postcode: string) => boolean
   isVisible: boolean
-  onLogoClick?: () => void
 }
 
 export default function Header({ 
@@ -36,7 +36,6 @@ export default function Header({
   handlePostcodeSubmit, 
   isValidBerlinPostcode,
   isVisible,
-  onLogoClick,
 }: HeaderProps) {
   const [mobileNavOpen, setMobileNavOpen] = useState(false)
 
@@ -73,21 +72,7 @@ export default function Header({
               type="button"
               className="flex items-center h-14 overflow-visible"
               onClick={() => {
-                if (onLogoClick) {
-                  onLogoClick();
-                  return;
-                }
-                if (typeof window === 'undefined') return;
-                (window as any)._releafzAllowHeroScroll = true;
-                const hero = document.querySelector('.hero-section') as HTMLElement | null;
-                if (hero) {
-                  hero.scrollIntoView({ behavior: 'smooth' });
-                } else {
-                  window.scrollTo({ top: 0, behavior: 'smooth' });
-                }
-                setTimeout(() => {
-                  (window as any)._releafzAllowHeroScroll = false;
-                }, 1200);
+                scrollToLandingTop()
               }}
               aria-label="Zurück zum Seitenanfang"
             >
@@ -96,7 +81,16 @@ export default function Header({
             
             {/* Desktop Nav */}
             <nav className="header-desktop-nav header-text space-x-10 ">
-              <a href="#ablauf" className="header-nav-link text-mg md:text-xl leading-relaxed">Ablauf</a>
+              <a
+                href="#ablauf"
+                className="header-nav-link text-mg md:text-xl leading-relaxed"
+                onClick={(e) => {
+                  e.preventDefault()
+                  scrollLandingToAblauf()
+                }}
+              >
+                Ablauf
+              </a>
               <a href="#partner-apotheken" className="header-nav-link text-mg md:text-xl leading-relaxed">Apotheke in Ihrer Nähe</a>
               <a href="#vorteile" className="header-nav-link text-lg md:text-xl leading-relaxed">Vorteile</a>
               <a href="#chat" className="header-nav-link text-lg md:text-xl leading-relaxed">Chat with us!</a>
@@ -158,7 +152,17 @@ export default function Header({
         {mobileNavOpen && (
           <div className="lg:hidden absolute top-full left-0 w-full bg-white shadow-lg border-t border-emerald-200 z-50">
             <nav className="flex flex-col items-center py-6 space-y-6">
-              <a href="#ablauf" className="text-xl text-black-800 inconsolata" onClick={() => setMobileNavOpen(false)}>Ablauf</a>
+              <a
+                href="#ablauf"
+                className="text-xl text-black-800 inconsolata"
+                onClick={(e) => {
+                  e.preventDefault()
+                  setMobileNavOpen(false)
+                  scrollLandingToAblauf()
+                }}
+              >
+                Ablauf
+              </a>
               <a href="#partner-apotheken" className="text-xl text-black-800 inconsolata" onClick={() => setMobileNavOpen(false)}>Apotheke in Ihrer Nähe</a>
               <a href="#vorteile" className="text-xl text-black-800 inconsolata" onClick={() => setMobileNavOpen(false)}>Vorteile</a>
               <a href="#chat" className="text-xl text-black-800 inconsolata" onClick={() => setMobileNavOpen(false)}>Chat with us!</a>
