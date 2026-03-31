@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import {Eye, EyeOff, Lock, Mail, User, Clock, CheckCircle, XCircle, FileText, Phone, MapPin, AlertCircle, LogOut, Package } from 'lucide-react';
 import { API_BASE } from '@/lib/api'
@@ -37,6 +37,28 @@ export default function DoctorDashboard() {
   const [pastRequests, setPastRequests] = useState<TreatmentRequest[]>([])
   const [activeView, setActiveView] = useState<ViewType>('pending')
   const [loading, setLoading] = useState(false)
+  const [sessionChecking, setSessionChecking] = useState(true)
+
+  useEffect(() => {
+    const checkSession = async () => {
+      try {
+        const res = await fetch(`${API_BASE}/api/doctor/requests`, {
+          credentials: 'include',
+        })
+        if (res.ok) {
+          const data = await res.json()
+          setIsLoggedIn(true)
+          setRequests(data.requests || [])
+          fetchPastRequests()
+        }
+      } catch (err) {
+        // not logged in, stay on login screen
+      } finally {
+        setSessionChecking(false)
+      }
+    }
+    checkSession()
+  }, [])
 
   // Doctor login
   const handleLogin = async () => {
@@ -170,6 +192,8 @@ export default function DoctorDashboard() {
 
   // go back to home page To do
   
+  if (sessionChecking) return null
+
   // If not logged in, show login form
   if (!isLoggedIn) {
     return (
