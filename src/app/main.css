@@ -308,9 +308,7 @@ button[disabled] {
     font-weight: 550;
     font-size: 14px;
     line-height: 24px;
-    margin-top: 150px;
-    margin-bottom: 1px;
-    border-radius: 2px;
+    margin-top: 100px;
 }
 
 @property --border-angle {
@@ -319,6 +317,35 @@ button[disabled] {
     inherits: false;
 }
 
+.behandlung-button-hero {
+    font-family: "Inconsolata";
+    font-weight: 900;
+    font-size: 15px;
+    font-style: bold;
+    line-height: 24px;
+    margin-top: 15rem;
+    color: rgba(255, 255, 255, 0.95);
+    border: 2px solid transparent;
+    background-clip: padding-box, border-box;
+    background-origin: padding-box, border-box;
+    background-image:
+        linear-gradient(#72906F, #72906F),
+        conic-gradient(
+            from var(--border-angle),
+            #72906F 0deg,
+            #8aaa87 45deg,
+            #b8d9b5 90deg,
+            #e8f5e8 135deg,
+            #ffffff 180deg,
+            #e8f5e8 225deg,
+            #b8d9b5 270deg,
+            #8aaa87 315deg,
+            #72906F 360deg
+        );
+    box-shadow: 0 0 8px 1px rgba(168, 213, 162, 0.2), 0 4px 6px -1px rgba(0, 0, 0, 0.12);
+    animation: spin-border 6s linear infinite;
+    transition: box-shadow 0.4s ease, transform 0.3s ease;
+}
 
 @keyframes spin-border {
     to { --border-angle: 360deg; }
@@ -832,7 +859,7 @@ header .behandlung-button {
     }
 
     .hero-section .word-item {
-        font-size: clamp(0.9rem, 5.4vw, 1.15rem) !important;
+        font-size: clamp(0.7rem, 3.4vw, 0.95rem) !important;
     }
 }
 

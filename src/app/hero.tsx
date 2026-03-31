@@ -35,7 +35,7 @@ export default function Hero({
       {/* Background — no hit target so wheel/touch scrolls the page to the next section */}
       <div className="pointer-events-none absolute inset-0 w-full overflow-hidden">
          <video
-          className="absolute inset-x-0 -top-[6svh] h-[112svh] w-full object-cover sm:inset-0 sm:h-full"
+          className="absolute inset-0 w-full h-full object-cover"
           src="/hero-vibe.mp4"
           preload="auto"
           autoPlay
@@ -91,15 +91,15 @@ export default function Hero({
       <div className="pointer-events-none relative max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 overflow-visible w-full">
         <div className="text-center overflow-visible w-full max-w-full">
           {/* Main heading */}
-          <h1 className="title-gradient-hero scale-110">
+          <h1 className="title-gradient-hero">
             MEDIZINAL CANNABIS
           </h1>
-          <div className="animated-words-container scale-110">
+          <div className="animated-words-container">
             <div className="words-wrapper">
               {words.map((word, index) => (
                 <div
                   key={index}
-                  className="word-item font-bold title-gradient-hero leading-tight italic margin-bottom-100 sm:mb-150"
+                  className="word-item text-base sm:text-5xl md:text-7xl font-bold title-gradient-hero leading-tight italic margin-bottom-100"
                 >
                   {word}
                 </div>
