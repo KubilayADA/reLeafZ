@@ -49,14 +49,14 @@ export default function QuestionnairePage() {
     setLoading(true)
 
     try {
-      const treatmentData = localStorage.getItem('treatmentRequest')
+      const treatmentData = sessionStorage.getItem('treatmentRequest')
       if (!treatmentData) {
         router.push('/')
         return
       }
       const treatmentRequest = JSON.parse(treatmentData)
       if (!treatmentRequest?.id) {
-        localStorage.removeItem('treatmentRequest')
+        sessionStorage.removeItem('treatmentRequest')
         router.push('/')
         return
       }
@@ -77,7 +77,7 @@ export default function QuestionnairePage() {
         alert(`Fehler: ${result.message || 'Symptome konnten nicht aktualisiert werden'}`)
       }
     } catch (e) {
-      localStorage.removeItem('treatmentRequest')
+      sessionStorage.removeItem('treatmentRequest')
       router.push('/')
       return
     } finally {
