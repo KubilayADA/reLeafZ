@@ -145,9 +145,8 @@ const PartnerApotheken = () => {
       className="partner-apotheken-section"
       aria-label="Partner Apotheken Karte"
     >
-      <div className="partner-apotheken-inner">
+      <div className="partner-apotheken-inner margin-top-200">
         <div className="partner-apotheken-heading">
-          <p className="partner-apotheken-kicker">Partner-Apotheken</p>
           <h2>Finde deine Apotheke in der Nahe</h2>
           <p className="partner-apotheken-subtitle">
             Sobald du diesen Bereich erreichst, wachsen unsere Partnerpunkte nacheinander ins Netz.

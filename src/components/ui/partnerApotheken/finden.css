@@ -1,8 +1,16 @@
 .partner-apotheken-section {
-  padding: 5rem 1.25rem 4rem;
+  padding: 11rem 1.25rem 1rem;
+  scroll-margin-top: 120px;
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
+}
+
+@media (max-width: 768px) {
+  .partner-apotheken-section {
+    padding: 4rem 1rem 2rem;
+    margin-top: -10px;
+  }
 }
 
 .partner-apotheken-inner {
@@ -11,6 +19,9 @@
 }
 
 .partner-apotheken-heading h2 {
+  font-family: "inconsolata", monospace;
+  font-weight: 900;
+  margin-top: 2px;
   margin: 0.3rem 0 0.8rem;
   font-size: clamp(1.8rem, 3.5vw, 2.9rem);
   line-height: 1.05;
@@ -26,8 +37,10 @@
 }
 
 .partner-apotheken-subtitle {
+  font-family: "inconsolata", monospace;
+  font-weight: 600;
   margin: 0;
-  max-width: 64ch;
+  max-width: 84ch;
   color: #35503e;
   line-height: 1.6;
 }

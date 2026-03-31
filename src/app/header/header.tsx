@@ -103,7 +103,7 @@ export default function Header({
                   <Button
                     className="header-button"
                     variant="button2"
-                    style={{ "--c-color": "#000000", color: "#000000" } as React.CSSProperties}
+                    style={{ "--c-color": "#ffffff", color: "#ffffff" } as React.CSSProperties}
                   >
                   BEHANDLUNG ANFRAGEN 
                 </Button>

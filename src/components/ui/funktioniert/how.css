@@ -7,7 +7,6 @@
 .how-funktioniert {
   /* Match Finden: offset for fixed header when scrolling to #ablauf */
   scroll-margin-top: max(8.5rem, 140px);
-  --how-bg: #F8FAF8;
   --how-card: #ffffff;
   --how-accent: #72906F;
   --how-accent-mid: #72906F;
