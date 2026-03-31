@@ -556,6 +556,29 @@ header .behandlung-button {
     touch-action: pan-y;
 }
 
+/* Landing: two-section bridge with snap from fixed hero to main content */
+.landing-snap-scroll {
+    scroll-snap-type: y mandatory;
+}
+
+.landing-hero-snap-target {
+    min-height: 100dvh;
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+    pointer-events: none;
+}
+
+.landing-main {
+    position: relative;
+    z-index: 10;
+    background: #fbfdfb;
+}
+
+.landing-snap-target {
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+}
+
 
 /* Hero CTA: button centered; text+arrow absolutely placed */
 .hero-cta-wrap {

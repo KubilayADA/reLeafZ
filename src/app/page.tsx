@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { ArrowRight, ArrowDown, ListCheck, MousePointer, ZapIcon, Sparkles, Brain, Users, Shield, Clock, MapPin, ChevronRight, ChevronDown, Star, BikeIcon, LucideBike, Hospital, HospitalIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -15,7 +15,7 @@ import '@/components/ui/Hero/Words-Sliding-Smooth.css'
 import ComingSoon from '@/components/ComingSoon'
 import How from '@/components/ui/funktioniert/how'
 import { API_BASE } from '@/lib/api'
-import { RELEAFZ_GO_TO_ABLAUF, RELEAFZ_GO_TO_HERO } from '@/lib/scroll'
+import { attachLandingBinarySwitch } from '@/lib/scroll'
 
 const COMING_SOON_MODE = false;
 // Font setup - using Inconsolata
@@ -80,10 +80,6 @@ export default function LandingPage() {
   const [dialogOpen, setDialogOpen] = useState(false)
   const [showForm, setShowForm] = useState(false)
   const [showHeader, setShowHeader] = useState(false)
-  const [inHeroView, setInHeroView] = useState(true)
-  const [isTransitioning, setIsTransitioning] = useState(false)
-  const [isLeavingMain, setIsLeavingMain] = useState(false)
-  const navigatingRef = useRef(false)
   // --- Begin zip code state and form state ---
   const [zipEntered, setZipEntered] = useState(false);
   const [zipInput, setZipInput] = useState('');
@@ -161,107 +157,27 @@ export default function LandingPage() {
     }
   };
   // --- End zip code state and form state ---
-  
+
   useEffect(() => {
-    if (window.location.hash === '#ablauf') {
-      setInHeroView(false);
+    const updateHeaderVisibility = () => {
+      const landingMain = document.getElementById('landing-main')
+      const mainTop = landingMain?.getBoundingClientRect().top ?? Number.POSITIVE_INFINITY
+      setShowHeader(mainTop <= 80)
     }
 
-    const handlePopState = () => {
-      setInHeroView(window.location.hash !== '#ablauf');
-      window.scrollTo({ top: 0 });
-    };
-
-    window.addEventListener('popstate', handlePopState);
-    return () => window.removeEventListener('popstate', handlePopState);
-  }, []);
-
-  useEffect(() => {
-    const checkHeaderVisibility = () => {
-      const hero = document.querySelector('.hero-section') as HTMLElement | null
-      if (hero) {
-        setShowHeader(hero.getBoundingClientRect().bottom <= 0)
-      } else {
-        setShowHeader(true)
-      }
-    }
-    checkHeaderVisibility()
-    window.addEventListener('scroll', checkHeaderVisibility, { passive: true })
-    return () => window.removeEventListener('scroll', checkHeaderVisibility)
-  }, []);
-
-  // Scroll / swipe to switch between Hero and main view
-  useEffect(() => {
-    const goToMain = () => {
-      if (navigatingRef.current || !inHeroView || isTransitioning) return;
-      navigatingRef.current = true;
-      document.body.style.overflow = 'hidden';
-      setIsTransitioning(true);
-      window.history.pushState({}, '', '/#ablauf');
-      window.requestAnimationFrame(() => window.scrollTo({ top: 0 }));
-      setTimeout(() => {
-        setInHeroView(false);
-        setIsTransitioning(false);
-        document.body.style.overflow = '';
-        setShowHeader(true);
-        window.dispatchEvent(new Event('scroll'));
-        navigatingRef.current = false;
-      }, 750);
-    };
-
-    const goToHero = () => {
-      if (navigatingRef.current || inHeroView) return;
-      navigatingRef.current = true;
-      document.body.style.overflow = 'hidden';
-      setIsLeavingMain(true);
-      window.history.replaceState(null, '', '/');
-      window.scrollTo({ top: 0 });
-      setTimeout(() => {
-        setInHeroView(true);
-        setIsLeavingMain(false);
-        setShowHeader(false);
-        document.body.style.overflow = '';
-        navigatingRef.current = false;
-      }, 750);
-    };
-
-    const onScrollLibGoToAblauf = () => goToMain();
-    const onScrollLibGoToHero = () => goToHero();
-    window.addEventListener(RELEAFZ_GO_TO_ABLAUF, onScrollLibGoToAblauf);
-    window.addEventListener(RELEAFZ_GO_TO_HERO, onScrollLibGoToHero);
-
-    const handleWheel = (e: WheelEvent) => {
-      if (inHeroView && e.deltaY > 30) {
-        goToMain();
-      } else if (!inHeroView && e.deltaY < -30 && window.scrollY === 0) {
-        goToHero();
-      }
-    };
-
-    let touchStartY = 0;
-    const handleTouchStart = (e: TouchEvent) => {
-      touchStartY = e.touches[0].clientY;
-    };
-    const handleTouchEnd = (e: TouchEvent) => {
-      const dy = touchStartY - e.changedTouches[0].clientY;
-      if (inHeroView && dy > 50) {
-        goToMain();
-      } else if (!inHeroView && dy < -50 && window.scrollY === 0) {
-        goToHero();
-      }
-    };
-
-    window.addEventListener('wheel', handleWheel, { passive: true });
-    window.addEventListener('touchstart', handleTouchStart, { passive: true });
-    window.addEventListener('touchend', handleTouchEnd, { passive: true });
+    updateHeaderVisibility()
+    window.addEventListener('scroll', updateHeaderVisibility, { passive: true })
+    window.addEventListener('resize', updateHeaderVisibility)
     return () => {
-      window.removeEventListener(RELEAFZ_GO_TO_ABLAUF, onScrollLibGoToAblauf);
-      window.removeEventListener(RELEAFZ_GO_TO_HERO, onScrollLibGoToHero);
-      window.removeEventListener('wheel', handleWheel);
-      window.removeEventListener('touchstart', handleTouchStart);
-      window.removeEventListener('touchend', handleTouchEnd);
-    };
-  }, [inHeroView, isTransitioning]);
+      window.removeEventListener('scroll', updateHeaderVisibility)
+      window.removeEventListener('resize', updateHeaderVisibility)
+    }
+  }, [])
+
+  useEffect(() => {
+    return attachLandingBinarySwitch()
+  }, [])
+  
 
   // Show form if valid Berlin postcode was entered
   if (showForm) {
@@ -271,7 +187,7 @@ export default function LandingPage() {
   return (
     <>
       <CookieBanner />
-      <div className="min-h-screen bg-beige inconsolata" style={inconsolataStyle}>
+      <div className="landing-page landing-snap-scroll min-h-screen bg-beige inconsolata" style={inconsolataStyle}>
       {/* Header */}
       <Header 
         dialogOpen={dialogOpen}
@@ -291,38 +207,25 @@ export default function LandingPage() {
         isValidBerlinPostcode={isValidBerlinPostcode}
       />
 
-      {(inHeroView || isTransitioning || isLeavingMain) && (
-        <Hero
-          dialogOpen={dialogOpen}
-          setDialogOpen={setDialogOpen}
-          zipInput={zipInput}
-          setZipInput={setZipInput}
-          handlePostcodeSubmit={handlePostcodeSubmit}
-          isValidBerlinPostcode={isValidBerlinPostcode}
-          onScrollToAblauf={() => {
-            document.body.style.overflow = 'hidden';
-            setIsTransitioning(true);
-            window.history.pushState({}, '', '/#ablauf');
-            window.requestAnimationFrame(() => {
-              window.scrollTo({ top: 0 });
-            });
-            setTimeout(() => {
-              setInHeroView(false);
-              setIsTransitioning(false);
-              document.body.style.overflow = '';
-              setShowHeader(true);
-              window.dispatchEvent(new Event('scroll'));
-            }, 750);
-          }}
-        />
-      )}
+      <Hero
+        dialogOpen={dialogOpen}
+        setDialogOpen={setDialogOpen}
+        zipInput={zipInput}
+        setZipInput={setZipInput}
+        handlePostcodeSubmit={handlePostcodeSubmit}
+        isValidBerlinPostcode={isValidBerlinPostcode}
+        onScrollToAblauf={() => {
+          const landingMain = document.getElementById('landing-main')
+          const mainTop =
+            landingMain?.getBoundingClientRect().top != null
+              ? landingMain.getBoundingClientRect().top + window.scrollY
+              : window.innerHeight
+          window.scrollTo({ top: mainTop, behavior: 'smooth' })
+        }}
+      />
 
-      {(!inHeroView || isTransitioning || isLeavingMain) && (
-        <div className={
-          isTransitioning ? 'main-view-enter main-view-transitioning' :
-          isLeavingMain   ? 'main-view-exit main-view-transitioning' :
-          ''
-        }>
+        <div className="landing-hero-snap-target" aria-hidden />
+        <div id="landing-main" className="landing-main landing-snap-target">
             {/* --- Zip code entry & form conditional rendering --- */}
             {/* COMMENTED OUT - Survey/Form Elements
             {zipEntered && !formData.zip && (
@@ -510,7 +413,6 @@ export default function LandingPage() {
 
       {/* <FloatingMonkey /> */}
       </div>
-      )}
       </div>
     </>
   )
