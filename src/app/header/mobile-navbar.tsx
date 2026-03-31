@@ -154,14 +154,15 @@ export default function MobileNavbar({
         <div className="mnav__cta-wrap">
           <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
             <DialogTrigger asChild>
-              <button
-                className="mnav__cta"
+              <Button
+                variant="button2"
+                className="w-full shadow-[0_10px_24px_rgba(0,0,0,0.26)]"
                 onClick={() => setIsOpen(false)}
               >
                 BEHANDLUNG ANFRAGEN
-              </button>
+              </Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-md">
+            <DialogContent className="sm:max-w-md border border-white/20 bg-white/10 backdrop-blur-md">
               <DialogHeader>
                 <DialogTitle className="inconsolata text-xl font-bold">
                   Postleitzahl eingeben
