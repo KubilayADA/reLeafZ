@@ -265,13 +265,12 @@ export default function LandingPage() {
             )}
             */}
 
-      {/* Partner-Apotheken map */}
-
-      <PartnerApotheken />
-
       {/* How to order — right under hero //let's structure this file like this g?*/}
       <How />
 
+      {/* Partner-Apotheken map */}
+
+      <PartnerApotheken />
  
       {/* Vorteile / city delivery section — commented out, replaced by How (how to order) under hero
      <section id="vorteile" className="py-12 sm:py-16 md:py-24 bg-gradient-to-r-custom section-container">
@@ -313,6 +312,34 @@ export default function LandingPage() {
 </section>
       */}
 
+      {/* Bottom CTA section */}
+      <section id="chat" className="py-12 sm:py-16 md:py-24 section-container">
+        <div className="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-6 title-gradient">
+            Ready to Transform Your<br className="hidden sm:block" />Medical Cannabis Experience?
+          </h2>
+          <p className="text-lg sm:text-xl subtitle-text mb-8 sm:mb-12 max-w-2xl mx-auto">
+            Join thousands of patients who&apos;ve found better care, faster relief, and a supportive community with reLeafZ.
+          </p>
+          {/* WEEDO needed to go sorry boss */} 
+          {/* <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 justify-center subtitle-text">
+            <Button className="bg-white text-gray-900 hover:bg-gray-50 px-6 sm:px-10 py-4 sm:py-6 rounded-2xl text-base sm:text-lg font-bold shadow-xl hover:shadow-2xl">
+              Start Your Journey Today
+              <ChevronRight className="w-5 h-5 ml-2" />
+            </Button>
+            <Button 
+              variant="outline" 
+              className="border-2 border-gray-900 text-gray-900 hover:bg-gray-100 px-6 sm:px-10 py-4 sm:py-6 rounded-2xl text-base sm:text-lg font-bold subtitle-text"
+            >
+              Speak with Weedo, the best budtender in town
+            </Button>
+          </div> */}
+
+          <p className="subtitle-text text-xs sm:text-sm mt-6 sm:mt-8 px-4">
+            No commitment required • Speak with licensed doctors • GDPR compliant
+          </p>
+        </div>
+      </section>
 
       {/* Footer stuff */}
       <footer className="bg-gray-900 text-white py-10 md:py-16">
