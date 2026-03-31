@@ -145,9 +145,9 @@ function PrescriptionPaymentContent() {
 
   const initializePayment = async () => {
     try {
-      const requestId = localStorage.getItem('pendingTreatmentRequestId')
-      const products = localStorage.getItem('selectedProducts')
-      const total = localStorage.getItem('totalPrice')
+      const requestId = sessionStorage.getItem('pendingTreatmentRequestId')
+      const products = sessionStorage.getItem('selectedProducts')
+      const total = sessionStorage.getItem('totalPrice')
 
       if (!requestId || !products || !total) {
         setError('Missing payment information. Please restart from marketplace.')

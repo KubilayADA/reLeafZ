@@ -13,6 +13,7 @@ import '@/components/ui/Hero/Words-Sliding-Smooth.css'
 import ComingSoon from '@/components/ComingSoon'
 import How from '@/components/ui/funktioniert/how'
 import { API_BASE } from '@/lib/api'
+import { APIProvider, useMapsLibrary } from '@vis.gl/react-google-maps'
 
 const COMING_SOON_MODE = true;
 
@@ -71,6 +72,133 @@ const FloatingMonkey = () => {
   )
 }
 
+interface AddressAutocompleteProps {
+  onAddressSelect: (address: string, plz: string, street: string, houseNumber: string, city: string) => void
+  onInputChange: (value: string) => void
+}
+
+function AddressAutocomplete({ onAddressSelect, onInputChange }: AddressAutocompleteProps) {
+  const [inputValue, setInputValue] = useState('')
+  const [suggestions, setSuggestions] = useState<google.maps.places.AutocompletePrediction[]>([])
+  const [showSuggestions, setShowSuggestions] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
+  const placesLib = useMapsLibrary('places')
+  const autocompleteService = React.useRef<google.maps.places.AutocompleteService | null>(null)
+  const geocoderRef = React.useRef<google.maps.Geocoder | null>(null)
+  const debounceTimer = React.useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  useEffect(() => {
+    if (!placesLib) return
+    autocompleteService.current = new placesLib.AutocompleteService()
+    geocoderRef.current = new google.maps.Geocoder()
+  }, [placesLib])
+
+  // Close suggestions on outside click
+  useEffect(() => {
+    const handleClickOutside = () => setShowSuggestions(false)
+    document.addEventListener('click', handleClickOutside)
+    return () => document.removeEventListener('click', handleClickOutside)
+  }, [])
+
+  const handleInput = (value: string) => {
+    // Sanitize input — strip HTML tags and limit length
+    const sanitized = value.replace(/<[^>]*>/g, '').slice(0, 200)
+    setInputValue(sanitized)
+    onInputChange(sanitized)
+    if (debounceTimer.current) clearTimeout(debounceTimer.current)
+    if (!autocompleteService.current || sanitized.length < 3) {
+      setSuggestions([])
+      setShowSuggestions(false)
+      return
+    }
+    debounceTimer.current = setTimeout(() => {
+      setIsLoading(true)
+      autocompleteService.current!.getPlacePredictions(
+        {
+          input: sanitized,
+          componentRestrictions: { country: 'de' },
+          types: ['address'],
+        },
+        (predictions, status) => {
+          setIsLoading(false)
+          if (status === google.maps.places.PlacesServiceStatus.OK && predictions) {
+            setSuggestions(predictions.slice(0, 5))
+            setShowSuggestions(true)
+          } else {
+            setSuggestions([])
+          }
+        }
+      )
+    }, 300)
+  }
+
+  const handleSelect = (prediction: google.maps.places.AutocompletePrediction) => {
+    const safeDescription = prediction.description.replace(/<[^>]*>/g, '').slice(0, 300)
+    setInputValue(safeDescription)
+    onInputChange(safeDescription)
+    setShowSuggestions(false)
+    setSuggestions([])
+    if (!geocoderRef.current) return
+    geocoderRef.current.geocode({ placeId: prediction.place_id }, (results, status) => {
+      if (status !== google.maps.GeocoderStatus.OK || !results || results.length === 0) return
+      const result = results[0]
+      const components = result.address_components
+      const get = (type: string) => components.find(c => c.types.includes(type))?.long_name ?? ''
+      const getShort = (type: string) => components.find(c => c.types.includes(type))?.short_name ?? ''
+      const plz = getShort('postal_code')
+      const street = get('route')
+      const houseNumber = get('street_number')
+      const city = get('locality') || get('administrative_area_level_1') || ''
+      // Still call callback even if no PLZ found for street-only results
+      // so fields populate and user sees what's missing
+      // Only block if PLZ exists but is clearly invalid (not a partial result)
+      // Street-only results may return partial PLZ like '13' — still populate fields
+      const validPlz = /^\d{5}$/.test(plz) ? plz : ''
+      onAddressSelect(safeDescription, validPlz, street, houseNumber, city)
+    })
+  }
+
+  return (
+    <div className="relative w-full" onClick={(e) => e.stopPropagation()}>
+      <input
+        type="text"
+        placeholder="Straße, Hausnummer, Stadt"
+        value={inputValue}
+        onChange={(e) => handleInput(e.target.value)}
+        className="w-full p-3 border border-gray-300 rounded-lg inconsolata text-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"
+        autoComplete="off"
+        maxLength={200}
+        aria-label="Adresse eingeben"
+        aria-autocomplete="list"
+        aria-expanded={showSuggestions}
+      />
+      {isLoading && (
+        <div className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs inconsolata">
+          Suche...
+        </div>
+      )}
+      {showSuggestions && suggestions.length > 0 && (
+        <ul
+          role="listbox"
+          className="absolute z-50 w-full bg-white border border-gray-200 rounded-lg mt-1 shadow-lg max-h-60 overflow-y-auto"
+        >
+          {suggestions.map((s) => (
+            <li
+              key={s.place_id}
+              role="option"
+              aria-selected={false}
+              onClick={() => handleSelect(s)}
+              className="px-4 py-3 cursor-pointer hover:bg-gray-50 inconsolata text-sm border-b border-gray-100 last:border-0"
+            >
+              {s.description}
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  )
+}
+
 export default function LandingPage() {
   const router = useRouter()
   const [testimonialIdx, setTestimonialIdx] = useState(0)
@@ -88,6 +216,34 @@ export default function LandingPage() {
     city: '',
     symptoms: '',
   });
+  const [selectedAddress, setSelectedAddress] = useState('')
+  const [selectedPlz, setSelectedPlz] = useState('')
+  const [streetName, setStreetName] = useState('')
+  const [houseNumber, setHouseNumber] = useState('')
+  const [cityName, setCityName] = useState('')
+  const [addressInputValue, setAddressInputValue] = useState('')
+
+  useEffect(() => {
+    if (!houseNumber || !streetName || !cityName) return
+    if (!window.google?.maps?.Geocoder) return
+
+    const timer = setTimeout(() => {
+      const geocoder = new window.google.maps.Geocoder()
+      const fullAddress = `${streetName} ${houseNumber}, ${cityName}, Germany`
+      geocoder.geocode({ address: fullAddress }, (results, status) => {
+        if (status !== window.google.maps.GeocoderStatus.OK || !results || results.length === 0) return
+        const plzComponent = results[0].address_components.find(
+          (c: google.maps.GeocoderAddressComponent) => c.types.includes('postal_code')
+        )
+        const newPlz = plzComponent?.short_name ?? ''
+        if (/^\d{5}$/.test(newPlz)) {
+          setSelectedPlz(newPlz)
+        }
+      })
+    }, 500)
+
+    return () => clearTimeout(timer)
+  }, [houseNumber, streetName, cityName])
 
   // Show coming soon page if flag is true
   if (COMING_SOON_MODE) {
@@ -99,19 +255,23 @@ export default function LandingPage() {
   };
   
   // Berlin postcode validation (10115-14199)
-  const isValidBerlinPostcode = (postcode: string) => {
-    const zip = parseInt(postcode);
-    return zip >= 10115 && zip <= 14199;
-  };
+  const isValidBerlinPostcode = (postcode: string): boolean => {
+    if (!/^\d{5}$/.test(postcode)) return false
+    const zip = parseInt(postcode, 10)
+    return zip >= 10000 && zip <= 14999
+  }
   
   const handlePostcodeSubmit = () => {
-    if (zipInput.trim() && isValidBerlinPostcode(zipInput)) {
-      setFormData(prev => ({ ...prev, zip: zipInput }));
-      setDialogOpen(false);
-      // Valid Berlin postcode - navigate to form page
-      router.push(`/form?postcode=${zipInput}`);
-    }
-  };
+    if (!selectedPlz || !isValidBerlinPostcode(selectedPlz)) return
+    const safeAddress = selectedAddress.replace(/<[^>]*>/g, '').slice(0, 300)
+    const safePlz = selectedPlz.replace(/\D/g, '').slice(0, 5)
+    const safeStreet = streetName.replace(/<[^>]*>/g, '').slice(0, 100)
+    const safeHouseNumber = houseNumber.replace(/<[^>]*>/g, '').slice(0, 20)
+    const safeCity = cityName.replace(/<[^>]*>/g, '').slice(0, 100)
+    setFormData(prev => ({ ...prev, zip: safePlz }))
+    setDialogOpen(false)
+    router.push(`/form?postcode=${safePlz}&address=${encodeURIComponent(safeAddress)}&street=${encodeURIComponent(safeStreet)}&houseNumber=${encodeURIComponent(safeHouseNumber)}&city=${encodeURIComponent(safeCity)}`)
+  }
   
   const handleBackToMain = () => {
     setShowForm(false);
@@ -236,29 +396,93 @@ export default function LandingPage() {
                 </DialogTrigger>
                 <DialogContent className="sm:max-w-md">
                   <DialogHeader>
-                    <DialogTitle className="inconsolata text-xl font-bold">Postleitzahl eingeben</DialogTitle>
+                    <DialogTitle className="inconsolata text-xl font-bold">
+                      Ihre Adresse eingeben
+                    </DialogTitle>
                     <DialogDescription className="inconsolata text-gray-600">
-                      Bitte geben Sie Ihre Postleitzahl ein, um zu prüfen, ob wir in Ihrer Region liefern können.
+                      Bitte geben Sie Ihre Adresse ein, damit wir die nächste Apotheke für Sie finden können.
                     </DialogDescription>
                   </DialogHeader>
-                  <div className="py-4">
-                    <input
-                      type="text"
-                      name="zip"
-                      placeholder="z.B. 10115"
-                      value={zipInput}
-                      onChange={(e) => setZipInput(e.target.value)}
-                      className="w-full p-3 border border-gray-300 rounded-lg inconsolata text-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"
-                      maxLength={5}
-                    />
+                  <div className="py-4 space-y-3">
+                    <APIProvider apiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY ?? ''}>
+                      <AddressAutocomplete
+                        onInputChange={(val) => setAddressInputValue(val)}
+                        onAddressSelect={(address, plz, street, houseNumber, city) => {
+                          setSelectedAddress(address)
+                          setSelectedPlz(plz)
+                          setStreetName(street)
+                          setHouseNumber(houseNumber)
+                          setCityName(city)
+                        }}
+                      />
+                    </APIProvider>
+
+                    {selectedAddress && !selectedPlz && (
+                      <p className="text-sm text-gray-500 inconsolata">
+                        Bitte wählen Sie eine vollständige Adresse mit Hausnummer.
+                      </p>
+                    )}
+
+                    {addressInputValue.length > 2 && (
+                      <div className="grid grid-cols-3 gap-2">
+                        <input
+                          type="text"
+                          value={streetName}
+                          onChange={(e) => setStreetName(e.target.value.replace(/<[^>]*>/g, '').slice(0, 100))}
+                          placeholder="Straße"
+                          className="col-span-2 p-2.5 border border-gray-300 rounded-lg inconsolata text-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"
+                        />
+                        <input
+                          type="text"
+                          value={houseNumber}
+                          onChange={(e) => setHouseNumber(e.target.value.replace(/<[^>]*>/g, '').slice(0, 20))}
+                          placeholder="Nr."
+                          className={`p-2.5 border rounded-lg inconsolata text-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none ${
+                            selectedPlz && !houseNumber
+                              ? 'border-red-400 bg-red-50'
+                              : 'border-gray-300'
+                          }`}
+                        />
+                      </div>
+                    )}
+
+                    {addressInputValue.length > 2 && (
+                      <div className="grid grid-cols-2 gap-2">
+                        <input
+                          type="text"
+                          value={selectedPlz}
+                          readOnly
+                          placeholder="PLZ"
+                          className="p-2.5 border border-gray-200 rounded-lg inconsolata text-sm bg-gray-50 text-gray-600 outline-none"
+                        />
+                        <input
+                          type="text"
+                          value={cityName}
+                          onChange={(e) => setCityName(e.target.value.replace(/<[^>]*>/g, '').slice(0, 100))}
+                          placeholder="Stadt"
+                          className="p-2.5 border border-gray-300 rounded-lg inconsolata text-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"
+                        />
+                      </div>
+                    )}
+
+                    {selectedPlz && !isValidBerlinPostcode(selectedPlz) && (
+                      <p className="text-sm text-red-500 inconsolata">
+                        Wir sind derzeit nicht in Ihrer Region verfügbar. Aktuell liefern wir in Berlin.
+                      </p>
+                    )}
+                    {selectedPlz && isValidBerlinPostcode(selectedPlz) && (
+                      <p className="text-sm text-emerald-600 inconsolata">
+                        ✓ Adresse erkannt — {streetName} {houseNumber}, {selectedPlz} {cityName}
+                      </p>
+                    )}
                   </div>
                   <DialogFooter>
                     <Button
                       onClick={handlePostcodeSubmit}
-                      disabled={!zipInput.trim() || !isValidBerlinPostcode(zipInput)}
+                      disabled={!selectedPlz || !isValidBerlinPostcode(selectedPlz) || !houseNumber}
                       className={`w-full inconsolata text-white font-medium py-3 ${
-                        !zipInput.trim() || !isValidBerlinPostcode(zipInput) 
-                          ? 'opacity-50 cursor-not-allowed bg-gray-400' 
+                        !selectedPlz || !isValidBerlinPostcode(selectedPlz) || !houseNumber
+                          ? 'opacity-50 cursor-not-allowed bg-gray-400'
                           : 'animated-button'
                       }`}
                     >

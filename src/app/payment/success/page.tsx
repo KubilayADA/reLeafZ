@@ -17,7 +17,7 @@ function PaymentSuccessContent() {
 
   const finalizeRequest = useCallback(async () => {
     try {
-      const selectedProducts = localStorage.getItem('selectedProducts')
+      const selectedProducts = sessionStorage.getItem('selectedProducts')
 
       if (!selectedProducts) {
         setLoading(false)
@@ -42,16 +42,16 @@ function PaymentSuccessContent() {
         body: JSON.stringify({
           treatmentRequestId: parseInt(requestId!),
           selectedProducts: parsedProducts,
-          pharmacyId: parseInt(localStorage.getItem('selectedPharmacyId') || '0'),
-          deliveryMethod: localStorage.getItem('selectedDeliveryMethod') || 'PICKUP',
+          pharmacyId: parseInt(sessionStorage.getItem('selectedPharmacyId') || '0'),
+          deliveryMethod: sessionStorage.getItem('selectedDeliveryMethod') || 'PICKUP',
         })
       })
 
       if (response.ok) {
-        localStorage.removeItem('pendingTreatmentRequestId')
-        localStorage.removeItem('selectedProducts')
-        localStorage.removeItem('totalPrice')
-        localStorage.removeItem('deliveryFee')
+        sessionStorage.removeItem('pendingTreatmentRequestId')
+        sessionStorage.removeItem('selectedProducts')
+        sessionStorage.removeItem('totalPrice')
+        sessionStorage.removeItem('deliveryFee')
       }
     } catch (err) {
       console.error('Finalize error:', err)

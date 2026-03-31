@@ -48,8 +48,8 @@ export default function MashallahForm({ postcode, onBack }: MashallahFormProps) 
                       // 🔒 SECURITY: Clear authentication tokens when email changes
                       // This prevents using old tokens with new email addresses
                       if (name === 'email') {
-                        localStorage.removeItem('treatmentRequest')
-                        localStorage.removeItem('assignedPharmacyId')
+                        sessionStorage.removeItem('treatmentRequest')
+                        sessionStorage.removeItem('assignedPharmacyId')
                         // Reset OTP modal state if it was open
                         setOtpModalOpen(false)
                         setOtpCode('')
@@ -151,15 +151,15 @@ export default function MashallahForm({ postcode, onBack }: MashallahFormProps) 
 
       // Only store when API returned a real treatment request
       if (result.data.pharmacyId != null) {
-        localStorage.setItem('assignedPharmacyId', result.data.pharmacyId.toString())
+        sessionStorage.setItem('assignedPharmacyId', result.data.pharmacyId.toString())
       }
       const treatmentRequestData = {
         id: result.data.id,
         city: formData.city,
         postcode,
       }
-      localStorage.setItem('treatmentRequest', JSON.stringify(treatmentRequestData))
-      localStorage.setItem('formPostcode', postcode)
+      sessionStorage.setItem('treatmentRequest', JSON.stringify(treatmentRequestData))
+      sessionStorage.setItem('formPostcode', postcode)
       return { success: true }
     } catch (error) {
       if (process.env.NODE_ENV === 'development') {
