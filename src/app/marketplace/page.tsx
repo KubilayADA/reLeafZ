@@ -149,7 +149,7 @@ export default function MarketplacePage() {
   const loadData = async () => {
     try {
       setLoading(true)
-      const treatmentData = localStorage.getItem('treatmentRequest')
+      const treatmentData = sessionStorage.getItem('treatmentRequest')
       if (!treatmentData) {
         setError('Keine Behandlungsanfrage gefunden. Bitte füllen Sie zuerst das Formular aus.')
         setLoading(false)
@@ -159,7 +159,7 @@ export default function MarketplacePage() {
       try {
         request = JSON.parse(treatmentData)
       } catch {
-        localStorage.removeItem('treatmentRequest')
+        sessionStorage.removeItem('treatmentRequest')
         setError('Your session data is corrupted. Please return to the home page and start over.')
         setLoading(false)
         return
@@ -302,15 +302,15 @@ export default function MarketplacePage() {
     const productsTotal = selectedItems.reduce((sum, item) => sum + item.subtotal, 0)
     const grandTotal = productsTotal + PRESCRIPTION_FEE + selectedDeliveryFee
 
-    localStorage.setItem('pendingTreatmentRequestId', treatmentRequest.id)
-    localStorage.setItem('selectedProducts', JSON.stringify(selectedItems))
-    localStorage.setItem('productsTotal', productsTotal.toString())
-    localStorage.setItem('prescriptionFee', PRESCRIPTION_FEE.toString())
-    localStorage.setItem('deliveryFee', selectedDeliveryFee.toString())
-    localStorage.setItem('totalPrice', grandTotal.toString())
-    localStorage.setItem('selectedPharmacyId', String(selectedPharmacyId))
-    localStorage.setItem('selectedDeliveryMethod', selectedDeliveryMethod)
-    localStorage.setItem('deliveryFee', selectedDeliveryFee.toString())
+    sessionStorage.setItem('pendingTreatmentRequestId', treatmentRequest.id)
+    sessionStorage.setItem('selectedProducts', JSON.stringify(selectedItems))
+    sessionStorage.setItem('productsTotal', productsTotal.toString())
+    sessionStorage.setItem('prescriptionFee', PRESCRIPTION_FEE.toString())
+    sessionStorage.setItem('deliveryFee', selectedDeliveryFee.toString())
+    sessionStorage.setItem('totalPrice', grandTotal.toString())
+    sessionStorage.setItem('selectedPharmacyId', String(selectedPharmacyId))
+    sessionStorage.setItem('selectedDeliveryMethod', selectedDeliveryMethod)
+    sessionStorage.setItem('deliveryFee', selectedDeliveryFee.toString())
 
     router.push('/payment/prescription')
   }
