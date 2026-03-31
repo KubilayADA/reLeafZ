@@ -35,7 +35,7 @@ export default function Hero({
       {/* Background — no hit target so wheel/touch scrolls the page to the next section */}
       <div className="pointer-events-none absolute inset-0 w-full overflow-hidden">
          <video
-          className="absolute inset-0 w-full h-full object-cover"
+          className="absolute inset-x-0 -top-[6svh] h-[112svh] w-full object-cover sm:inset-0 sm:h-full"
           src="/hero-vibe.mp4"
           preload="auto"
           autoPlay

@@ -5,6 +5,12 @@
 const HEADER_OFFSET = 70
 const SWITCH_EPSILON = 2
 const SWITCH_IDLE_MS = 90
+const MOBILE_SWITCH_IDLE_MS = 140
+
+function isMobileScrollMode(): boolean {
+  if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') return false
+  return window.matchMedia('(max-width: 900px), (pointer: coarse)').matches
+}
 
 function getLandingMainTop(): number {
   const landingMain = document.getElementById('landing-main')
@@ -58,15 +64,25 @@ export function isLandingPastHero(): boolean {
 export function attachLandingBinarySwitch(): () => void {
   let snapTimer: number | null = null
   let animating = false
+  let isTouching = false
+  let lockUntil = 0
+  let mobileMode = isMobileScrollMode()
+  let lastScrollY = window.scrollY
+  let lastScrollTs = performance.now()
+
+  const refreshMode = () => {
+    mobileMode = isMobileScrollMode()
+  }
 
   const settleTo = (targetTop: number) => {
     if (isAt(targetTop)) return
     animating = true
+    lockUntil = Date.now() + (mobileMode ? 320 : 420)
     window.scrollTo({ top: targetTop, behavior: 'smooth' })
 
     const startedAt = performance.now()
     const tick = () => {
-      if (isAt(targetTop) || performance.now() - startedAt > 700) {
+      if (isAt(targetTop) || performance.now() - startedAt > (mobileMode ? 900 : 700)) {
         animating = false
         return
       }
@@ -76,6 +92,7 @@ export function attachLandingBinarySwitch(): () => void {
   }
 
   const onWheel = (e: WheelEvent) => {
+    if (mobileMode) return
     const mainTop = getLandingMainTop()
     const y = window.scrollY
     const crossingBridge = y > SWITCH_EPSILON && y < mainTop - SWITCH_EPSILON
@@ -108,24 +125,55 @@ export function attachLandingBinarySwitch(): () => void {
 
   const onScroll = () => {
     if (animating) return
+    if (Date.now() < lockUntil) return
     const mainTop = getLandingMainTop()
     const y = window.scrollY
     const crossingBridge = y > SWITCH_EPSILON && y < mainTop - SWITCH_EPSILON
+    const now = performance.now()
+    const dt = Math.max(1, now - lastScrollTs)
+    const dy = y - lastScrollY
+    const velocity = dy / dt
+    lastScrollY = y
+    lastScrollTs = now
     if (!crossingBridge) return
+
+    if (mobileMode && isTouching) return
 
     if (snapTimer) window.clearTimeout(snapTimer)
     snapTimer = window.setTimeout(() => {
+      const currentY = window.scrollY
       const midpoint = mainTop / 2
-      settleTo(window.scrollY < midpoint ? 0 : mainTop)
-    }, SWITCH_IDLE_MS)
+      settleTo(currentY < midpoint ? 0 : mainTop)
+    }, mobileMode ? MOBILE_SWITCH_IDLE_MS : SWITCH_IDLE_MS)
+  }
+
+  const onTouchStart = (e: TouchEvent) => {
+    isTouching = true
+  }
+  const onTouchEnd = () => {
+    isTouching = false
+    if (snapTimer) window.clearTimeout(snapTimer)
+    snapTimer = window.setTimeout(() => {
+      const mainTop = getLandingMainTop()
+      const y = window.scrollY
+      if (!(y > SWITCH_EPSILON && y < mainTop - SWITCH_EPSILON)) return
+      const midpoint = mainTop / 2
+      settleTo(y < midpoint ? 0 : mainTop)
+    }, MOBILE_SWITCH_IDLE_MS)
   }
 
   window.addEventListener('wheel', onWheel, { passive: false })
   window.addEventListener('scroll', onScroll, { passive: true })
+  window.addEventListener('touchstart', onTouchStart, { passive: true })
+  window.addEventListener('touchend', onTouchEnd, { passive: true })
+  window.addEventListener('resize', refreshMode)
 
   return () => {
     window.removeEventListener('wheel', onWheel)
     window.removeEventListener('scroll', onScroll)
+    window.removeEventListener('touchstart', onTouchStart)
+    window.removeEventListener('touchend', onTouchEnd)
+    window.removeEventListener('resize', refreshMode)
     if (snapTimer) window.clearTimeout(snapTimer)
   }
 }

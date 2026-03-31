@@ -137,14 +137,25 @@
   html:has(.landing-page) {
     scroll-behavior: auto;
     overscroll-behavior-y: none;
+    background: transparent;
   }
 
   body:has(.landing-page) {
     overscroll-behavior-y: none;
+    background: transparent;
   }
 
   .landing-page {
     touch-action: pan-y;
+  }
+
+  @supports (padding: env(safe-area-inset-top)) {
+    @media (max-width: 900px) {
+      html:has(.landing-page),
+      body:has(.landing-page) {
+        background-color: transparent;
+      }
+    }
   }
   body {
     @apply bg-background text-foreground;
