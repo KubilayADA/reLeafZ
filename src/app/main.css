@@ -308,11 +308,7 @@ button[disabled] {
     font-weight: 550;
     font-size: 14px;
     line-height: 24px;
-    background-color: #72906F;
-    color: white;
-    border: 2px solid #000000;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-    transition: all 0.3s ease;
+    margin-top: 100px;
 }
 
 @property --border-angle {
@@ -892,7 +888,7 @@ h1 + .animated-words-container {
 .words-wrapper {
     display: flex;
     flex-direction: column;
-    animation: wordSlider 14s infinite ease-in-out;
+    animation: wordSlider 24s infinite ease-in-out;
     height: auto;
 }
 

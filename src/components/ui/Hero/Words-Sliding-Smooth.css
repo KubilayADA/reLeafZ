@@ -3,7 +3,7 @@
  * .words-wrapper must have height:auto so translateY percentages are relative
  * to the full stacked content (7 × --word-h), making each step exactly one word.
  */
- @keyframes wordSlider {
+@keyframes wordSlider {
   0%   { transform: translateY(0%); }
   11%  { transform: translateY(0%);        animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1); }
   14%  { transform: translateY(-14.285%); }
@@ -17,8 +17,8 @@
   70%  { transform: translateY(-71.428%); }
   81%  { transform: translateY(-71.428%);  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1); }
   84%  { transform: translateY(-85.714%); }
-  95%  { transform: translateY(-85.714%);  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1); }
-  100% { transform: translateY(0%); }
+  90%  { transform: translateY(-85.714%); }
+  100% { transform: translateY(0%); animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1); }
 }
 
 .words-wrapper {

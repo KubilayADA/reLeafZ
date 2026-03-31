@@ -51,6 +51,14 @@ export default function Hero({
         <div className="absolute inset-0 bg-black/20" />
       </div>
 
+      {/* Full-hero tap/click target to advance to next section */}
+      <button
+        type="button"
+        aria-label="Go to next section"
+        className="pointer-events-auto absolute inset-0 z-[1] bg-transparent"
+        onClick={onScrollToAblauf}
+      />
+
       {/* reLeafZ logo — top left (back to hero) */}
       <a
         href="#hero"
@@ -76,22 +84,7 @@ export default function Hero({
           onScrollToAblauf()
         }}
       >
-        <span className="hero-scroll-cta-text">Entdecke wie es funktioniert</span>
-        <div className="hero-scroll-cta-icon" aria-hidden>
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="40"
-            height="40"
-            viewBox="0 0 24 24"
-            fill="transparent"
-            stroke="currentColor"
-            strokeWidth="2.5"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <polyline points="6 9 12 15 18 9" />
-          </svg>
-        </div>
+        <span className="hero-scroll-cta-text">Tap anywhere or click to go to the next section</span>
       </a>
 
       {/* `pointer-events-none` so wheel/touch reaches `.hero-scroll-spacer` under the fixed hero; only interactive chunks use `pointer-events-auto`. */}
@@ -106,7 +99,7 @@ export default function Hero({
               {words.map((word, index) => (
                 <div
                   key={index}
-                  className="word-item text-base sm:text-5xl md:text-7xl font-bold title-gradient-hero leading-tight italic"
+                  className="word-item text-base sm:text-5xl md:text-7xl font-bold title-gradient-hero leading-tight italic margin-bottom-100"
                 >
                   {word}
                 </div>
@@ -145,10 +138,10 @@ export default function Hero({
               <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
                 <DialogTrigger asChild>
                   <Button
-                    className="behandlung-button-hero px-5 py-2 sm:px-7 sm:py-2.5 md:scale-125 lg:scale-150 md:px-8 md:py-3 flex items-center justify-center min-w-44 sm:min-w-56 md:min-w-64 w-auto"
+                    variant="button2"
+                    className="behandlung-button md:scale-125 lg:scale-150 min-w-44 sm:min-w-56 md:min-w-64 w-auto"
                   >
                     BEHANDLUNG ANFRAGEN
-                    <ChevronRight className="w-5 h-5 ml-2" />
                   </Button>
                 </DialogTrigger>
                 <DialogContent className="sm:max-w-md">
@@ -171,13 +164,10 @@ export default function Hero({
                   </div>
                   <DialogFooter>
                     <Button
+                      variant="button2"
                       onClick={handlePostcodeSubmit}
                       disabled={!zipInput.trim() || !isValidBerlinPostcode(zipInput)}
-                      className={`w-full inconsolata text-white font-medium py-3 ${
-                        !zipInput.trim() || !isValidBerlinPostcode(zipInput)
-                          ? 'opacity-50 cursor-not-allowed bg-gray-400'
-                          : 'animated-button'
-                      }`}
+                      className="w-full inconsolata text-white font-medium"
                     >
                       Weiter
                     </Button>
@@ -206,22 +196,9 @@ export default function Hero({
             Lieferung in 30-90 Minuten in Berlin<br />
             Ganz Deutschland in 1-2 Tagen<br /><br />
           </div>
-
-            <div className="hero-cta-text-block">
-              <span className="hero-cta-text">Weißt du schon was du willst? Worauf wartest du noch ;)</span>
-            </div>
-            <div className="hero-cta-arrow-block">
-              <img
-                src="/arrow-down.png"
-                alt=""
-                className="w-15 h-15 object-contain drop-shadow-md"
-                style={{ transform: 'rotate(75deg)' }}
-                aria-hidden
-              />
             </div>
           </div>
         </div>
-      </div>
     </section>
   )
 }
