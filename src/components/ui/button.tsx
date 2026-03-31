@@ -22,7 +22,7 @@ const buttonVariants = cva(
           "hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50",
         link: "text-primary underline-offset-4 hover:underline",
         button2:
-          "uiverse !inline-block !h-auto !rounded-[24px] !p-0 !font-semibold !text-base",
+          "uiverse !inline-block !h-auto !rounded-[7px] !p-0 !font-semibold !text-base",
       },
       size: {
         default: "h-9 px-4 py-2 has-[>svg]:px-3",

@@ -91,10 +91,10 @@ export default function Hero({
       <div className="pointer-events-none relative max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 overflow-visible w-full">
         <div className="text-center overflow-visible w-full max-w-full">
           {/* Main heading */}
-          <h1 className="title-gradient-hero">
+          <h1 className="title-gradient-hero scale-110">
             MEDIZINAL CANNABIS
           </h1>
-          <div className="animated-words-container">
+          <div className="animated-words-container scale-110">
             <div className="words-wrapper">
               {words.map((word, index) => (
                 <div

@@ -97,13 +97,15 @@ export default function Header({
             </nav>
             
             {/* Desktop Button - Hidden on mobile, only in hamburger menu wish i believe is better let me know if you see this UwUwuu*/}
-            <div className="hidden lg:block">
+            <div className="hidden lg:block text-black">
               <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
               <DialogTrigger asChild>
                   <Button
                     className="header-button"
+                    variant="button2"
+                    style={{ "--c-color": "#000000", color: "#000000" } as React.CSSProperties}
                   >
-                  BEHANDLUNG ANFRAGEN
+                  BEHANDLUNG ANFRAGEN 
                 </Button>
               </DialogTrigger>
               <DialogContent className="sm:max-w-md">
