@@ -7,16 +7,18 @@ import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import MashallahForm from '@/form/mashallah'
 import words from '@/constants/index'
-import Header from './header'
+import Header from './header/header'
+import MobileNavbar from './header/mobile-navbar'
+import Hero from './hero'
 import CookieBanner from '@/components/ui/cookie'
 import '@/components/ui/Hero/Words-Sliding-Smooth.css' 
 import ComingSoon from '@/components/ComingSoon'
 import How from '@/components/ui/funktioniert/how'
+import PartnerApotheken from '@/components/ui/partnerApotheken/finden'
 import { API_BASE } from '@/lib/api'
-import { APIProvider, useMapsLibrary } from '@vis.gl/react-google-maps'
+import { attachLandingBinarySwitch } from '@/lib/scroll'
 
-const COMING_SOON_MODE = true;
-
+const COMING_SOON_MODE = false;
 // Font setup - using Inconsolata
 const inconsolataStyle = {
   fontFamily: '"Inconsolata", monospace',
@@ -43,161 +45,34 @@ const cities = [
   { name: "Frankfurt am Main", explanation: "Coming soon" }
 ];
 
-// Fun monkey easter egg - for now I like it lol
-const FloatingMonkey = () => {
-  const [show, setShow] = useState(false)
-  const [mounted, setMounted] = useState(false)
+// Fun monkey easter egg - for now I like it lol // had to go sorry boss - for now...
+// const FloatingMonkey = () => {
+//   const [show, setShow] = useState(false)
+//   const [mounted, setMounted] = useState(false)
 
-  useEffect(() => {
-    setMounted(true)
-    setShow(true)
-    const timer = setInterval(() => setShow(prev => !prev), 8000)
-    return () => clearInterval(timer)
-  }, [])
+//   useEffect(() => {
+//     setMounted(true)
+//     setShow(true)
+//     const timer = setInterval(() => setShow(prev => !prev), 8000)
+//     return () => clearInterval(timer)
+//   }, [])
 
-  if (!mounted || !show) return null
+//   if (!mounted || !show) return null
 
-  return (
-    <div className="fixed bottom-8 right-8 z-40 transition-opacity duration-1000">
-      <div className="bg-white/90 backdrop-blur-sm rounded-3xl p-6 shadow-2xl border border-emerald-200 max-w-xs">
-        <div className="flex items-center space-x-4">
-          <div className="text-4xl transform rotate-12">🐒💨</div>
-          <div className="flex-1">
-            <div className="text-sm font-semibold text-emerald-700 mb-1">Feeling Relaxed?</div>
-            <div className="text-xs text-gray-600">Weedo found the perfect strain for your sleep schedule</div>
-          </div>
-        </div>
-      </div>
-    </div>
-  )
-}
-
-interface AddressAutocompleteProps {
-  onAddressSelect: (address: string, plz: string, street: string, houseNumber: string, city: string) => void
-  onInputChange: (value: string) => void
-}
-
-function AddressAutocomplete({ onAddressSelect, onInputChange }: AddressAutocompleteProps) {
-  const [inputValue, setInputValue] = useState('')
-  const [suggestions, setSuggestions] = useState<google.maps.places.AutocompletePrediction[]>([])
-  const [showSuggestions, setShowSuggestions] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
-  const placesLib = useMapsLibrary('places')
-  const autocompleteService = React.useRef<google.maps.places.AutocompleteService | null>(null)
-  const geocoderRef = React.useRef<google.maps.Geocoder | null>(null)
-  const debounceTimer = React.useRef<ReturnType<typeof setTimeout> | null>(null)
-
-  useEffect(() => {
-    if (!placesLib) return
-    autocompleteService.current = new placesLib.AutocompleteService()
-    geocoderRef.current = new google.maps.Geocoder()
-  }, [placesLib])
-
-  // Close suggestions on outside click
-  useEffect(() => {
-    const handleClickOutside = () => setShowSuggestions(false)
-    document.addEventListener('click', handleClickOutside)
-    return () => document.removeEventListener('click', handleClickOutside)
-  }, [])
-
-  const handleInput = (value: string) => {
-    // Sanitize input — strip HTML tags and limit length
-    const sanitized = value.replace(/<[^>]*>/g, '').slice(0, 200)
-    setInputValue(sanitized)
-    onInputChange(sanitized)
-    if (debounceTimer.current) clearTimeout(debounceTimer.current)
-    if (!autocompleteService.current || sanitized.length < 3) {
-      setSuggestions([])
-      setShowSuggestions(false)
-      return
-    }
-    debounceTimer.current = setTimeout(() => {
-      setIsLoading(true)
-      autocompleteService.current!.getPlacePredictions(
-        {
-          input: sanitized,
-          componentRestrictions: { country: 'de' },
-          types: ['address'],
-        },
-        (predictions, status) => {
-          setIsLoading(false)
-          if (status === google.maps.places.PlacesServiceStatus.OK && predictions) {
-            setSuggestions(predictions.slice(0, 5))
-            setShowSuggestions(true)
-          } else {
-            setSuggestions([])
-          }
-        }
-      )
-    }, 300)
-  }
-
-  const handleSelect = (prediction: google.maps.places.AutocompletePrediction) => {
-    const safeDescription = prediction.description.replace(/<[^>]*>/g, '').slice(0, 300)
-    setInputValue(safeDescription)
-    onInputChange(safeDescription)
-    setShowSuggestions(false)
-    setSuggestions([])
-    if (!geocoderRef.current) return
-    geocoderRef.current.geocode({ placeId: prediction.place_id }, (results, status) => {
-      if (status !== google.maps.GeocoderStatus.OK || !results || results.length === 0) return
-      const result = results[0]
-      const components = result.address_components
-      const get = (type: string) => components.find(c => c.types.includes(type))?.long_name ?? ''
-      const getShort = (type: string) => components.find(c => c.types.includes(type))?.short_name ?? ''
-      const plz = getShort('postal_code')
-      const street = get('route')
-      const houseNumber = get('street_number')
-      const city = get('locality') || get('administrative_area_level_1') || ''
-      // Still call callback even if no PLZ found for street-only results
-      // so fields populate and user sees what's missing
-      // Only block if PLZ exists but is clearly invalid (not a partial result)
-      // Street-only results may return partial PLZ like '13' — still populate fields
-      const validPlz = /^\d{5}$/.test(plz) ? plz : ''
-      onAddressSelect(safeDescription, validPlz, street, houseNumber, city)
-    })
-  }
-
-  return (
-    <div className="relative w-full" onClick={(e) => e.stopPropagation()}>
-      <input
-        type="text"
-        placeholder="Straße, Hausnummer, Stadt"
-        value={inputValue}
-        onChange={(e) => handleInput(e.target.value)}
-        className="w-full p-3 border border-gray-300 rounded-lg inconsolata text-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"
-        autoComplete="off"
-        maxLength={200}
-        aria-label="Adresse eingeben"
-        aria-autocomplete="list"
-        aria-expanded={showSuggestions}
-      />
-      {isLoading && (
-        <div className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs inconsolata">
-          Suche...
-        </div>
-      )}
-      {showSuggestions && suggestions.length > 0 && (
-        <ul
-          role="listbox"
-          className="absolute z-50 w-full bg-white border border-gray-200 rounded-lg mt-1 shadow-lg max-h-60 overflow-y-auto"
-        >
-          {suggestions.map((s) => (
-            <li
-              key={s.place_id}
-              role="option"
-              aria-selected={false}
-              onClick={() => handleSelect(s)}
-              className="px-4 py-3 cursor-pointer hover:bg-gray-50 inconsolata text-sm border-b border-gray-100 last:border-0"
-            >
-              {s.description}
-            </li>
-          ))}
-        </ul>
-      )}
-    </div>
-  )
-}
+//   return (
+//     <div className="fixed bottom-8 right-8 z-40 transition-opacity duration-1000">
+//       <div className="bg-white/90 backdrop-blur-sm rounded-3xl p-6 shadow-2xl border border-emerald-200 max-w-xs">
+//         <div className="flex items-center space-x-4">
+//           <div className="text-4xl transform rotate-12">🐒💨</div>
+//           <div className="flex-1">
+//             <div className="text-sm font-semibold text-emerald-700 mb-1">Feeling Relaxed?</div>
+//             <div className="text-xs text-gray-600">Weedo found the perfect strain for your sleep schedule</div>
+//           </div>
+//         </div>
+//       </div>
+//     </div>
+//   )
+// }
 
 export default function LandingPage() {
   const router = useRouter()
@@ -205,6 +80,7 @@ export default function LandingPage() {
   const [openCity, setOpenCity] = useState<string | null>(null)
   const [dialogOpen, setDialogOpen] = useState(false)
   const [showForm, setShowForm] = useState(false)
+  const [showHeader, setShowHeader] = useState(false)
   // --- Begin zip code state and form state ---
   const [zipEntered, setZipEntered] = useState(false);
   const [zipInput, setZipInput] = useState('');
@@ -216,34 +92,6 @@ export default function LandingPage() {
     city: '',
     symptoms: '',
   });
-  const [selectedAddress, setSelectedAddress] = useState('')
-  const [selectedPlz, setSelectedPlz] = useState('')
-  const [streetName, setStreetName] = useState('')
-  const [houseNumber, setHouseNumber] = useState('')
-  const [cityName, setCityName] = useState('')
-  const [addressInputValue, setAddressInputValue] = useState('')
-
-  useEffect(() => {
-    if (!houseNumber || !streetName || !cityName) return
-    if (!window.google?.maps?.Geocoder) return
-
-    const timer = setTimeout(() => {
-      const geocoder = new window.google.maps.Geocoder()
-      const fullAddress = `${streetName} ${houseNumber}, ${cityName}, Germany`
-      geocoder.geocode({ address: fullAddress }, (results, status) => {
-        if (status !== window.google.maps.GeocoderStatus.OK || !results || results.length === 0) return
-        const plzComponent = results[0].address_components.find(
-          (c: google.maps.GeocoderAddressComponent) => c.types.includes('postal_code')
-        )
-        const newPlz = plzComponent?.short_name ?? ''
-        if (/^\d{5}$/.test(newPlz)) {
-          setSelectedPlz(newPlz)
-        }
-      })
-    }, 500)
-
-    return () => clearTimeout(timer)
-  }, [houseNumber, streetName, cityName])
 
   // Show coming soon page if flag is true
   if (COMING_SOON_MODE) {
@@ -255,23 +103,19 @@ export default function LandingPage() {
   };
   
   // Berlin postcode validation (10115-14199)
-  const isValidBerlinPostcode = (postcode: string): boolean => {
-    if (!/^\d{5}$/.test(postcode)) return false
-    const zip = parseInt(postcode, 10)
-    return zip >= 10000 && zip <= 14999
-  }
+  const isValidBerlinPostcode = (postcode: string) => {
+    const zip = parseInt(postcode);
+    return zip >= 10115 && zip <= 14199;
+  };
   
   const handlePostcodeSubmit = () => {
-    if (!selectedPlz || !isValidBerlinPostcode(selectedPlz)) return
-    const safeAddress = selectedAddress.replace(/<[^>]*>/g, '').slice(0, 300)
-    const safePlz = selectedPlz.replace(/\D/g, '').slice(0, 5)
-    const safeStreet = streetName.replace(/<[^>]*>/g, '').slice(0, 100)
-    const safeHouseNumber = houseNumber.replace(/<[^>]*>/g, '').slice(0, 20)
-    const safeCity = cityName.replace(/<[^>]*>/g, '').slice(0, 100)
-    setFormData(prev => ({ ...prev, zip: safePlz }))
-    setDialogOpen(false)
-    router.push(`/form?postcode=${safePlz}&address=${encodeURIComponent(safeAddress)}&street=${encodeURIComponent(safeStreet)}&houseNumber=${encodeURIComponent(safeHouseNumber)}&city=${encodeURIComponent(safeCity)}`)
-  }
+    if (zipInput.trim() && isValidBerlinPostcode(zipInput)) {
+      setFormData(prev => ({ ...prev, zip: zipInput }));
+      setDialogOpen(false);
+      // Valid Berlin postcode - navigate to form page
+      router.push(`/form?postcode=${zipInput}`);
+    }
+  };
   
   const handleBackToMain = () => {
     setShowForm(false);
@@ -314,7 +158,28 @@ export default function LandingPage() {
     }
   };
   // --- End zip code state and form state ---
+
+  useEffect(() => {
+    const updateHeaderVisibility = () => {
+      const landingMain = document.getElementById('landing-main')
+      const mainTop = landingMain?.getBoundingClientRect().top ?? Number.POSITIVE_INFINITY
+      setShowHeader(mainTop <= 80)
+    }
+
+    updateHeaderVisibility()
+    window.addEventListener('scroll', updateHeaderVisibility, { passive: true })
+    window.addEventListener('resize', updateHeaderVisibility)
+    return () => {
+      window.removeEventListener('scroll', updateHeaderVisibility)
+      window.removeEventListener('resize', updateHeaderVisibility)
+    }
+  }, [])
+
+  useEffect(() => {
+    return attachLandingBinarySwitch()
+  }, [])
   
+
   // Show form if valid Berlin postcode was entered
   if (showForm) {
     return <MashallahForm postcode={zipInput} onBack={handleBackToMain} />
@@ -323,7 +188,7 @@ export default function LandingPage() {
   return (
     <>
       <CookieBanner />
-      <div className="min-h-screen bg-beige inconsolata" style={inconsolataStyle}>
+      <div className="landing-page landing-snap-scroll min-h-screen bg-beige inconsolata" style={inconsolataStyle}>
       {/* Header */}
       <Header 
         dialogOpen={dialogOpen}
@@ -332,174 +197,36 @@ export default function LandingPage() {
         setZipInput={setZipInput}
         handlePostcodeSubmit={handlePostcodeSubmit}
         isValidBerlinPostcode={isValidBerlinPostcode}
+        isVisible={showHeader}
+      />
+      <MobileNavbar
+        dialogOpen={dialogOpen}
+        setDialogOpen={setDialogOpen}
+        zipInput={zipInput}
+        setZipInput={setZipInput}
+        handlePostcodeSubmit={handlePostcodeSubmit}
+        isValidBerlinPostcode={isValidBerlinPostcode}
       />
 
-      {/* Main hero area */}
-      <section className="hero-section relative pt-20 pb-32 overflow-hidden"
-      
-      >
-        {/* Background decoration */}
-        <div className="absolute inset-0 overflow-hidden">
-          {/* <div className="absolute top-40 left-20 w-72 h-72 bg-purple-500/40 -full blur-3xl" />
-          <div className="absolute top-60 right-20 w-96 h-96 bg-green-500/30 -full blur-3xl" />
-          <div className="absolute bottom-20 left-1/2 w-90 h-80 bg-green-600/35 -full blur-3xl" /> */}
-        </div>
+      <Hero
+        dialogOpen={dialogOpen}
+        setDialogOpen={setDialogOpen}
+        zipInput={zipInput}
+        setZipInput={setZipInput}
+        handlePostcodeSubmit={handlePostcodeSubmit}
+        isValidBerlinPostcode={isValidBerlinPostcode}
+        onScrollToAblauf={() => {
+          const landingMain = document.getElementById('landing-main')
+          const mainTop =
+            landingMain?.getBoundingClientRect().top != null
+              ? landingMain.getBoundingClientRect().top + window.scrollY
+              : window.innerHeight
+          window.scrollTo({ top: mainTop, behavior: 'smooth' })
+        }}
+      />
 
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            {/* Badge */}
-            <div className="inline-flex items-center px-4 py-2 bg-gradient-to-r-custom mb-8">
-              <Sparkles className="w-4 h-4 mr-5" />
-              <span className="text-sm font-medium subtitle-text">
-                AI-Powered, Ultra fast Medical Cannabis Service
-              </span>
-            </div>
-
-            {/* Main heading */}
-            <h1 className="text-3xl sm:text-5xl md:text-7xl font-bold title-gradient mb-5 leading-tight italic">
-              MEDIZINAL CANNABIS
-            </h1>
-            <div className="animated-words-container">
-                <div className="words-wrapper">
-                    {words.map((word, index) => (
-                        <div 
-                            key={index} 
-                            className="word-item text-3xl sm:text-5xl md:text-7xl font-bold title-gradient leading-tight italic"
-                        >
-                            {word}
-                        </div>
-                    ))}
-                </div>
-            </div>
-
-            {/* - messy HTML */}
-            <div className="text-sm sm:text-base md:text-lg subtitle-text inconsolata mb-6 max-w-4xl mx-auto leading-relaxed px-4">
-              BER | HAM | MUC | COL | DUS | FFM <br />Lieferung in 30-90 Minuten in Berlin<br />
-              Ganz Deutschland in 1-2 Tagen<br /><br />
-              </div>
-            <div className="text-sm sm:text-base md:text-lg subtitle-text inconsolata mb-6 max-w-4xl mx-auto leading-relaxed font-thin px-4">
-              ✓ Blüten ab 4,99€*<br />
-              ✓ Rezept digital austellen lassen<br />
-              ✓ Medikamente aus der Apotheke abholen oder liefern lassen<br />
-            </div>
-
-            {/* CTA button - Visible on all devices */}
-            <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
-              <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-                <DialogTrigger asChild>
-                  <Button
-                    className="behandlung-button-hero px-8 py-3 flex items-center justify-center min-w-64 w-auto"
-                  >
-                    BEHANDLUNG ANFRAGEN
-                    <ChevronRight className="w-5 h-5 ml-2" />
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="sm:max-w-md">
-                  <DialogHeader>
-                    <DialogTitle className="inconsolata text-xl font-bold">
-                      Ihre Adresse eingeben
-                    </DialogTitle>
-                    <DialogDescription className="inconsolata text-gray-600">
-                      Bitte geben Sie Ihre Adresse ein, damit wir die nächste Apotheke für Sie finden können.
-                    </DialogDescription>
-                  </DialogHeader>
-                  <div className="py-4 space-y-3">
-                    <APIProvider apiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY ?? ''}>
-                      <AddressAutocomplete
-                        onInputChange={(val) => setAddressInputValue(val)}
-                        onAddressSelect={(address, plz, street, houseNumber, city) => {
-                          setSelectedAddress(address)
-                          setSelectedPlz(plz)
-                          setStreetName(street)
-                          setHouseNumber(houseNumber)
-                          setCityName(city)
-                        }}
-                      />
-                    </APIProvider>
-
-                    {selectedAddress && !selectedPlz && (
-                      <p className="text-sm text-gray-500 inconsolata">
-                        Bitte wählen Sie eine vollständige Adresse mit Hausnummer.
-                      </p>
-                    )}
-
-                    {addressInputValue.length > 2 && (
-                      <div className="grid grid-cols-3 gap-2">
-                        <input
-                          type="text"
-                          value={streetName}
-                          onChange={(e) => setStreetName(e.target.value.replace(/<[^>]*>/g, '').slice(0, 100))}
-                          placeholder="Straße"
-                          className="col-span-2 p-2.5 border border-gray-300 rounded-lg inconsolata text-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"
-                        />
-                        <input
-                          type="text"
-                          value={houseNumber}
-                          onChange={(e) => setHouseNumber(e.target.value.replace(/<[^>]*>/g, '').slice(0, 20))}
-                          placeholder="Nr."
-                          className={`p-2.5 border rounded-lg inconsolata text-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none ${
-                            selectedPlz && !houseNumber
-                              ? 'border-red-400 bg-red-50'
-                              : 'border-gray-300'
-                          }`}
-                        />
-                      </div>
-                    )}
-
-                    {addressInputValue.length > 2 && (
-                      <div className="grid grid-cols-2 gap-2">
-                        <input
-                          type="text"
-                          value={selectedPlz}
-                          readOnly
-                          placeholder="PLZ"
-                          className="p-2.5 border border-gray-200 rounded-lg inconsolata text-sm bg-gray-50 text-gray-600 outline-none"
-                        />
-                        <input
-                          type="text"
-                          value={cityName}
-                          onChange={(e) => setCityName(e.target.value.replace(/<[^>]*>/g, '').slice(0, 100))}
-                          placeholder="Stadt"
-                          className="p-2.5 border border-gray-300 rounded-lg inconsolata text-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"
-                        />
-                      </div>
-                    )}
-
-                    {selectedPlz && !isValidBerlinPostcode(selectedPlz) && (
-                      <p className="text-sm text-red-500 inconsolata">
-                        Wir sind derzeit nicht in Ihrer Region verfügbar. Aktuell liefern wir in Berlin.
-                      </p>
-                    )}
-                    {selectedPlz && isValidBerlinPostcode(selectedPlz) && (
-                      <p className="text-sm text-emerald-600 inconsolata">
-                        ✓ Adresse erkannt — {streetName} {houseNumber}, {selectedPlz} {cityName}
-                      </p>
-                    )}
-                  </div>
-                  <DialogFooter>
-                    <Button
-                      onClick={handlePostcodeSubmit}
-                      disabled={!selectedPlz || !isValidBerlinPostcode(selectedPlz) || !houseNumber}
-                      className={`w-full inconsolata text-white font-medium py-3 ${
-                        !selectedPlz || !isValidBerlinPostcode(selectedPlz) || !houseNumber
-                          ? 'opacity-50 cursor-not-allowed bg-gray-400'
-                          : 'animated-button'
-                      }`}
-                    >
-                      Weiter
-                    </Button>
-                  </DialogFooter>
-                </DialogContent>
-              </Dialog>
-              <button
-                type="button"
-                onClick={() => router.push('/verify-prescription')}
-                className="inconsolata px-8 py-3 flex items-center justify-center min-w-64 w-auto box-border text-[14px] leading-[24px] font-[550] bg-transparent text-black border-[1.1px] border-black shadow-[0_4px_6px_-1px_rgba(0,0,0,0.1),0_2px_4px_-1px_rgba(0,0,0,0.06)] transition-all hover:shadow-[0_10px_15px_-3px_rgba(0,0,0,0.1),0_4px_6px_-2px_rgba(0,0,0,0.05)] hover:-translate-y-px active:translate-y-0 active:shadow-[0_2px_4px_-1px_rgba(0,0,0,0.1)] focus:outline-none focus-visible:ring-2 focus-visible:ring-black/25 focus-visible:ring-offset-2"
-              >
-                Ich habe ein Rezept
-              </button>
-            </div>
-
+        <div className="landing-hero-snap-target" aria-hidden />
+        <div id="landing-main" className="landing-main landing-snap-target">
             {/* --- Zip code entry & form conditional rendering --- */}
             {/* COMMENTED OUT - Survey/Form Elements
             {zipEntered && !formData.zip && (
@@ -538,58 +265,14 @@ export default function LandingPage() {
             )}
             */}
 
-            {/* Trust badges */}
-            <div className="flex flex-wrap items-center justify-center gap-8 text-sm text-gray-600">
-              <div className="flex items-center">
-                <Shield className="w-5 h-5 text-green-700 mr-2" />
-                GDPR Compliant
-              </div>
-              <div className="flex items-center">
-                <Clock className="w-5 h-5 text-green-700 mr-2" />
-                Licensed Doctors
-              </div>
-              <div className="flex items-center">
-                <MapPin className="w-5 h-5 text-green-700 mr-2" />
-                Berlin Pharmacies
-              </div>
-            </div>
-          </div>
-        </div>
-        <img
-          src="/payy.png"
-          alt="Payy"
-          className="absolute bottom-10 left-1/2 -translate-x-1/2 w-90 h-10 opacity-80"
-          style={{ zIndex: 10 }}
-        />
-      </section>
+      {/* Partner-Apotheken map */}
+
+      <PartnerApotheken />
 
       {/* How to order — right under hero //let's structure this file like this g?*/}
       <How />
 
-      {/* Partner-Apotheken map */}
-      <section id="partner-apotheken" className="section-container">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16 px-4">
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold title-gradient mb-4 italic">FINDEN SIE UNSERE PARTNER-APOTHEKEN</h2>
-            <p className="text-lg sm:text-xl subtitle-text max-w-3xl mx-auto inconsolata font-thin">
-            Schneller als Ihre Hausschuhe zu finden – einfach klicken, abholen, fertig!
-            </p>
-          </div>
-
-          <div className="w-full rounded-2xl overflow-hidden shadow-lg" style={{ height: '500px' }}>
-            <iframe
-              src="https://maps.google.com/maps?q=Apotheke+in+Berlin&t=&z=11&ie=UTF8&iwloc=&output=embed"
-              width="100%"
-              height="100%"
-              style={{ border: 0 }}
-              allowFullScreen
-              loading="lazy"
-              referrerPolicy="no-referrer-when-downgrade"
-            />
-          </div>
-        </div>
-      </section>
-
+ 
       {/* Vorteile / city delivery section — commented out, replaced by How (how to order) under hero
      <section id="vorteile" className="py-12 sm:py-16 md:py-24 bg-gradient-to-r-custom section-container">
   <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center md:items-start text-center md:text-left">
@@ -630,48 +313,16 @@ export default function LandingPage() {
 </section>
       */}
 
-      {/* Bottom CTA section */}
-      <section id="chat" className="py-12 sm:py-16 md:py-24 section-container">
-        <div className="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-6 title-gradient">
-            Ready to Transform Your<br className="hidden sm:block" />Medical Cannabis Experience?
-          </h2>
-          <p className="text-lg sm:text-xl subtitle-text mb-8 sm:mb-12 max-w-2xl mx-auto">
-            Join thousands of patients who&apos;ve found better care, faster relief, and a supportive community with reLeafZ.
-          </p>
-
-          <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 justify-center subtitle-text">
-            <Button className="bg-white text-gray-900 hover:bg-gray-50 px-6 sm:px-10 py-4 sm:py-6 rounded-2xl text-base sm:text-lg font-bold shadow-xl hover:shadow-2xl">
-              Start Your Journey Today
-              <ChevronRight className="w-5 h-5 ml-2" />
-            </Button>
-            <Button 
-              variant="outline" 
-              className="border-2 border-gray-900 text-gray-900 hover:bg-gray-100 px-6 sm:px-10 py-4 sm:py-6 rounded-2xl text-base sm:text-lg font-bold subtitle-text"
-            >
-              Speak with Weedo, the best budtender in town
-            </Button>
-          </div>
-
-          <p className="subtitle-text text-xs sm:text-sm mt-6 sm:mt-8 px-4">
-            No commitment required • Speak with licensed doctors • GDPR compliant
-          </p>
-        </div>
-      </section>
 
       {/* Footer stuff */}
-      <footer className="bg-gray-900 text-white py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid md:grid-cols-4 gap-8">
+      <footer className="bg-gray-900 text-white py-10 md:py-16">
+        <div className="max-w-7xl mx-auto px-6 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
             {/* Company info */}
-            <div>
-              <div className="flex items-center space-x-3 mb-15">
-                <LeafLogo />
-                
+            <div className="col-span-2 md:col-span-1">
+              <div className="flex items-center mb-6">
+                <img src="/logo2.png" alt="reLeafZ Logo" className="w-32 h-auto object-contain scale-180 -translate-x-[-40px]" />
               </div>
-              <p className="text-gray-400 mb-4 subtitle-text">
-                Germany&apos;s fastest, safest, and coolest medical cannabis platform.
-              </p>
             </div>
 
             {/* Patient links */}
@@ -708,13 +359,14 @@ export default function LandingPage() {
             </div>
           </div>
 
-          <div className="border-t border-gray-800 mt-12 pt-8 text-center text-gray-400">
-            <p>© 2025 reLeafZ. All rights reserved. Licensed medical cannabis platform serving Berlin.</p>
+          <div className="border-t border-gray-800 mt-8 md:mt-12 pt-8 text-center text-gray-400">
+            <p>© 2026 reLeafZ.<span className="hidden md:inline"> All rights reserved. Licensed medical cannabis platform serving Berlin.</span></p>
           </div>
         </div>
       </footer>
 
-      <FloatingMonkey />
+      {/* <FloatingMonkey /> */}
+      </div>
       </div>
     </>
   )

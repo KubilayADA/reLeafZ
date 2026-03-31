@@ -5,12 +5,13 @@ import { Button } from '@/components/ui/button'
 import { Menu, X } from 'lucide-react'
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import './header.css'
+import { scrollToLandingTop, scrollLandingToAblauf } from '@/lib/scroll'
 
 // logo
 const LeafLogo = ({ className = 'logo-header' }) => (
   <div className={`logo-header ${className}`}>
     <img
-      src="/logo1.png"
+      src="/logo2.png"
       alt="reLeafZ Logo"
       className="w-full h-full object-contain"
     />
@@ -24,6 +25,7 @@ interface HeaderProps {
   setZipInput: (input: string) => void
   handlePostcodeSubmit: () => void
   isValidBerlinPostcode: (postcode: string) => boolean
+  isVisible: boolean
 }
 
 export default function Header({ 
@@ -32,15 +34,20 @@ export default function Header({
   zipInput, 
   setZipInput, 
   handlePostcodeSubmit, 
-  isValidBerlinPostcode 
+  isValidBerlinPostcode,
+  isVisible,
 }: HeaderProps) {
   const [mobileNavOpen, setMobileNavOpen] = useState(false)
 
   return (
     <>
-      <header className="relative z-50 bg-#E9E6DE/50 backdrop-blur-md border-b border-black">
+      <header
+        className={`header ${
+          isVisible ? 'translate-y-0 opacity-100' : '-translate-y-full opacity-0 pointer-events-none'
+        }`}
+      >
         {/* Moving information banner */}
-        <div className="bg-transparent text-black py-0.5 overflow-hidden border-b border-black">
+        {/* <div className="bg-transparent text-black py-0.5 overflow-hidden border-b border-black">
         <div className="moving-text">
           <span>Card payment accepted</span>
           <span>|</span>
@@ -55,35 +62,50 @@ export default function Header({
           <span>Medical Cannabis good shit</span>
           <span className="spacer px-100"></span>
         </div>
-      </div>
+      </div> */}
       
       <div className="header-row-wrap relative w-full h-22">
-        {/* Vertical lines aligned with hero left/right edges (250px inset) */}
-        <span className="header-line header-line--hero-left" aria-hidden />
-        <span className="header-line header-line--hero-right" aria-hidden />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-14">
           <div className="flex justify-between items-center h-14">
-            {/* Logo geniş, navbar sabit yükseklikte */}
-            <div className="flex items-center h-14 overflow-visible">
+            {/* Logo geniş, navbar sabit yükseklikte - your turkish is not friendly to me*/}
+            <button
+              type="button"
+              className="flex items-center h-14 overflow-visible"
+              onClick={() => {
+                scrollToLandingTop()
+              }}
+              aria-label="Zurück zum Seitenanfang"
+            >
               <LeafLogo className="w-45 h-52 transform translate-y-0" />
-            </div>
+            </button>
             
             {/* Desktop Nav */}
-            <nav className="header-desktop-nav hidden md:flex absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 space-x-8 inconsolata font-normal ">
-              <a href="#ablauf" className="header-nav-link text-mg md:text-xl leading-relaxed">Ablauf</a>
+            <nav className="header-desktop-nav header-text space-x-10 ">
+              <a
+                href="#ablauf"
+                className="header-nav-link text-mg md:text-xl leading-relaxed"
+                onClick={(e) => {
+                  e.preventDefault()
+                  scrollLandingToAblauf()
+                }}
+              >
+                Ablauf
+              </a>
               <a href="#partner-apotheken" className="header-nav-link text-mg md:text-xl leading-relaxed">Apotheke in Ihrer Nähe</a>
               <a href="#vorteile" className="header-nav-link text-lg md:text-xl leading-relaxed">Vorteile</a>
               <a href="#chat" className="header-nav-link text-lg md:text-xl leading-relaxed">Chat with us!</a>
             </nav>
             
             {/* Desktop Button - Hidden on mobile, only in hamburger menu wish i believe is better let me know if you see this UwUwuu*/}
-            <div className="hidden lg:block">
+            <div className="hidden lg:block text-black">
               <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
               <DialogTrigger asChild>
                   <Button
-                    className="behandlung-button px-4 py-2 flex items-center justify-center -translate-y-4"
+                    className="header-button"
+                    variant="button2"
+                    style={{ "--c-color": "#ffffff", color: "#ffffff" } as React.CSSProperties}
                   >
-                  BEHANDLUNG ANFRAGEN
+                  BEHANDLUNG ANFRAGEN 
                 </Button>
               </DialogTrigger>
               <DialogContent className="sm:max-w-md">
@@ -132,7 +154,17 @@ export default function Header({
         {mobileNavOpen && (
           <div className="lg:hidden absolute top-full left-0 w-full bg-white shadow-lg border-t border-emerald-200 z-50">
             <nav className="flex flex-col items-center py-6 space-y-6">
-              <a href="#ablauf" className="text-xl text-black-800 inconsolata" onClick={() => setMobileNavOpen(false)}>Ablauf</a>
+              <a
+                href="#ablauf"
+                className="text-xl text-black-800 inconsolata"
+                onClick={(e) => {
+                  e.preventDefault()
+                  setMobileNavOpen(false)
+                  scrollLandingToAblauf()
+                }}
+              >
+                Ablauf
+              </a>
               <a href="#partner-apotheken" className="text-xl text-black-800 inconsolata" onClick={() => setMobileNavOpen(false)}>Apotheke in Ihrer Nähe</a>
               <a href="#vorteile" className="text-xl text-black-800 inconsolata" onClick={() => setMobileNavOpen(false)}>Vorteile</a>
               <a href="#chat" className="text-xl text-black-800 inconsolata" onClick={() => setMobileNavOpen(false)}>Chat with us!</a>
