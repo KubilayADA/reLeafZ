@@ -169,10 +169,20 @@ export default function PharmacyDashboard() {
   useEffect(() => { setIsClient(true) }, [])
   useEffect(() => {
     if (!isClient) return
-    try {
-      const p = localStorage.getItem('pharmacy_id')
-      if (p) { setPharmacyId(parseInt(p)); loadDashboard() }
-    } catch (e) { console.error(e) }
+    const checkSession = async () => {
+      try {
+        const p = localStorage.getItem('pharmacy_id')
+        if (!p) return
+        await fetchPharmacyDashboard()
+        setPharmacyId(parseInt(p))
+        await loadDashboard()
+      } catch (e) {
+        localStorage.removeItem('pharmacy_id')
+        setPharmacyId(null)
+        setDashboardData(null)
+      }
+    }
+    checkSession()
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isClient])
   useEffect(() => { if (error) { const t = setTimeout(() => setError(null), 6000); return () => clearTimeout(t) } }, [error])
