@@ -1,19 +1,23 @@
 /* ============================================
    HOW IT WORKS (reLeafz – Wie es funktioniert)
-   Scoped under .how-funktioniert so it doesn't override main.css
+   Scoped under .how-funktioniert — no @media here.
+   All responsive rules live in how-mobile.css
    ============================================ */
-/* Match hero: max-w-7xl = 80rem, padding px-4 sm:px-6 lg:px-8 */
+
 .how-funktioniert {
-  --how-bg: #fafafa;
+  /* Match Finden: offset for fixed header when scrolling to #ablauf */
+  scroll-margin-top: max(8.5rem, 140px);
   --how-card: #ffffff;
   --how-accent: #72906F;
   --how-accent-mid: #72906F;
-  --how-text: #111827;         /* darker body text */
-  --how-muted: #374151;       /* darker muted text */
-  --how-muted-light: #4b5563; /* darker secondary text */
-  --how-border: #e5e5e5;
+  --how-text: #111827;         /* near-black headings */
+  --how-muted: #4B5563;        /* body / desc text */
+  --how-muted-light: #6B7280;  /* labels, secondary text */
+  --how-border: #72906F;
   --how-mono: 'Inconsolata', monospace;
   --how-sans: 'Geist Sans', sans-serif;
+  --how-marker: 'Inconsolata', monospace;
+  --how-hand:   'Inconsolata', monospace;
   --how-ease: cubic-bezier(0.4, 0, 0.2, 1);
   --how-radius-sm: 0.375rem;
   --how-radius-md: 0.5rem;
@@ -29,822 +33,372 @@
   -webkit-font-smoothing: antialiased;
 }
 
+.how-funktioniert.section-container {
+  background: var(--how-bg) !important;
+  padding-top: calc(100px + 5rem);
+  border-top: none;
+}
+
+/* ── Layout ── */
+
 .how-funktioniert .section {
-    max-width: 80rem;
-    margin: 0 auto;
-    padding: 2.5rem 1rem 3.5rem;
-    position: relative;
-    overflow: hidden;
-  }
-  @media (min-width: 640px) {
-    .how-funktioniert .section {
-      padding: 3rem 1.5rem 4rem;
-    }
-  }
-  @media (min-width: 1024px) {
-    .how-funktioniert .section {
-      padding: 4rem 2rem 5rem;
-    }
-  }
+  max-width: 80rem;
+  margin: 0 auto;
+  padding: 2.5rem 1rem 3.5rem;
+  position: relative;
+  overflow: hidden;
+}
 
-  /* Two-column layout: left = header + progress + summary, right = carousel + nav + CTA */
-  .how-funktioniert .how-layout {
-    display: flex;
-    flex-direction: column;
-    gap: 2rem;
-  }
-  @media (min-width: 1024px) {
-    .how-funktioniert .how-layout {
-      display: grid;
-      grid-template-columns: 1fr 1.25fr;
-      gap: 2.5rem;
-      align-items: start;
-    }
-  }
+.how-funktioniert .how-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
 
-  .how-funktioniert .how-left {
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
-  }
-  @media (min-width: 1024px) {
-    .how-funktioniert .how-left {
-      gap: 1.75rem;
-      position: sticky;
-      top: 1.5rem;
-    }
-  }
+.how-funktioniert .how-left {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
 
-  .how-funktioniert .how-right {
-    display: flex;
-    flex-direction: column;
-    gap: var(--how-space-lg);
-    min-width: 0;
-  }
-  @media (min-width: 1024px) {
-    .how-funktioniert .how-right {
-      gap: var(--how-space-xl);
-    }
-  }
+.how-funktioniert .how-right {
+  display: flex;
+  flex-direction: column;
+  gap: var(--how-space-lg);
+  min-width: 0;
+}
 
-  .how-funktioniert .header {
-    text-align: center;
-    margin-bottom: 0;
-  }
-  @media (min-width: 1024px) {
-    .how-funktioniert .header {
-      text-align: left;
-    }
-  }
-  .how-funktioniert .eyebrow {
-    font-family: var(--how-mono);
-    font-size: 0.8125rem;
-    font-weight: 500;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--how-accent-mid);
-    margin-bottom: var(--how-space-sm);
-  }
-  .how-funktioniert .title {
-    font-family: var(--how-mono);
-    font-size: clamp(1.75rem, 4vw, 2.5rem);
-    font-weight: 600;
-    line-height: 1.25;
-    letter-spacing: -0.02em;
-    color: var(--how-text);
-    margin-bottom: var(--how-space-sm);
-  }
-  .how-funktioniert .subtitle {
-    font-size: 1.2rem;
-    color: var(--how-muted);
-    font-weight: 500;
-    max-width: 32rem;
-    margin: 0 auto;
-    line-height: 1.55;
-  }
+/* ── Header ── */
 
-  .how-funktioniert .progress-wrap {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0;
-    margin: 0;
-    max-width: 42rem;
-  }
-  @media (min-width: 1024px) {
-    .how-funktioniert .progress-wrap {
-      margin: 0;
-      max-width: 100%;
-    }
-  }
-  .how-funktioniert .prog-step {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: var(--how-space-xs);
-    cursor: pointer;
-    flex: 1;
-    opacity: 0.5;
-    transition: opacity 0.2s var(--how-ease);
-  }
-  .how-funktioniert .prog-step.active { opacity: 1; }
-  .how-funktioniert .prog-step.done { opacity: 0.7; }
-  .how-funktioniert .prog-dot {
-    width: 2.25rem;
-    height: 2.25rem;
-    border-radius: 50%;
-    border: 1px solid var(--how-border);
-    background: var(--how-card);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-family: var(--how-mono);
-    font-size: 0.75rem;
-    font-weight: 600;
-    color: var(--how-muted-light);
-    transition: background 0.2s var(--how-ease), border-color 0.2s var(--how-ease), color 0.2s var(--how-ease);
-    position: relative;
-    z-index: 1;
-  }
-  .how-funktioniert .prog-step.active .prog-dot {
-    background: var(--how-accent-mid);
-    border-color: var(--how-accent-mid);
-    color: #fff;
-  }
-  .how-funktioniert .prog-step.done .prog-dot {
-    background: var(--how-accent-mid);
-    border-color: var(--how-accent-mid);
-    color: #fff;
-    opacity: 0.5;
-  }
-  .how-funktioniert .prog-label {
-    font-family: var(--how-mono);
-    font-size: 0.6875rem;
-    font-weight: 500;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
-    color: var(--how-muted-light);
-    text-align: center;
-    max-width: 4.5rem;
-    line-height: 1.2;
-  }
-  .how-funktioniert .prog-step.active .prog-label { color: var(--how-text); }
-  .how-funktioniert .prog-connector {
-    height: 1px;
-    flex: 1;
-    background: var(--how-border);
-    transition: background 0.3s var(--how-ease);
-    margin-bottom: 1.125rem;
-  }
-  .how-funktioniert .prog-connector.done { background: var(--how-accent-mid); opacity: 0.5; }
+.how-funktioniert .how-header {
+  text-align: center;
+  margin-bottom: 0;
+}
 
-  /* —— Carousel —— */
-  .how-funktioniert .carousel-viewport {
-    position: relative;
-    overflow: hidden;
-    min-height: 300px;
-    max-width: 48rem;
-    margin: 0 auto;
-    -webkit-overflow-scrolling: touch;
-  }
-  /* Mobile: horizontal scroll, one card per view — swipe/scroll to change step */
-  @media (max-width: 1023px) {
-    /* Reorder: title → nav → hint → carousel → step label → progress bar → progress dots → summary → CTA */
-    .how-funktioniert .how-layout {
-      display: flex;
-      flex-direction: column;
-      gap: 1.25rem;
-    }
-    .how-funktioniert .how-left,
-    .how-funktioniert .how-right {
-      display: contents;
-    }
-    .how-funktioniert .header { order: 1; }
-    .how-funktioniert .carousel-hint-desktop { order: 2; display: none; }
-    .how-funktioniert .carousel-hint-mobile { order: 2; display: block; }
-    .how-funktioniert .carousel-viewport { order: 3; }
-    .how-funktioniert .nav-row.nav-row-under-slides { order: 4; }
-    .how-funktioniert .carousel-step-label { order: 5; margin-top: 0; }
-    .how-funktioniert .carousel-progress { order: 6; }
-    .how-funktioniert .progress-wrap { order: 7; }
-    .how-funktioniert .summary-grid { order: 8; }
-    .how-funktioniert .cta-block { order: 9; }
+.how-funktioniert .eyebrow {
+  font-family: var(--how-mono);
+  font-size: 2rem;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--how-accent-mid);
+  margin-bottom: var(--how-space-m);
+}
 
-    /* Bigger touch targets on mobile */
-    .how-funktioniert .btn-nav {
-      min-height: 44px;
-      min-width: 44px;
-      padding: 0.6rem 1rem;
-    }
-    .how-funktioniert .summary-item {
-      min-height: 44px;
-      padding: var(--how-space-md) var(--how-space-sm);
-    }
+.how-funktioniert .title {
+  font-family: var(--how-mono);
+  font-size: clamp(2rem, 4.5vw, 3rem);
+  font-weight: 900;
+  line-height: 1.15;
+  letter-spacing: -0.03em;
+  color: #1a2e1a;
+  margin-bottom: var(--how-space-lg);
+}
 
-    .how-funktioniert .carousel-viewport {
-      overflow-x: auto;
-      overflow-y: hidden;
-      scroll-snap-type: x mandatory;
-      margin: 0 calc(-1 * var(--how-space-md));
-      padding: 0 var(--how-space-md);
-      min-height: 300px;
-      scrollbar-width: none;
-    }
-    .how-funktioniert .carousel-viewport::-webkit-scrollbar {
-      display: none;
-    }
-    .how-funktioniert .carousel-track {
-      display: flex;
-      width: 600%;
-      transform: none !important;
-      transition: none;
-      min-height: 100%;
-    }
-    .how-funktioniert .carousel-slide {
-      flex: 0 0 16.666%;
-      width: 16.666%;
-      min-width: 16.666%;
-      scroll-snap-align: start;
-      scroll-snap-stop: always;
-      padding: 0 var(--how-space-sm);
-      box-sizing: border-box;
-    }
-  }
-  @media (min-width: 1024px) {
-    .how-funktioniert .carousel-hint-mobile { display: none !important; }
-    .how-funktioniert .carousel-hint-desktop { display: block; }
-  }
-  @media (min-width: 1024px) {
-    .how-funktioniert .carousel-track {
-      display: flex;
-      width: 100%;
-      transition: transform 0.35s var(--how-ease);
-      will-change: transform;
-    }
-    .how-funktioniert .carousel-slide {
-      flex: 0 0 100%;
-      width: 100%;
-      min-width: 0;
-      padding: 0 var(--how-space-xs);
-      box-sizing: border-box;
-    }
-  }
+/* The "4" — slightly larger, accent colour + underline */
+.how-funktioniert .title-num {
+  color: var(--how-accent);
+  font-weight: 900;
+  font-size: 1.25em;
+  line-height: 1;
+  vertical-align: baseline;
+  text-decoration: none;
+}
 
-  .how-funktioniert .step-card {
-    display: block;
-    background: var(--how-card); /* neutral card; grid carries green */
-    border: 1px solid var(--how-border);
-    border-radius: var(--how-radius-lg);
-    padding: var(--how-space-2xl) 2rem;
-    max-width: 48rem;
-    margin: 0 auto;
-    position: relative;
-    min-height: 300px;
-    overflow: hidden;
-  }
-  /* Dot pattern texture — subtle paper-like */
-  .how-funktioniert .step-card::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    border-radius: inherit;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%2372906F' opacity='0.3'%3E%3Ccircle cx='4' cy='4' r='0.8'/%3E%3Ccircle cx='12' cy='4' r='0.8'/%3E%3Ccircle cx='20' cy='4' r='0.8'/%3E%3Ccircle cx='4' cy='12' r='0.8'/%3E%3Ccircle cx='12' cy='12' r='0.8'/%3E%3Ccircle cx='20' cy='12' r='0.8'/%3E%3Ccircle cx='4' cy='20' r='0.8'/%3E%3Ccircle cx='12' cy='20' r='0.8'/%3E%3Ccircle cx='20' cy='20' r='0.8'/%3E%3C/g%3E%3C/svg%3E");
-    background-size: 24px 24px;
-    pointer-events: none;
-    z-index: 0;
-  }
-  .how-funktioniert .step-card .card-inner {
-    position: relative;
-    z-index: 1;
-  }
-  .how-funktioniert .section.carousel .step-card .card-inner,
-  .how-funktioniert .section.carousel .step-card .card-hero,
-  .how-funktioniert .section.carousel .step-card .card-visual,
-  .how-funktioniert .section.carousel .step-card .card-icon-wrap,
-  .how-funktioniert .section.carousel .step-card .card-num,
-  .how-funktioniert .section.carousel .step-card .card-title,
-  .how-funktioniert .section.carousel .step-card .card-desc,
-  .how-funktioniert .section.carousel .step-card .detail-icons,
-  .how-funktioniert .section.carousel .step-card .detail-list,
-  .how-funktioniert .section.carousel .step-card .detail-list li,
-  .how-funktioniert .section.carousel .step-card .status-pill,
-  .how-funktioniert .section.carousel .step-card .mini-flow {
-    opacity: 1;
-  }
+/* ── Progress panel ── */
 
-  .how-funktioniert .card-inner {
-    display: flex;
-    flex-direction: column;
-    gap: var(--how-space-2xl);
-    align-items: stretch;
-  }
+.how-funktioniert .progress-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--how-space-md);
+  margin: 0;
+  max-width: 42rem;
+}
 
-  /* Hero: big icon + title + one-line desc */
-  .how-funktioniert .card-hero {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    gap: var(--how-space-md);
-  }
-  .how-funktioniert .card-icon-wrap {
-    width: 4rem;
-    height: 4rem;
-    border-radius: var(--how-radius-md);
-    background: var(--how-bg);
-    border: 1px solid var(--how-border);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-  }
-  .how-funktioniert .card-icon-wrap .step-icon {
-    width: 1.75rem;
-    height: 1.75rem;
-    color: var(--how-accent-mid);
-  }
-  .how-funktioniert .card-hero .card-num {
-    margin-bottom: 0;
-  }
-  .how-funktioniert .card-hero .card-title {
-    margin-bottom: 0;
-    font-size: 1.375rem;
-  }
-  .how-funktioniert .card-hero .card-desc {
-    margin-bottom: 0;
-    font-size: 1.125rem;
-    color: var(--how-muted);
-    font-weight: 500;
-    line-height: 1.5;
-    max-width: 24rem;
-  }
-  
-  /* Visual block: icon pills + flow diagram */
-  .how-funktioniert .card-visual {
-    display: flex;
-    flex-direction: column;
-    gap: var(--how-space-lg);
-    align-items: center;
-  }
-  .how-funktioniert .detail-icons {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: var(--how-space-md);
-  }
-  .how-funktioniert .detail-icon-item {
-    display: flex;
-    align-items: center;
-    gap: var(--how-space-xs);
-    padding: 0.5rem 0.75rem;
-    background: transparent;
-    border: none;
-    border-radius: var(--how-radius-sm);
-    font-family: var(--how-mono);
-    font-size: 0.8125rem;
-    font-weight: 500;
-    color: var(--how-muted);
-  }
-  .how-funktioniert .detail-icon-item .detail-icon {
-    width: 1rem;
-    height: 1rem;
-    color: var(--how-accent-mid);
-    flex-shrink: 0;
-  }
-  .how-funktioniert .detail-icon-label {
-    white-space: nowrap;
-  }
+.how-funktioniert .prog-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--how-space-xs);
+  cursor: pointer;
+  flex: 1;
+  opacity: 0.5;
+  transition: opacity 0.2s var(--how-ease);
+}
+.how-funktioniert .prog-step.active { opacity: 1; }
+.how-funktioniert .prog-step.done   { opacity: 0.7; }
 
-  .how-funktioniert .card-num {
-    font-family: var(--how-mono);
-    font-size: 0.75rem;
-    font-weight: 500;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--how-accent-mid);
-    margin-bottom: var(--how-space-xs);
-  }
-  .how-funktioniert .card-title {
-    font-family: var(--how-mono);
-    font-size: 1.3rem;
-    font-weight: 600;
-    color: var(--how-text);
-    margin-bottom: var(--how-space-sm);
-    line-height: 1.35;
-  }
-  .how-funktioniert .card-desc {
-    font-size: 1.125rem;
-    color: var(--how-muted);
-    font-weight: 500;
-    line-height: 1.6;
-    margin-bottom: var(--how-space-lg);
-  }
+.how-funktioniert .prog-dot {
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  border: 3px solid var(--how-border);
+  background: var(--how-card);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--how-mono);
+  font-size: 1rem;
+  font-weight: 900;
+  color: var(--how-muted-light);
+  transition: background 0.25s var(--how-ease), border-color 0.25s var(--how-ease),
+              color 0.25s var(--how-ease), transform 0.25s var(--how-ease),
+              box-shadow 0.25s var(--how-ease);
+  position: relative;
+  z-index: 1;
+}
+.how-funktioniert .prog-step.active .prog-dot {
+  background: var(--how-accent-mid);
+  border-color: var(--how-accent-mid);
+  color: #fff;
+  transform: scale(1.25);
+  box-shadow: 0 0 0 5px rgba(114, 144, 111, 0.2);
+}
+.how-funktioniert .prog-step.done .prog-dot {
+  background: var(--how-accent-mid);
+  border-color: var(--how-accent-mid);
+  color: #fff;
+  opacity: 0.6;
+}
 
-  .how-funktioniert .detail-list {
-    list-style: none;
-    display: flex;
-    flex-direction: column;
-    gap: var(--how-space-xs);
-    margin-bottom: var(--how-space-lg);
-  }
-  .how-funktioniert .detail-list li {
-    display: flex;
-    align-items: flex-start;
-    gap: var(--how-space-xs);
-    font-size: 1.0625rem;
-    color: var(--how-text);
-    font-weight: 500;
-  }
-  .how-funktioniert .detail-list li::before {
-    content: '';
-    display: block;
-    width: 0.25rem;
-    height: 0.25rem;
-    border-radius: 50%;
-    background: var(--how-muted-light);
-    margin-top: 0.45rem;
-    flex-shrink: 0;
-  }
+.how-funktioniert .prog-label {
+  font-family: var(--how-mono);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--how-muted-light);
+  text-align: center;
+  max-width: 5rem;
+  line-height: 1.2;
+}
+.how-funktioniert .prog-step.active .prog-label {
+  color: var(--how-text);
+  font-weight: 800;
+  font-size: 1rem;
+}
 
-  .how-funktioniert .status-pill {
-    font-family: var(--how-mono);
-    font-size: 0.75rem;
-    font-weight: 500;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
-    color: var(--how-muted);
-  }
+.how-funktioniert .prog-connector {
+  height: 3px;
+  flex: 1;
+  border-radius: 999px;
+  margin-bottom: 1.5rem;
+  overflow: hidden;
+  background: rgba(114, 144, 111, 0.2);
+  position: relative;
+}
+.how-funktioniert .prog-connector::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--how-accent-mid);
+  transform-origin: left center;
+  transform: scaleX(var(--conn-fill, 0));
+  border-radius: 999px;
+  transition: transform 0.05s linear;
+}
 
-  .how-funktioniert .time-badge {
-    font-family: var(--how-mono);
-    font-size: 0.75rem;
-    font-weight: 500;
-    color: var(--how-muted-light);
-    margin-left: var(--how-space-xs);
-  }
+/* ── Column cards ── */
 
-  .how-funktioniert .mini-flow {
-    display: flex;
-    align-items: center;
-    gap: var(--how-space-sm);
-    background: var(--how-bg);
-    border-radius: var(--how-radius-md);
-    padding: var(--how-space-md) var(--how-space-lg);
-    width: 100%;
-    max-width: 24rem;
-    justify-content: center;
-    flex-wrap: wrap;
-  }
-  .how-funktioniert .mini-node {
-    background: transparent;
-    border: none;
-    border-radius: 0;
-    padding: 0.2rem 0;
-    font-family: var(--how-mono);
-    font-size: 0.75rem;
-    font-weight: 500;
-    color: var(--how-muted-light);
-    white-space: nowrap;
-    transition: color 0.2s var(--how-ease);
-  }
-  .how-funktioniert .mini-node.active-node {
-    color: var(--how-text);
-  }
-  .how-funktioniert .mini-arrow-icon {
-    width: 0.75rem;
-    height: 0.75rem;
-    color: var(--how-border);
-    flex-shrink: 0;
-  }
-  .how-funktioniert .mini-arrow {
-    flex-shrink: 0;
-    width: 1rem;
-    height: 1px;
-    background: var(--how-border);
-    position: relative;
-  }
-  .how-funktioniert .mini-arrow::after {
-    content: '';
-    position: absolute;
-    right: -2px;
-    top: -2.5px;
-    border: 2.5px solid transparent;
-    border-left: 3px solid var(--how-border);
-  }
-  
-  /* Progress & step label */
-  .how-funktioniert .carousel-progress {
-    max-width: 48rem;
-    margin: var(--how-space-md) auto 0;
-    height: 2px;
-    background: var(--how-border);
-    border-radius: 999px;
-    overflow: hidden;
-  }
-  .how-funktioniert .carousel-progress-fill {
-    height: 100%;
-    background: var(--how-accent-mid);
-    border-radius: 999px;
-    transition: width 0.3s var(--how-ease);
-  }
-  .how-funktioniert .carousel-step-label {
-    font-family: var(--how-mono);
-    font-size: 0.9rem;
-    color: var(--how-muted);
-    font-weight: 500;
-    text-align: center;
-    margin: var(--how-space-sm) auto 0;
-    max-width: 48rem;
-  }
-  .how-funktioniert .carousel-step-label strong { color: var(--how-accent-mid); }
+.how-funktioniert .how-col-card {
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: var(--how-space-md);
+  padding: var(--how-space-md) 0 var(--how-space-md) var(--how-space-md);
+  border: none;
+  border-top: 1px solid rgba(17, 24, 39, 0.07);
+  border-radius: 0;
+  background: transparent;
+}
+.how-funktioniert .how-col-card:last-child {
+  border-bottom: 1px solid rgba(17, 24, 39, 0.07);
+}
 
-  .how-funktioniert .nav-row {
-    display: flex;
-    justify-content: flex-start;
-    align-items: center;
-    max-width: 48rem;
-    margin: 0;
-    gap: var(--how-space-md);
-  }
-  /* Nav directly under slides — little gap, green accent */
-  .how-funktioniert .nav-row-under-slides {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: var(--how-space-sm);
-    margin: 0.5rem auto 0;
-    padding: var(--how-space-sm) var(--how-space-md);
-    background: rgba(114, 144, 111, 0.08);
-    border: 1px solid rgba(114, 144, 111, 0.35);
-    border-radius: 999px;
-    width: fit-content;
-    box-shadow: 0 1px 3px rgba(114, 144, 111, 0.12);
-  }
-  .how-funktioniert .how-right .nav-row-under-slides {
-    margin-top: -0.75rem;
-  }
-  .how-funktioniert .how-left .nav-row {
-    margin-top: 0;
-    max-width: 100%;
-  }
-  .how-funktioniert .how-left .carousel-hint {
-    margin-top: var(--how-space-xs);
-    margin-bottom: 0;
-    text-align: left;
-  }
-  .how-funktioniert .carousel-hint-mobile {
-    display: none;
-  }
-  @media (min-width: 1024px) {
-    .how-funktioniert .how-left .carousel-hint {
-      text-align: left;
-    }
-  }
-  .how-funktioniert .carousel-hint {
-    font-family: var(--how-mono);
-    font-size: 0.85rem;
-    color: var(--how-muted-light);
-    text-align: center;
-    margin: var(--how-space-sm) auto 0;
-    max-width: 48rem;
-  }
-  .how-funktioniert .btn-nav {
-    font-family: var(--how-mono);
-    font-size: 0.9375rem;
-    font-weight: 500;
-    border: 1px solid var(--how-border);
-    border-radius: var(--how-radius-sm);
-    padding: 0.5rem 1rem;
-    cursor: pointer;
-    transition: border-color 0.2s var(--how-ease), background 0.2s var(--how-ease), color 0.2s var(--how-ease), opacity 0.2s var(--how-ease);
-    background: var(--how-card);
-    color: var(--how-text);
-  }
-  .how-funktioniert .nav-row-under-slides .btn-nav {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 2.5rem;
-    height: 2.5rem;
-    padding: 0;
-    border-radius: 50%;
-    border-color: rgba(114, 144, 111, 0.4);
-    background: var(--how-card);
-    color: var(--how-accent-mid);
-  }
-  .how-funktioniert .nav-row-under-slides .btn-nav .btn-nav-icon {
-    width: 1.25rem;
-    height: 1.25rem;
-    pointer-events: none;
-  }
-  .how-funktioniert .nav-row-under-slides .btn-nav:hover:not(:disabled) {
-    background: rgba(114, 144, 111, 0.15);
-    border-color: var(--how-accent-mid);
-  }
-  .how-funktioniert .nav-row-under-slides .step-counter .step-current {
-    color: var(--how-accent-mid);
-  }
-  .how-funktioniert .btn-nav:focus-visible {
-    outline: 1px solid var(--how-text);
-    outline-offset: 2px;
-  }
-  .how-funktioniert .btn-nav:hover:not(:disabled) {
-    border-color: var(--how-muted-light);
-  }
-  .how-funktioniert .btn-nav:disabled {
-    opacity: 0.4;
-    cursor: not-allowed;
-  }
-  .how-funktioniert .btn-nav.primary {
-    background: var(--how-accent-mid);
-    color: #fff;
-    border-color: var(--how-accent-mid);
-  }
-  .how-funktioniert .btn-nav.primary:hover:not(:disabled) {
-    opacity: 0.9;
-  }
+/* ── Timeline track ── */
 
-  .how-funktioniert .step-counter {
-    font-family: var(--how-mono);
-    font-size: 0.8125rem;
-    font-weight: 500;
-    color: var(--how-muted-light);
-  }
-  .how-funktioniert .step-counter .step-current { color: var(--how-text); font-weight: 600; }
-  .how-funktioniert .step-counter .step-sep { margin: 0 0.125rem; opacity: 0.7; }
-  .how-funktioniert .step-counter .step-total { color: var(--how-muted-light); }
+.how-funktioniert .how-cards-wrap {
+  position: relative;
+  padding-left: 1.5rem;
+}
 
-  /* Summary grid — in left column on desktop */
-  .how-funktioniert .summary-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: var(--how-space-md);
-    max-width: 48rem;
-    margin: 0 auto 0;
-  }
-  @media (min-width: 1024px) {
-    .how-funktioniert .summary-grid {
-      max-width: 100%;
-    }
-  }
-  .how-funktioniert .summary-item {
-    background: var(--how-card);
-    border: 1px solid var(--how-border);
-    border-radius: var(--how-radius-md);
-    padding: var(--how-space-lg);
-    cursor: pointer;
-    transition: border-color 0.2s var(--how-ease), background 0.2s var(--how-ease);
-    position: relative;
-    overflow: hidden;
-  }
-  .how-funktioniert .summary-item:focus-visible {
-    outline: 1px solid var(--how-text);
-    outline-offset: 2px;
-  }
-  .how-funktioniert .summary-item:hover {
-    border-color: var(--how-muted-light);
-  }
-  .how-funktioniert .summary-item.current {
-    border-color: var(--how-accent-mid);
-    background: rgba(114, 144, 111, 0.08);
-  }
-  .how-funktioniert .summary-item::before {
-    content: attr(data-num);
-    position: absolute;
-    top: var(--how-space-sm);
-    right: var(--how-space-sm);
-    font-family: var(--how-mono);
-    font-size: 0.6875rem;
-    font-weight: 500;
-    color: var(--how-muted-light);
-    letter-spacing: 0.04em;
-  }
-  .how-funktioniert .si-icon {
-    margin-bottom: var(--how-space-xs);
-    display: block;
-  }
-  .how-funktioniert .si-icon .summary-step-icon {
-    width: 1.25rem;
-    height: 1.25rem;
-    color: var(--how-accent-mid);
-  }
-  .how-funktioniert .si-title {
-    font-family: var(--how-mono);
-    font-size: 0.75rem;
-    font-weight: 500;
-    color: var(--how-text);
-    line-height: 1.4;
-  }
-  .how-funktioniert .si-done {
-    position: absolute;
-    bottom: var(--how-space-sm);
-    right: var(--how-space-sm);
-    width: 0.75rem;
-    height: 0.75rem;
-    border-radius: 50%;
-    background: var(--how-accent-mid);
-    display: none;
-    align-items: center;
-    justify-content: center;
-  }
-  .how-funktioniert .si-done svg,
-  .how-funktioniert .si-done .check-icon {
-    width: 0.45rem;
-    height: 0.45rem;
-    color: #fff;
-  }
-  .how-funktioniert .summary-item.done-item .si-done { display: flex; }
+.how-funktioniert .timeline-track {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: rgba(114, 144, 111, 0.2);
+  border-radius: 999px;
+  overflow: visible;
+}
 
-  /* CTA */
-  .how-funktioniert .cta-block {
-    text-align: center;
-    margin-top: 0;
-    padding-top: var(--how-space-xl);
-    border-top: 1px solid var(--how-border);
-  }
-  @media (min-width: 1024px) {
-    .how-funktioniert .cta-block {
-      padding-top: var(--how-space-xl);
-    }
-  }
-  .how-funktioniert .cta-note {
-    font-size: 0.9375rem;
-    color: var(--how-muted);
-    font-family: var(--how-mono);
-    margin-bottom: var(--how-space-md);
-    letter-spacing: 0.02em;
-  }
-  .how-funktioniert .btn-cta {
-    font-family: var(--how-mono);
-    font-size: 1rem;
-    font-weight: 500;
-    color: #fff;
-    background: var(--how-accent-mid);
-    border: 1px solid var(--how-accent-mid);
-    border-radius: var(--how-radius-sm);
-    padding: 0.5rem 1.5rem;
-    cursor: pointer;
-    transition: opacity 0.2s var(--how-ease);
-    text-decoration: none;
-    display: inline-block;
-  }
-  .how-funktioniert .btn-cta:focus-visible {
-    outline: 1px solid var(--how-accent-mid);
-    outline-offset: 2px;
-  }
-  .how-funktioniert .btn-cta:hover {
-    opacity: 0.9;
-  }
+.how-funktioniert .timeline-fill {
+  position: absolute;
+  inset: 0;
+  background: var(--how-accent-mid);
+  border-radius: 999px;
+  transform-origin: top center;
+  transform: scaleY(var(--progress, 0));
+  will-change: transform;
+}
 
-  .how-funktioniert .trust {
-    display: flex;
-    justify-content: center;
-    flex-wrap: wrap;
-    gap: var(--how-space-md);
-    margin-top: var(--how-space-md);
-  }
-  .how-funktioniert .trust-item {
-    display: flex;
-    align-items: center;
-    gap: var(--how-space-xs);
-    font-size: 0.75rem;
-    color: var(--how-muted-light);
-    font-family: var(--how-mono);
-    font-weight: 500;
-  }
-  .how-funktioniert .trust-dot {
-    width: 0.25rem;
-    height: 0.25rem;
-    border-radius: 50%;
-    background: var(--how-accent-mid);
-  }
+.how-funktioniert .timeline-dot {
+  position: absolute;
+  left: 50%;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: rgba(114, 144, 111, 0.3);
+  border: 2px solid rgba(114, 144, 111, 0.4);
+  transform: translate(-50%, -50%);
+  transition: background 0.2s ease-out, border-color 0.2s ease-out,
+              transform 0.2s ease-out, box-shadow 0.2s ease-out;
+  z-index: 2;
+}
+.how-funktioniert .timeline-dot.lit {
+  background: var(--how-accent-mid);
+  border-color: var(--how-accent-mid);
+  transform: translate(-50%, -50%) scale(1.4);
+  box-shadow: 0 0 0 4px rgba(114, 144, 111, 0.25);
+}
 
-  .how-funktioniert .prog-step:focus-visible {
-    outline: 1px solid var(--how-text);
-    outline-offset: 2px;
-    border-radius: var(--how-radius-sm);
-  }
-  
-  @media (max-width: 680px) {
-    .how-funktioniert .section { padding: 1.5rem var(--how-space-md) 2.5rem; }
-    .how-funktioniert .header { margin-bottom: 0; }
-    .how-funktioniert .title { font-size: clamp(1.5rem, 5vw, 2rem); }
-    .how-funktioniert .carousel-viewport { min-height: 280px; }
-    .how-funktioniert .step-card { padding: var(--how-space-lg) var(--how-space-md); min-height: 260px; }
-    .how-funktioniert .card-inner { gap: var(--how-space-lg); }
-    .how-funktioniert .card-icon-wrap { width: 3.5rem; height: 3.5rem; }
-    .how-funktioniert .card-icon-wrap .step-icon { width: 1.5rem; height: 1.5rem; }
-    .how-funktioniert .mini-flow { padding: var(--how-space-sm) var(--how-space-md); max-width: 100%; }
-    .how-funktioniert .summary-grid { grid-template-columns: repeat(2, 1fr); margin-top: 0; }
-    .how-funktioniert .mini-flow { flex-wrap: wrap; }
-    .how-funktioniert .carousel-step-label { font-size: 0.8125rem; padding: 0 var(--how-space-xs); }
-    .how-funktioniert .cta-block { margin-top: 0; padding-top: var(--how-space-xl); }
-  }
-  @media (max-width: 440px) {
-    .how-funktioniert .section { padding: 1.25rem var(--how-space-sm) 2rem; }
-    .how-funktioniert .prog-label { display: none; }
-    .how-funktioniert .summary-grid { grid-template-columns: 1fr 1fr; gap: var(--how-space-sm); }
-    .how-funktioniert .summary-item { padding: var(--how-space-sm) var(--how-space-md); }
-    .how-funktioniert .nav-row { flex-wrap: wrap; gap: var(--how-space-sm); justify-content: flex-start; }
-    .how-funktioniert .step-counter { order: 0; }
-  }
+/* ── Card image & body ── */
+
+.how-funktioniert .how-col-image {
+  flex-shrink: 0;
+  width: 300px;
+  height: 300px;
+  object-fit: cover;
+  border-radius: var(--how-radius-md);
+  display: block;
+  transition: transform 0.3s var(--how-ease);
+}
+.how-funktioniert .how-col-card.active .how-col-image {
+  transform: scale(1.015);
+}
+
+.how-funktioniert .how-col-body {
+  flex: 1;
+  position: relative;
+  padding: var(--how-space-sm) 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--how-space-sm);
+  overflow: hidden;
+}
+
+.how-funktioniert .how-col-ghost-num {
+  position: absolute;
+  bottom: -0.5rem;
+  right: 0;
+  font-family: var(--how-mono);
+  font-size: 5rem;
+  font-weight: 900;
+  color: var(--how-accent-mid);
+  opacity: 0.12;
+  line-height: 1;
+  pointer-events: none;
+  user-select: none;
+}
+
+.how-funktioniert .how-col-num {
+  font-family: var(--how-mono);
+  font-size: 0.975rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--how-accent-mid);
+  border-bottom: 2px solid var(--how-accent-mid);
+  padding-bottom: 1px;
+  display: inline-block;
+}
+
+.how-funktioniert .how-col-title {
+  font-family: var(--how-mono);
+  font-size: clamp(1.1rem, 2vw, 1.4rem);
+  font-weight: 900;
+  color: var(--how-text);
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  margin: 0;
+}
+
+.how-funktioniert .how-col-desc {
+  font-family: "Helvetica Neue", sans-serif;
+  font-size: 0.9375rem;
+  color: var(--how-muted);
+  font-weight: 500;
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* ── CTA ── */
+
+.how-funktioniert .cta-block {
+  text-align: center;
+  margin-top: 0;
+  padding-top: var(--how-space-xl);
+  border-top: 1px solid var(--how-border);
+}
+
+.how-funktioniert .cta-note {
+  font-size: 0.9375rem;
+  color: var(--how-muted);
+  font-family: var(--how-mono);
+  margin-bottom: var(--how-space-md);
+  letter-spacing: 0.02em;
+}
+
+.how-funktioniert .btn-cta {
+  font-family: var(--how-mono);
+  font-size: 1rem;
+  font-weight: 500;
+  color: #fff;
+  background: var(--how-accent-mid);
+  border: 1px solid var(--how-accent-mid);
+  border-radius: var(--how-radius-sm);
+  padding: 0.5rem 1.5rem;
+  cursor: pointer;
+  transition: opacity 0.2s var(--how-ease);
+  text-decoration: none;
+  display: inline-block;
+}
+.how-funktioniert .btn-cta:focus-visible {
+  outline: 1px solid var(--how-accent-mid);
+  outline-offset: 2px;
+}
+.how-funktioniert .btn-cta:hover {
+  opacity: 0.9;
+}
+
+.how-funktioniert .trust {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: var(--how-space-md);
+  margin-top: var(--how-space-md);
+}
+.how-funktioniert .trust-item {
+  display: flex;
+  align-items: center;
+  gap: var(--how-space-xs);
+  font-size: 0.75rem;
+  color: var(--how-muted);
+  font-family: var(--how-mono);
+  font-weight: 500;
+}
+.how-funktioniert .trust-dot {
+  width: 0.25rem;
+  height: 0.25rem;
+  border-radius: 50%;
+  background: var(--how-accent-mid);
+}
+
+.how-funktioniert .prog-step:focus-visible {
+  outline: 1px solid var(--how-text);
+  outline-offset: 2px;
+  border-radius: var(--how-radius-sm);
+}
