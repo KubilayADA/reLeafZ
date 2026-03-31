@@ -14,6 +14,7 @@ import CookieBanner from '@/components/ui/cookie'
 import '@/components/ui/Hero/Words-Sliding-Smooth.css' 
 import ComingSoon from '@/components/ComingSoon'
 import How from '@/components/ui/funktioniert/how'
+import PartnerApotheken from '@/components/ui/partnerApotheken/finden'
 import { API_BASE } from '@/lib/api'
 import { attachLandingBinarySwitch } from '@/lib/scroll'
 
@@ -268,29 +269,9 @@ export default function LandingPage() {
       <How />
 
       {/* Partner-Apotheken map */}
-      <section id="partner-apotheken" className="section-container">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16 px-4">
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold title-gradient mb-4 italic">FINDEN SIE UNSERE PARTNER-APOTHEKEN</h2>
-            <p className="text-lg sm:text-xl subtitle-text max-w-3xl mx-auto inconsolata font-thin">
-            Schneller als Ihre Hausschuhe zu finden – einfach klicken, abholen, fertig!
-            </p>
-          </div>
 
-          <div className="w-full rounded-2xl overflow-hidden shadow-lg" style={{ height: '500px' }}>
-            <iframe
-              src="https://www.openstreetmap.org/export/embed.html?bbox=13.2,52.45,13.6,52.58&layer=mapnik&marker=52.52,13.405"
-              width="100%"
-              height="100%"
-              style={{ border: 0 }}
-              allowFullScreen
-              loading="lazy"
-              referrerPolicy="no-referrer-when-downgrade"
-            />
-          </div>
-        </div>
-      </section>
-
+      <PartnerApotheken />
+ 
       {/* Vorteile / city delivery section — commented out, replaced by How (how to order) under hero
      <section id="vorteile" className="py-12 sm:py-16 md:py-24 bg-gradient-to-r-custom section-container">
   <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center md:items-start text-center md:text-left">

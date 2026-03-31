@@ -1,0 +1,268 @@
+.partner-apotheken-section {
+  padding: 5rem 1.25rem 4rem;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.partner-apotheken-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.partner-apotheken-heading h2 {
+  margin: 0.3rem 0 0.8rem;
+  font-size: clamp(1.8rem, 3.5vw, 2.9rem);
+  line-height: 1.05;
+  color: #163321;
+}
+
+.partner-apotheken-kicker {
+  margin: 0;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-size: 0.8rem;
+  color: #5b8a67;
+}
+
+.partner-apotheken-subtitle {
+  margin: 0;
+  max-width: 64ch;
+  color: #35503e;
+  line-height: 1.6;
+}
+
+.partner-apotheken-map-wrap {
+  position: relative;
+  margin-top: 2rem;
+  border-radius: 24px;
+  overflow: visible;
+  border: 1px solid rgba(65, 104, 77, 0.22);
+  background: #f3f3f3;
+  box-shadow: 0 24px 55px rgba(19, 43, 23, 0.15);
+}
+
+.partner-apotheken-map {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  border-radius: inherit;
+}
+
+.partner-apotheken-grid-overlay {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background-image: radial-gradient(circle at 50% 50%, rgba(53, 80, 62, 0.2) 1px, transparent 0);
+  background-size: 42px 42px;
+  opacity: 0.14;
+  pointer-events: none;
+}
+
+.partner-apotheken-marker {
+  --size: clamp(26px, 3vw, 38px);
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+  display: grid;
+  place-items: center;
+  width: var(--size);
+  height: var(--size);
+  transform: translate(-50%, -50%) scale(0.3);
+  z-index: 2;
+  opacity: 0;
+  transition: transform 400ms ease, opacity 400ms ease;
+  transition-delay: var(--delay);
+}
+
+.partner-apotheken-marker.is-visible {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+  animation: nodeGrow 620ms cubic-bezier(0.2, 1, 0.2, 1);
+}
+
+.partner-apotheken-marker:hover,
+.partner-apotheken-marker:focus-within {
+  z-index: 999;
+}
+
+.partner-apotheken-marker-trigger {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.partner-apotheken-marker-image {
+  width: 100%;
+  height: 100%;
+  display: block;
+  filter: drop-shadow(0 8px 10px rgba(31, 57, 42, 0.3));
+  transition: transform 220ms ease;
+}
+
+.partner-apotheken-marker:hover .partner-apotheken-marker-image,
+.partner-apotheken-marker:focus-within .partner-apotheken-marker-image,
+.partner-apotheken-marker.is-selected .partner-apotheken-marker-image {
+  transform: scale(1.18);
+}
+
+.partner-apotheken-pulse {
+  position: absolute;
+  inset: -8px;
+  border-radius: 50%;
+  border: 1px solid rgba(88, 143, 104, 0.7);
+  transform: scale(0.7);
+  opacity: 0;
+  pointer-events: none;
+  animation: pulseRing 2s ease-out infinite;
+}
+
+.partner-apotheken-tooltip {
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% - 6px);
+  transform: translate(-50%, 4px);
+  width: min(230px, 65vw);
+  border-radius: 14px;
+  padding: 0.7rem 0.75rem;
+  background: rgba(16, 27, 19, 0.94);
+  color: #ebf2ec;
+  box-shadow: 0 14px 40px rgba(16, 27, 19, 0.35);
+  font-size: 0.83rem;
+  line-height: 1.4;
+  display: grid;
+  gap: 0.3rem;
+  opacity: 0;
+  pointer-events: auto;
+  transition: opacity 190ms ease, transform 190ms ease;
+  z-index: 1000;
+}
+
+.partner-apotheken-tooltip strong {
+  font-size: 0.92rem;
+}
+
+.partner-apotheken-tooltip a {
+  color: #a9efbe;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  font-weight: 600;
+}
+
+.partner-apotheken-marker:hover .partner-apotheken-tooltip,
+.partner-apotheken-marker:focus-within .partner-apotheken-tooltip {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+
+.partner-apotheken-mobile-card {
+  margin-top: 1rem;
+  min-height: 0;
+}
+
+.partner-apotheken-mobile-card-content {
+  border-radius: 16px;
+  border: 1px solid rgba(68, 113, 82, 0.3);
+  background: #f6fbf6;
+  padding: 1rem;
+  color: #203626;
+  display: grid;
+  gap: 0.35rem;
+  opacity: 0;
+  transform: translateY(14px);
+  animation: mobileCardIn 320ms ease forwards;
+}
+
+.partner-apotheken-mobile-card-content h3 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.partner-apotheken-mobile-card-content p {
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+.partner-apotheken-mobile-card-content a {
+  margin-top: 0.25rem;
+  color: #2e7a47;
+  font-weight: 700;
+}
+
+@media (min-width: 900px) {
+  .partner-apotheken-section {
+    padding-inline: 2rem;
+  }
+
+  .partner-apotheken-mobile-card {
+    display: none;
+  }
+}
+
+@media (max-width: 899px) {
+  .partner-apotheken-tooltip {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .partner-apotheken-marker,
+  .partner-apotheken-marker.is-visible,
+  .partner-apotheken-mobile-card-content,
+  .partner-apotheken-pulse {
+    transition: none;
+    animation: none;
+  }
+
+  .partner-apotheken-marker.is-visible {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+  }
+
+  .partner-apotheken-mobile-card-content {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes nodeGrow {
+  0% {
+    transform: translate(-50%, -50%) scale(0.3);
+    opacity: 0;
+  }
+  60% {
+    transform: translate(-50%, -50%) scale(1.2);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes pulseRing {
+  0% {
+    transform: scale(0.7);
+    opacity: 0.75;
+  }
+  100% {
+    transform: scale(1.45);
+    opacity: 0;
+  }
+}
+
+@keyframes mobileCardIn {
+  from {
+    transform: translateY(14px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
