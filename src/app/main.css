@@ -866,7 +866,7 @@ header .behandlung-button {
     }
 
     .hero-section .word-item {
-        font-size: clamp(0.7rem, 3.4vw, 0.95rem) !important;
+        font-size: clamp(0.9rem, 5.4vw, 1.15rem) !important;
     }
 }
 

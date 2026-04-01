@@ -99,7 +99,7 @@ export default function Hero({
               {words.map((word, index) => (
                 <div
                   key={index}
-                  className="word-item text-base sm:text-5xl md:text-7xl font-bold title-gradient-hero leading-tight italic margin-bottom-100"
+                  className="word-item font-bold title-gradient-hero leading-tight italic margin-bottom-100 sm:mb-150"
                 >
                   {word}
                 </div>

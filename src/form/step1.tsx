@@ -15,14 +15,6 @@ type ConsultationOption = 'questionnaire' | 'video' | 'onsite'
 
 export default function Step1({ onNext, onBack }: Step1Props) {
   const [selectedOption, setSelectedOption] = useState<ConsultationOption | ''>('')
-  const [externalRedirectNotice, setExternalRedirectNotice] = useState<
-    'video' | 'onsite' | null
-  >(null)
-
-  const selectOption = (id: ConsultationOption) => {
-    setExternalRedirectNotice(null)
-    setSelectedOption(id)
-  }
 
   const options = [
     {
@@ -49,25 +41,8 @@ export default function Step1({ onNext, onBack }: Step1Props) {
   ]
 
   const handleNext = () => {
-    if (!selectedOption) return
-
-    if (selectedOption === 'questionnaire') {
-      onNext('questionnaire')
-      return
-    }
-
-    if (selectedOption === 'video') {
-      window.open('https://drterp.de', '_blank')
-      setExternalRedirectNotice('video')
-      return
-    }
-
-    if (selectedOption === 'onsite') {
-      window.open(
-        'https://www.cannabis-aerzte.de/karte/?type=arzt',
-        '_blank',
-      )
-      setExternalRedirectNotice('onsite')
+    if (selectedOption) {
+      onNext(selectedOption)
     }
   }
 
@@ -116,7 +91,7 @@ export default function Step1({ onNext, onBack }: Step1Props) {
               return (
                 <div
                   key={option.id}
-                  onClick={() => selectOption(option.id)}
+                  onClick={() => setSelectedOption(option.id)}
                   className={`form-option-card ${isSelected ? 'form-option-card--selected' : ''}`}
                 >
                   <div className="form-option-icon-wrap">
@@ -137,9 +112,8 @@ export default function Step1({ onNext, onBack }: Step1Props) {
             })}
           </div>
 
-          {/* Disclaimer */}
-          <div className="mb-6 sm:mb-8 pt-4 sm:pt-6 border-t border-gray-200">
-            <p className="text-xs sm:text-sm text-gray-600">
+          <div className="form-disclaimer">
+            <p className="form-disclaimer__text">
               * Die ärztlichen Leistungen werden nach der aktuell gültigen Gebührenordnung für Ärzte (GoÄ) berechnet.
             </p>
           </div>
@@ -151,18 +125,6 @@ export default function Step1({ onNext, onBack }: Step1Props) {
           >
             Weiter
           </Button>
-
-          {externalRedirectNotice === 'video' && (
-            <p className="mt-4 text-sm text-gray-600 text-center max-w-xl mx-auto">
-              Sie werden zu unserem Video-Konsultationsanbieter weitergeleitet. Kehren
-              Sie zurück, wenn Sie Ihr Rezept erhalten haben.
-            </p>
-          )}
-          {externalRedirectNotice === 'onsite' && (
-            <p className="mt-4 text-sm text-gray-600 text-center max-w-xl mx-auto">
-              Sie werden zur Karte der Cannabis-Ärzte weitergeleitet.
-            </p>
-          )}
         </div>
       </div>
     </div>
