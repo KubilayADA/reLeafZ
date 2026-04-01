@@ -15,7 +15,7 @@ import How from '@/components/ui/funktioniert/how'
 import PartnerApotheken from '@/components/ui/partnerApotheken/finden'
 import { attachLandingBinarySwitch } from '@/lib/scroll'
 
-const COMING_SOON_MODE = false
+const COMING_SOON_MODE = true
 
 const inconsolataStyle = {
   fontFamily: '"Inconsolata", monospace',
