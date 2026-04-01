@@ -7,7 +7,8 @@
 .how-funktioniert {
   scroll-margin-top: 100px;
   position: relative;
-  overflow: hidden;
+  /* visible so position:sticky works (any non-visible overflow breaks sticking to the page) */
+  overflow: visible;
 
   --how-bg: var(--releafz-bg);
   --how-card: var(--releafz-glass);
@@ -29,6 +30,11 @@
   --how-space-lg: 1.5rem;
   --how-space-xl: 2rem;
   --how-space-2xl: 2.5rem;
+  /* Extra slack below site header so eyebrow + title aren’t clipped */
+  --how-sticky-top: max(
+    8rem,
+    calc(env(safe-area-inset-top, 0px) + 12px + 3.5rem + 1.25rem)
+  );
 
   font-family: var(--how-sans);
   color: var(--how-text);
@@ -151,7 +157,7 @@
   margin: 0 auto;
   padding: 2.5rem 1rem 3.5rem;
   position: relative;
-  overflow: hidden;
+  overflow: visible;
 }
 
 @media (min-width: 640px) {
@@ -166,34 +172,52 @@
   }
 }
 
-/* Two-column layout */
+/* Two-column layout: sticky left (title + pills + CTA) | scrollable cards */
 .how-funktioniert .how-layout {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: 1fr;
   gap: 2rem;
+  align-items: start;
 }
 
 @media (min-width: 1024px) {
   .how-funktioniert .how-layout {
-    display: grid;
     grid-template-columns: 1fr 1.25fr;
     gap: 2.5rem;
-    align-items: start;
+    /* sidebar cell must match cards column height so sticky can ride the full section */
+    align-items: stretch;
+  }
+
+  .how-funktioniert .how-sidebar {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
   }
 }
 
-.how-funktioniert .how-left {
+.how-funktioniert .how-sidebar {
+  display: block;
+}
+
+.how-funktioniert .how-sidebar-sticky {
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
 }
 
 @media (min-width: 1024px) {
-  .how-funktioniert .how-left {
-    gap: 1.75rem;
+  .how-funktioniert .how-sidebar-sticky {
     position: sticky;
-    top: calc(88px + 1.5rem);
+    top: var(--how-sticky-top);
+    z-index: 40;
     align-self: start;
+    /* no nested scroll: avoids wheel/touch fighting the page + landing snap script */
+    overflow: visible;
+    backface-visibility: hidden;
+  }
+
+  .how-funktioniert .how-sidebar-sticky .prog-label {
+    text-align: left;
   }
 }
 
@@ -218,6 +242,7 @@
 @media (min-width: 1024px) {
   .how-funktioniert .how-header {
     text-align: left;
+    margin-bottom: 0.25rem;
   }
 }
 
@@ -256,6 +281,8 @@
   .how-funktioniert .progress-wrap {
     margin: 0;
     max-width: 100%;
+    justify-content: flex-start;
+    flex-wrap: wrap;
   }
 }
 
@@ -364,23 +391,7 @@
   backdrop-filter: blur(14px) saturate(140%);
   -webkit-backdrop-filter: blur(14px) saturate(140%);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
-  transition: border-color 0.35s var(--how-ease), box-shadow 0.35s var(--how-ease);
-}
-
-.how-funktioniert .how-col-card::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 0;
-  width: 3px;
-  height: 0;
-  border-radius: 2px;
-  background: linear-gradient(180deg, var(--how-accent-cyan), var(--how-accent));
-  transition: height 0.55s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.how-funktioniert .how-col-card.active::before {
-  height: 100%;
+  scroll-margin-top: calc(var(--how-sticky-top) + 0.75rem);
 }
 
 .how-funktioniert .how-col-card.active {
@@ -397,12 +408,7 @@
   object-fit: cover;
   border-radius: var(--how-radius-md);
   display: block;
-  transition: transform 0.3s var(--how-ease);
   border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.how-funktioniert .how-col-card.active .how-col-image {
-  transform: scale(1.02);
 }
 
 .how-funktioniert .how-col-body {
@@ -482,7 +488,12 @@
 
 @media (min-width: 1024px) {
   .how-funktioniert .cta-block {
-    padding-top: var(--how-space-xl);
+    padding-top: var(--how-space-lg);
+    text-align: left;
+  }
+
+  .how-funktioniert .cta-block .trust {
+    justify-content: flex-start;
   }
 }
 
