@@ -1,19 +1,18 @@
 /* ============================================
    HOW IT WORKS (reLeafz – Wie es funktioniert)
-   Scoped under .how-funktioniert — no @media here.
-   All responsive rules live in how-mobile.css
+   Scoped under .how-funktioniert so it doesn't override main.css
    ============================================ */
-
+/* Match hero: max-w-7xl = 80rem, padding px-4 sm:px-6 lg:px-8 */
 .how-funktioniert {
-  /* Match Finden: offset for fixed header when scrolling to #ablauf */
-  scroll-margin-top: max(8.5rem, 140px);
+  scroll-margin-top: 100px;
+  --how-bg: #ffffff;
   --how-card: #ffffff;
   --how-accent: #72906F;
   --how-accent-mid: #72906F;
-  --how-text: #111827;         /* near-black headings */
-  --how-muted: #4B5563;        /* body / desc text */
-  --how-muted-light: #6B7280;  /* labels, secondary text */
-  --how-border: #72906F;
+  --how-text: #111827;
+  --how-muted: #374151;
+  --how-muted-light: #6b7280;
+  --how-border: #d1d5db;
   --how-mono: 'Inconsolata', monospace;
   --how-sans: 'Geist Sans', sans-serif;
   --how-marker: 'Inconsolata', monospace;
@@ -35,370 +34,379 @@
 
 .how-funktioniert.section-container {
   background: var(--how-bg) !important;
+}
+
+/* Push content below the 88px fixed header on all screen sizes */
+.how-funktioniert.section-container {
   padding-top: calc(100px + 5rem);
-  border-top: none;
+}
+@media (min-width: 640px) {
+  .how-funktioniert.section-container {
+    padding-top: calc(88px + 3rem);
+  }
+}
+@media (min-width: 1024px) {
+  .how-funktioniert.section-container {
+    padding-top: calc(88px + 4rem);
+  }
 }
 
-/* ── Layout ── */
+  .how-funktioniert .section {
+    max-width: 80rem;
+    margin: 0 auto;
+    padding: 2.5rem 1rem 3.5rem;
+    position: relative;
+    overflow: hidden;
+  }
+  @media (min-width: 640px) {
+    .how-funktioniert .section {
+      padding: 3rem 1.5rem 4rem;
+    }
+  }
+  @media (min-width: 1024px) {
+    .how-funktioniert .section {
+      padding: 4rem 2rem 5rem;
+    }
+  }
 
-.how-funktioniert .section {
-  max-width: 80rem;
-  margin: 0 auto;
-  padding: 2.5rem 1rem 3.5rem;
-  position: relative;
-  overflow: hidden;
-}
+  /* Two-column layout: left = header + progress, right = cards + CTA */
+  .how-funktioniert .how-layout {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+  }
+  @media (min-width: 1024px) {
+    .how-funktioniert .how-layout {
+      display: grid;
+      grid-template-columns: 1fr 1.25fr;
+      gap: 2.5rem;
+      align-items: start;
+    }
+  }
 
-.how-funktioniert .how-layout {
-  display: flex;
-  flex-direction: column;
-  gap: 2rem;
-}
+  .how-funktioniert .how-left {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+  @media (min-width: 1024px) {
+    .how-funktioniert .how-left {
+      gap: 1.75rem;
+      position: sticky;
+      top: calc(88px + 1.5rem);
+      align-self: start;
+    }
+  }
 
-.how-funktioniert .how-left {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-}
+  .how-funktioniert .how-right {
+    display: flex;
+    flex-direction: column;
+    gap: var(--how-space-lg);
+    min-width: 0;
+  }
+  @media (min-width: 1024px) {
+    .how-funktioniert .how-right {
+      gap: var(--how-space-xl);
+    }
+  }
 
-.how-funktioniert .how-right {
-  display: flex;
-  flex-direction: column;
-  gap: var(--how-space-lg);
-  min-width: 0;
-}
+  .how-funktioniert .how-header {
+    text-align: center;
+    margin-bottom: 0;
+  }
+  @media (min-width: 1024px) {
+    .how-funktioniert .how-header {
+      text-align: left;
+    }
+  }
+  .how-funktioniert .eyebrow {
+    font-family: var(--how-mono);
+    font-size: 2rem;
+    font-weight: 900;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--how-accent-mid);
+    margin-bottom: var(--how-space-m);
+  }
+  .how-funktioniert .title {
+    font-family: var(--how-mono);
+    font-size: clamp(1.75rem, 4vw, 2.5rem);
+    font-weight: 900;
+    line-height: 1.25;
+    letter-spacing: -0.02em;
+    color: var(--how-text);
+    margin-bottom: var(--how-space-lg);
+  }
 
-/* ── Header ── */
+  .how-funktioniert .progress-wrap {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--how-space-md);
+    margin: 0;
+    max-width: 42rem;
+  }
+  @media (min-width: 1024px) {
+    .how-funktioniert .progress-wrap {
+      margin: 0;
+      max-width: 100%;
+    }
+  }
+  .how-funktioniert .prog-step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--how-space-xs);
+    cursor: pointer;
+    flex: 1;
+    opacity: 0.5;
+    transition: opacity 0.2s var(--how-ease);
+  }
+  .how-funktioniert .prog-step.active { opacity: 1; }
+  .how-funktioniert .prog-step.done { opacity: 0.7; }
+  .how-funktioniert .prog-dot {
+    width: 3rem;
+    height: 3rem;
+    border-radius: 50%;
+    border: 3px solid var(--how-border);
+    background: var(--how-card);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--how-mono);
+    font-size: 1rem;
+    font-weight: 900;
+    color: var(--how-muted-light);
+    transition: background 0.25s var(--how-ease), border-color 0.25s var(--how-ease), color 0.25s var(--how-ease), transform 0.25s var(--how-ease), box-shadow 0.25s var(--how-ease);
+    position: relative;
+    z-index: 1;
+  }
+  .how-funktioniert .prog-step.active .prog-dot {
+    background: var(--how-accent-mid);
+    border-color: var(--how-accent-mid);
+    color: #fff;
+    transform: scale(1.25);
+    box-shadow: 0 0 0 5px rgba(114, 144, 111, 0.2);
+  }
+  .how-funktioniert .prog-step.done .prog-dot {
+    background: var(--how-accent-mid);
+    border-color: var(--how-accent-mid);
+    color: #fff;
+    opacity: 0.6;
+  }
+  .how-funktioniert .prog-label {
+    font-family: var(--how-mono);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--how-muted-light);
+    text-align: center;
+    max-width: 5rem;
+    line-height: 1.2;
+  }
+  .how-funktioniert .prog-step.active .prog-label {
+    color: var(--how-text);
+    font-weight: 800;
+    font-size: 1rem;
+  }
+  .how-funktioniert .prog-connector {
+    height: 3px;
+    flex: 1;
+    background: var(--how-border);
+    border-radius: 999px;
+    transition: background 0.3s var(--how-ease);
+    margin-bottom: 1.5rem;
+  }
+  .how-funktioniert .prog-connector.done { background: var(--how-accent-mid); opacity: 0.6; }
 
-.how-funktioniert .how-header {
-  text-align: center;
-  margin-bottom: 0;
-}
+  /* ── Column cards ── */
 
-.how-funktioniert .eyebrow {
-  font-family: var(--how-mono);
-  font-size: 2rem;
-  font-weight: 900;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--how-accent-mid);
-  margin-bottom: var(--how-space-m);
-}
+  .how-funktioniert .how-col-card {
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    gap: var(--how-space-md);
+    padding: var(--how-space-md) 0 var(--how-space-md) var(--how-space-md);
+    border: none;
+    border-top: 1px solid rgba(17, 24, 39, 0.14);
+    border-radius: 0;
+    background: transparent;
+  }
+  .how-funktioniert .how-col-card:last-child {
+    border-bottom: 1px solid rgba(17, 24, 39, 0.14);
+  }
+  .how-funktioniert .how-col-card::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 2px;
+    height: 0;
+    background: var(--how-accent-mid);
+    border-radius: 1px;
+    transition: height 0.55s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .how-funktioniert .how-col-card.active::before {
+    height: 100%;
+  }
 
-.how-funktioniert .title {
-  font-family: var(--how-mono);
-  font-size: clamp(2rem, 4.5vw, 3rem);
-  font-weight: 900;
-  line-height: 1.15;
-  letter-spacing: -0.03em;
-  color: #1a2e1a;
-  margin-bottom: var(--how-space-lg);
-}
+  .how-funktioniert .how-col-image {
+    flex-shrink: 0;
+    width: 300px;
+    height: 300px;
+    object-fit: cover;
+    border-radius: var(--how-radius-md);
+    display: block;
+    transition: transform 0.3s var(--how-ease);
+    border: 1px solid rgba(17, 24, 39, 0.1);
+  }
+  .how-funktioniert .how-col-card.active .how-col-image {
+    transform: scale(1.015);
+  }
 
-/* The "4" — slightly larger, accent colour + underline */
-.how-funktioniert .title-num {
-  color: var(--how-accent);
-  font-weight: 900;
-  font-size: 1.25em;
-  line-height: 1;
-  vertical-align: baseline;
-  text-decoration: none;
-}
+  .how-funktioniert .how-col-body {
+    flex: 1;
+    position: relative;
+    padding: var(--how-space-sm) 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--how-space-sm);
+    overflow: hidden;
+  }
 
-/* ── Progress panel ── */
+  .how-funktioniert .how-col-ghost-num {
+    position: absolute;
+    bottom: -0.5rem;
+    right: 0;
+    font-family: var(--how-mono);
+    font-size: 5rem;
+    font-weight: 900;
+    color: var(--how-accent-mid);
+    opacity: 0.12;
+    line-height: 1;
+    pointer-events: none;
+    user-select: none;
+  }
 
-.how-funktioniert .progress-wrap {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--how-space-md);
-  margin: 0;
-  max-width: 42rem;
-}
+  .how-funktioniert .how-col-num {
+    font-family: var(--how-mono);
+    font-size: 0.975rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--how-accent-mid);
+    border-bottom: 2px solid var(--how-accent-mid);
+    padding-bottom: 1px;
+    display: inline-block;
+  }
+  .how-funktioniert .how-col-title {
+    font-family: var(--how-mono);
+    font-size: clamp(1.1rem, 2vw, 1.4rem);
+    font-weight: 900;
+    color: var(--how-text);
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+    margin: 0;
+  }
+  .how-funktioniert .how-col-desc {
+    font-family: var(--how-mono);
+    font-size: 0.9375rem;
+    color: var(--how-muted);
+    font-weight: 500;
+    line-height: 1.6;
+    margin: 0;
+  }
 
-.how-funktioniert .prog-step {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--how-space-xs);
-  cursor: pointer;
-  flex: 1;
-  opacity: 0.5;
-  transition: opacity 0.2s var(--how-ease);
-}
-.how-funktioniert .prog-step.active { opacity: 1; }
-.how-funktioniert .prog-step.done   { opacity: 0.7; }
+  @media (max-width: 640px) {
+    .how-funktioniert .how-col-card {
+      flex-direction: column;
+    }
+    .how-funktioniert .how-col-image {
+      width: 100%;
+      height: 220px;
+    }
+  }
 
-.how-funktioniert .prog-dot {
-  width: 3rem;
-  height: 3rem;
-  border-radius: 50%;
-  border: 3px solid var(--how-border);
-  background: var(--how-card);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: var(--how-mono);
-  font-size: 1rem;
-  font-weight: 900;
-  color: var(--how-muted-light);
-  transition: background 0.25s var(--how-ease), border-color 0.25s var(--how-ease),
-              color 0.25s var(--how-ease), transform 0.25s var(--how-ease),
-              box-shadow 0.25s var(--how-ease);
-  position: relative;
-  z-index: 1;
-}
-.how-funktioniert .prog-step.active .prog-dot {
-  background: var(--how-accent-mid);
-  border-color: var(--how-accent-mid);
-  color: #fff;
-  transform: scale(1.25);
-  box-shadow: 0 0 0 5px rgba(114, 144, 111, 0.2);
-}
-.how-funktioniert .prog-step.done .prog-dot {
-  background: var(--how-accent-mid);
-  border-color: var(--how-accent-mid);
-  color: #fff;
-  opacity: 0.6;
-}
 
-.how-funktioniert .prog-label {
-  font-family: var(--how-mono);
-  font-size: 0.75rem;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--how-muted-light);
-  text-align: center;
-  max-width: 5rem;
-  line-height: 1.2;
-}
-.how-funktioniert .prog-step.active .prog-label {
-  color: var(--how-text);
-  font-weight: 800;
-  font-size: 1rem;
-}
+  /* CTA */
+  .how-funktioniert .cta-block {
+    text-align: center;
+    margin-top: 0;
+    padding-top: var(--how-space-xl);
+    border-top: 1px solid var(--how-border);
+  }
+  @media (min-width: 1024px) {
+    .how-funktioniert .cta-block {
+      padding-top: var(--how-space-xl);
+    }
+  }
+  .how-funktioniert .cta-note {
+    font-size: 0.9375rem;
+    color: var(--how-muted);
+    font-family: var(--how-mono);
+    margin-bottom: var(--how-space-md);
+    letter-spacing: 0.02em;
+  }
+  .how-funktioniert .btn-cta {
+    font-family: var(--how-mono);
+    font-size: 1rem;
+    font-weight: 500;
+    color: #fff;
+    background: var(--how-accent-mid);
+    border: 1px solid var(--how-accent-mid);
+    border-radius: var(--how-radius-sm);
+    padding: 0.5rem 1.5rem;
+    cursor: pointer;
+    transition: opacity 0.2s var(--how-ease);
+    text-decoration: none;
+    display: inline-block;
+  }
+  .how-funktioniert .btn-cta:focus-visible {
+    outline: 1px solid var(--how-accent-mid);
+    outline-offset: 2px;
+  }
+  .how-funktioniert .btn-cta:hover {
+    opacity: 0.9;
+  }
 
-.how-funktioniert .prog-connector {
-  height: 3px;
-  flex: 1;
-  border-radius: 999px;
-  margin-bottom: 1.5rem;
-  overflow: hidden;
-  background: rgba(114, 144, 111, 0.2);
-  position: relative;
-}
-.how-funktioniert .prog-connector::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: var(--how-accent-mid);
-  transform-origin: left center;
-  transform: scaleX(var(--conn-fill, 0));
-  border-radius: 999px;
-  transition: transform 0.05s linear;
-}
+  .how-funktioniert .trust {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: var(--how-space-md);
+    margin-top: var(--how-space-md);
+  }
+  .how-funktioniert .trust-item {
+    display: flex;
+    align-items: center;
+    gap: var(--how-space-xs);
+    font-size: 0.75rem;
+    color: var(--how-muted);
+    font-family: var(--how-mono);
+    font-weight: 500;
+  }
+  .how-funktioniert .trust-dot {
+    width: 0.25rem;
+    height: 0.25rem;
+    border-radius: 50%;
+    background: var(--how-accent-mid);
+  }
 
-/* ── Column cards ── */
+  .how-funktioniert .prog-step:focus-visible {
+    outline: 1px solid var(--how-text);
+    outline-offset: 2px;
+    border-radius: var(--how-radius-sm);
+  }
 
-.how-funktioniert .how-col-card {
-  position: relative;
-  display: flex;
-  flex-direction: row;
-  align-items: flex-start;
-  gap: var(--how-space-md);
-  padding: var(--how-space-md) 0 var(--how-space-md) var(--how-space-md);
-  border: none;
-  border-top: 1px solid rgba(17, 24, 39, 0.07);
-  border-radius: 0;
-  background: transparent;
-}
-.how-funktioniert .how-col-card:last-child {
-  border-bottom: 1px solid rgba(17, 24, 39, 0.07);
-}
-
-/* ── Timeline track ── */
-
-.how-funktioniert .how-cards-wrap {
-  position: relative;
-  padding-left: 1.5rem;
-}
-
-.how-funktioniert .timeline-track {
-  position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  width: 2px;
-  background: rgba(114, 144, 111, 0.2);
-  border-radius: 999px;
-  overflow: visible;
-}
-
-.how-funktioniert .timeline-fill {
-  position: absolute;
-  inset: 0;
-  background: var(--how-accent-mid);
-  border-radius: 999px;
-  transform-origin: top center;
-  transform: scaleY(var(--progress, 0));
-  will-change: transform;
-}
-
-.how-funktioniert .timeline-dot {
-  position: absolute;
-  left: 50%;
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: rgba(114, 144, 111, 0.3);
-  border: 2px solid rgba(114, 144, 111, 0.4);
-  transform: translate(-50%, -50%);
-  transition: background 0.2s ease-out, border-color 0.2s ease-out,
-              transform 0.2s ease-out, box-shadow 0.2s ease-out;
-  z-index: 2;
-}
-.how-funktioniert .timeline-dot.lit {
-  background: var(--how-accent-mid);
-  border-color: var(--how-accent-mid);
-  transform: translate(-50%, -50%) scale(1.4);
-  box-shadow: 0 0 0 4px rgba(114, 144, 111, 0.25);
-}
-
-/* ── Card image & body ── */
-
-.how-funktioniert .how-col-image {
-  flex-shrink: 0;
-  width: 300px;
-  height: 300px;
-  object-fit: cover;
-  border-radius: var(--how-radius-md);
-  display: block;
-  transition: transform 0.3s var(--how-ease);
-}
-.how-funktioniert .how-col-card.active .how-col-image {
-  transform: scale(1.015);
-}
-
-.how-funktioniert .how-col-body {
-  flex: 1;
-  position: relative;
-  padding: var(--how-space-sm) 0;
-  display: flex;
-  flex-direction: column;
-  gap: var(--how-space-sm);
-  overflow: hidden;
-}
-
-.how-funktioniert .how-col-ghost-num {
-  position: absolute;
-  bottom: -0.5rem;
-  right: 0;
-  font-family: var(--how-mono);
-  font-size: 5rem;
-  font-weight: 900;
-  color: var(--how-accent-mid);
-  opacity: 0.12;
-  line-height: 1;
-  pointer-events: none;
-  user-select: none;
-}
-
-.how-funktioniert .how-col-num {
-  font-family: var(--how-mono);
-  font-size: 0.975rem;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--how-accent-mid);
-  border-bottom: 2px solid var(--how-accent-mid);
-  padding-bottom: 1px;
-  display: inline-block;
-}
-
-.how-funktioniert .how-col-title {
-  font-family: var(--how-mono);
-  font-size: clamp(1.1rem, 2vw, 1.4rem);
-  font-weight: 900;
-  color: var(--how-text);
-  line-height: 1.2;
-  letter-spacing: -0.02em;
-  margin: 0;
-}
-
-.how-funktioniert .how-col-desc {
-  font-family: "Helvetica Neue", sans-serif;
-  font-size: 0.9375rem;
-  color: var(--how-muted);
-  font-weight: 500;
-  line-height: 1.6;
-  margin: 0;
-}
-
-/* ── CTA ── */
-
-.how-funktioniert .cta-block {
-  text-align: center;
-  margin-top: 0;
-  padding-top: var(--how-space-xl);
-  border-top: 1px solid var(--how-border);
-}
-
-.how-funktioniert .cta-note {
-  font-size: 0.9375rem;
-  color: var(--how-muted);
-  font-family: var(--how-mono);
-  margin-bottom: var(--how-space-md);
-  letter-spacing: 0.02em;
-}
-
-.how-funktioniert .btn-cta {
-  font-family: var(--how-mono);
-  font-size: 1rem;
-  font-weight: 500;
-  color: #fff;
-  background: var(--how-accent-mid);
-  border: 1px solid var(--how-accent-mid);
-  border-radius: var(--how-radius-sm);
-  padding: 0.5rem 1.5rem;
-  cursor: pointer;
-  transition: opacity 0.2s var(--how-ease);
-  text-decoration: none;
-  display: inline-block;
-}
-.how-funktioniert .btn-cta:focus-visible {
-  outline: 1px solid var(--how-accent-mid);
-  outline-offset: 2px;
-}
-.how-funktioniert .btn-cta:hover {
-  opacity: 0.9;
-}
-
-.how-funktioniert .trust {
-  display: flex;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: var(--how-space-md);
-  margin-top: var(--how-space-md);
-}
-.how-funktioniert .trust-item {
-  display: flex;
-  align-items: center;
-  gap: var(--how-space-xs);
-  font-size: 0.75rem;
-  color: var(--how-muted);
-  font-family: var(--how-mono);
-  font-weight: 500;
-}
-.how-funktioniert .trust-dot {
-  width: 0.25rem;
-  height: 0.25rem;
-  border-radius: 50%;
-  background: var(--how-accent-mid);
-}
-
-.how-funktioniert .prog-step:focus-visible {
-  outline: 1px solid var(--how-text);
-  outline-offset: 2px;
-  border-radius: var(--how-radius-sm);
-}
+  @media (max-width: 680px) {
+    .how-funktioniert .section { padding: 1.5rem var(--how-space-md) 2.5rem; }
+    .how-funktioniert .header { margin-bottom: 0; }
+    .how-funktioniert .title { font-size: clamp(1.5rem, 5vw, 2rem); }
+    .how-funktioniert .cta-block { margin-top: 0; padding-top: var(--how-space-xl); }
+  }
+  @media (max-width: 440px) {
+    .how-funktioniert .section { padding: 1.25rem var(--how-space-sm) 2rem; }
+    .how-funktioniert .prog-label { display: none; }
+  }

@@ -44,6 +44,12 @@ export function scrollLandingToAblauf(): void {
 
 /** True once the fixed hero has scrolled out of view (mobile docked nav). */
 export function isLandingPastHero(): boolean {
+  const landingMain = document.getElementById('landing-main')
+  if (landingMain) {
+    // Primary signal: once main content reaches the top bridge, show mobile navbar.
+    return landingMain.getBoundingClientRect().top <= HEADER_OFFSET + SWITCH_EPSILON
+  }
+
   const hero = document.querySelector('.hero-section')
   if (!hero) return true
   return hero.getBoundingClientRect().bottom <= 0

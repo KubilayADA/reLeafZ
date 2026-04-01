@@ -7,7 +7,6 @@ import { ArrowLeft, MapPin, Building2, Mail, Lock, CheckCircle2, X } from 'lucid
 import { useRouter } from 'next/navigation'
 import '@/app/main.css'
 import '@/form/form.css'
-import { API_BASE } from '@/lib/api'
 
 interface MashallahFormProps {
   postcode: string
@@ -32,6 +31,8 @@ export default function MashallahForm({ postcode, onBack }: MashallahFormProps) 
   const [showWelcomeNotification, setShowWelcomeNotification] = useState(false)
   const [consentHealth, setConsentHealth] = useState(false)
   const [consentTerms, setConsentTerms] = useState(false)
+  
+  const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
 
   // Validate form fields
   const isFormValid = formData.fullName.trim() !== '' && 
@@ -48,8 +49,10 @@ export default function MashallahForm({ postcode, onBack }: MashallahFormProps) 
                       // 🔒 SECURITY: Clear authentication tokens when email changes
                       // This prevents using old tokens with new email addresses
                       if (name === 'email') {
-                        sessionStorage.removeItem('treatmentRequest')
-                        sessionStorage.removeItem('assignedPharmacyId')
+                        console.log('🧹 Clearing tokens due to email change')
+                        localStorage.removeItem('token')
+                        localStorage.removeItem('treatmentRequest')
+                        localStorage.removeItem('assignedPharmacyId')
                         // Reset OTP modal state if it was open
                         setOtpModalOpen(false)
                         setOtpCode('')
@@ -81,7 +84,6 @@ export default function MashallahForm({ postcode, onBack }: MashallahFormProps) 
       const response = await fetch(`${API_BASE}/api/auth/verify-otp`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
         body: JSON.stringify({
           email: formData.email,
           otpCode: otpCode
@@ -90,16 +92,15 @@ export default function MashallahForm({ postcode, onBack }: MashallahFormProps) 
 
       const result = await response.json()
 
-      if (response.ok) {
+      if (response.ok && result.token) {
+        localStorage.setItem('token', result.token)
         setOtpModalOpen(false)
         router.push('/questionnaire')
       } else {
         setOtpError(result.message || 'Ungültiger Code. Bitte versuchen Sie es erneut.')
       }
     } catch (error) {
-      if (process.env.NODE_ENV === 'development') {
-        console.error('OTP verification error:', error)
-      }
+      console.error('OTP verification error:', error)
       setOtpError('Fehler bei der Verifizierung. Bitte versuchen Sie es erneut.')
     } finally {
       setVerifyingOtp(false)
@@ -151,20 +152,20 @@ export default function MashallahForm({ postcode, onBack }: MashallahFormProps) 
 
       // Only store when API returned a real treatment request
       if (result.data.pharmacyId != null) {
-        sessionStorage.setItem('assignedPharmacyId', result.data.pharmacyId.toString())
+        localStorage.setItem('assignedPharmacyId', result.data.pharmacyId.toString())
       }
       const treatmentRequestData = {
         id: result.data.id,
-        city: formData.city,
+        patientId: result.data.patientId ?? null,
+        pharmacyId: result.data.pharmacyId ?? null,
         postcode,
+        ...formData,
       }
-      sessionStorage.setItem('treatmentRequest', JSON.stringify(treatmentRequestData))
-      sessionStorage.setItem('formPostcode', postcode)
+      localStorage.setItem('treatmentRequest', JSON.stringify(treatmentRequestData))
+      localStorage.setItem('formPostcode', postcode)
       return { success: true }
     } catch (error) {
-      if (process.env.NODE_ENV === 'development') {
-        console.error('Error creating treatment request:', error)
-      }
+      console.error('Error creating treatment request:', error)
       return {
         success: false,
         message: 'Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut.',
@@ -190,7 +191,6 @@ export default function MashallahForm({ postcode, onBack }: MashallahFormProps) 
       const loginResponse = await fetch(`${API_BASE}/api/auth/patient-login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
         body: JSON.stringify({ email: formData.email }),
       })
       const loginResult = await loginResponse.json()
@@ -208,7 +208,8 @@ export default function MashallahForm({ postcode, onBack }: MashallahFormProps) 
       }
 
       // Case 2: Existing user - known device (same IP)
-      if (!loginResult.otpRequired) {
+      if (loginResult.token && !loginResult.otpRequired) {
+        localStorage.setItem('token', loginResult.token)
         setShowWelcomeNotification(true)
         setTimeout(() => setShowWelcomeNotification(false), 3000)
         router.push('/questionnaire')
@@ -225,9 +226,7 @@ export default function MashallahForm({ postcode, onBack }: MashallahFormProps) 
       setSubmitError('Ein unerwarteter Fehler ist aufgetreten. Bitte versuchen Sie es erneut.')
       setLoading(false)
     } catch (error) {
-      if (process.env.NODE_ENV === 'development') {
-        console.error('Error during submit:', error)
-      }
+      console.error('Error during submit:', error)
       setSubmitError('Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut.')
       setLoading(false)
     }
@@ -300,7 +299,6 @@ export default function MashallahForm({ postcode, onBack }: MashallahFormProps) 
                   value={formData.fullName}
                   onChange={handleChange}
                   required
-                  maxLength={100}
                   disabled={loading}
                   className="form-input inconsolata"
                   placeholder="Max Mustermann"
@@ -318,7 +316,6 @@ export default function MashallahForm({ postcode, onBack }: MashallahFormProps) 
                   value={formData.email}
                   onChange={handleChange}
                   required
-                  maxLength={254}
                   disabled={loading}
                   className="form-input inconsolata"
                   placeholder="max@example.com"
@@ -336,7 +333,6 @@ export default function MashallahForm({ postcode, onBack }: MashallahFormProps) 
                   value={formData.phone}
                   onChange={handleChange}
                   required
-                  maxLength={20}
                   disabled={loading}
                   className="form-input inconsolata"
                   placeholder="+49 30 12345678"
@@ -358,7 +354,6 @@ export default function MashallahForm({ postcode, onBack }: MashallahFormProps) 
                     value={formData.street}
                     onChange={handleChange}
                     required
-                    maxLength={200}
                     disabled={loading}
                     className={`form-input inconsolata form-input--with-icon-left ${formData.street ? 'has-value' : ''}`}
                     placeholder="z.B. Hauptstraße 42"
@@ -382,7 +377,6 @@ export default function MashallahForm({ postcode, onBack }: MashallahFormProps) 
                       value={formData.city}
                       onChange={handleChange}
                       required
-                      maxLength={100}
                       disabled={loading}
                       className={`form-input inconsolata form-input--with-icon-left ${formData.city ? 'has-value' : ''}`}
                       placeholder="Berlin"
@@ -405,40 +399,6 @@ export default function MashallahForm({ postcode, onBack }: MashallahFormProps) 
                   />
                 </div>
               </div>
-              {/* GDPR Consent Checkboxes */}
-<div className="space-y-3">
-  <div className="flex items-start gap-3">
-    <input
-      type="checkbox"
-      id="consentTerms"
-      checked={consentTerms}
-      onChange={(e) => setConsentTerms(e.target.checked)}
-      disabled={loading}
-      className="mt-1 h-4 w-4 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500 cursor-pointer"
-    />
-    <label htmlFor="consentTerms" className="text-sm text-gray-700 cursor-pointer">
-      Ich akzeptiere die{' '}
-      <a href="/agb" target="_blank" className="text-emerald-600 underline hover:text-emerald-700">AGB</a>
-      {' '}und die{' '}
-      <a href="/datenschutz" target="_blank" className="text-emerald-600 underline hover:text-emerald-700">Datenschutzerklärung</a>
-      {' '}von releafZ. *
-    </label>
-  </div>
-
-      <div className="flex items-start gap-3">
-    <input
-      type="checkbox"
-      id="consentHealth"
-      checked={consentHealth}
-      onChange={(e) => setConsentHealth(e.target.checked)}
-      disabled={loading}
-      className="mt-1 h-4 w-4 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500 cursor-pointer"
-    />
-        <label htmlFor="consentHealth" className="text-sm text-gray-700 cursor-pointer">
-          Ich willige ausdrücklich in die Verarbeitung meiner Gesundheitsdaten (Symptome, Diagnosen, Rezepte) durch releafZ zur Vermittlung medizinischer Leistungen ein (Art. 9 Abs. 2 lit. a DSGVO). *
-        </label>
-      </div>
-    </div>
 
               <div className="space-y-3">
                 <div className="form-checkbox-row">
@@ -574,16 +534,13 @@ export default function MashallahForm({ postcode, onBack }: MashallahFormProps) 
                     await fetch(`${API_BASE}/api/auth/patient-login`, {
                       method: 'POST',
                       headers: { 'Content-Type': 'application/json' },
-                      credentials: 'include',
                       body: JSON.stringify({ email: formData.email })
                     })
                     alert('Neuer Code wurde gesendet!')
                     setOtpCode('')
                     setOtpError('')
                   } catch (error) {
-                    if (process.env.NODE_ENV === 'development') {
-                      console.error('Resend OTP error:', error)
-                    }
+                    console.error('Resend OTP error:', error)
                   }
                 }}
                 className="text-sm text-emerald-600 hover:text-emerald-700 underline"
