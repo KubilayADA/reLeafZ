@@ -1,32 +1,35 @@
 /* ============================================
-   HOW IT WORKS (reLeafz – Wie es funktioniert)
-   Scoped under .how-funktioniert so it doesn't override main.css
+   HOW IT WORKS — aligned with ComingSoon.tsx
+   (dark #0a0a0a, cyan #22d3ee, emerald #10b981, grid + glow + particles)
+   Scoped under .how-funktioniert
    ============================================ */
-/* Match hero: max-w-7xl = 80rem, padding px-4 sm:px-6 lg:px-8 */
+
 .how-funktioniert {
   scroll-margin-top: 100px;
-  --how-bg: #ffffff;
-  --how-card: #ffffff;
-  --how-accent: #72906F;
-  --how-accent-mid: #72906F;
-  --how-text: #111827;
-  --how-muted: #374151;
-  --how-muted-light: #6b7280;
-  --how-border: #d1d5db;
-  --how-mono: 'Inconsolata', monospace;
-  --how-sans: 'Geist Sans', sans-serif;
-  --how-marker: 'Inconsolata', monospace;
-  --how-hand:   'Inconsolata', monospace;
+  position: relative;
+  overflow: hidden;
+
+  --how-bg: var(--releafz-bg);
+  --how-card: var(--releafz-glass);
+  --how-accent: var(--releafz-accent);
+  --how-accent-cyan: var(--releafz-cyan);
+  --how-text: var(--releafz-text);
+  --how-muted: var(--releafz-muted);
+  --how-muted-light: var(--releafz-muted-dim);
+  --how-border: var(--releafz-border);
+  --how-mono: var(--releafz-mono);
+  --how-sans: var(--releafz-sans);
   --how-ease: cubic-bezier(0.4, 0, 0.2, 1);
-  --how-radius-sm: 0.375rem;
-  --how-radius-md: 0.5rem;
-  --how-radius-lg: 0.75rem;
+  --how-radius-sm: 0.5rem;
+  --how-radius-md: 0.75rem;
+  --how-radius-lg: 1rem;
   --how-space-xs: 0.5rem;
   --how-space-sm: 0.75rem;
   --how-space-md: 1rem;
   --how-space-lg: 1.5rem;
   --how-space-xl: 2rem;
   --how-space-2xl: 2.5rem;
+
   font-family: var(--how-sans);
   color: var(--how-text);
   -webkit-font-smoothing: antialiased;
@@ -36,7 +39,7 @@
   background: var(--how-bg) !important;
 }
 
-/* Push content below the 88px fixed header on all screen sizes */
+/* Push content below fixed header */
 .how-funktioniert.section-container {
   padding-top: calc(100px + 5rem);
 }
@@ -51,362 +54,531 @@
   }
 }
 
-  .how-funktioniert .section {
-    max-width: 80rem;
-    margin: 0 auto;
-    padding: 2.5rem 1rem 3.5rem;
-    position: relative;
-    overflow: hidden;
-  }
-  @media (min-width: 640px) {
-    .how-funktioniert .section {
-      padding: 3rem 1.5rem 4rem;
-    }
-  }
-  @media (min-width: 1024px) {
-    .how-funktioniert .section {
-      padding: 4rem 2rem 5rem;
-    }
-  }
+/* ── ComingSoon-style background (section-local) ── */
+.how-funktioniert__bg {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+}
 
-  /* Two-column layout: left = header + progress, right = cards + CTA */
-  .how-funktioniert .how-layout {
-    display: flex;
-    flex-direction: column;
-    gap: 2rem;
-  }
-  @media (min-width: 1024px) {
-    .how-funktioniert .how-layout {
-      display: grid;
-      grid-template-columns: 1fr 1.25fr;
-      gap: 2.5rem;
-      align-items: start;
-    }
-  }
+.how-funktioniert__bg-base {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, #0a0a0a 0%, #0f0f0f 50%, #0a0a0a 100%);
+}
 
-  .how-funktioniert .how-left {
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
-  }
-  @media (min-width: 1024px) {
-    .how-funktioniert .how-left {
-      gap: 1.75rem;
-      position: sticky;
-      top: calc(88px + 1.5rem);
-      align-self: start;
-    }
-  }
+.how-funktioniert__glow-line {
+  position: absolute;
+  left: 50%;
+  top: 42%;
+  transform: translate(-50%, -50%);
+  width: 120%;
+  height: 2px;
+  z-index: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(34, 211, 238, 0.55) 20%,
+    rgba(16, 185, 129, 0.75) 50%,
+    rgba(34, 211, 238, 0.55) 80%,
+    transparent 100%
+  );
+  box-shadow:
+    0 0 60px rgba(34, 211, 238, 0.45),
+    0 0 120px rgba(16, 185, 129, 0.35),
+    0 0 180px rgba(34, 211, 238, 0.2);
+  animation: glowPulse 4s ease-in-out infinite;
+}
 
-  .how-funktioniert .how-right {
-    display: flex;
-    flex-direction: column;
-    gap: var(--how-space-lg);
-    min-width: 0;
-  }
-  @media (min-width: 1024px) {
-    .how-funktioniert .how-right {
-      gap: var(--how-space-xl);
-    }
-  }
-
-  .how-funktioniert .how-header {
-    text-align: center;
-    margin-bottom: 0;
-  }
-  @media (min-width: 1024px) {
-    .how-funktioniert .how-header {
-      text-align: left;
-    }
-  }
-  .how-funktioniert .eyebrow {
-    font-family: var(--how-mono);
-    font-size: 2rem;
-    font-weight: 900;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--how-accent-mid);
-    margin-bottom: var(--how-space-m);
-  }
-  .how-funktioniert .title {
-    font-family: var(--how-mono);
-    font-size: clamp(1.75rem, 4vw, 2.5rem);
-    font-weight: 900;
-    line-height: 1.25;
-    letter-spacing: -0.02em;
-    color: var(--how-text);
-    margin-bottom: var(--how-space-lg);
-  }
-
-  .how-funktioniert .progress-wrap {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: var(--how-space-md);
-    margin: 0;
-    max-width: 42rem;
-  }
-  @media (min-width: 1024px) {
-    .how-funktioniert .progress-wrap {
-      margin: 0;
-      max-width: 100%;
-    }
-  }
-  .how-funktioniert .prog-step {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: var(--how-space-xs);
-    cursor: pointer;
-    flex: 1;
-    opacity: 0.5;
-    transition: opacity 0.2s var(--how-ease);
-  }
-  .how-funktioniert .prog-step.active { opacity: 1; }
-  .how-funktioniert .prog-step.done { opacity: 0.7; }
-  .how-funktioniert .prog-dot {
-    width: 3rem;
-    height: 3rem;
-    border-radius: 50%;
-    border: 3px solid var(--how-border);
-    background: var(--how-card);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-family: var(--how-mono);
-    font-size: 1rem;
-    font-weight: 900;
-    color: var(--how-muted-light);
-    transition: background 0.25s var(--how-ease), border-color 0.25s var(--how-ease), color 0.25s var(--how-ease), transform 0.25s var(--how-ease), box-shadow 0.25s var(--how-ease);
-    position: relative;
-    z-index: 1;
-  }
-  .how-funktioniert .prog-step.active .prog-dot {
-    background: var(--how-accent-mid);
-    border-color: var(--how-accent-mid);
-    color: #fff;
-    transform: scale(1.25);
-    box-shadow: 0 0 0 5px rgba(114, 144, 111, 0.2);
-  }
-  .how-funktioniert .prog-step.done .prog-dot {
-    background: var(--how-accent-mid);
-    border-color: var(--how-accent-mid);
-    color: #fff;
-    opacity: 0.6;
-  }
-  .how-funktioniert .prog-label {
-    font-family: var(--how-mono);
-    font-size: 0.75rem;
-    font-weight: 700;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    color: var(--how-muted-light);
-    text-align: center;
-    max-width: 5rem;
-    line-height: 1.2;
-  }
-  .how-funktioniert .prog-step.active .prog-label {
-    color: var(--how-text);
-    font-weight: 800;
-    font-size: 1rem;
-  }
-  .how-funktioniert .prog-connector {
+@media (min-width: 768px) {
+  .how-funktioniert__glow-line {
     height: 3px;
-    flex: 1;
-    background: var(--how-border);
-    border-radius: 999px;
-    transition: background 0.3s var(--how-ease);
-    margin-bottom: 1.5rem;
   }
-  .how-funktioniert .prog-connector.done { background: var(--how-accent-mid); opacity: 0.6; }
+}
 
-  /* ── Column cards ── */
+.how-funktioniert__glow-radial {
+  position: absolute;
+  left: 50%;
+  top: 40%;
+  transform: translate(-50%, -50%);
+  width: 100%;
+  height: 320px;
+  z-index: 0;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(34, 211, 238, 0.16) 0%,
+    rgba(16, 185, 129, 0.12) 30%,
+    transparent 70%
+  );
+  animation: glowPulse 6s ease-in-out infinite;
+  animation-delay: 1s;
+}
 
+@media (min-width: 768px) {
+  .how-funktioniert__glow-radial {
+    height: 400px;
+  }
+}
+
+.how-funktioniert__grid {
+  position: absolute;
+  inset: 0;
+  opacity: 0.05;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.1) 1px, transparent 1px);
+  background-size: 50px 50px;
+}
+
+.how-funktioniert__particle {
+  position: absolute;
+  border-radius: 999px;
+  background: rgba(34, 211, 238, 0.65);
+  box-shadow:
+    0 0 15px rgba(34, 211, 238, 0.75),
+    0 0 30px rgba(34, 211, 238, 0.35);
+}
+
+.how-funktioniert .how-funktioniert__shell {
+  position: relative;
+  z-index: 1;
+}
+
+.how-funktioniert .section {
+  max-width: 80rem;
+  margin: 0 auto;
+  padding: 2.5rem 1rem 3.5rem;
+  position: relative;
+  overflow: hidden;
+}
+
+@media (min-width: 640px) {
+  .how-funktioniert .section {
+    padding: 3rem 1.5rem 4rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .how-funktioniert .section {
+    padding: 4rem 2rem 5rem;
+  }
+}
+
+/* Two-column layout */
+.how-funktioniert .how-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+@media (min-width: 1024px) {
+  .how-funktioniert .how-layout {
+    display: grid;
+    grid-template-columns: 1fr 1.25fr;
+    gap: 2.5rem;
+    align-items: start;
+  }
+}
+
+.how-funktioniert .how-left {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+@media (min-width: 1024px) {
+  .how-funktioniert .how-left {
+    gap: 1.75rem;
+    position: sticky;
+    top: calc(88px + 1.5rem);
+    align-self: start;
+  }
+}
+
+.how-funktioniert .how-right {
+  display: flex;
+  flex-direction: column;
+  gap: var(--how-space-lg);
+  min-width: 0;
+}
+
+@media (min-width: 1024px) {
+  .how-funktioniert .how-right {
+    gap: var(--how-space-xl);
+  }
+}
+
+.how-funktioniert .how-header {
+  text-align: center;
+  margin-bottom: 0;
+}
+
+@media (min-width: 1024px) {
+  .how-funktioniert .how-header {
+    text-align: left;
+  }
+}
+
+.how-funktioniert .eyebrow {
+  font-family: var(--how-mono);
+  font-size: clamp(0.75rem, 2vw, 0.9rem);
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--how-accent-cyan);
+  margin-bottom: var(--how-space-md);
+  text-shadow: 0 0 24px rgba(34, 211, 238, 0.25);
+}
+
+.how-funktioniert .title {
+  font-family: var(--how-sans);
+  font-size: clamp(1.75rem, 4vw, 2.5rem);
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  color: var(--how-text);
+  margin-bottom: var(--how-space-lg);
+  text-shadow: 0 0 30px rgba(255, 255, 255, 0.08);
+}
+
+.how-funktioniert .progress-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--how-space-md);
+  margin: 0;
+  max-width: 42rem;
+}
+
+@media (min-width: 1024px) {
+  .how-funktioniert .progress-wrap {
+    margin: 0;
+    max-width: 100%;
+  }
+}
+
+.how-funktioniert .prog-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--how-space-xs);
+  cursor: pointer;
+  flex: 1;
+  opacity: 0.45;
+  transition: opacity 0.2s var(--how-ease);
+}
+
+.how-funktioniert .prog-step.active {
+  opacity: 1;
+}
+
+.how-funktioniert .prog-step.done {
+  opacity: 0.75;
+}
+
+.how-funktioniert .prog-dot {
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  border: 2px solid var(--how-border);
+  background: rgba(26, 26, 26, 0.85);
+  backdrop-filter: blur(10px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--how-mono);
+  font-size: 1rem;
+  font-weight: 800;
+  color: var(--how-muted-light);
+  transition:
+    background 0.25s var(--how-ease),
+    border-color 0.25s var(--how-ease),
+    color 0.25s var(--how-ease),
+    transform 0.25s var(--how-ease),
+    box-shadow 0.25s var(--how-ease);
+  position: relative;
+  z-index: 1;
+}
+
+.how-funktioniert .prog-step.active .prog-dot {
+  background: linear-gradient(145deg, rgba(16, 185, 129, 0.95), rgba(5, 150, 105, 0.98));
+  border-color: rgba(34, 211, 238, 0.5);
+  color: #fff;
+  transform: scale(1.12);
+  box-shadow:
+    0 0 0 4px rgba(16, 185, 129, 0.25),
+    0 0 28px rgba(34, 211, 238, 0.35);
+}
+
+.how-funktioniert .prog-step.done .prog-dot {
+  background: rgba(16, 185, 129, 0.55);
+  border-color: rgba(16, 185, 129, 0.65);
+  color: #fff;
+}
+
+.how-funktioniert .prog-label {
+  font-family: var(--how-mono);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--how-muted-light);
+  text-align: center;
+  max-width: 5rem;
+  line-height: 1.2;
+}
+
+.how-funktioniert .prog-step.active .prog-label {
+  color: var(--how-text);
+  font-weight: 800;
+  font-size: 0.8rem;
+}
+
+.how-funktioniert .prog-connector {
+  height: 3px;
+  flex: 1;
+  background: var(--how-border);
+  border-radius: 999px;
+  transition: background 0.3s var(--how-ease);
+  margin-bottom: 1.5rem;
+}
+
+.how-funktioniert .prog-connector.done {
+  background: linear-gradient(90deg, rgba(16, 185, 129, 0.5), rgba(34, 211, 238, 0.45));
+  opacity: 0.85;
+}
+
+/* Column cards — glass panels */
+.how-funktioniert .how-col-card {
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: var(--how-space-md);
+  padding: var(--how-space-lg);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--how-radius-lg);
+  background: var(--how-card);
+  backdrop-filter: blur(14px) saturate(140%);
+  -webkit-backdrop-filter: blur(14px) saturate(140%);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+  transition: border-color 0.35s var(--how-ease), box-shadow 0.35s var(--how-ease);
+}
+
+.how-funktioniert .how-col-card::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 3px;
+  height: 0;
+  border-radius: 2px;
+  background: linear-gradient(180deg, var(--how-accent-cyan), var(--how-accent));
+  transition: height 0.55s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.how-funktioniert .how-col-card.active::before {
+  height: 100%;
+}
+
+.how-funktioniert .how-col-card.active {
+  border-color: rgba(34, 211, 238, 0.28);
+  box-shadow:
+    0 8px 36px rgba(0, 0, 0, 0.45),
+    0 0 40px rgba(34, 211, 238, 0.08);
+}
+
+.how-funktioniert .how-col-image {
+  flex-shrink: 0;
+  width: 300px;
+  height: 300px;
+  object-fit: cover;
+  border-radius: var(--how-radius-md);
+  display: block;
+  transition: transform 0.3s var(--how-ease);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.how-funktioniert .how-col-card.active .how-col-image {
+  transform: scale(1.02);
+}
+
+.how-funktioniert .how-col-body {
+  flex: 1;
+  position: relative;
+  padding: var(--how-space-xs) 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--how-space-sm);
+  overflow: hidden;
+}
+
+.how-funktioniert .how-col-ghost-num {
+  position: absolute;
+  bottom: -0.25rem;
+  right: 0.5rem;
+  font-family: var(--how-mono);
+  font-size: 4.5rem;
+  font-weight: 900;
+  color: var(--how-accent-cyan);
+  opacity: 0.1;
+  line-height: 1;
+  pointer-events: none;
+  user-select: none;
+}
+
+.how-funktioniert .how-col-num {
+  font-family: var(--how-mono);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--how-accent-cyan);
+  padding-bottom: 2px;
+  border-bottom: 1px solid rgba(34, 211, 238, 0.45);
+  display: inline-block;
+  width: fit-content;
+}
+
+.how-funktioniert .how-col-title {
+  font-family: var(--how-sans);
+  font-size: clamp(1.1rem, 2vw, 1.35rem);
+  font-weight: 700;
+  color: var(--how-text);
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+  margin: 0;
+}
+
+.how-funktioniert .how-col-desc {
+  font-family: var(--how-sans);
+  font-size: 0.9375rem;
+  color: var(--how-muted);
+  font-weight: 400;
+  line-height: 1.65;
+  margin: 0;
+}
+
+@media (max-width: 640px) {
   .how-funktioniert .how-col-card {
-    position: relative;
-    display: flex;
-    flex-direction: row;
-    align-items: flex-start;
-    gap: var(--how-space-md);
-    padding: var(--how-space-md) 0 var(--how-space-md) var(--how-space-md);
-    border: none;
-    border-top: 1px solid rgba(17, 24, 39, 0.14);
-    border-radius: 0;
-    background: transparent;
-  }
-  .how-funktioniert .how-col-card:last-child {
-    border-bottom: 1px solid rgba(17, 24, 39, 0.14);
-  }
-  .how-funktioniert .how-col-card::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 2px;
-    height: 0;
-    background: var(--how-accent-mid);
-    border-radius: 1px;
-    transition: height 0.55s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-  .how-funktioniert .how-col-card.active::before {
-    height: 100%;
+    flex-direction: column;
   }
 
   .how-funktioniert .how-col-image {
-    flex-shrink: 0;
-    width: 300px;
-    height: 300px;
-    object-fit: cover;
-    border-radius: var(--how-radius-md);
-    display: block;
-    transition: transform 0.3s var(--how-ease);
-    border: 1px solid rgba(17, 24, 39, 0.1);
+    width: 100%;
+    height: 220px;
   }
-  .how-funktioniert .how-col-card.active .how-col-image {
-    transform: scale(1.015);
-  }
+}
 
-  .how-funktioniert .how-col-body {
-    flex: 1;
-    position: relative;
-    padding: var(--how-space-sm) 0;
-    display: flex;
-    flex-direction: column;
-    gap: var(--how-space-sm);
-    overflow: hidden;
-  }
+/* CTA */
+.how-funktioniert .cta-block {
+  text-align: center;
+  margin-top: 0;
+  padding-top: var(--how-space-xl);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
 
-  .how-funktioniert .how-col-ghost-num {
-    position: absolute;
-    bottom: -0.5rem;
-    right: 0;
-    font-family: var(--how-mono);
-    font-size: 5rem;
-    font-weight: 900;
-    color: var(--how-accent-mid);
-    opacity: 0.12;
-    line-height: 1;
-    pointer-events: none;
-    user-select: none;
-  }
-
-  .how-funktioniert .how-col-num {
-    font-family: var(--how-mono);
-    font-size: 0.975rem;
-    font-weight: 700;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    color: var(--how-accent-mid);
-    border-bottom: 2px solid var(--how-accent-mid);
-    padding-bottom: 1px;
-    display: inline-block;
-  }
-  .how-funktioniert .how-col-title {
-    font-family: var(--how-mono);
-    font-size: clamp(1.1rem, 2vw, 1.4rem);
-    font-weight: 900;
-    color: var(--how-text);
-    line-height: 1.2;
-    letter-spacing: -0.02em;
-    margin: 0;
-  }
-  .how-funktioniert .how-col-desc {
-    font-family: var(--how-mono);
-    font-size: 0.9375rem;
-    color: var(--how-muted);
-    font-weight: 500;
-    line-height: 1.6;
-    margin: 0;
-  }
-
-  @media (max-width: 640px) {
-    .how-funktioniert .how-col-card {
-      flex-direction: column;
-    }
-    .how-funktioniert .how-col-image {
-      width: 100%;
-      height: 220px;
-    }
-  }
-
-
-  /* CTA */
+@media (min-width: 1024px) {
   .how-funktioniert .cta-block {
-    text-align: center;
+    padding-top: var(--how-space-xl);
+  }
+}
+
+.how-funktioniert .cta-note {
+  font-size: 0.9375rem;
+  color: var(--how-muted);
+  font-family: var(--how-sans);
+  margin-bottom: var(--how-space-md);
+  letter-spacing: 0.02em;
+}
+
+.how-funktioniert .btn-cta {
+  font-family: var(--how-sans);
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.95);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: var(--how-radius-sm);
+  padding: 0.65rem 1.5rem;
+  cursor: pointer;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  transition:
+    border-color 0.25s var(--how-ease),
+    color 0.25s var(--how-ease),
+    box-shadow 0.25s var(--how-ease),
+    transform 0.2s var(--how-ease);
+  text-decoration: none;
+  display: inline-block;
+}
+
+.how-funktioniert .btn-cta:focus-visible {
+  outline: 1px solid var(--how-accent-cyan);
+  outline-offset: 3px;
+}
+
+.how-funktioniert .btn-cta:hover {
+  border-color: rgba(34, 211, 238, 0.55);
+  color: var(--how-accent-cyan);
+  box-shadow: 0 0 24px rgba(34, 211, 238, 0.12);
+}
+
+.how-funktioniert .trust {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: var(--how-space-md);
+  margin-top: var(--how-space-lg);
+}
+
+.how-funktioniert .trust-item {
+  display: flex;
+  align-items: center;
+  gap: var(--how-space-xs);
+  font-size: 0.75rem;
+  color: var(--how-muted);
+  font-family: var(--how-sans);
+  font-weight: 500;
+}
+
+.how-funktioniert .trust-dot {
+  width: 0.35rem;
+  height: 0.35rem;
+  border-radius: 50%;
+  background: var(--how-accent);
+  box-shadow: 0 0 8px rgba(16, 185, 129, 0.55);
+}
+
+.how-funktioniert .prog-step:focus-visible {
+  outline: 1px solid rgba(34, 211, 238, 0.6);
+  outline-offset: 3px;
+  border-radius: var(--how-radius-sm);
+}
+
+@media (max-width: 680px) {
+  .how-funktioniert .section {
+    padding: 1.5rem var(--how-space-md) 2.5rem;
+  }
+
+  .how-funktioniert .title {
+    font-size: clamp(1.5rem, 5vw, 2rem);
+  }
+
+  .how-funktioniert .cta-block {
     margin-top: 0;
     padding-top: var(--how-space-xl);
-    border-top: 1px solid var(--how-border);
   }
-  @media (min-width: 1024px) {
-    .how-funktioniert .cta-block {
-      padding-top: var(--how-space-xl);
-    }
-  }
-  .how-funktioniert .cta-note {
-    font-size: 0.9375rem;
-    color: var(--how-muted);
-    font-family: var(--how-mono);
-    margin-bottom: var(--how-space-md);
-    letter-spacing: 0.02em;
-  }
-  .how-funktioniert .btn-cta {
-    font-family: var(--how-mono);
-    font-size: 1rem;
-    font-weight: 500;
-    color: #fff;
-    background: var(--how-accent-mid);
-    border: 1px solid var(--how-accent-mid);
-    border-radius: var(--how-radius-sm);
-    padding: 0.5rem 1.5rem;
-    cursor: pointer;
-    transition: opacity 0.2s var(--how-ease);
-    text-decoration: none;
-    display: inline-block;
-  }
-  .how-funktioniert .btn-cta:focus-visible {
-    outline: 1px solid var(--how-accent-mid);
-    outline-offset: 2px;
-  }
-  .how-funktioniert .btn-cta:hover {
-    opacity: 0.9;
+}
+
+@media (max-width: 440px) {
+  .how-funktioniert .section {
+    padding: 1.25rem var(--how-space-sm) 2rem;
   }
 
-  .how-funktioniert .trust {
-    display: flex;
-    justify-content: center;
-    flex-wrap: wrap;
-    gap: var(--how-space-md);
-    margin-top: var(--how-space-md);
+  .how-funktioniert .prog-label {
+    display: none;
   }
-  .how-funktioniert .trust-item {
-    display: flex;
-    align-items: center;
-    gap: var(--how-space-xs);
-    font-size: 0.75rem;
-    color: var(--how-muted);
-    font-family: var(--how-mono);
-    font-weight: 500;
-  }
-  .how-funktioniert .trust-dot {
-    width: 0.25rem;
-    height: 0.25rem;
-    border-radius: 50%;
-    background: var(--how-accent-mid);
-  }
-
-  .how-funktioniert .prog-step:focus-visible {
-    outline: 1px solid var(--how-text);
-    outline-offset: 2px;
-    border-radius: var(--how-radius-sm);
-  }
-
-  @media (max-width: 680px) {
-    .how-funktioniert .section { padding: 1.5rem var(--how-space-md) 2.5rem; }
-    .how-funktioniert .header { margin-bottom: 0; }
-    .how-funktioniert .title { font-size: clamp(1.5rem, 5vw, 2rem); }
-    .how-funktioniert .cta-block { margin-top: 0; padding-top: var(--how-space-xl); }
-  }
-  @media (max-width: 440px) {
-    .how-funktioniert .section { padding: 1.25rem var(--how-space-sm) 2rem; }
-    .how-funktioniert .prog-label { display: none; }
-  }
+}

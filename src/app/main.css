@@ -86,6 +86,23 @@
     font-optical-sizing: auto;
     font-style: normal;
 }
+
+/* ── Shared dark landing palette (how-funktioniert, partner-apotheken, ComingSoon) ── */
+:root {
+    --releafz-bg: #0a0a0a;
+    --releafz-bg-mid: #0f0f0f;
+    --releafz-accent: #10b981;
+    --releafz-cyan: #22d3ee;
+    --releafz-text: #ffffff;
+    --releafz-muted: rgba(255, 255, 255, 0.72);
+    --releafz-muted-dim: rgba(255, 255, 255, 0.5);
+    --releafz-border: rgba(255, 255, 255, 0.14);
+    --releafz-glass: rgba(26, 26, 26, 0.72);
+    --releafz-glass-elevated: rgba(26, 26, 26, 0.75);
+    --releafz-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    --releafz-mono: "Inconsolata", monospace;
+}
+
 /* setting background color */
 
 body {
@@ -112,17 +129,15 @@ body {
 /* Text Color Classes for Mashallah Form and hero section */
 
 .title-gradient-hero {
-    background: linear-gradient(to bottom, rgba(255,255,255,0.95), rgba(300,300,300,0.55));
+    background: linear-gradient(to bottom, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.55));
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
-    -webkit-text-stroke: -10px #000000;
     color: transparent;
     font-size: 1.875rem;
-    font-weight: 950;
+    font-weight: 900;
     margin-bottom: 0.15rem;
     line-height: 1.5;
-    font-style: bold;
 }
 
 .title-gradient {
@@ -132,7 +147,7 @@ body {
     -webkit-text-fill-color: transparent;
     color: transparent;
     font-size: 1.875rem;
-    font-weight: 950;
+    font-weight: 900;
     margin-bottom: 0.15rem;
     line-height: 1.25;
 }
@@ -150,19 +165,10 @@ body {
         width: 190px;
         height: 190px;
     }
-}
 
-.logo-hero {
-    margin-top: -4rem;
-    width: 190px;
-    height: 190px;
-    object-fit: contain;
-}
-
-@media (min-width: 640px) {
     .title-gradient {
         font-size: 3rem;
-        font-weight: 1550;
+        font-weight: 900;
         margin-bottom: 1rem;
         position: relative;
         left: 0.5rem;
@@ -172,17 +178,13 @@ body {
 @media (min-width: 768px) {
     .title-gradient {
         font-size: 4.5rem;
-        font-weight: 1550;
-        margin-bottom: 1rem;
-        position: relative;
-        left: 0.5rem;
     }
 }
 
 @media (min-width: 640px) {
     .title-gradient-hero {
         font-size: clamp(3rem, 6vw, 4.5rem);
-        font-weight: 950;
+        font-weight: 900;
         margin-bottom: 1rem;
     }
 }
@@ -325,10 +327,10 @@ button[disabled] {
 }
 
 .behandlung-button-hero {
-    font-family: "Inconsolata";
+    position: relative;
+    font-family: "Inconsolata", monospace;
     font-weight: 900;
     font-size: 15px;
-    font-style: bold;
     line-height: 24px;
     margin-top: 15rem;
     color: rgba(255, 255, 255, 0.95);
@@ -336,10 +338,10 @@ button[disabled] {
     background-clip: padding-box, border-box;
     background-origin: padding-box, border-box;
     background-image:
-        linear-gradient(#72906F, #72906F),
+        linear-gradient(#72906f, #72906f),
         conic-gradient(
             from var(--border-angle),
-            #72906F 0deg,
+            #72906f 0deg,
             #8aaa87 45deg,
             #b8d9b5 90deg,
             #e8f5e8 135deg,
@@ -347,7 +349,7 @@ button[disabled] {
             #e8f5e8 225deg,
             #b8d9b5 270deg,
             #8aaa87 315deg,
-            #72906F 360deg
+            #72906f 360deg
         );
     box-shadow: 0 0 8px 1px rgba(168, 213, 162, 0.2), 0 4px 6px -1px rgba(0, 0, 0, 0.12);
     animation: spin-border 6s linear infinite;
@@ -355,20 +357,17 @@ button[disabled] {
 }
 
 @keyframes spin-border {
-    to { --border-angle: 360deg; }
+    to {
+        --border-angle: 360deg;
+    }
 }
 
-/* Header button - absolute positioned only when inside the site header */
+/* Header button — absolute only inside site header */
 header .btn-primary,
 header .behandlung-button {
     position: absolute;
     top: 45px;
     right: 50px;
-}
-
-/* Hero button - stays in normal document flow so you can position it with flex/margin/padding */
-.behandlung-button-hero {
-    position: relative;
 }
 
 .btn-primary:hover:not(:disabled),
@@ -422,7 +421,7 @@ header .behandlung-button {
     transition: all 0.3s ease;
 }
 
-.btn-outline:hover:not(:disabled) { 
+.btn-outline:hover:not(:disabled) {
     background-color: #fbfdfb;
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
     transform: translateY(-1px);
@@ -574,14 +573,44 @@ header .behandlung-button {
 .landing-main {
     position: relative;
     z-index: 10;
-    background: #fbfdfb;
+    background: var(--releafz-bg);
+    color: var(--releafz-text);
+    -webkit-font-smoothing: antialiased;
+}
+
+/* Scrollable landing column: match how/partner dark sections + downstream blocks */
+.landing-main .section-container {
+    background: var(--releafz-bg);
+}
+
+.landing-main .bg-gradient-to-br-custom {
+    background: linear-gradient(to bottom, var(--releafz-bg) 0%, var(--releafz-bg-mid) 50%, var(--releafz-bg) 100%);
+}
+
+.landing-main .bg-gradient-to-r-custom {
+    background: linear-gradient(to right, var(--releafz-bg), var(--releafz-bg-mid), var(--releafz-bg));
+}
+
+.landing-main .bg-gradient-to-l-custom {
+    background: linear-gradient(to left, var(--releafz-bg-mid), var(--releafz-bg));
+}
+
+.landing-main .subtitle-text {
+    color: var(--releafz-muted);
+}
+
+.landing-main .title-gradient {
+    background: linear-gradient(to right, #f8fafc, rgba(34, 211, 238, 0.95));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
 }
 
 .landing-snap-target {
     scroll-snap-align: start;
     scroll-snap-stop: always;
 }
-
 
 /* Hero CTA: button centered; text+arrow absolutely placed */
 .hero-cta-wrap {
@@ -916,9 +945,9 @@ h1 + .animated-words-container {
 
 /* Section Styling — full-width sections, top/bottom lines only (no side borders) */
 .section-container {
-    background:     #fbfdfb;
-    border-top: 0px solid #000000;
-    border-bottom: 0px solid #000000;
+    background: #fbfdfb;
+    border-top: 0 solid #000000;
+    border-bottom: 0 solid #000000;
     padding: 3rem 1rem;
     margin: 0;
     width: 100%;
@@ -954,18 +983,6 @@ h1 + .animated-words-container {
 }
 
 /* Modern AI-style background animations */
-@keyframes gradientShift {
-    0% {
-        background-position: 0% 50%;
-    }
-    50% {
-        background-position: 100% 50%;
-    }
-    100% {
-        background-position: 0% 50%;
-    }
-}
-
 @keyframes meshMove {
     0%, 100% {
         opacity: 0.7;
