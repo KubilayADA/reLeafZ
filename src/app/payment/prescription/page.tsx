@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, Suspense } from 'react'
+import { useState, useEffect, useRef, Suspense } from 'react'
 import { useRouter } from 'next/navigation'
 import { loadStripe } from '@stripe/stripe-js'
 import { Elements, PaymentElement, useStripe, useElements } from '@stripe/react-stripe-js'
@@ -138,8 +138,11 @@ function PrescriptionPaymentContent() {
   const [treatmentRequestId, setTreatmentRequestId] = useState<string>('')
   const [selectedProducts, setSelectedProducts] = useState<CartItem[]>([])
   const [totalPrice, setTotalPrice] = useState<number>(0)
+  const hasInitialized = useRef(false)
 
   useEffect(() => {
+    if (hasInitialized.current) return
+    hasInitialized.current = true
     initializePayment()
   }, [])
 
