@@ -5,6 +5,15 @@ import './how.css';
 
 const TOTAL = 4;
 
+type Particle = {
+  id: number;
+  size: number;
+  left: number;
+  top: number;
+  duration: number;
+  delay: number;
+};
+
 interface Step {
   num: string;
   title: string;
@@ -44,7 +53,21 @@ const PROG_LABELS: string[] = ['Fragebogen', 'Sortiment', 'Rezept', 'Lieferung']
 
 export default function How(): React.JSX.Element {
   const [current, setCurrent] = useState<number>(0);
+  const [particles, setParticles] = useState<Particle[]>([]);
   const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
+
+  useEffect(() => {
+    setParticles(
+      Array.from({ length: 6 }, (_, i) => ({
+        id: i,
+        size: Math.random() * 4 + 2,
+        left: Math.random() * 100,
+        top: Math.random() * 100,
+        duration: Math.random() * 10 + 10,
+        delay: Math.random() * 5,
+      }))
+    );
+  }, []);
 
   useEffect(() => {
     const observers: IntersectionObserver[] = [];
@@ -70,10 +93,32 @@ export default function How(): React.JSX.Element {
   return (
     <section
       id="ablauf"
-      className="how-funktioniert section-container section how-column"
+      className="how-funktioniert section-container how-column"
       aria-label="So funktioniert der Ablauf"
     >
-      <div className="how-layout">
+      <div className="how-funktioniert__bg" aria-hidden>
+        <div className="how-funktioniert__bg-base" />
+        <div className="how-funktioniert__glow-line" />
+        <div className="how-funktioniert__glow-radial" />
+        <div className="how-funktioniert__grid" />
+        {particles.map((particle) => (
+          <div
+            key={particle.id}
+            className="how-funktioniert__particle"
+            style={{
+              width: `${particle.size}px`,
+              height: `${particle.size}px`,
+              left: `${particle.left}%`,
+              top: `${particle.top}%`,
+              animation: `floatParticle ${particle.duration}s ease-in-out infinite`,
+              animationDelay: `${particle.delay}s`,
+            }}
+          />
+        ))}
+      </div>
+
+      <div className="section how-funktioniert__shell">
+        <div className="how-layout">
 
         {/* ── Left: sticky progress panel ── */}
         <div className="how-left">
@@ -142,6 +187,7 @@ export default function How(): React.JSX.Element {
           </div>
         </div>
 
+        </div>
       </div>
     </section>
   );

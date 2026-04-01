@@ -87,8 +87,6 @@
   font-size: 0.5rem;
   letter-spacing: 0.1em;
   gap: 1rem;
-  font-style: bold;
-  
 }
 
 .header-button {
@@ -102,8 +100,12 @@
 /* Desktop nav link — hover underline (line draws underneath) */
 .header-desktop-nav .header-nav-link {
   position: relative;
-  color: inherit;
+  color: #ffffff;
   text-decoration: none;
+}
+
+.header-desktop-nav .header-nav-link:hover {
+  color: rgba(255, 255, 255, 0.92);
 }
 .header-desktop-nav .header-nav-link::after {
   content: '';
@@ -113,7 +115,7 @@
   width: 0;
   height: 2px;
   border-radius: 10px;
-  background: currentColor;
+  background: white;
   transition: width 0.25s ease;
 }
 .header-desktop-nav .header-nav-link:hover::after {

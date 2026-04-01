@@ -1,8 +1,121 @@
+/* ============================================
+   Partner Apotheken — same visual language as
+   ComingSoon / how-funktioniert (dark #0a0a0a, cyan, emerald, grid, glow, particles)
+   Scoped under .partner-apotheken-section
+   ============================================ */
+
 .partner-apotheken-section {
+  --pa-bg: var(--releafz-bg);
+  --pa-accent: var(--releafz-accent);
+  --pa-cyan: var(--releafz-cyan);
+  --pa-text: var(--releafz-text);
+  --pa-muted: var(--releafz-muted);
+  --pa-muted-dim: var(--releafz-muted-dim);
+  --pa-border: var(--releafz-border);
+  --pa-glass: var(--releafz-glass-elevated);
+  --pa-sans: var(--releafz-sans);
+  --pa-mono: var(--releafz-mono);
+
+  position: relative;
+  overflow: hidden;
+  scroll-margin-top: 100px;
   padding: 5rem 1.25rem 4rem;
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
+  background: var(--pa-bg);
+  font-family: var(--pa-sans);
+  color: var(--pa-text);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── Background layers (matches how-funktioniert) ── */
+.partner-apotheken__bg {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.partner-apotheken__bg-base {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, #0a0a0a 0%, #0f0f0f 50%, #0a0a0a 100%);
+}
+
+.partner-apotheken__glow-line {
+  position: absolute;
+  left: 50%;
+  top: 38%;
+  transform: translate(-50%, -50%);
+  width: 120%;
+  height: 2px;
+  z-index: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(34, 211, 238, 0.55) 20%,
+    rgba(16, 185, 129, 0.75) 50%,
+    rgba(34, 211, 238, 0.55) 80%,
+    transparent 100%
+  );
+  box-shadow:
+    0 0 60px rgba(34, 211, 238, 0.45),
+    0 0 120px rgba(16, 185, 129, 0.35),
+    0 0 180px rgba(34, 211, 238, 0.2);
+  animation: glowPulse 4s ease-in-out infinite;
+}
+
+@media (min-width: 768px) {
+  .partner-apotheken__glow-line {
+    height: 3px;
+  }
+}
+
+.partner-apotheken__glow-radial {
+  position: absolute;
+  left: 50%;
+  top: 35%;
+  transform: translate(-50%, -50%);
+  width: 100%;
+  height: 280px;
+  z-index: 0;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(34, 211, 238, 0.14) 0%,
+    rgba(16, 185, 129, 0.1) 30%,
+    transparent 70%
+  );
+  animation: glowPulse 6s ease-in-out infinite;
+  animation-delay: 1s;
+}
+
+@media (min-width: 768px) {
+  .partner-apotheken__glow-radial {
+    height: 360px;
+  }
+}
+
+.partner-apotheken__grid {
+  position: absolute;
+  inset: 0;
+  opacity: 0.05;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.1) 1px, transparent 1px);
+  background-size: 50px 50px;
+}
+
+.partner-apotheken__particle {
+  position: absolute;
+  border-radius: 999px;
+  background: rgba(34, 211, 238, 0.65);
+  box-shadow:
+    0 0 15px rgba(34, 211, 238, 0.75),
+    0 0 30px rgba(34, 211, 238, 0.35);
+}
+
+.partner-apotheken-section .partner-apotheken__shell {
+  position: relative;
+  z-index: 1;
 }
 
 .partner-apotheken-inner {
@@ -11,38 +124,46 @@
 }
 
 .partner-apotheken-heading h2 {
-  margin: 0.3rem 0 0.8rem;
-  font-size: clamp(1.8rem, 3.5vw, 2.9rem);
-  line-height: 1.05;
-  color: #163321;
+  margin: 0.35rem 0 0.85rem;
+  font-size: clamp(1.75rem, 3.5vw, 2.75rem);
+  line-height: 1.1;
+  font-weight: 700;
+  color: var(--pa-text);
+  text-shadow: 0 0 30px rgba(255, 255, 255, 0.06);
 }
 
 .partner-apotheken-kicker {
   margin: 0;
-  letter-spacing: 0.08em;
+  font-family: var(--pa-mono);
+  letter-spacing: 0.14em;
   text-transform: uppercase;
-  font-size: 0.8rem;
-  color: #5b8a67;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--pa-cyan);
+  text-shadow: 0 0 20px rgba(34, 211, 238, 0.2);
 }
 
 .partner-apotheken-subtitle {
   margin: 0;
   max-width: 64ch;
-  color: #35503e;
-  line-height: 1.6;
+  color: var(--pa-muted);
+  line-height: 1.65;
+  font-size: 0.95rem;
 }
 
 .partner-apotheken-map-wrap {
   position: relative;
   margin-top: 2rem;
-  border-radius: 24px;
+  border-radius: 1.25rem;
   overflow: visible;
-  border-top: 2.5px solid #333;
-  border-left: 2.5px solid #333;
-  border-right: 4px solid #333;
-  border-bottom: 4px solid #333;
-  background: #f3f3f3;
-  box-shadow: 0 24px 55px rgba(19, 43, 23, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: var(--pa-glass);
+  backdrop-filter: blur(14px) saturate(140%);
+  -webkit-backdrop-filter: blur(14px) saturate(140%);
+  box-shadow:
+    0 24px 55px rgba(0, 0, 0, 0.45),
+    0 0 0 1px rgba(34, 211, 238, 0.06),
+    0 0 48px rgba(34, 211, 238, 0.06);
 }
 
 .partner-apotheken-map {
@@ -50,6 +171,22 @@
   width: 100%;
   aspect-ratio: 16 / 9;
   object-fit: cover;
+  border-radius: 1.25rem;
+  opacity: 0.92;
+}
+
+.partner-apotheken-map-wrap::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    180deg,
+    rgba(10, 10, 10, 0.15) 0%,
+    transparent 35%,
+    transparent 65%,
+    rgba(10, 10, 10, 0.25) 100%
+  );
   border-radius: inherit;
 }
 
@@ -57,10 +194,14 @@
   position: absolute;
   inset: 0;
   border-radius: inherit;
-  background-image: radial-gradient(circle at 50% 50%, rgba(53, 80, 62, 0.2) 1px, transparent 0);
-  background-size: 42px 42px;
-  opacity: 0.14;
+  background-image:
+    radial-gradient(circle at 50% 50%, rgba(34, 211, 238, 0.12) 1px, transparent 0),
+    linear-gradient(rgba(16, 185, 129, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(16, 185, 129, 0.04) 1px, transparent 1px);
+  background-size: 42px 42px, 24px 24px, 24px 24px;
+  opacity: 0.35;
   pointer-events: none;
+  mix-blend-mode: screen;
 }
 
 .partner-apotheken-marker {
@@ -104,7 +245,7 @@
   width: 100%;
   height: 100%;
   display: block;
-  filter: drop-shadow(0 8px 10px rgba(31, 57, 42, 0.3));
+  filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.5)) drop-shadow(0 0 12px rgba(34, 211, 238, 0.35));
   transition: transform 220ms ease;
 }
 
@@ -112,13 +253,14 @@
 .partner-apotheken-marker:focus-within .partner-apotheken-marker-image,
 .partner-apotheken-marker.is-selected .partner-apotheken-marker-image {
   transform: scale(1.18);
+  filter: drop-shadow(0 8px 18px rgba(0, 0, 0, 0.55)) drop-shadow(0 0 18px rgba(16, 185, 129, 0.55));
 }
 
 .partner-apotheken-pulse {
   position: absolute;
   inset: -8px;
   border-radius: 50%;
-  border: 1px solid rgba(88, 143, 104, 0.7);
+  border: 1px solid rgba(34, 211, 238, 0.55);
   transform: scale(0.7);
   opacity: 0;
   pointer-events: none;
@@ -132,14 +274,17 @@
   transform: translate(-50%, 4px);
   width: min(230px, 65vw);
   border-radius: 14px;
-  padding: 0.7rem 0.75rem;
-  background: rgba(16, 27, 19, 0.94);
-  color: #ebf2ec;
-  box-shadow: 0 14px 40px rgba(16, 27, 19, 0.35);
+  padding: 0.75rem 0.85rem;
+  background: rgba(14, 14, 14, 0.94);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  color: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(34, 211, 238, 0.22);
+  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.5), 0 0 28px rgba(34, 211, 238, 0.08);
   font-size: 0.83rem;
-  line-height: 1.4;
+  line-height: 1.45;
   display: grid;
-  gap: 0.3rem;
+  gap: 0.35rem;
   opacity: 0;
   pointer-events: auto;
   transition: opacity 190ms ease, transform 190ms ease;
@@ -148,13 +293,18 @@
 
 .partner-apotheken-tooltip strong {
   font-size: 0.92rem;
+  color: #fff;
 }
 
 .partner-apotheken-tooltip a {
-  color: #a9efbe;
+  color: var(--pa-cyan);
   text-decoration: underline;
   text-underline-offset: 2px;
   font-weight: 600;
+}
+
+.partner-apotheken-tooltip a:hover {
+  color: #67e8f9;
 }
 
 .partner-apotheken-marker:hover .partner-apotheken-tooltip,
@@ -170,12 +320,15 @@
 
 .partner-apotheken-mobile-card-content {
   border-radius: 16px;
-  border: 1px solid rgba(68, 113, 82, 0.3);
-  background: #f6fbf6;
-  padding: 1rem;
-  color: #203626;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: var(--pa-glass);
+  backdrop-filter: blur(14px) saturate(140%);
+  -webkit-backdrop-filter: blur(14px) saturate(140%);
+  padding: 1.1rem;
+  color: rgba(255, 255, 255, 0.92);
   display: grid;
-  gap: 0.35rem;
+  gap: 0.4rem;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.35);
   opacity: 0;
   transform: translateY(14px);
   animation: mobileCardIn 320ms ease forwards;
@@ -183,23 +336,32 @@
 
 .partner-apotheken-mobile-card-content h3 {
   margin: 0;
-  font-size: 1rem;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #fff;
 }
 
 .partner-apotheken-mobile-card-content p {
   margin: 0;
   font-size: 0.9rem;
+  color: var(--pa-muted);
 }
 
 .partner-apotheken-mobile-card-content a {
-  margin-top: 0.25rem;
-  color: #2e7a47;
+  margin-top: 0.35rem;
+  color: var(--pa-cyan);
   font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.partner-apotheken-mobile-card-content a:hover {
+  color: #67e8f9;
 }
 
 @media (min-width: 900px) {
   .partner-apotheken-section {
-    padding-inline: 2rem;
+    padding: 5.5rem 2rem 4.5rem;
   }
 
   .partner-apotheken-mobile-card {
