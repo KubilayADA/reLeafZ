@@ -148,6 +148,7 @@ export interface OrderPayment {
 
 export interface OrderDetail {
   id: number;
+  treatmentRequestId?: number;
   patientName: string;
   patientEmail: string;
   patientPhone: string;
