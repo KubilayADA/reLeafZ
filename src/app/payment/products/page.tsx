@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, Suspense } from 'react'
+import { useState, useEffect, useRef, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { loadStripe } from '@stripe/stripe-js'
 import { Elements, PaymentElement, useStripe, useElements } from '@stripe/react-stripe-js'
@@ -98,15 +98,13 @@ function ProductPaymentContent() {
   const [clientSecret, setClientSecret] = useState<string>('')
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  const hasInitialized = useRef(false)
 
   useEffect(() => {
-    if (treatmentRequestId) {
-      initializePayment()
-    } else {
-      setError('Missing treatment request ID')
-      setLoading(false)
-    }
-  }, [treatmentRequestId])
+    if (hasInitialized.current) return
+    hasInitialized.current = true
+    initializePayment()
+  }, [])
 
   const initializePayment = async () => {
     try {
