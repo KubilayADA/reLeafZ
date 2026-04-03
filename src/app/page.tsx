@@ -317,7 +317,15 @@ export default function LandingPage() {
   
   // Show form if valid Berlin postcode was entered
   if (showForm) {
-    return <MashallahForm postcode={zipInput} onBack={handleBackToMain} />
+    return (
+      <MashallahForm
+        postcode={zipInput}
+        street={streetName}
+        houseNumber={houseNumber}
+        city={cityName}
+        onBack={handleBackToMain}
+      />
+    )
   }
   
   return (
