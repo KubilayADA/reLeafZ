@@ -15,7 +15,7 @@ import {
 } from 'recharts'
 import {
   pharmacyLogin, fetchPharmacyDashboard, fetchPharmacyOrders, updateOrderStatus,
-  markOrderReady, fetchPharmacyOrderDetail, fetchPharmacyInventory, fetchPharmacyAnalytics,
+  markOrderReady, dispatchOrder, fetchPharmacyOrderDetail, fetchPharmacyInventory, fetchPharmacyAnalytics,
   createProduct, updateProduct, deleteProduct,
   type Product, type ProductFormData, type DashboardResponse,
   type OrdersResponse, type OrderFilters, type OrderDetail, type InventoryResponse,
@@ -46,8 +46,13 @@ const PRODUCT_UNITS: Record<string, string> = { FLOWER: 'gram', OIL: 'ml', EXTRA
 const FORM_LABELS: Record<string, string> = { FLOWER: 'Blüte', OIL: 'Öl', EXTRACT: 'Extrakt', CAPSULE: 'Kapsel', SPRAY: 'Spray' }
 
 const ORDER_STATUS_TABS = [
-  { key: 'ALL', label: 'Alle' }, { key: 'APPROVED', label: 'Ausstehend' }, { key: 'PAID', label: 'Bezahlt' },
-  { key: 'PROCESSING', label: 'In Bearbeitung' }, { key: 'READY', label: 'Bereit' }, { key: 'DELIVERED', label: 'Geliefert' },
+  { key: 'ALL', label: 'Alle' },
+  { key: 'PROCESSING', label: 'Neu' },
+  { key: 'PREPARING', label: 'In Bearbeitung' },
+  { key: 'READY', label: 'Bereit' },
+  { key: 'DISPATCHED', label: 'Unterwegs 🚚' },
+  { key: 'PICKED_UP', label: 'Abgeholt 🏪' },
+  { key: 'DELIVERED', label: 'Abgeschlossen' },
 ] as const
 const AVAILABILITY_TABS = [
   { key: 'all', label: 'Alle' }, { key: 'available', label: 'Verfügbar' }, { key: 'lowStock', label: 'Niedriger Bestand' },
@@ -73,6 +78,7 @@ function formatShortDate(d?: string) { if (!d) return '—'; try { return new Da
 
 function getStatusColor(status: string) {
   const s = status.toUpperCase()
+  if (s === 'DISPATCHED') return { bg: 'bg-orange-500/15', text: 'text-orange-400', dot: 'bg-orange-400', border: 'border-orange-500/20' }
   if (s === 'DELIVERED' || s === 'FULFILLED') return { bg: 'bg-emerald-500/15', text: 'text-emerald-400', dot: 'bg-emerald-400', border: 'border-emerald-500/20' }
   if (s === 'READY') return { bg: 'bg-green-500/15', text: 'text-green-400', dot: 'bg-green-400', border: 'border-green-500/20' }
   if (s === 'PROCESSING') return { bg: 'bg-blue-500/15', text: 'text-blue-400', dot: 'bg-blue-400', border: 'border-blue-500/20' }
@@ -208,6 +214,19 @@ export default function PharmacyDashboard() {
   const handleLogout = () => { setPharmacyId(null); setDashboardData(null); setOrdersResponse(null); setInventoryResponse(null); setAnalyticsData(null); setEmail(''); setPassword(''); setActiveView('dashboard'); setError(null); localStorage?.removeItem('pharmacy_id') }
   const handleUpdateStatus = async (id: number, s: string) => { if (!pharmacyId) return; try { setOrdersLoading(true); await updateOrderStatus(pharmacyId, id, s); await loadOrders(pharmacyId, buildOrderFilters()); await loadDashboard() } catch (e: unknown) { setError(e instanceof Error ? e.message : 'Fehler') } finally { setOrdersLoading(false) } }
   const handleMarkReady = async (id: number) => { if (!pharmacyId) return; try { setOrdersLoading(true); await markOrderReady(pharmacyId, id); await loadOrders(pharmacyId, buildOrderFilters()); await loadDashboard() } catch (e: unknown) { setError(e instanceof Error ? e.message : 'Fehler') } finally { setOrdersLoading(false) } }
+  const handleDispatch = async (id: number) => {
+    if (!pharmacyId) return;
+    try {
+      setOrdersLoading(true);
+      await dispatchOrder(pharmacyId, id);
+      await loadOrders(pharmacyId, buildOrderFilters());
+      await loadDashboard();
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : 'Dispatch fehlgeschlagen');
+    } finally {
+      setOrdersLoading(false);
+    }
+  }
 
   const handleAddProduct = () => { setEditingProduct(null); setProductForm(initialProductForm); setShowProductModal(true) }
   const handleEditProduct = (p: Product) => { setEditingProduct(p); setProductForm({ name: p.name, form: p.form, thcPercent: p.thcPercent, cbdPercent: p.cbdPercent, price: p.price, unit: p.unit, stock: p.stock, imageUrl: p.imageUrl || '' }); setShowProductModal(true) }
@@ -217,11 +236,17 @@ export default function PharmacyDashboard() {
   const handleStockUpdate = async () => { if (!editingStock || !pharmacyId) return; try { setProductLoading(true); await updateProduct(editingStock.id, { stock: editingStock.value }); setEditingStock(null); await loadInventory(pharmacyId, buildInventoryFilters()) } catch (e: unknown) { setError(e instanceof Error ? e.message : 'Fehler') } finally { setProductLoading(false) } }
   const handleInventorySortToggle = (col: string) => { if (inventorySortBy === col) setInventorySortOrder(p => p === 'asc' ? 'desc' : 'asc'); else { setInventorySortBy(col); setInventorySortOrder('asc') } }
 
-  const renderNextStatusButton = (order: { id: number; status: string }) => {
-    const allowed = STATUS_TRANSITIONS[order.status]; if (!allowed?.length) return null
-    const colors: Record<string, string> = { PROCESSING: 'from-blue-600 to-blue-500', READY: 'from-green-600 to-green-500', PICKED_UP: 'from-purple-600 to-purple-500', DELIVERED: 'from-emerald-600 to-emerald-500' }
+  const renderNextStatusButton = (order: { id: number; status: string; deliveryMethod?: string }) => {
+    let allowed = STATUS_TRANSITIONS[order.status] ?? [];
+    if (order.status === 'READY') {
+      allowed = order.deliveryMethod?.includes('BOTENDIENST')
+        ? ['DISPATCHED']
+        : ['PICKED_UP'];
+    }
+    if (!allowed.length) return null
+    const colors: Record<string, string> = { PROCESSING: 'from-blue-600 to-blue-500', PREPARING: 'from-blue-600 to-blue-500', READY: 'from-green-600 to-green-500', PICKED_UP: 'from-purple-600 to-purple-500', DISPATCHED: 'from-orange-600 to-orange-500', DELIVERED: 'from-emerald-600 to-emerald-500' }
     return <div className="flex gap-2">{allowed.map(ns => { const l = STATUS_TRANSITION_LABELS[ns]; if (!l) return null; return (
-      <button key={ns} onClick={ns === 'READY' ? () => handleMarkReady(order.id) : () => handleUpdateStatus(order.id, ns)} disabled={ordersLoading}
+      <button key={ns} onClick={ns === 'READY' ? () => handleMarkReady(order.id) : ns === 'DISPATCHED' ? () => handleDispatch(order.id) : () => handleUpdateStatus(order.id, ns)} disabled={ordersLoading}
         className={`bg-gradient-to-r ${colors[ns] || 'from-white/20 to-white/10'} text-white px-3.5 py-1.5 ${G.btn} flex items-center gap-1.5 shadow-lg`}>
         {ordersLoading && <Loader2 className="animate-spin" size={12} />}{l}
       </button>) })}</div>
@@ -425,7 +450,7 @@ export default function PharmacyDashboard() {
                       <td className={`${G.td} text-sm font-semibold text-white/80 text-right`}>{o.totalPrice ? formatEUR(o.totalPrice) : '—'}</td>
                       <td className={`${G.td} text-xs text-white/25 text-right hidden md:table-cell`}>{formatShortDate(o.createdAt)}</td>
                       <td className={`${G.td} text-xs text-white/25 text-right hidden lg:table-cell`}>{formatShortDate(o.updatedAt)}</td>
-                      <td className={`${G.td} text-right`}><div className="flex items-center justify-end gap-2"><button onClick={() => loadOrderDetail(o.id)} className="p-1.5 text-white/20 hover:text-emerald-400 hover:bg-emerald-500/10 rounded-lg transition-all opacity-0 group-hover:opacity-100"><ExternalLink size={13} /></button>{renderNextStatusButton(o)}</div></td>
+                      <td className={`${G.td} text-right`}><div className="flex items-center justify-end gap-2"><button onClick={() => loadOrderDetail(o.id)} className="p-1.5 text-white/20 hover:text-emerald-400 hover:bg-emerald-500/10 rounded-lg transition-all opacity-0 group-hover:opacity-100"><ExternalLink size={13} /></button>{renderNextStatusButton({ id: o.id, status: o.status, deliveryMethod: o.deliveryMethod })}</div></td>
                     </tr>
                   ))}</tbody>
                 </table>
@@ -472,7 +497,7 @@ export default function PharmacyDashboard() {
                   {selectedOrderDetail.payments?.length > 0 && <div><h3 className={G.label}>Zahlungshistorie</h3><div className="bg-white/[0.03] border border-white/[0.06] rounded-xl overflow-hidden"><table className="w-full"><thead><tr className="border-b border-white/[0.06]"><th className={`${G.th} text-left`}>Typ</th><th className={`${G.th} text-left`}>Methode</th><th className={`${G.th} text-right`}>Betrag</th><th className={`${G.th} text-left`}>Status</th><th className={`${G.th} text-right`}>Datum</th></tr></thead><tbody className="divide-y divide-white/[0.04]">{selectedOrderDetail.payments.map(p => <tr key={p.id}><td className={`${G.td} text-sm capitalize text-white/50`}>{p.type}</td><td className={`${G.td} text-sm capitalize text-white/40`}>{p.method}</td><td className={`${G.td} text-sm text-right font-medium text-white/70`}>{formatEUR(p.amount)}</td><td className={G.td}><span className={`px-2 py-0.5 text-[10px] font-semibold rounded-md ${p.status === 'completed' ? 'bg-emerald-500/15 text-emerald-400' : p.status === 'pending' ? 'bg-amber-500/15 text-amber-400' : 'bg-white/[0.06] text-white/40'}`}>{p.status}</span></td><td className={`${G.td} text-xs text-white/25 text-right`}>{formatDate(p.completedAt || p.createdAt)}</td></tr>)}</tbody></table></div></div>}
                   {selectedOrderDetail.prescriptionPdfPath && <a href={`${API_BASE}/api/treatment/${selectedOrderDetail.treatmentRequestId}/prescription`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2.5 text-sm font-semibold text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-4 py-3 rounded-xl hover:bg-emerald-500/15 transition-all"><FileText size={16} /> Rezept PDF <ExternalLink size={12} /></a>}
                   <div className="flex gap-6 text-xs text-white/20 pt-3 border-t border-white/[0.06]"><span>Erstellt: {formatDate(selectedOrderDetail.createdAt)}</span><span>Aktualisiert: {formatDate(selectedOrderDetail.updatedAt)}</span></div>
-                  {STATUS_TRANSITIONS[selectedOrderDetail.status]?.length > 0 && <div className="pt-1">{renderNextStatusButton({ id: selectedOrderDetail.id, status: selectedOrderDetail.status })}</div>}
+                  {STATUS_TRANSITIONS[selectedOrderDetail.status]?.length > 0 && <div className="pt-1">{renderNextStatusButton({ id: selectedOrderDetail.id, status: selectedOrderDetail.status, deliveryMethod: selectedOrderDetail.deliveryMethod })}</div>}
                 </div>
               </> : <div className="p-10 text-center text-white/20 text-sm">Nicht verfügbar</div>}
             </div>

@@ -15,7 +15,7 @@ import How from '@/components/ui/funktioniert/how'
 import { API_BASE } from '@/lib/api'
 import { APIProvider, useMapsLibrary } from '@vis.gl/react-google-maps'
 
-const COMING_SOON_MODE = true;
+const COMING_SOON_MODE = false;
 
 // Font setup - using Inconsolata
 const inconsolataStyle = {
@@ -317,7 +317,15 @@ export default function LandingPage() {
   
   // Show form if valid Berlin postcode was entered
   if (showForm) {
-    return <MashallahForm postcode={zipInput} onBack={handleBackToMain} />
+    return (
+      <MashallahForm
+        postcode={zipInput}
+        street={streetName}
+        houseNumber={houseNumber}
+        city={cityName}
+        onBack={handleBackToMain}
+      />
+    )
   }
   
   return (
