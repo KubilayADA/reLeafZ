@@ -3,7 +3,7 @@
 import React, { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { ArrowLeft, MapPin, Building2, Mail, Lock, CheckCircle2, X } from 'lucide-react'
+import { ArrowLeft, Lock, CheckCircle2, X } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import '@/app/main.css'
 import '@/form/form.css'
@@ -11,17 +11,26 @@ import { API_BASE } from '@/lib/api'
 
 interface MashallahFormProps {
   postcode: string
+  street: string
+  houseNumber: string
+  city: string
   onBack: () => void
 }
 
-export default function MashallahForm({ postcode, onBack }: MashallahFormProps) {
+export default function MashallahForm({
+  postcode,
+  street,
+  houseNumber,
+  city,
+  onBack,
+}: MashallahFormProps) {
   const router = useRouter()
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
     phone: '',
-    street: '',
-    city: '',
+    street: `${street} ${houseNumber}`.trim(),
+    city: city.trim(),
   })
   const [loading, setLoading] = useState(false)
   const [submitError, setSubmitError] = useState('')
@@ -33,12 +42,10 @@ export default function MashallahForm({ postcode, onBack }: MashallahFormProps) 
   const [consentHealth, setConsentHealth] = useState(false)
   const [consentTerms, setConsentTerms] = useState(false)
 
-  // Validate form fields
-  const isFormValid = formData.fullName.trim() !== '' && 
-                     formData.email.trim() !== '' && 
-                     formData.phone.trim() !== '' && 
-                     formData.street.trim() !== '' &&
-                     formData.city.trim() !== '' &&
+  // Validate form fields (street/city come from props; not gated here)
+  const isFormValid = formData.fullName.trim() !== '' &&
+                     formData.email.trim() !== '' &&
+                     formData.phone.trim() !== '' &&
                      consentHealth === true &&
                      consentTerms === true
 
@@ -344,48 +351,56 @@ export default function MashallahForm({ postcode, onBack }: MashallahFormProps) 
               </div>
 
               <div className="form-field">
-                <label htmlFor="street" className="form-label">
-                  Straße + Hausnummer *
+                <label htmlFor="street" className="form-label form-label--confirmed">
+                  <span className="form-label__text-row">
+                    Straße + Hausnummer *
+                    <CheckCircle2
+                      className="form-label__confirmed-icon"
+                      size={18}
+                      aria-hidden
+                    />
+                  </span>
                 </label>
                 <div className="relative">
-                  {!formData.street && (
-                    <MapPin className="form-input-icon" size={20} />
-                  )}
                   <input
                     type="text"
                     id="street"
                     name="street"
                     value={formData.street}
-                    onChange={handleChange}
+                    readOnly
                     required
                     maxLength={200}
-                    disabled={loading}
-                    className={`form-input inconsolata form-input--with-icon-left ${formData.street ? 'has-value' : ''}`}
+                    className="form-input inconsolata form-input--confirmed"
                     placeholder="z.B. Hauptstraße 42"
+                    aria-readonly="true"
                   />
                 </div>
               </div>
 
               <div className="form-field-grid-2">
                 <div className="form-field">
-                  <label htmlFor="city" className="form-label">
-                    Stadt *
+                  <label htmlFor="city" className="form-label form-label--confirmed">
+                    <span className="form-label__text-row">
+                      Stadt *
+                      <CheckCircle2
+                        className="form-label__confirmed-icon"
+                        size={18}
+                        aria-hidden
+                      />
+                    </span>
                   </label>
                   <div className="relative">
-                    {!formData.city && (
-                      <Building2 className="form-input-icon" size={20} />
-                    )}
                     <input
                       type="text"
                       id="city"
                       name="city"
                       value={formData.city}
-                      onChange={handleChange}
+                      readOnly
                       required
                       maxLength={100}
-                      disabled={loading}
-                      className={`form-input inconsolata form-input--with-icon-left ${formData.city ? 'has-value' : ''}`}
+                      className="form-input inconsolata form-input--confirmed"
                       placeholder="Berlin"
+                      aria-readonly="true"
                     />
                   </div>
                 </div>
