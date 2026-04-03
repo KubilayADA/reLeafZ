@@ -102,6 +102,7 @@ export interface PharmacyOrder {
   patientEmail: string;
   patientPhone: string;
   status: string;
+  deliveryMethod?: string;
   symptoms: string;
   createdAt: string;
   updatedAt: string;
@@ -153,6 +154,7 @@ export interface OrderDetail {
   patientEmail: string;
   patientPhone: string;
   status: string;
+  deliveryMethod?: string;
   createdAt: string;
   updatedAt: string;
   selectedProducts: Array<{
@@ -231,7 +233,8 @@ export const ALLOWED_ORDER_STATUSES = ['APPROVED', 'PAID', 'PROCESSING', 'READY'
 // Status transition map — mirrors backend's allowed transitions
 export const STATUS_TRANSITIONS: Record<string, string[]> = {
   PAID: ['PROCESSING'],
-  PROCESSING: ['READY'],
+  PROCESSING: ['PREPARING'],
+  PREPARING: ['READY'],
   READY: ['PICKED_UP', 'DISPATCHED'],
   DISPATCHED: ['DELIVERED'],
   PICKED_UP: ['DELIVERED'],
@@ -239,6 +242,7 @@ export const STATUS_TRANSITIONS: Record<string, string[]> = {
 
 export const STATUS_TRANSITION_LABELS: Record<string, string> = {
   PROCESSING: 'In Bearbeitung nehmen',
+  PREPARING: 'In Bearbeitung nehmen',
   READY: 'Als Bereit markieren',
   PICKED_UP: 'Als Abgeholt markieren',
   DISPATCHED: 'Kurier beauftragen',
