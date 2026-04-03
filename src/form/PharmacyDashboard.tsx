@@ -15,7 +15,7 @@ import {
 } from 'recharts'
 import {
   pharmacyLogin, fetchPharmacyDashboard, fetchPharmacyOrders, updateOrderStatus,
-  markOrderReady, fetchPharmacyOrderDetail, fetchPharmacyInventory, fetchPharmacyAnalytics,
+  markOrderReady, dispatchOrder, fetchPharmacyOrderDetail, fetchPharmacyInventory, fetchPharmacyAnalytics,
   createProduct, updateProduct, deleteProduct,
   type Product, type ProductFormData, type DashboardResponse,
   type OrdersResponse, type OrderFilters, type OrderDetail, type InventoryResponse,
@@ -73,6 +73,7 @@ function formatShortDate(d?: string) { if (!d) return '—'; try { return new Da
 
 function getStatusColor(status: string) {
   const s = status.toUpperCase()
+  if (s === 'DISPATCHED') return { bg: 'bg-orange-500/15', text: 'text-orange-400', dot: 'bg-orange-400', border: 'border-orange-500/20' }
   if (s === 'DELIVERED' || s === 'FULFILLED') return { bg: 'bg-emerald-500/15', text: 'text-emerald-400', dot: 'bg-emerald-400', border: 'border-emerald-500/20' }
   if (s === 'READY') return { bg: 'bg-green-500/15', text: 'text-green-400', dot: 'bg-green-400', border: 'border-green-500/20' }
   if (s === 'PROCESSING') return { bg: 'bg-blue-500/15', text: 'text-blue-400', dot: 'bg-blue-400', border: 'border-blue-500/20' }
@@ -208,6 +209,19 @@ export default function PharmacyDashboard() {
   const handleLogout = () => { setPharmacyId(null); setDashboardData(null); setOrdersResponse(null); setInventoryResponse(null); setAnalyticsData(null); setEmail(''); setPassword(''); setActiveView('dashboard'); setError(null); localStorage?.removeItem('pharmacy_id') }
   const handleUpdateStatus = async (id: number, s: string) => { if (!pharmacyId) return; try { setOrdersLoading(true); await updateOrderStatus(pharmacyId, id, s); await loadOrders(pharmacyId, buildOrderFilters()); await loadDashboard() } catch (e: unknown) { setError(e instanceof Error ? e.message : 'Fehler') } finally { setOrdersLoading(false) } }
   const handleMarkReady = async (id: number) => { if (!pharmacyId) return; try { setOrdersLoading(true); await markOrderReady(pharmacyId, id); await loadOrders(pharmacyId, buildOrderFilters()); await loadDashboard() } catch (e: unknown) { setError(e instanceof Error ? e.message : 'Fehler') } finally { setOrdersLoading(false) } }
+  const handleDispatch = async (id: number) => {
+    if (!pharmacyId) return;
+    try {
+      setOrdersLoading(true);
+      await dispatchOrder(pharmacyId, id);
+      await loadOrders(pharmacyId, buildOrderFilters());
+      await loadDashboard();
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : 'Dispatch fehlgeschlagen');
+    } finally {
+      setOrdersLoading(false);
+    }
+  }
 
   const handleAddProduct = () => { setEditingProduct(null); setProductForm(initialProductForm); setShowProductModal(true) }
   const handleEditProduct = (p: Product) => { setEditingProduct(p); setProductForm({ name: p.name, form: p.form, thcPercent: p.thcPercent, cbdPercent: p.cbdPercent, price: p.price, unit: p.unit, stock: p.stock, imageUrl: p.imageUrl || '' }); setShowProductModal(true) }
@@ -219,9 +233,9 @@ export default function PharmacyDashboard() {
 
   const renderNextStatusButton = (order: { id: number; status: string }) => {
     const allowed = STATUS_TRANSITIONS[order.status]; if (!allowed?.length) return null
-    const colors: Record<string, string> = { PROCESSING: 'from-blue-600 to-blue-500', READY: 'from-green-600 to-green-500', PICKED_UP: 'from-purple-600 to-purple-500', DELIVERED: 'from-emerald-600 to-emerald-500' }
+    const colors: Record<string, string> = { PROCESSING: 'from-blue-600 to-blue-500', READY: 'from-green-600 to-green-500', PICKED_UP: 'from-purple-600 to-purple-500', DISPATCHED: 'from-orange-600 to-orange-500', DELIVERED: 'from-emerald-600 to-emerald-500' }
     return <div className="flex gap-2">{allowed.map(ns => { const l = STATUS_TRANSITION_LABELS[ns]; if (!l) return null; return (
-      <button key={ns} onClick={ns === 'READY' ? () => handleMarkReady(order.id) : () => handleUpdateStatus(order.id, ns)} disabled={ordersLoading}
+      <button key={ns} onClick={ns === 'READY' ? () => handleMarkReady(order.id) : ns === 'DISPATCHED' ? () => handleDispatch(order.id) : () => handleUpdateStatus(order.id, ns)} disabled={ordersLoading}
         className={`bg-gradient-to-r ${colors[ns] || 'from-white/20 to-white/10'} text-white px-3.5 py-1.5 ${G.btn} flex items-center gap-1.5 shadow-lg`}>
         {ordersLoading && <Loader2 className="animate-spin" size={12} />}{l}
       </button>) })}</div>

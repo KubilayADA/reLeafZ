@@ -232,7 +232,8 @@ export const ALLOWED_ORDER_STATUSES = ['APPROVED', 'PAID', 'PROCESSING', 'READY'
 export const STATUS_TRANSITIONS: Record<string, string[]> = {
   PAID: ['PROCESSING'],
   PROCESSING: ['READY'],
-  READY: ['PICKED_UP'],
+  READY: ['PICKED_UP', 'DISPATCHED'],
+  DISPATCHED: ['DELIVERED'],
   PICKED_UP: ['DELIVERED'],
 };
 
@@ -240,6 +241,7 @@ export const STATUS_TRANSITION_LABELS: Record<string, string> = {
   PROCESSING: 'In Bearbeitung nehmen',
   READY: 'Als Bereit markieren',
   PICKED_UP: 'Als Abgeholt markieren',
+  DISPATCHED: 'Kurier beauftragen',
   DELIVERED: 'Als Geliefert markieren',
 };
 
@@ -590,6 +592,27 @@ export async function markOrderReady(pharmacyId: number, orderId: number): Promi
   } catch (error) {
     if (process.env.NODE_ENV === 'development') {
       console.error('Error marking order as ready:', error);
+    }
+    throw error;
+  }
+}
+
+export async function dispatchOrder(pharmacyId: number, orderId: number): Promise<unknown> {
+  try {
+    const response = await fetch(`${API_BASE}/api/pharmacy/${pharmacyId}/orders/${orderId}/dispatch`, {
+      method: 'POST',
+      credentials: 'include',
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || 'Failed to dispatch order');
+    }
+
+    return await response.json();
+  } catch (error) {
+    if (process.env.NODE_ENV === 'development') {
+      console.error('Error dispatching order:', error);
     }
     throw error;
   }
