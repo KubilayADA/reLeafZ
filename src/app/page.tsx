@@ -222,6 +222,15 @@ export default function LandingPage() {
   const [houseNumber, setHouseNumber] = useState('')
   const [cityName, setCityName] = useState('')
   const [addressInputValue, setAddressInputValue] = useState('')
+  const [isPreview, setIsPreview] = useState(false)
+
+  useEffect(() => {
+    const cookie = document.cookie
+      .split('; ')
+      .find(r => r.startsWith('preview_token='))
+      ?.split('=')[1]
+    setIsPreview(!!cookie)
+  }, [])
 
   useEffect(() => {
     if (!houseNumber || !streetName || !cityName) return
@@ -245,13 +254,7 @@ export default function LandingPage() {
     return () => clearTimeout(timer)
   }, [houseNumber, streetName, cityName])
 
-  // Show coming soon page if flag is true
-  const previewCookie = typeof window !== 'undefined'
-    ? document.cookie.split('; ').find(r => r.startsWith('preview_token='))?.split('=')[1]
-    : null;
-  if (COMING_SOON_MODE && previewCookie !== process.env.NEXT_PUBLIC_PREVIEW_TOKEN) {
-    return <ComingSoon />;
-  }
+  if (COMING_SOON_MODE && !isPreview) return <ComingSoon />;
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
