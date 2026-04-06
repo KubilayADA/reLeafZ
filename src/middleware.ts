@@ -2,6 +2,26 @@ import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
 export function middleware(req: NextRequest) {
+  const previewEnvToken = process.env.NEXT_PUBLIC_PREVIEW_TOKEN
+  const previewQuery = req.nextUrl.searchParams.get('preview')
+  if (previewEnvToken && previewQuery === previewEnvToken) {
+    const cleanUrl = req.nextUrl.clone()
+    cleanUrl.searchParams.delete('preview')
+    const res = NextResponse.redirect(cleanUrl)
+    res.cookies.set('preview_token', previewQuery, {
+      path: '/',
+      maxAge: 86400,
+    })
+    return res
+  }
+
+  if (
+    previewEnvToken &&
+    req.cookies.get('preview_token')?.value === previewEnvToken
+  ) {
+    return NextResponse.next()
+  }
+
   const hostname = req.headers.get('host')?.split(':')[0] ?? ''
   const pathname = req.nextUrl.pathname
 
