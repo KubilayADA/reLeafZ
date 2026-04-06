@@ -246,7 +246,10 @@ export default function LandingPage() {
   }, [houseNumber, streetName, cityName])
 
   // Show coming soon page if flag is true
-  if (COMING_SOON_MODE) {
+  const previewCookie = typeof window !== 'undefined'
+    ? document.cookie.split('; ').find(r => r.startsWith('preview_token='))?.split('=')[1]
+    : null;
+  if (COMING_SOON_MODE && previewCookie !== process.env.NEXT_PUBLIC_PREVIEW_TOKEN) {
     return <ComingSoon />;
   }
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
