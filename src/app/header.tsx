@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react'
 import { Button } from '@/components/ui/button'
-import { Menu, X } from 'lucide-react'
+import { Menu, Moon, Sun, X } from 'lucide-react'
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import './header.css'
 import { scrollToLandingTop, scrollLandingToAblauf } from '@/lib/scroll'
@@ -26,6 +26,8 @@ interface HeaderProps {
   handlePostcodeSubmit: () => void
   isValidBerlinPostcode: (postcode: string) => boolean
   isVisible: boolean
+  landingTheme: 'dark' | 'light'
+  onThemeToggle: () => void
 }
 
 export default function Header({ 
@@ -36,13 +38,15 @@ export default function Header({
   handlePostcodeSubmit, 
   isValidBerlinPostcode,
   isVisible,
+  landingTheme,
+  onThemeToggle,
 }: HeaderProps) {
   const [mobileNavOpen, setMobileNavOpen] = useState(false)
 
   return (
     <>
       <header
-        className={`header ${
+        className={`header ${landingTheme === 'light' ? 'header--light' : ''} ${
           isVisible ? 'translate-y-0 opacity-100' : '-translate-y-full opacity-0 pointer-events-none'
         }`}
       >
@@ -80,21 +84,34 @@ export default function Header({
             </button>
             
             {/* Desktop Nav */}
-            <nav className="header-desktop-nav header-text space-x-10 ">
-              <a
-                href="#ablauf"
-                className="header-nav-link text-mg md:text-xl leading-relaxed"
-                onClick={(e) => {
-                  e.preventDefault()
-                  scrollLandingToAblauf()
-                }}
+            <div className="header-center-controls hidden md:flex">
+              <nav className="header-desktop-nav header-text space-x-10 ">
+                <a
+                  href="#ablauf"
+                  className="header-nav-link text-mg md:text-xl leading-relaxed"
+                  onClick={(e) => {
+                    e.preventDefault()
+                    scrollLandingToAblauf()
+                  }}
+                >
+                  Ablauf
+                </a>
+                <a href="#partner-apotheken" className="header-nav-link text-mg md:text-xl leading-relaxed">Apotheke in Ihrer Nähe</a>
+                <a href="#vorteile" className="header-nav-link text-lg md:text-xl leading-relaxed">Vorteile</a>
+                <a href="#chat" className="header-nav-link text-lg md:text-xl leading-relaxed">Chat with us!</a>
+              </nav>
+
+              <button
+                type="button"
+                onClick={onThemeToggle}
+                className={`header-theme-icon-toggle ${landingTheme === 'light' ? 'is-light' : ''}`}
+                aria-pressed={landingTheme === 'light'}
+                aria-label={`Switch to ${landingTheme === 'dark' ? 'light' : 'dark'} mode`}
               >
-                Ablauf
-              </a>
-              <a href="#partner-apotheken" className="header-nav-link text-mg md:text-xl leading-relaxed">Apotheke in Ihrer Nähe</a>
-              <a href="#vorteile" className="header-nav-link text-lg md:text-xl leading-relaxed">Vorteile</a>
-              <a href="#chat" className="header-nav-link text-lg md:text-xl leading-relaxed">Chat with us!</a>
-            </nav>
+                <Moon className={`header-theme-icon ${landingTheme === 'dark' ? 'is-active' : ''}`} size={15} />
+                <Sun className={`header-theme-icon ${landingTheme === 'light' ? 'is-active' : ''}`} size={15} />
+              </button>
+            </div>
             
             {/* Desktop Button - Hidden on mobile, only in hamburger menu wish i believe is better let me know if you see this UwUwuu*/}
             <div className="hidden lg:block text-black">

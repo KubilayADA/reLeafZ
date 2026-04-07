@@ -23,6 +23,8 @@ interface MobileNavbarProps {
   setZipInput: (input: string) => void
   handlePostcodeSubmit: () => void
   isValidBerlinPostcode: (postcode: string) => boolean
+  landingTheme: 'dark' | 'light'
+  onThemeToggle: () => void
 }
 
 const NAV_LINKS = [
@@ -39,6 +41,8 @@ export default function MobileNavbar({
   setZipInput,
   handlePostcodeSubmit,
   isValidBerlinPostcode,
+  landingTheme,
+  onThemeToggle,
 }: MobileNavbarProps) {
   const [isVisible, setIsVisible] = useState(false)
   const [isOpen, setIsOpen] = useState(false)
@@ -150,6 +154,21 @@ export default function MobileNavbar({
             </a>
           ))}
         </nav>
+
+        <div className="mnav__theme-row">
+          <span className="mnav__theme-label">Theme</span>
+          <button
+            type="button"
+            onClick={onThemeToggle}
+            className={`mnav__theme-toggle ${landingTheme === 'light' ? 'is-light' : ''}`}
+            aria-pressed={landingTheme === 'light'}
+            aria-label={`Switch to ${landingTheme === 'dark' ? 'light' : 'dark'} mode`}
+          >
+            <span className="mnav__theme-thumb" aria-hidden />
+            <span className={`mnav__theme-state ${landingTheme === 'dark' ? 'is-active' : ''}`}>Dark</span>
+            <span className={`mnav__theme-state ${landingTheme === 'light' ? 'is-active' : ''}`}>Light</span>
+          </button>
+        </div>
 
         <div className="mnav__cta-wrap">
           <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
