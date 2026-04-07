@@ -20,7 +20,7 @@ const FOOTER_LINK_GROUPS = [
 
 const FooterLogo = () => (
   <img
-    src="/logo2.png"
+    src="/logo1.png"
     alt="reLeafZ Logo"
     className="footer__logo"
   />

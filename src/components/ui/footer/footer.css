@@ -22,8 +22,11 @@
 
 .footer__brand {
   padding: 1.2rem 1.2rem 1.4rem;
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  border-radius: 16px;
+  border-top: 2.5px solid #333;
+  border-left: 2.5px solid #333;
+  border-right: 4px solid #333;
+  border-bottom: 4px solid #333;
+  border-radius: 10px;
   background: rgba(255, 255, 255, 0.05);
   backdrop-filter: blur(10px);
   transition: background 300ms ease, border-color 300ms ease, box-shadow 300ms ease;
@@ -126,7 +129,10 @@
 }
 
 #landing-main[data-theme='light'] .footer__brand {
-  border-color: rgba(15, 23, 42, 0.12);
+  border-top-color: #333;
+  border-left-color: #333;
+  border-right-color: #333;
+  border-bottom-color: #333;
   background: rgba(255, 255, 255, 0.82);
 }
 

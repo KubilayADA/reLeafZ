@@ -50,8 +50,11 @@ const STEPS: Step[] = [
 
 const PROG_LABELS: string[] = ['Fragebogen', 'Sortiment', 'Rezept', 'Lieferung'];
 
+interface HowProps {
+  landingTheme: 'dark' | 'light';
+}
 
-export default function How(): React.JSX.Element {
+export default function How({ landingTheme }: HowProps): React.JSX.Element {
   const [current, setCurrent] = useState<number>(0);
   const [particles, setParticles] = useState<Particle[]>([]);
   const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
@@ -127,7 +130,7 @@ export default function How(): React.JSX.Element {
   return (
     <section
       id="ablauf"
-      className="how-funktioniert section-container how-column"
+      className={`how-funktioniert section-container how-column ${landingTheme === 'light' ? 'theme-light' : 'theme-dark'}`}
       aria-label="So funktioniert der Ablauf"
     >
       <div className="how-funktioniert__bg" aria-hidden>
