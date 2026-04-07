@@ -27,6 +27,7 @@ export default function LandingPage() {
   const [showHeader, setShowHeader] = useState(false)
   const [zipInput, setZipInput] = useState('')
   const [landingTheme, setLandingTheme] = useState<'dark' | 'light'>('dark')
+  const LANDING_THEME_STORAGE_KEY = 'releafz-landing-theme'
 
   useEffect(() => {
     const updateHeaderVisibility = () => {
@@ -48,6 +49,17 @@ export default function LandingPage() {
   useEffect(() => {
     return attachLandingBinarySwitch()
   }, [])
+
+  useEffect(() => {
+    const storedTheme = window.localStorage.getItem(LANDING_THEME_STORAGE_KEY)
+    if (storedTheme === 'dark' || storedTheme === 'light') {
+      setLandingTheme(storedTheme)
+    }
+  }, [])
+
+  useEffect(() => {
+    window.localStorage.setItem(LANDING_THEME_STORAGE_KEY, landingTheme)
+  }, [landingTheme])
 
   if (COMING_SOON_MODE) {
     return <ComingSoon />
@@ -119,7 +131,7 @@ export default function LandingPage() {
         >
 
           <PartnerApotheken />
-          <How />
+          <How landingTheme={landingTheme} />
 
           <Footer />
         </div>

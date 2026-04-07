@@ -265,9 +265,12 @@
     height: 30px;
     padding: 3px;
     border-radius: 999px;
-    border: 1px solid rgba(17, 17, 17, 0.18);
+    border-top: 2.5px solid #333;
+    border-left: 2.5px solid #333;
+    border-right: 4px solid #333;
+    border-bottom: 4px solid #333;
     background: rgba(255, 255, 255, 0.7);
-    transition: border-color 220ms ease, background 220ms ease;
+    transition: background 220ms ease;
   }
 
   .mnav__theme-thumb {

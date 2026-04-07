@@ -131,7 +131,7 @@ export default function MobileNavbar({
               className={`mnav__logo-icon${isOpen ? ' mnav__logo-icon--hidden' : ''}`}
             />
             <img
-              src="/logo2.png"
+              src="/logo1.png"
               alt="reLeafZ"
               className={`mnav__logo-full${isOpen ? ' mnav__logo-full--visible' : ''}`}
             />

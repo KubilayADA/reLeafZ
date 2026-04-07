@@ -36,7 +36,7 @@ export default function Hero({
       <div className="pointer-events-none absolute inset-0 w-full overflow-hidden">
          <video
           className="absolute inset-0 w-full h-full object-cover"
-          src="/hero-vibe.mp4"
+          src="/bubble-explose.mp4"
           preload="auto"
           autoPlay
           muted
@@ -68,11 +68,11 @@ export default function Hero({
           scrollToLandingTop()
         }}
       >
-        <img
+        {/* <img
           src="/logo2.png"
           alt="reLeafZ Logo"
           className="logo-hero"
-        />
+        /> */}
       </a>
 
       {/* CTA: go to next view */}

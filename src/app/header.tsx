@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useRef, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Menu, Moon, Sun, X } from 'lucide-react'
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
@@ -11,7 +11,7 @@ import { scrollToLandingTop, scrollLandingToAblauf } from '@/lib/scroll'
 const LeafLogo = ({ className = 'logo-header' }) => (
   <div className={`logo-header ${className}`}>
     <img
-      src="/logo2.png"
+      src="/logo1.png"
       alt="reLeafZ Logo"
       className="w-full h-full object-contain"
     />
@@ -42,6 +42,27 @@ export default function Header({
   onThemeToggle,
 }: HeaderProps) {
   const [mobileNavOpen, setMobileNavOpen] = useState(false)
+  // HOVER SOUND BLOCK loving it 
+  const hoverAudioRef = useRef<HTMLAudioElement | null>(null)
+  const playHoverSound = () => {
+    if (!hoverAudioRef.current) {
+      hoverAudioRef.current = new Audio('/tekkkk.mp3')
+      hoverAudioRef.current.preload = 'auto'
+      hoverAudioRef.current.volume = 0.6
+    }
+
+    hoverAudioRef.current.currentTime = 0
+    void hoverAudioRef.current.play().catch(() => {
+      // Ignore autoplay/gesture policy errors on some browsers
+    })
+  }
+
+  const stopHoverSound = () => {
+    if (!hoverAudioRef.current) return
+    hoverAudioRef.current.pause()
+    hoverAudioRef.current.currentTime = 0
+  }
+  // END HOVER SOUND BLOCK
 
   return (
     <>
@@ -121,6 +142,8 @@ export default function Header({
                     className="header-button"
                     variant="button2"
                     style={{ "--c-color": "#000000", color: "#000000" } as React.CSSProperties}
+                    onMouseEnter={playHoverSound}
+                    onMouseLeave={stopHoverSound}
                   >
                   BEHANDLUNG ANFRAGEN 
                 </Button>
