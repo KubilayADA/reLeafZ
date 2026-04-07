@@ -3,26 +3,12 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { Menu } from 'lucide-react'
 
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import './header-mobile.css'
 import { isLandingPastHero, scrollLandingToAblauf } from '@/lib/scroll'
 
 interface MobileNavbarProps {
-  dialogOpen: boolean
   setDialogOpen: (open: boolean) => void
-  zipInput: string
-  setZipInput: (input: string) => void
-  handlePostcodeSubmit: () => void
-  isValidBerlinPostcode: (postcode: string) => boolean
   landingTheme: 'dark' | 'light'
   onThemeToggle: () => void
 }
@@ -35,12 +21,7 @@ const NAV_LINKS = [
 ]
 
 export default function MobileNavbar({
-  dialogOpen,
   setDialogOpen,
-  zipInput,
-  setZipInput,
-  handlePostcodeSubmit,
-  isValidBerlinPostcode,
   landingTheme,
   onThemeToggle,
 }: MobileNavbarProps) {
@@ -171,47 +152,16 @@ export default function MobileNavbar({
         </div>
 
         <div className="mnav__cta-wrap">
-          <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-            <DialogTrigger asChild>
-              <Button
-                variant="button2"
-                className="w-full shadow-[0_10px_24px_rgba(0,0,0,0.26)]"
-                onClick={() => setIsOpen(false)}
-              >
-                BEHANDLUNG ANFRAGEN
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-md border border-white/20 bg-white/10 backdrop-blur-md">
-              <DialogHeader>
-                <DialogTitle className="inconsolata text-xl font-bold">
-                  Postleitzahl eingeben
-                </DialogTitle>
-                <DialogDescription className="inconsolata text-gray-600">
-                  Bitte geben Sie Ihre Postleitzahl ein, um zu prüfen, ob wir in Ihrer Region liefern können.
-                </DialogDescription>
-              </DialogHeader>
-              <div className="py-4">
-                <input
-                  type="text"
-                  name="zip"
-                  placeholder="z.B. 10115"
-                  value={zipInput}
-                  onChange={(e) => setZipInput(e.target.value)}
-                  className="w-full p-3 border border-gray-300 rounded-lg inconsolata text-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"
-                  maxLength={5}
-                />
-              </div>
-              <DialogFooter>
-                <Button
-                  onClick={handlePostcodeSubmit}
-                  disabled={!zipInput.trim() || !isValidBerlinPostcode(zipInput)}
-                  className="w-full btn-primary font-medium py-3"
-                >
-                  Weiter
-                </Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
+          <Button
+            variant="button2"
+            className="w-full shadow-[0_10px_24px_rgba(0,0,0,0.26)]"
+            onClick={() => {
+              setIsOpen(false)
+              setDialogOpen(true)
+            }}
+          >
+            BEHANDLUNG ANFRAGEN
+          </Button>
         </div>
       </div>
     </div>

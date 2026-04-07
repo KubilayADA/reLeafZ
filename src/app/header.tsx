@@ -42,6 +42,8 @@ export default function Header({
   onThemeToggle,
 }: HeaderProps) {
   const [mobileNavOpen, setMobileNavOpen] = useState(false)
+  const dialogCardRef = useRef<HTMLDivElement | null>(null)
+  const [isPostcodeFocused, setIsPostcodeFocused] = useState(false)
   // HOVER SOUND BLOCK loving it 
   const hoverAudioRef = useRef<HTMLAudioElement | null>(null)
   const playHoverSound = () => {
@@ -63,6 +65,10 @@ export default function Header({
     hoverAudioRef.current.currentTime = 0
   }
   // END HOVER SOUND BLOCK
+
+  const sanitizedZipInput = zipInput.trim().replace(/\D/g, '')
+  const showInvalidPostcodeNote =
+    sanitizedZipInput.length > 0 && !isValidBerlinPostcode(sanitizedZipInput)
 
   return (
     <>
@@ -135,48 +141,19 @@ export default function Header({
             </div>
             
             {/* Desktop Button - Hidden on mobile, only in hamburger menu wish i believe is better let me know if you see this UwUwuu*/}
+            <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
             <div className="hidden lg:block text-black">
-              <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
               <DialogTrigger asChild>
-                  <Button
-                    className="header-button"
-                    variant="button2"
-                    style={{ "--c-color": "#000000", color: "#000000" } as React.CSSProperties}
-                    onMouseEnter={playHoverSound}
-                    onMouseLeave={stopHoverSound}
-                  >
+                <Button
+                  className="header-button"
+                  variant="button2"
+                  style={{ "--c-color": "#000000", color: "#000000" } as React.CSSProperties}
+                  onMouseEnter={playHoverSound}
+                  onMouseLeave={stopHoverSound}
+                >
                   BEHANDLUNG ANFRAGEN 
                 </Button>
               </DialogTrigger>
-              <DialogContent className="sm:max-w-md">
-                <DialogHeader>
-                  <DialogTitle className="inconsolata text-xl font-bold">Postleitzahl eingeben</DialogTitle>
-                  <DialogDescription className="inconsolata text-gray-600">
-                    Bitte geben Sie Ihre Postleitzahl ein, um zu prüfen, ob wir in Ihrer Region liefern können.
-                  </DialogDescription>
-                </DialogHeader>
-                <div className="py-4">
-                  <input
-                    type="text"
-                    name="zip"
-                    placeholder="z.B. 10115"
-                    value={zipInput}
-                    onChange={(e) => setZipInput(e.target.value)}
-                    className="w-full p-3 border border-gray-300 rounded-lg inconsolata text-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"
-                    maxLength={5}
-                  />
-                </div>
-                <DialogFooter>
-                  <Button
-                    onClick={handlePostcodeSubmit}
-                    disabled={!zipInput.trim() || !isValidBerlinPostcode(zipInput)}
-                    className="w-full btn-primary font-medium py-3"
-                  >
-                    Weiter
-                  </Button>
-                </DialogFooter>
-              </DialogContent>
-            </Dialog>
             </div>
             {/* Hamburger for mobile and tablet */}
             <button
@@ -186,6 +163,78 @@ export default function Header({
             >
               {mobileNavOpen ? <X className="w-7 h-7" /> : <Menu className="w-7 h-7" />}
             </button>
+            <DialogContent
+              ref={dialogCardRef}
+              className={`left-1/2 -translate-x-1/2 w-[calc(100vw-1.5rem)] max-w-[24rem] max-h-[calc(100dvh-1.5rem)] overflow-y-auto rounded-xl bg-white/95 p-3 border-0 transition-[top,transform] duration-300 ${
+                isPostcodeFocused
+                  ? 'top-[max(0.75rem,env(safe-area-inset-top))] translate-y-0'
+                  : 'top-1/2 -translate-y-1/2'
+              } sm:top-[50%] sm:max-h-none sm:-translate-y-1/2 sm:p-4`}
+              style={{
+                borderTop: '2.5px solid #333',
+                borderLeft: '2.5px solid #333',
+                borderRight: '4px solid #333',
+                borderBottom: '4px solid #333',
+              }}
+            >
+              <div className="mb-1">
+                <img
+                  src="/logo1.png"
+                  alt="reLeafZ"
+                  className="h-7 w-auto object-contain sm:h-8"
+                />
+              </div>
+              <DialogHeader>
+                <DialogTitle className="text-base sm:text-lg font-bold" style={{ fontFamily: '"Helvetica Neue", sans-serif' }}>
+                  Postleitzahl eingeben
+                </DialogTitle>
+                <DialogDescription
+                  className="text-xs sm:text-sm text-gray-600"
+                  style={{ fontFamily: '"Helvetica Neue", sans-serif' }}
+                >
+                  Bitte geben Sie Ihre Postleitzahl ein, um zu prüfen, ob wir in Ihrer Region liefern können.
+                </DialogDescription>
+              </DialogHeader>
+              <div className="py-2 sm:py-3">
+                <input
+                  type="text"
+                  name="zip"
+                  placeholder="z.B. 10115"
+                  value={zipInput}
+                  onChange={(e) => setZipInput(e.target.value)}
+                  onFocus={() => setIsPostcodeFocused(true)}
+                  onBlur={() => setIsPostcodeFocused(false)}
+                  className="w-full h-10 sm:h-11 p-2.5 rounded-lg text-sm sm:text-base outline-none"
+                  style={{
+                    fontFamily: '"Helvetica Neue", sans-serif',
+                    borderTop: '2.5px solid #333',
+                    borderLeft: '2.5px solid #333',
+                    borderRight: '4px solid #333',
+                    borderBottom: '4px solid #333',
+                  }}
+                  maxLength={5}
+                />
+                {showInvalidPostcodeNote && (
+                  <p
+                    className="mt-2 text-xs sm:text-sm text-red-600"
+                    style={{ fontFamily: '"Helvetica Neue", sans-serif' }}
+                  >
+                    Bitte gueltige Berliner Postleitzahl eingeben.
+                  </p>
+                )}
+              </div>
+              <DialogFooter>
+                <Button
+                  onClick={handlePostcodeSubmit}
+                  disabled={!sanitizedZipInput || !isValidBerlinPostcode(sanitizedZipInput)}
+                  className="w-full h-10 sm:h-11 rounded-lg bg-[#72906F] text-white font-medium py-2.5 hover:bg-[#5f795d] disabled:opacity-50"
+                  style={{ fontFamily: '"Helvetica Neue", sans-serif' }}
+                >
+                  Weiter
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+            </Dialog>
           </div>
         </div>
       </div>
@@ -209,47 +258,12 @@ export default function Header({
               <a href="#vorteile" className="text-xl text-black-800 inconsolata" onClick={() => setMobileNavOpen(false)}>Vorteile</a>
               <a href="#chat" className="text-xl text-black-800 inconsolata" onClick={() => setMobileNavOpen(false)}>Chat with us!</a>
               <div className="w-full px-4">
-                <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-                  <DialogTrigger asChild>
-                    <Button 
-                      className="behandlung-button2 w-full px-6 py-3 flex items-center justify-center"
-                    >
-                      BEHANDLUNG ANFRAGEN
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent className="sm:max-w-md">
-                    <DialogHeader>
-                      <DialogTitle className="inconsolata text-xl font-bold">Postleitzahl eingeben</DialogTitle>
-                      <DialogDescription className="inconsolata text-gray-600">
-                        Bitte geben Sie Ihre Postleitzahl ein, um zu prüfen, ob wir in Ihrer Region liefern können.
-                      </DialogDescription>
-                    </DialogHeader>
-                    <div className="py-4">
-                      <input
-                        type="text"
-                        name="zip"
-                        placeholder="z.B. 10115"
-                        value={zipInput}
-                        onChange={(e) => setZipInput(e.target.value)}
-                        className="w-full p-3 border border-gray-300 rounded-lg inconsolata text-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"
-                        maxLength={5}
-                      />
-                    </div>
-                    <DialogFooter>
-                      <Button
-                        onClick={handlePostcodeSubmit}
-                        disabled={!zipInput.trim() || !isValidBerlinPostcode(zipInput)}
-                        className={`w-full inconsolata text-white font-medium py-3 ${
-                          !zipInput.trim() || !isValidBerlinPostcode(zipInput) 
-                            ? 'opacity-50 cursor-not-allowed bg-gray-400' 
-                            : 'animated-button'
-                        }`}
-                      >
-                        Weiter
-                      </Button>
-                    </DialogFooter>
-                  </DialogContent>
-                </Dialog>
+                <Button
+                  className="behandlung-button2 w-full px-6 py-3 flex items-center justify-center"
+                  onClick={() => setDialogOpen(true)}
+                >
+                  BEHANDLUNG ANFRAGEN
+                </Button>
               </div>
             </nav>
           </div>

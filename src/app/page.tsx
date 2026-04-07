@@ -96,23 +96,13 @@ export default function LandingPage() {
           onThemeToggle={() => setLandingTheme((prev) => (prev === 'dark' ? 'light' : 'dark'))}
         />
         <MobileNavbar
-          dialogOpen={dialogOpen}
           setDialogOpen={setDialogOpen}
-          zipInput={zipInput}
-          setZipInput={setZipInput}
-          handlePostcodeSubmit={handlePostcodeSubmit}
-          isValidBerlinPostcode={isValidBerlinPostcode}
           landingTheme={landingTheme}
           onThemeToggle={() => setLandingTheme((prev) => (prev === 'dark' ? 'light' : 'dark'))}
         />
 
         <Hero
-          dialogOpen={dialogOpen}
           setDialogOpen={setDialogOpen}
-          zipInput={zipInput}
-          setZipInput={setZipInput}
-          handlePostcodeSubmit={handlePostcodeSubmit}
-          isValidBerlinPostcode={isValidBerlinPostcode}
           onScrollToAblauf={() => {
             const landingMain = document.getElementById('landing-main')
             const mainTop =

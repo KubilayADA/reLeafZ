@@ -3,28 +3,17 @@
 import React from 'react'
 import { ChevronRight, Shield, Clock, MapPin } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import words from '@/constants/index'
 import { scrollToLandingTop } from '@/lib/scroll'
 
 interface HeroProps {
-  dialogOpen: boolean
   setDialogOpen: (open: boolean) => void
-  zipInput: string
-  setZipInput: (value: string) => void
-  handlePostcodeSubmit: () => void
-  isValidBerlinPostcode: (postcode: string) => boolean
   /** Scroll to #ablauf; parent may sync URL with pushState (no overflow lock). */
   onScrollToAblauf: () => void
 }
 
 export default function Hero({
-  dialogOpen,
   setDialogOpen,
-  zipInput,
-  setZipInput,
-  handlePostcodeSubmit,
-  isValidBerlinPostcode,
   onScrollToAblauf,
 }: HeroProps) {
   return (
@@ -135,45 +124,16 @@ export default function Hero({
           {/* CTA: button above, then text+arrow block below */}
           <div className="hero-cta-wrap">
             <div className="hero-cta-center pointer-events-auto">
-              <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-                <DialogTrigger asChild>
-                  <Button
-                    variant="button2"
-                    className="behandlung-button md:scale-125 lg:scale-150 min-w-44 sm:min-w-56 md:min-w-64 w-auto"
-                  >
-                    BEHANDLUNG ANFRAGEN
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="sm:max-w-md">
-                  <DialogHeader>
-                    <DialogTitle className="inconsolata text-xl font-bold">Postleitzahl eingeben</DialogTitle>
-                    <DialogDescription className="inconsolata text-gray-600">
-                      Bitte geben Sie Ihre Postleitzahl ein, um zu prüfen, ob wir in Ihrer Region liefern können.
-                    </DialogDescription>
-                  </DialogHeader>
-                  <div className="py-4">
-                    <input
-                      type="text"
-                      name="zip"
-                      placeholder="z.B. 10115"
-                      value={zipInput}
-                      onChange={(e) => setZipInput(e.target.value)}
-                      className="w-full p-3 border border-gray-300 rounded-lg inconsolata text-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"
-                      maxLength={5}
-                    />
-                  </div>
-                  <DialogFooter>
-                    <Button
-                      variant="button2"
-                      onClick={handlePostcodeSubmit}
-                      disabled={!zipInput.trim() || !isValidBerlinPostcode(zipInput)}
-                      className="w-full inconsolata text-white font-medium"
-                    >
-                      Weiter
-                    </Button>
-                  </DialogFooter>
-                </DialogContent>
-              </Dialog>
+              <Button
+                variant="button2"
+                className="behandlung-button relative z-20 md:scale-125 lg:scale-150 min-w-44 sm:min-w-56 md:min-w-64 w-auto"
+                onClick={(e) => {
+                  e.stopPropagation()
+                  setDialogOpen(true)
+                }}
+              >
+                BEHANDLUNG ANFRAGEN
+              </Button>
             </div>
 
             {/* Trust badges */}
