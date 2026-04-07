@@ -3,24 +3,33 @@
 import React, { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { ArrowLeft, MapPin, Building2, Mail, Lock, CheckCircle2, X } from 'lucide-react'
+import { ArrowLeft, Lock, CheckCircle2, X } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import '@/app/main.css'
 import '@/form/form.css'
 
 interface MashallahFormProps {
   postcode: string
+  street: string
+  houseNumber: string
+  city: string
   onBack: () => void
 }
 
-export default function MashallahForm({ postcode, onBack }: MashallahFormProps) {
+export default function MashallahForm({
+  postcode,
+  street,
+  houseNumber,
+  city,
+  onBack,
+}: MashallahFormProps) {
   const router = useRouter()
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
     phone: '',
-    street: '',
-    city: '',
+    street: `${street} ${houseNumber}`.trim(),
+    city: city.trim(),
   })
   const [loading, setLoading] = useState(false)
   const [submitError, setSubmitError] = useState('')
@@ -340,46 +349,57 @@ export default function MashallahForm({ postcode, onBack }: MashallahFormProps) 
               </div>
 
               <div className="form-field">
-                <label htmlFor="street" className="form-label">
-                  Straße + Hausnummer *
+                <label htmlFor="street" className="form-label form-label--confirmed">
+                  <span className="form-label__text-row">
+                    Straße + Hausnummer *
+                    <CheckCircle2
+                      className="form-label__confirmed-icon"
+                      size={18}
+                      aria-hidden
+                    />
+                  </span>
                 </label>
                 <div className="relative">
-                  {!formData.street && (
-                    <MapPin className="form-input-icon" size={20} />
-                  )}
                   <input
                     type="text"
                     id="street"
                     name="street"
                     value={formData.street}
-                    onChange={handleChange}
+                    readOnly
                     required
+                    maxLength={200}
                     disabled={loading}
-                    className={`form-input inconsolata form-input--with-icon-left ${formData.street ? 'has-value' : ''}`}
+                    className={`form-input inconsolata form-input--confirmed form-input--with-icon-left ${formData.street ? 'has-value' : ''}`}
                     placeholder="z.B. Hauptstraße 42"
+                    aria-readonly="true"
                   />
                 </div>
               </div>
 
               <div className="form-field-grid-2">
                 <div className="form-field">
-                  <label htmlFor="city" className="form-label">
-                    Stadt *
+                  <label htmlFor="city" className="form-label form-label--confirmed">
+                    <span className="form-label__text-row">
+                      Stadt *
+                      <CheckCircle2
+                        className="form-label__confirmed-icon"
+                        size={18}
+                        aria-hidden
+                      />
+                    </span>
                   </label>
                   <div className="relative">
-                    {!formData.city && (
-                      <Building2 className="form-input-icon" size={20} />
-                    )}
                     <input
                       type="text"
                       id="city"
                       name="city"
                       value={formData.city}
-                      onChange={handleChange}
+                      readOnly
                       required
                       disabled={loading}
                       className={`form-input inconsolata form-input--with-icon-left ${formData.city ? 'has-value' : ''}`}
                       placeholder="Berlin"
+                      aria-readonly="true"
                     />
                   </div>
                 </div>

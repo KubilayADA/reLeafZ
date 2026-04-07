@@ -15,13 +15,29 @@ function FormContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const postcode = searchParams.get('postcode') || ''
+  const street = searchParams.get('street') || ''
+  const houseNumber = searchParams.get('houseNumber') || ''
+  const city = searchParams.get('city') || ''
 
   if (!postcode || !isValidBerlinPostcode(postcode)) {
     router.push('/')
     return null
   }
 
-  return <MashallahForm postcode={postcode} onBack={() => router.push('/')} />
+  if (!street.trim() || !houseNumber.trim() || !city.trim()) {
+    router.push('/')
+    return null
+  }
+
+  return (
+    <MashallahForm
+      postcode={postcode}
+      street={street}
+      houseNumber={houseNumber}
+      city={city}
+      onBack={() => router.push('/')}
+    />
+  )
 }
 
 // ⬇Parent component (Suspense wrapper) 

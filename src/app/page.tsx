@@ -2,9 +2,6 @@
 
 import React, { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { ChevronRight, ChevronDown } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import MashallahForm from '@/form/mashallah'
 import Header from './header'
 import Hero from './hero'
 import MobileNavbar from './header/mobile-navbar'
@@ -26,26 +23,16 @@ const inconsolataStyle = {
 const LeafLogo = ({ className = 'w-80 h-40 sm:w-56 sm:h-24 md:w-72 md:h-32' }) => (
   <div className={`relative overflow-hidden ${className}`}>
     <img
-      src="/logo1.png"
+      src="/logo2.png"
       alt="reLeafZ Logo"
       className="w-full h-full object-contain"
     />
   </div>
 )
 
-const cities = [
-  { name: 'Berlin', explanation: 'Mo – So, 09-21 Uhr in fast allen Bezirken\nMo – Fr, 09-19 Uhr in Neukölln, Schöneberg, Sa 9-18Uhr' },
-  { name: 'München', explanation: 'Coming soon' },
-  { name: 'Hamburg', explanation: 'Coming soon' },
-  { name: 'Köln', explanation: 'Coming soon' },
-  { name: 'Frankfurt am Main', explanation: 'Coming soon' },
-]
-
 export default function LandingPage() {
   const router = useRouter()
-  const [openCity, setOpenCity] = useState<string | null>(null)
   const [dialogOpen, setDialogOpen] = useState(false)
-  const [showForm, setShowForm] = useState(false)
   const [showHeader, setShowHeader] = useState(false)
   const [zipInput, setZipInput] = useState('')
 
@@ -55,9 +42,11 @@ export default function LandingPage() {
       const mainTop = landingMain?.getBoundingClientRect().top ?? Number.POSITIVE_INFINITY
       setShowHeader(mainTop <= 80)
     }
+
     updateHeaderVisibility()
     window.addEventListener('scroll', updateHeaderVisibility, { passive: true })
     window.addEventListener('resize', updateHeaderVisibility)
+
     return () => {
       window.removeEventListener('scroll', updateHeaderVisibility)
       window.removeEventListener('resize', updateHeaderVisibility)
@@ -78,19 +67,13 @@ export default function LandingPage() {
   }
 
   const handlePostcodeSubmit = () => {
-    if (zipInput.trim() && isValidBerlinPostcode(zipInput)) {
-      setDialogOpen(false)
-      router.push(`/form?postcode=${zipInput}`)
-    }
-  }
+    const safePostcode = zipInput.trim().replace(/\D/g, '')
+    if (!safePostcode || !isValidBerlinPostcode(safePostcode)) return
 
-  const handleBackToMain = () => {
-    setShowForm(false)
-    setZipInput('')
-  }
-
-  if (showForm) {
-    return <MashallahForm postcode={zipInput} onBack={handleBackToMain} />
+    setDialogOpen(false)
+    router.push(
+      `/form?postcode=${safePostcode}&street=${encodeURIComponent('Unbekannt')}&houseNumber=${encodeURIComponent('1')}&city=${encodeURIComponent('Berlin')}`
+    )
   }
 
   return (
