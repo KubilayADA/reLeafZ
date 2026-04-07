@@ -18,12 +18,13 @@
 
   position: relative;
   overflow: hidden;
-  scroll-margin-top: 100px;
-  padding: 5rem 1.25rem 4rem;
+  scroll-margin-top: 150px;
+  padding: 9rem 1.55rem 10rem;
   background: var(--pa-bg);
   font-family: var(--pa-sans);
   color: var(--pa-text);
   -webkit-font-smoothing: antialiased;
+  transition: color 280ms ease, background-color 280ms ease;
 }
 
 /* ── Background layers (matches how-funktioniert) ── */
@@ -164,6 +165,7 @@
     0 24px 55px rgba(0, 0, 0, 0.45),
     0 0 0 1px rgba(34, 211, 238, 0.06),
     0 0 48px rgba(34, 211, 238, 0.06);
+  transition: background 280ms ease, border-color 280ms ease, box-shadow 280ms ease;
 }
 
 .partner-apotheken-map {
@@ -289,6 +291,7 @@
   pointer-events: auto;
   transition: opacity 190ms ease, transform 190ms ease;
   z-index: 1000;
+  transition: opacity 190ms ease, transform 190ms ease, background 280ms ease, color 280ms ease, border-color 280ms ease;
 }
 
 .partner-apotheken-tooltip strong {
@@ -332,6 +335,7 @@
   opacity: 0;
   transform: translateY(14px);
   animation: mobileCardIn 320ms ease forwards;
+  transition: background 280ms ease, color 280ms ease, border-color 280ms ease;
 }
 
 .partner-apotheken-mobile-card-content h3 {
@@ -361,7 +365,7 @@
 
 @media (min-width: 900px) {
   .partner-apotheken-section {
-    padding: 5.5rem 2rem 4.5rem;
+    padding: 7.25rem 2rem 4.5rem;
   }
 
   .partner-apotheken-mobile-card {
@@ -430,4 +434,44 @@
     transform: translateY(0);
     opacity: 1;
   }
+}
+
+#landing-main[data-theme='light'] .partner-apotheken-section {
+  --pa-bg: #f8fafc;
+  --pa-accent: #0f9f6e;
+  --pa-cyan: #0284c7;
+  --pa-text: #0f172a;
+  --pa-muted: rgba(15, 23, 42, 0.74);
+  --pa-muted-dim: rgba(15, 23, 42, 0.56);
+  --pa-border: rgba(15, 23, 42, 0.14);
+  --pa-glass: rgba(255, 255, 255, 0.86);
+}
+
+#landing-main[data-theme='light'] .partner-apotheken__bg-base {
+  background: linear-gradient(to bottom, #f8fafc 0%, #f1f5f9 50%, #f8fafc 100%);
+}
+
+#landing-main[data-theme='light'] .partner-apotheken__grid {
+  opacity: 0.11;
+  background-image:
+    linear-gradient(rgba(15, 23, 42, 0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(15, 23, 42, 0.08) 1px, transparent 1px);
+}
+
+#landing-main[data-theme='light'] .partner-apotheken-map-wrap {
+  box-shadow: 0 18px 42px rgba(2, 6, 23, 0.12), 0 0 0 1px rgba(2, 132, 199, 0.1);
+}
+
+#landing-main[data-theme='light'] .partner-apotheken-tooltip {
+  background: rgba(255, 255, 255, 0.96);
+  color: #1e293b;
+  border-color: rgba(2, 132, 199, 0.24);
+}
+
+#landing-main[data-theme='light'] .partner-apotheken-tooltip strong {
+  color: #0f172a;
+}
+
+#landing-main[data-theme='light'] .partner-apotheken-mobile-card-content {
+  color: #0f172a;
 }

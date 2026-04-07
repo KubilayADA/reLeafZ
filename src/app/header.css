@@ -78,14 +78,20 @@
 }
 
 .header-text {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
   font-family: "Inconsolata", monospace;
   font-weight: 900;
   font-size: 0.5rem;
   letter-spacing: 0.1em;
+  gap: 1rem;
+}
+
+.header-center-controls {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  align-items: center;
   gap: 1rem;
 }
 
@@ -97,11 +103,63 @@
   text-transform: uppercase;
 }
 
+.header-theme-icon-toggle {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  min-width: 66px;
+  height: 32px;
+  padding: 0.25rem 0.5rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.34);
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(14px);
+  transition: background 220ms ease, border-color 220ms ease, transform 220ms ease;
+}
+
+.header-theme-icon-toggle:hover {
+  border-color: rgba(255, 255, 255, 0.52);
+  transform: translateY(-1px);
+}
+
+.header-theme-icon-toggle:focus-visible {
+  outline: 2px solid rgba(16, 185, 129, 0.65);
+  outline-offset: 2px;
+}
+
+.header-theme-icon {
+  color: rgba(255, 255, 255, 0.48);
+  transition: color 220ms ease, opacity 220ms ease, transform 220ms ease;
+  opacity: 0.8;
+}
+
+.header-theme-icon.is-active {
+  color: #ffffff;
+  opacity: 1;
+  transform: scale(1.06);
+}
+
+.header-theme-icon-toggle.is-light {
+  border-color: rgba(15, 23, 42, 0.22);
+  background: rgba(255, 255, 255, 0.82);
+}
+
+.header-theme-icon-toggle.is-light .header-theme-icon {
+  color: rgba(15, 23, 42, 0.42);
+}
+
+.header-theme-icon-toggle.is-light .header-theme-icon.is-active {
+  color: #0f172a;
+}
+
 /* Desktop nav link — hover underline (line draws underneath) */
 .header-desktop-nav .header-nav-link {
   position: relative;
   color: #ffffff;
   text-decoration: none;
+  transition: color 0.22s ease;
 }
 
 .header-desktop-nav .header-nav-link:hover {
@@ -120,6 +178,18 @@
 }
 .header-desktop-nav .header-nav-link:hover::after {
   width: 100%;
+}
+
+.header--light .header-desktop-nav .header-nav-link {
+  color: #0f172a;
+}
+
+.header--light .header-desktop-nav .header-nav-link:hover {
+  color: rgba(15, 23, 42, 0.82);
+}
+
+.header--light .header-desktop-nav .header-nav-link::after {
+  background: #0f172a;
 }
 
 

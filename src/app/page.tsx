@@ -10,6 +10,7 @@ import '@/components/ui/Hero/Words-Sliding-Smooth.css'
 import ComingSoon from '@/components/ComingSoon'
 import How from '@/components/ui/funktioniert/how'
 import PartnerApotheken from '@/components/ui/partnerApotheken/finden'
+import Footer from '@/components/ui/footer/footer'
 import { attachLandingBinarySwitch } from '@/lib/scroll'
 
 const COMING_SOON_MODE = false
@@ -20,21 +21,12 @@ const inconsolataStyle = {
   lineHeight: '35px',
 }
 
-const LeafLogo = ({ className = 'w-80 h-40 sm:w-56 sm:h-24 md:w-72 md:h-32' }) => (
-  <div className={`relative overflow-hidden ${className}`}>
-    <img
-      src="/logo2.png"
-      alt="reLeafZ Logo"
-      className="w-full h-full object-contain"
-    />
-  </div>
-)
-
 export default function LandingPage() {
   const router = useRouter()
   const [dialogOpen, setDialogOpen] = useState(false)
   const [showHeader, setShowHeader] = useState(false)
   const [zipInput, setZipInput] = useState('')
+  const [landingTheme, setLandingTheme] = useState<'dark' | 'light'>('dark')
 
   useEffect(() => {
     const updateHeaderVisibility = () => {
@@ -88,6 +80,8 @@ export default function LandingPage() {
           handlePostcodeSubmit={handlePostcodeSubmit}
           isValidBerlinPostcode={isValidBerlinPostcode}
           isVisible={showHeader}
+          landingTheme={landingTheme}
+          onThemeToggle={() => setLandingTheme((prev) => (prev === 'dark' ? 'light' : 'dark'))}
         />
         <MobileNavbar
           dialogOpen={dialogOpen}
@@ -96,6 +90,8 @@ export default function LandingPage() {
           setZipInput={setZipInput}
           handlePostcodeSubmit={handlePostcodeSubmit}
           isValidBerlinPostcode={isValidBerlinPostcode}
+          landingTheme={landingTheme}
+          onThemeToggle={() => setLandingTheme((prev) => (prev === 'dark' ? 'light' : 'dark'))}
         />
 
         <Hero
@@ -116,53 +112,16 @@ export default function LandingPage() {
         />
 
         <div className="landing-hero-snap-target" aria-hidden />
-        <div id="landing-main" className="landing-main landing-snap-target">
-          <How />
-          <PartnerApotheken />
+        <div
+          id="landing-main"
+          className="landing-main landing-snap-target"
+          data-theme={landingTheme}
+        >
 
-          <footer className="bg-gray-900 text-white py-16">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-              <div className="grid md:grid-cols-4 gap-8">
-                <div>
-                  <div className="flex items-center space-x-3 mb-15">
-                    <LeafLogo />
-                  </div>
-                  <p className="text-gray-400 mb-4 subtitle-text">
-                    Germany&apos;s fastest, safest, and coolest medical cannabis platform.
-                  </p>
-                </div>
-                <div>
-                  <h4 className="font-bold mb-4">For Patients</h4>
-                  <ul className="space-y-2 text-gray-400">
-                    <li><a href="#" className="hover:text-white transition-colors">How it Works</a></li>
-                    <li><a href="#" className="hover:text-white transition-colors">Strain Library</a></li>
-                    <li><a href="#" className="hover:text-white transition-colors">Treatment Tracking</a></li>
-                    <li><a href="#" className="hover:text-white transition-colors">Community</a></li>
-                  </ul>
-                </div>
-                <div>
-                  <h4 className="font-bold mb-4">For Professionals</h4>
-                  <ul className="space-y-2 text-gray-400">
-                    <li><a href="#" className="hover:text-white transition-colors">For Doctors</a></li>
-                    <li><a href="#" className="hover:text-white transition-colors">For Pharmacies</a></li>
-                    <li><a href="#" className="hover:text-white transition-colors">Partner with Us</a></li>
-                  </ul>
-                </div>
-                <div>
-                  <h4 className="font-bold mb-4">Legal & Support</h4>
-                  <ul className="space-y-2 text-gray-400">
-                    <li><a href="#" className="hover:text-white transition-colors">Privacy Policy</a></li>
-                    <li><a href="#" className="hover:text-white transition-colors">Terms of Service</a></li>
-                    <li><a href="#" className="hover:text-white transition-colors">GDPR Compliance</a></li>
-                    <li><a href="#" className="hover:text-white transition-colors">Support</a></li>
-                  </ul>
-                </div>
-              </div>
-              <div className="border-t border-gray-800 mt-12 pt-8 text-center text-gray-400">
-                <p>© 2026 reLeafZ. All rights reserved. Licensed medical cannabis platform serving Berlin.</p>
-              </div>
-            </div>
-          </footer>
+          <PartnerApotheken />
+          <How />
+
+          <Footer />
         </div>
       </div>
     </>
