@@ -54,7 +54,7 @@
 .header {
   position: fixed;
   left: 50%;
-  transform: translateX(-50%);
+  transform: translate(-50%, 0);
   width: fit-content;
   min-width: 1500px;
   max-width: 90vw;
@@ -69,6 +69,18 @@
   box-shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
   transition: all 0.3s ease;
   z-index: 50;
+}
+
+.header--visible {
+  transform: translate(-50%, 0);
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.header--hidden {
+  transform: translate(-50%, -100%);
+  opacity: 0;
+  pointer-events: none;
 }
 
 .logo-header {

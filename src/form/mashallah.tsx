@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { ArrowLeft, Lock, CheckCircle2, X } from 'lucide-react'
 import { useRouter } from 'next/navigation'
-import '@/app/main.css'
+import FormLogoHomeExit from '@/form/form-logo-home-exit'
 import '@/form/form.css'
 import { isLocalAccessBypassEnabled } from '@/lib/devAccess'
 
@@ -309,25 +309,29 @@ export default function MashallahForm({
         </div>
       )}
 
-      <div className="form-page inconsolata">
-        <div className="form-container form-container--narrow">
+      <div className="form-page form-page--mashallah inconsolata">
+        <FormLogoHomeExit />
+        <div className="form-container form-container--narrow form-container--mashallah">
           <div className="form-header">
-            <div className="form-header__back-wrap">
-              <Button onClick={onBack} className="btn-outline text-sm sm:text-base">
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                Zurück
-              </Button>
+            <div className="form-header__title-card">
+              <h1 className="form-header__title form-header__title-card-title title-gradient">
+                Medizinische Anfrage
+              </h1>
             </div>
-            <h1 className="form-header__title text-2xl sm:text-3xl md:text-4xl font-bold title-gradient mb-2">
-              Medizinische Anfrage
-            </h1>
-            <p className="form-header__subtitle text-base sm:text-lg">
-              Postleitzahl: <span className="font-semibold text-emerald-600">{postcode}</span>
+          </div>
+
+          <div className="form-header__back-wrap form-header__back-wrap--with-postcode">
+            <Button onClick={onBack} className="btn-outline form-back-button text-sm sm:text-base">
+              <ArrowLeft className="form-back-icon" />
+              Zurück
+            </Button>
+            <p className="form-header__postcode-inline form-header__postcode-inline--boxed">
+              Postleitzahl: <span className="form-header__postcode-value">{postcode}</span>
             </p>
           </div>
 
-          <div className="form-card">
-            <form onSubmit={handleSubmit} className="form-fields">
+          <div className="form-card form-card--mashallah">
+            <form onSubmit={handleSubmit} className="form-fields form-fields--mashallah">
               <div className="form-field">
                 <label htmlFor="fullName" className="form-label">
                   Vollständiger Name
@@ -499,7 +503,7 @@ export default function MashallahForm({
             </form>
           </div>
 
-          <div className="form-message-box form-message-box--info mt-6 sm:mt-8">
+          <div className="form-message-box form-message-box--info form-message-box--mashallah-info mt-6 sm:mt-8">
             <h3 className="form-message-box__title">
               Lieferung in Berlin
             </h3>
