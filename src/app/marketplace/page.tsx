@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { Product, API_BASE } from '@/lib/api'
 import { useRouter } from 'next/navigation'
 import { Check, Leaf, ArrowRight, ChevronDown, ChevronUp, Package, Loader2 } from 'lucide-react'
+import { isLocalAccessBypassEnabled } from '@/lib/devAccess'
 
 // =====================================================
 // CENTRALIZED STRAIN IMAGE LIBRARY
@@ -84,6 +85,73 @@ interface MarketplacePharmacy {
   productCount: number
 }
 
+/* LOCAL ACCESS BYPASS BLOCK START (demo treatment + marketplace fallback data) */
+const LOCALHOST_FALLBACK_TREATMENT_REQUEST: TreatmentRequest = {
+  id: 'local-demo-request',
+  postcode: '10115',
+  zip: '10115',
+  city: 'Berlin',
+  fullName: 'Local Demo',
+  email: 'local@releafz.dev',
+  phone: '+49 30 000000',
+  symptoms: 'Local testing',
+}
+
+const LOCALHOST_FALLBACK_MARKETPLACE_DATA: MarketplacePharmacy[] = [
+  {
+    pharmacy: {
+      id: 9991,
+      name: 'Demo Apotheke Mitte',
+      zip: '10115',
+      city: 'Berlin',
+      contact: '030 000000',
+      deliveryType: 'BOTENDIENST',
+      withinDeliveryRadius: true,
+    },
+    deliveryOptions: [
+      { method: 'BOTENDIENST_NEARBY', label: 'Botendienst (nah)', fee: 4.99, estimatedTime: '60-90 min', available: true },
+      { method: 'PICKUP', label: 'Abholung', fee: 0, estimatedTime: 'Heute', available: true },
+    ],
+    products: [
+      {
+        id: 90001,
+        pharmacyId: 9991,
+        name: 'Demo Flower - White Widow',
+        form: 'FLOWER',
+        thcPercent: 22,
+        cbdPercent: 1,
+        price: 9.9,
+        unit: 'g',
+        stock: 100,
+      },
+      {
+        id: 90002,
+        pharmacyId: 9991,
+        name: 'Demo Oil - Balanced 10/10',
+        form: 'OIL',
+        thcPercent: 10,
+        cbdPercent: 10,
+        price: 59.9,
+        unit: 'ml',
+        stock: 30,
+      },
+      {
+        id: 90003,
+        pharmacyId: 9991,
+        name: 'Demo Flower - Lemon Skunk',
+        form: 'FLOWER',
+        thcPercent: 18,
+        cbdPercent: 1,
+        price: 8.4,
+        unit: 'g',
+        stock: 60,
+      },
+    ],
+    productCount: 3,
+  },
+]
+/* LOCAL ACCESS BYPASS BLOCK END (demo treatment + marketplace fallback data) */
+
 const getStrainType = (name: string): { type: string; color: string } => {
   const nameLower = name.toLowerCase()
   if (nameLower.includes('indica') || nameLower.includes('kush') || nameLower.includes('og') || nameLower.includes('punch') || nameLower.includes('slurricane')) {
@@ -117,6 +185,9 @@ const isFlower = (product: Product): boolean => product.form === 'FLOWER'
 
 export default function MarketplacePage() {
   const router = useRouter()
+  /* LOCAL ACCESS BYPASS BLOCK START (toggle usage) */
+  const canBypassAccess = isLocalAccessBypassEnabled()
+  /* LOCAL ACCESS BYPASS BLOCK END (toggle usage) */
   const [marketplaceData, setMarketplaceData] = useState<MarketplacePharmacy[]>([])
   const [selectedPharmacyId, setSelectedPharmacyId] = useState<number | null>(null)
   const [selectedDeliveryMethod, setSelectedDeliveryMethod] = useState<'BOTENDIENST_NEARBY' | 'BOTENDIENST_FAR' | 'PICKUP' | null>(null)
@@ -150,14 +221,24 @@ export default function MarketplacePage() {
     try {
       setLoading(true)
       const treatmentData = sessionStorage.getItem('treatmentRequest')
-      if (!treatmentData) {
+      /* LOCAL ACCESS BYPASS BLOCK START (seed treatmentRequest locally) */
+      if (!treatmentData && canBypassAccess) {
+        sessionStorage.setItem(
+          'treatmentRequest',
+          JSON.stringify(LOCALHOST_FALLBACK_TREATMENT_REQUEST)
+        )
+      }
+      /* LOCAL ACCESS BYPASS BLOCK END (seed treatmentRequest locally) */
+
+      const resolvedTreatmentData = sessionStorage.getItem('treatmentRequest')
+      if (!resolvedTreatmentData) {
         setError('Keine Behandlungsanfrage gefunden. Bitte füllen Sie zuerst das Formular aus.')
         setLoading(false)
         return
       }
       let request: TreatmentRequest
       try {
-        request = JSON.parse(treatmentData)
+        request = JSON.parse(resolvedTreatmentData)
       } catch {
         sessionStorage.removeItem('treatmentRequest')
         setError('Your session data is corrupted. Please return to the home page and start over.')
@@ -165,8 +246,17 @@ export default function MarketplacePage() {
         return
       }
       setTreatmentRequest(request)
-      const city = request.city ?? ''
-      const zip = request.zip ?? request.postcode ?? ''
+      let city = request.city ?? ''
+      let zip = request.zip ?? request.postcode ?? ''
+      /* LOCAL ACCESS BYPASS BLOCK START (fill missing city/zip locally) */
+      if ((!city || !zip) && canBypassAccess) {
+        city = city || LOCALHOST_FALLBACK_TREATMENT_REQUEST.city || ''
+        zip = zip || LOCALHOST_FALLBACK_TREATMENT_REQUEST.zip || ''
+        request = { ...request, city, zip }
+        setTreatmentRequest(request)
+      }
+      /* LOCAL ACCESS BYPASS BLOCK END (fill missing city/zip locally) */
+
       if (!city || !zip) {
         setError('Stadt und Postleitzahl fehlen in der Behandlungsanfrage.')
         setLoading(false)
@@ -185,6 +275,19 @@ export default function MarketplacePage() {
       setQuantities(prev => ({ ...initialQuantities, ...prev }))
       setError('')
     } catch (err: unknown) {
+      /* LOCAL ACCESS BYPASS BLOCK START (fallback to demo marketplace data locally) */
+      if (canBypassAccess) {
+        const initialQuantities: Record<number, number> = {}
+        LOCALHOST_FALLBACK_MARKETPLACE_DATA.forEach(m =>
+          m.products.forEach(p => { initialQuantities[p.id] = getDefaultQuantity(p) })
+        )
+        setMarketplaceData(LOCALHOST_FALLBACK_MARKETPLACE_DATA)
+        setQuantities(prev => ({ ...initialQuantities, ...prev }))
+        setTreatmentRequest(LOCALHOST_FALLBACK_TREATMENT_REQUEST)
+        setError('')
+        return
+      }
+      /* LOCAL ACCESS BYPASS BLOCK END (fallback to demo marketplace data locally) */
       const message = err instanceof Error ? err.message : 'Unknown error'
       setError('Fehler beim Laden der Apotheken: ' + message)
       console.error(err)

@@ -7,6 +7,7 @@ import { ArrowLeft, Lock, CheckCircle2, X } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import '@/app/main.css'
 import '@/form/form.css'
+import { isLocalAccessBypassEnabled } from '@/lib/devAccess'
 
 interface MashallahFormProps {
   postcode: string
@@ -41,6 +42,9 @@ export default function MashallahForm({
   const [showWelcomeNotification, setShowWelcomeNotification] = useState(false)
   const [consentHealth, setConsentHealth] = useState(false)
   const [consentTerms, setConsentTerms] = useState(false)
+  /* LOCAL ACCESS BYPASS BLOCK START (toggle usage) */
+  const canBypassAccess = isLocalAccessBypassEnabled()
+  /* LOCAL ACCESS BYPASS BLOCK END (toggle usage) */
   
   const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
 
@@ -121,6 +125,23 @@ export default function MashallahForm({
   // Returns success + optional error message so caller can show validation errors.
   const submitTreatmentRequest = async (): Promise<{ success: true } | { success: false; message: string }> => {
     try {
+      /* LOCAL ACCESS BYPASS BLOCK START (local submit short-circuit) */
+      if (canBypassAccess) {
+        const localTreatmentRequestData = {
+          id: Date.now(),
+          patientId: null,
+          pharmacyId: null,
+          postcode,
+          zip: postcode,
+          ...formData,
+        }
+        localStorage.setItem('treatmentRequest', JSON.stringify(localTreatmentRequestData))
+        sessionStorage.setItem('treatmentRequest', JSON.stringify(localTreatmentRequestData))
+        localStorage.setItem('formPostcode', postcode)
+        return { success: true }
+      }
+      /* LOCAL ACCESS BYPASS BLOCK END (local submit short-circuit) */
+
       const response = await fetch(`${API_BASE}/api/treatment/submit`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -169,9 +190,11 @@ export default function MashallahForm({
         patientId: result.data.patientId ?? null,
         pharmacyId: result.data.pharmacyId ?? null,
         postcode,
+        zip: postcode,
         ...formData,
       }
       localStorage.setItem('treatmentRequest', JSON.stringify(treatmentRequestData))
+      sessionStorage.setItem('treatmentRequest', JSON.stringify(treatmentRequestData))
       localStorage.setItem('formPostcode', postcode)
       return { success: true }
     } catch (error) {
@@ -196,6 +219,13 @@ export default function MashallahForm({
         setLoading(false)
         return
       }
+
+      /* LOCAL ACCESS BYPASS BLOCK START (skip auth/OTP locally) */
+      if (canBypassAccess) {
+        router.push('/questionnaire')
+        return
+      }
+      /* LOCAL ACCESS BYPASS BLOCK END (skip auth/OTP locally) */
 
       // Step 2: Check if user exists and if OTP is required (may send OTP email)
       const loginResponse = await fetch(`${API_BASE}/api/auth/patient-login`, {

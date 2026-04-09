@@ -5,13 +5,13 @@
    ============================================ */
 
 .how-funktioniert {
-  scroll-margin-top: 10px;
+  scroll-margin-top: 150px;
   position: relative;
   /* visible so position:sticky works (any non-visible overflow breaks sticking to the page) */
   overflow: visible;
 
   --how-bg: var(--releafz-bg);
-  --how-card: var(--releafz-glass);
+  --how-card: var(--releafz-glass-elevated);
   --how-accent: var(--releafz-accent);
   --how-accent-cyan: var(--releafz-cyan);
   --how-text: var(--releafz-text);
@@ -38,6 +38,7 @@
 
   font-family: var(--how-sans);
   color: var(--how-text);
+  background: var(--how-bg);
   -webkit-font-smoothing: antialiased;
   transition: color 280ms ease, background-color 280ms ease;
 }
@@ -79,7 +80,7 @@
 .how-funktioniert__glow-line {
   position: absolute;
   left: 50%;
-  top: 42%;
+  top: 38%;
   transform: translate(-50%, -50%);
   width: 120%;
   height: 2px;
@@ -108,15 +109,15 @@
 .how-funktioniert__glow-radial {
   position: absolute;
   left: 50%;
-  top: 40%;
+  top: 35%;
   transform: translate(-50%, -50%);
   width: 100%;
-  height: 320px;
+  height: 280px;
   z-index: 0;
   background: radial-gradient(
     ellipse at center,
-    rgba(34, 211, 238, 0.16) 0%,
-    rgba(16, 185, 129, 0.12) 30%,
+    rgba(34, 211, 238, 0.14) 0%,
+    rgba(16, 185, 129, 0.1) 30%,
     transparent 70%
   );
   animation: glowPulse 6s ease-in-out infinite;
@@ -125,7 +126,7 @@
 
 @media (min-width: 768px) {
   .how-funktioniert__glow-radial {
-    height: 400px;
+    height: 360px;
   }
 }
 
@@ -247,14 +248,14 @@
 }
 
 .how-funktioniert .eyebrow {
+  margin: 0;
   font-family: var(--how-mono);
-  font-size: clamp(0.75rem, 2vw, 0.9rem);
-  font-weight: 700;
   letter-spacing: 0.14em;
   text-transform: uppercase;
+  font-size: 1.25rem;
+  font-weight: 700;
   color: var(--how-accent-cyan);
-  margin-bottom: var(--how-space-md);
-  text-shadow: 0 0 24px rgba(34, 211, 238, 0.25);
+  text-shadow: 0 0 20px rgba(34, 211, 238, 0.2);
 }
 
 .how-funktioniert .title {
@@ -623,7 +624,7 @@
 
 #landing-main[data-theme='light'] .how-funktioniert .how-funktioniert__grid,
 .how-funktioniert.theme-light .how-funktioniert__grid {
-  opacity: 0.12;
+  opacity: 0.11;
   background-image:
     linear-gradient(rgba(15, 23, 42, 0.08) 1px, transparent 1px),
     linear-gradient(90deg, rgba(15, 23, 42, 0.08) 1px, transparent 1px);
