@@ -4,6 +4,7 @@ import React, { Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import MashallahForm from '@/form/mashallah'
 import { isLocalAccessBypassEnabled } from '@/lib/devAccess'
+import { navigateHomeHard } from '@/lib/navigateHome'
 
 const isValidBerlinPostcode = (postcode: string) => {
   if (!/^\d{5}$/.test(postcode)) return false
@@ -41,7 +42,7 @@ function FormContent() {
       street={street}
       houseNumber={houseNumber}
       city={city}
-      onBack={() => router.push('/')}
+      onBack={() => navigateHomeHard()}
     />
   )
 }
