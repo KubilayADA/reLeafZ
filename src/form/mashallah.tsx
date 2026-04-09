@@ -24,11 +24,12 @@ export default function MashallahForm({
   onBack,
 }: MashallahFormProps) {
   const router = useRouter()
+  const streetPlaceholder = `${street} ${houseNumber}`.trim()
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
     phone: '',
-    street: `${street} ${houseNumber}`.trim(),
+    street: '',
     city: city.trim(),
   })
   const [loading, setLoading] = useState(false)
@@ -365,13 +366,12 @@ export default function MashallahForm({
                     id="street"
                     name="street"
                     value={formData.street}
-                    readOnly
+                    onChange={handleChange}
                     required
                     maxLength={200}
                     disabled={loading}
-                    className={`form-input inconsolata form-input--confirmed form-input--with-icon-left ${formData.street ? 'has-value' : ''}`}
-                    placeholder="z.B. Hauptstraße 42"
-                    aria-readonly="true"
+                    className="form-input inconsolata form-input--confirmed"
+                    placeholder={streetPlaceholder || 'z.B. Hauptstraße 42'}
                   />
                 </div>
               </div>
