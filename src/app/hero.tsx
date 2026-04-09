@@ -19,6 +19,7 @@ export default function Hero({
   const heroChecklistItems = [
     'Lieferung in 30-90 Minuten in Berlin',
     'Ganz Deutschland in 1-2 Tagen',
+    '100% Legal & Secure Wallah',
     'i am a banana',
   ]
 
@@ -31,7 +32,7 @@ export default function Hero({
       <div className="pointer-events-none absolute inset-0 w-full overflow-hidden">
          <video
           className="absolute inset-0 w-full h-full object-cover"
-          src="/bubble-explose.mp4"
+          src="/bubble-explose.mov"
           preload="auto"
           autoPlay
           muted
