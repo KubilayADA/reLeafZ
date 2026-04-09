@@ -196,10 +196,6 @@
   }
 }
 
-.how-funktioniert .how-sidebar {
-  display: block;
-}
-
 .how-funktioniert .how-sidebar-sticky {
   display: flex;
   flex-direction: column;
@@ -225,13 +221,16 @@
 .how-funktioniert .how-right {
   display: flex;
   flex-direction: column;
-  gap: var(--how-space-lg);
+  gap: var(--how-space-md);
   min-width: 0;
 }
 
 @media (min-width: 1024px) {
   .how-funktioniert .how-right {
-    gap: var(--how-space-xl);
+    gap: var(--how-space-md);
+    max-height: none;
+    overflow: visible;
+    padding-right: 0;
   }
 }
 
@@ -528,11 +527,6 @@
   cursor: pointer;
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
-  transition:
-    border-color 0.25s var(--how-ease),
-    color 0.25s var(--how-ease),
-    box-shadow 0.25s var(--how-ease),
-    transform 0.2s var(--how-ease);
   text-decoration: none;
   display: inline-block;
   transition:

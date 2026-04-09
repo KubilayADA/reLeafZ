@@ -57,7 +57,12 @@ interface HowProps {
 export default function How({ landingTheme }: HowProps): React.JSX.Element {
   const [current, setCurrent] = useState<number>(0);
   const [particles, setParticles] = useState<Particle[]>([]);
+  const sectionRef = useRef<HTMLElement | null>(null);
   const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const cardsContainerRef = useRef<HTMLDivElement | null>(null);
+  const autoScrollRafRef = useRef<number | null>(null);
+  const autoScrollTargetIdxRef = useRef<number | null>(null);
+  const isAutoScrollingRef = useRef(false);
 
   useEffect(() => {
     setParticles(
@@ -72,30 +77,34 @@ export default function How({ landingTheme }: HowProps): React.JSX.Element {
     );
   }, []);
 
-  /** One rAF-throttled scroll model: avoids multiple IntersectionObservers fighting over `current`. */
+  /** Simple rAF-throttled model: active card follows page scroll. */
   useLayoutEffect(() => {
     let scheduled = false;
+    let rafId: number | null = null;
 
     const computeActive = (): void => {
+      if (isAutoScrollingRef.current) {
+        const lockedIdx = autoScrollTargetIdxRef.current;
+        if (lockedIdx !== null) {
+          setCurrent((c) => (c === lockedIdx ? c : lockedIdx));
+        }
+        return;
+      }
+
       const cards = cardRefs.current;
       const vh = window.innerHeight;
       const focusY = vh * 0.32;
       let bestIdx = 0;
-      let bestScore = -Infinity;
+      let bestDist = Infinity;
 
       for (let i = 0; i < cards.length; i++) {
         const el = cards[i];
         if (!el) continue;
         const rect = el.getBoundingClientRect();
-        const visibleTop = Math.max(0, rect.top);
-        const visibleBottom = Math.min(vh, rect.bottom);
-        const visible = Math.max(0, visibleBottom - visibleTop);
-        const ratio = visible / Math.max(rect.height, 1);
         const center = (rect.top + rect.bottom) / 2;
         const dist = Math.abs(center - focusY);
-        const score = ratio * 2 - (dist / vh) * 0.85;
-        if (score > bestScore) {
-          bestScore = score;
+        if (dist < bestDist) {
+          bestDist = dist;
           bestIdx = i;
         }
       }
@@ -106,29 +115,83 @@ export default function How({ landingTheme }: HowProps): React.JSX.Element {
     const schedule = (): void => {
       if (scheduled) return;
       scheduled = true;
-      requestAnimationFrame(() => {
+      rafId = requestAnimationFrame(() => {
         scheduled = false;
         computeActive();
       });
     };
 
     schedule();
+    const container = cardsContainerRef.current;
     window.addEventListener('scroll', schedule, { passive: true });
+    container?.addEventListener('scroll', schedule, { passive: true });
     window.addEventListener('resize', schedule, { passive: true });
 
     return () => {
       window.removeEventListener('scroll', schedule);
+      container?.removeEventListener('scroll', schedule);
       window.removeEventListener('resize', schedule);
+      if (rafId !== null) {
+        cancelAnimationFrame(rafId);
+      }
+      if (autoScrollRafRef.current !== null) {
+        cancelAnimationFrame(autoScrollRafRef.current);
+      }
     };
   }, []);
 
   const scrollToCard = (idx: number): void => {
-    cardRefs.current[idx]?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    const target = cardRefs.current[idx];
+    if (!target) return;
+
+    const stickyTopRaw = sectionRef.current
+      ? getComputedStyle(sectionRef.current).getPropertyValue('--how-sticky-top')
+      : '';
+    const stickyTop = Number.parseFloat(stickyTopRaw);
+    const topOffset = Number.isFinite(stickyTop) ? stickyTop : 120;
+    const endY = Math.max(0, window.scrollY + target.getBoundingClientRect().top - topOffset - 12);
+    const startY = window.scrollY;
+    const distance = endY - startY;
+
+    if (Math.abs(distance) < 1) {
+      setCurrent(idx);
+      return;
+    }
+
+    if (autoScrollRafRef.current !== null) {
+      cancelAnimationFrame(autoScrollRafRef.current);
+    }
+
+    isAutoScrollingRef.current = true;
+    autoScrollTargetIdxRef.current = idx;
     setCurrent(idx);
+
+    const duration = 420;
+    const start = performance.now();
+    const easeOutCubic = (t: number): number => 1 - Math.pow(1 - t, 3);
+
+    const tick = (now: number): void => {
+      const elapsed = now - start;
+      const t = Math.min(1, elapsed / duration);
+      const eased = easeOutCubic(t);
+      window.scrollTo(0, startY + distance * eased);
+
+      if (t < 1) {
+        autoScrollRafRef.current = requestAnimationFrame(tick);
+        return;
+      }
+
+      isAutoScrollingRef.current = false;
+      autoScrollTargetIdxRef.current = null;
+      autoScrollRafRef.current = null;
+    };
+
+    autoScrollRafRef.current = requestAnimationFrame(tick);
   };
 
   return (
     <section
+      ref={sectionRef}
       id="ablauf"
       className={`how-funktioniert section-container how-column ${landingTheme === 'light' ? 'theme-light' : 'theme-dark'}`}
       aria-label="So funktioniert der Ablauf"
@@ -199,7 +262,7 @@ export default function How({ landingTheme }: HowProps): React.JSX.Element {
           </aside>
 
           {/* ── Right: scrollable step cards ── */}
-          <div className="how-right">
+          <div ref={cardsContainerRef} className="how-right">
             {STEPS.map((step, i) => (
               <div
                 key={`card-${i}`}
