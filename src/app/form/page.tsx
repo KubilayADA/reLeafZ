@@ -3,6 +3,7 @@
 import React, { Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import MashallahForm from '@/form/mashallah'
+import { isLocalAccessBypassEnabled } from '@/lib/devAccess'
 
 const isValidBerlinPostcode = (postcode: string) => {
   if (!/^\d{5}$/.test(postcode)) return false
@@ -14,15 +15,20 @@ const isValidBerlinPostcode = (postcode: string) => {
 function FormContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const postcode = searchParams.get('postcode') || ''
-  const street = searchParams.get('street') || ''
-  const houseNumber = searchParams.get('houseNumber') || ''
-  const city = searchParams.get('city') || ''
+  /* LOCAL ACCESS BYPASS BLOCK START (remove with matching END block) */
+  const canBypassAccess = isLocalAccessBypassEnabled()
+  const postcode = searchParams.get('postcode') || (canBypassAccess ? '10115' : '')
+  const street = searchParams.get('street') || (canBypassAccess ? 'Teststrasse' : '')
+  const houseNumber = searchParams.get('houseNumber') || (canBypassAccess ? '1' : '')
+  const city = searchParams.get('city') || (canBypassAccess ? 'Berlin' : '')
+  /* LOCAL ACCESS BYPASS BLOCK END */
 
-  if (!postcode || !isValidBerlinPostcode(postcode)) {
+  /* LOCAL ACCESS BYPASS BLOCK START (postcode validation bypass) */
+  if (!postcode || (!canBypassAccess && !isValidBerlinPostcode(postcode))) {
     router.push('/')
     return null
   }
+  /* LOCAL ACCESS BYPASS BLOCK END */
 
   if (!street.trim() || !houseNumber.trim() || !city.trim()) {
     router.push('/')
