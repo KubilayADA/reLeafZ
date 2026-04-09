@@ -1,20 +1,29 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { ArrowLeft, FileText, Video, Building2 } from 'lucide-react'
-import '@/app/main.css'
+import StepProgress from '@/form/step-progress'
+import FormLogoHomeExit from '@/form/form-logo-home-exit'
 import '@/form/form.css'
 
 interface Step1Props {
   onNext: (selectedOption: string) => void
   onBack?: () => void
+  initialValue?: string
+  onSelectionChange?: (selectedOption: string) => void
 }
 
 type ConsultationOption = 'questionnaire' | 'video' | 'onsite'
 
-export default function Step1({ onNext, onBack }: Step1Props) {
-  const [selectedOption, setSelectedOption] = useState<ConsultationOption | ''>('')
+export default function Step1({ onNext, onBack, initialValue = '', onSelectionChange }: Step1Props) {
+  const [selectedOption, setSelectedOption] = useState<ConsultationOption | ''>(
+    initialValue as ConsultationOption | ''
+  )
+
+  useEffect(() => {
+    setSelectedOption(initialValue as ConsultationOption | '')
+  }, [initialValue])
 
   const options = [
     {
@@ -47,62 +56,45 @@ export default function Step1({ onNext, onBack }: Step1Props) {
   }
 
   return (
-    <div className="form-page inconsolata">
-      <div className="form-container">
+    <div className="form-page form-page--step1-fit inconsolata">
+      <FormLogoHomeExit />
+      <div className="form-container form-container--step1-fit">
         {onBack && (
           <div className="form-header__back-wrap">
-            <Button onClick={onBack} className="btn-outline text-sm sm:text-base">
-              <ArrowLeft className="w-4 h-4 mr-2" />
+            <Button onClick={onBack} className="btn-outline form-back-button text-sm sm:text-base">
+              <ArrowLeft className="form-back-icon" />
               Zurück
             </Button>
           </div>
         )}
 
-        <div className="form-progress">
-          <div className="form-progress__track">
-            <div className="form-progress__step">
-              <div className="form-progress__dot form-progress__dot--active">1</div>
-              <span className="form-progress__label form-progress__label--active">Anfrage</span>
-            </div>
-            <div className="form-progress__connector" />
-            <div className="form-progress__step">
-              <div className="form-progress__dot form-progress__dot--inactive">2</div>
-              <span className="form-progress__label form-progress__label--inactive hidden sm:inline">Produktauswahl</span>
-              <span className="form-progress__label form-progress__label--inactive sm:hidden">Produkt</span>
-            </div>
-            <div className="form-progress__connector" />
-            <div className="form-progress__step">
-              <div className="form-progress__dot form-progress__dot--inactive">3</div>
-              <span className="form-progress__label form-progress__label--inactive hidden sm:inline">Anfrage absenden</span>
-              <span className="form-progress__label form-progress__label--inactive sm:hidden">Absenden</span>
-            </div>
-          </div>
-        </div>
-
-        <div className="form-card">
+        <div className="form-card form-card--step1-fit">
           <h2 className="form-question title-gradient">
             Wie möchtest du Angaben zu deinem Gesundheitszustand machen? *
           </h2>
 
-          <div className="form-options form-options--cols-3">
+          <div className="form-options form-options--cols-3 form-options--step1-fit">
             {options.map((option) => {
               const Icon = option.icon
               const isSelected = selectedOption === option.id
               return (
                 <div
                   key={option.id}
-                  onClick={() => setSelectedOption(option.id)}
+                  onClick={() => {
+                    setSelectedOption(option.id)
+                    onSelectionChange?.(option.id)
+                  }}
                   className={`form-option-card ${isSelected ? 'form-option-card--selected' : ''}`}
                 >
                   <div className="form-option-icon-wrap">
-                    <Icon className={`form-option-icon w-6 h-6 sm:w-8 sm:h-8`} />
+                    <Icon className="form-option-icon form-option-icon--step1" />
                   </div>
                   <h3 className="form-option-title">{option.title}</h3>
                   <p className="form-option-desc">{option.description}</p>
                   <div className="form-option-price">
                     <span className="form-option-price__value">{option.price}</span>
                   </div>
-                  <div className="flex items-center justify-center mt-4">
+                  <div className="form-option-card__radio-wrap">
                     <div className="form-option-radio">
                       {isSelected && <div className="form-option-radio__inner" />}
                     </div>
@@ -112,7 +104,7 @@ export default function Step1({ onNext, onBack }: Step1Props) {
             })}
           </div>
 
-          <div className="form-disclaimer">
+          <div className="form-disclaimer form-disclaimer--step1-fit">
             <p className="form-disclaimer__text">
               * Die ärztlichen Leistungen werden nach der aktuell gültigen Gebührenordnung für Ärzte (GoÄ) berechnet.
             </p>
@@ -121,11 +113,12 @@ export default function Step1({ onNext, onBack }: Step1Props) {
           <Button
             onClick={handleNext}
             disabled={!selectedOption}
-            className="form-cta btn-secondary"
+              className="form-cta form-cta--step1-fit btn-secondary"
           >
             Weiter
           </Button>
         </div>
+        <StepProgress currentStep={1} />
       </div>
     </div>
   )

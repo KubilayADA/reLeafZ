@@ -74,7 +74,7 @@ export default function Header({
     <>
       <header
         className={`header ${landingTheme === 'light' ? 'header--light' : ''} ${
-          isVisible ? 'translate-y-0 opacity-100' : '-translate-y-full opacity-0 pointer-events-none'
+          isVisible ? 'header--visible' : 'header--hidden'
         }`}
         style={
           {
