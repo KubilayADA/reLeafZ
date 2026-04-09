@@ -26,25 +26,25 @@ const STEPS: Step[] = [
     num: '01',
     title: 'Cannabis-Therapie starten.',
     desc: 'Fülle einfach unseren medizinischen Online-Fragebogen in 2 Minuten aus - unkompliziert von zuhause oder unterwegs. DSGVO-konform und geschützt.',
-    imageUrl: '/berlinmap.png',
+    imageUrl: '/how/how1.png',
   },
   {
     num: '02',
     title: 'Cannabis-Blüten auswählen.',
     desc: 'Entdecke unser vielfältiges Sortiment an ausgewählten medizinischen Cannabis Blüten - geprüfte Qualität ab 4,99 €',
-    imageUrl: '/berlinmap.png',
+    imageUrl: '/how/how2.png',
   },
   {
     num: '03',
     title: 'Cannabis-Rezept online erhalten.',
     desc: 'Ein approbierter Arzt oder Ärztin prüft digital deine Angaben und stellt dir bei Eignung ein Cannabis Rezept aus.',
-    imageUrl: '/berlinmap.png',
+    imageUrl: '/how/how3.png',
   },
   {
     num: '04',
     title: 'Deine Lieferung ist unterwegs.',
     desc: 'Dein medizinisches Cannabis wird aus einer Apotheke zu dir geliefert - per Cannabis Express Lieferung in 60 Minuten, per Cannabis Sofort Lieferung in 1-3 Tagen oder hole es einfach in der nächstgelegenen Apotheke ab.',
-    imageUrl: '/berlinmap.png',
+    imageUrl: '/how/how4.png',
   },
 ];
 
