@@ -1,7 +1,7 @@
 'use client'
 
 import React from 'react'
-import { ChevronRight, Shield, Clock, MapPin } from 'lucide-react'
+import { Check, Shield, Clock, MapPin } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import words from '@/constants/index'
 import { scrollToLandingTop } from '@/lib/scroll'
@@ -16,6 +16,12 @@ export default function Hero({
   setDialogOpen,
   onScrollToAblauf,
 }: HeroProps) {
+  const heroChecklistItems = [
+    'Lieferung in 30-90 Minuten in Berlin',
+    'Ganz Deutschland in 1-2 Tagen',
+    'i am a banana',
+  ]
+
   return (
     <section
       id="hero"
@@ -79,50 +85,43 @@ export default function Hero({
       {/* `pointer-events-none` so wheel/touch reaches `.hero-scroll-spacer` under the fixed hero; only interactive chunks use `pointer-events-auto`. */}
       <div className="pointer-events-none relative max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 overflow-visible w-full">
         <div className="text-center overflow-visible w-full max-w-full">
-          {/* Main heading */}
-          <h1 className="title-gradient-hero">
-            MEDIZINAL CANNABIS
-          </h1>
-          <div className="animated-words-container">
-            <div className="words-wrapper">
-              {words.map((word, index) => (
-                <div
-                  key={index}
-                  className="word-item font-bold title-gradient-hero leading-tight italic margin-bottom-100 sm:mb-150"
-                >
-                  {word}
-                </div>
-              ))}
+          <div className="lg:-ml-[94px] lg:mr-auto lg:w-full lg:max-w-[980px]">
+            <img
+              src="/payy.png"
+              alt="payy"
+              className="w-88 h-10 object-contain mx-auto lg:mx-0 mt-8 lg:mt-12 mb-0"
+            />
+            {/* Main heading */}
+            <h1 className="title-gradient-hero mt-0 lg:w-full lg:text-left">
+              MEDIZINAL CANNABIS
+            </h1>
+            <div className="animated-words-container -mt-2 lg:-mt-5 lg:!-ml-[33px] lg:!w-full lg:!items-start lg:!justify-start">
+              <div className="words-wrapper lg:!w-full lg:!items-start">
+                {words.map((word, index) => (
+                  <div
+                    key={index}
+                    className="word-item font-bold title-gradient-hero leading-tight italic margin-bottom-100 sm:mb-150 lg:!w-full lg:!justify-start lg:!text-left"
+                  >
+                    {word}
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
 
-          {/* <div className="subtitle-text-hero">
-            Lieferung in 30-90 Minuten in Berlin<br />
-            Ganz Deutschland in 1-2 Tagen<br /><br />
-          </div> */}
-
-          {/* Trust badges */}
-          {/* <div className="trust-badges">
-            <div className="trust-badge-item">
-              <Shield className="w-5 h-5 text-black-700 mr-2" />
-              GDPR Compliant
-            </div>
-            <div className="trust-badge-item">
-              <Clock className="w-5 h-5 text-black-700 mr-2" />
-              Licensed Doctors
-            </div>
-            <div className="trust-badge-item">
-              <MapPin className="w-5 h-5 text-black-700 mr-2" />
-              Berlin Pharmacies
-            </div>
-          </div> */}
-
-          {/* payy png */}
-
-          {/* <img src="/payy.png" alt="payy" className="w-88 h-10 object-contain mx-auto mb-4 sm:mb-6 md:mb-10" /> */}
+          <div className="mx-auto mt-6 mb-4 flex w-fit flex-col gap-6 text-left lg:mt-15 lg:mb-6 lg:ml-[-100px] lg:mr-auto scale-100">
+            {heroChecklistItems.map((text, index) => (
+              <div key={`hero-check-${index}`} className="flex items-center gap-3 text-white">
+                <span className="flex h-7 w-7 items-center justify-center rounded-full bg-emerald-500/90 shadow-[0_0_0_4px_rgba(16,185,129,0.22)]">
+                  <Check className="h-4 w-4 text-white" />
+                </span>
+                <span className="text-lg font-bold leading-none">{text}</span>
+              </div>
+            ))}
+          </div>
 
           {/* CTA: button above, then text+arrow block below */}
-          <div className="hero-cta-wrap">
+          <div className="hero-cta-wrap -mt-4 lg:-mt-10 lg:mr-auto lg:ml-[-380px]">
             <div className="hero-cta-center pointer-events-auto">
               <Button
                 variant="button2"
@@ -137,7 +136,7 @@ export default function Hero({
             </div>
 
             {/* Trust badges */}
-          <div className="trust-badges">
+          <div className="trust-badges -mt-2">
             <div className="trust-badge-item">
               <Shield className="w-5 h-5 text-black-700 mr-2" />
               GDPR Compliant
@@ -152,10 +151,10 @@ export default function Hero({
             </div>
           </div>
 
-          <div className="subtitle-text-hero">
+          {/* <div className="subtitle-text-hero -mt-8">
             Lieferung in 30-90 Minuten in Berlin<br />
             Ganz Deutschland in 1-2 Tagen<br /><br />
-          </div>
+          </div> */}
             </div>
           </div>
         </div>
