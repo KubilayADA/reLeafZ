@@ -26,8 +26,13 @@ export default function LandingPage() {
   const [dialogOpen, setDialogOpen] = useState(false)
   const [showHeader, setShowHeader] = useState(false)
   const [zipInput, setZipInput] = useState('')
-  const [landingTheme, setLandingTheme] = useState<'dark' | 'light'>('dark')
   const LANDING_THEME_STORAGE_KEY = 'releafz-landing-theme'
+  const [landingTheme, setLandingTheme] = useState<'dark' | 'light'>(() => {
+    if (typeof window === 'undefined') return 'light'
+    const storedTheme = window.localStorage.getItem(LANDING_THEME_STORAGE_KEY)
+    if (storedTheme === 'dark' || storedTheme === 'light') return storedTheme
+    return 'light'
+  })
 
   useEffect(() => {
     const updateHeaderVisibility = () => {
@@ -48,13 +53,6 @@ export default function LandingPage() {
 
   useEffect(() => {
     return attachLandingBinarySwitch()
-  }, [])
-
-  useEffect(() => {
-    const storedTheme = window.localStorage.getItem(LANDING_THEME_STORAGE_KEY)
-    if (storedTheme === 'dark' || storedTheme === 'light') {
-      setLandingTheme(storedTheme)
-    }
   }, [])
 
   useEffect(() => {

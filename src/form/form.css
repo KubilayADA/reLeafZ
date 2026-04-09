@@ -50,6 +50,7 @@
 .form-page {
   min-height: 100vh;
   background-color: var(--form-bg);
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 
 /* Constrained content area */
@@ -111,6 +112,11 @@
    ============================================ */
 .form-card {
   background: var(--form-card-bg);
+  border-top: 2.5px solid #333;
+  border-left: 2.5px solid #333;
+  border-right: 4px solid #333;
+  border-bottom: 4px solid #333;
+  box-sizing: border-box;
   border-radius: var(--form-card-radius);
   box-shadow: var(--form-card-shadow);
   padding: var(--form-spacing-lg);
@@ -314,7 +320,11 @@
 }
 
 .form-option-card {
-  border: var(--form-border-strong);
+  border-top: 2.5px solid #333;
+  border-left: 2.5px solid #333;
+  border-right: 4px solid #333;
+  border-bottom: 4px solid #333;
+  box-sizing: border-box;
   border-radius: var(--form-card-radius);
   padding: var(--form-spacing-lg);
   cursor: pointer;
@@ -539,6 +549,11 @@
    ============================================ */
 .form-cta {
   width: 100%;
+  border-top: 2.5px solid #333;
+  border-left: 2.5px solid #333;
+  border-right: 4px solid #333;
+  border-bottom: 4px solid #333;
+  box-sizing: border-box;
   padding: var(--form-spacing-md) var(--form-spacing-lg);
   font-size: 1rem;
   font-weight: 700;
