@@ -158,13 +158,17 @@
 /* Desktop nav link — hover underline (line draws underneath) */
 .header-desktop-nav .header-nav-link {
   position: relative;
-  color: #ffffff;
+  color: var(--header-nav-color, #ffffff);
   text-decoration: none;
   transition: color 0.22s ease;
 }
 
 .header-desktop-nav .header-nav-link:hover {
-  color: rgba(255, 255, 255, 0.92);
+  color: var(--header-nav-hover-color, rgba(255, 255, 255, 0.92));
+}
+
+.header-desktop-nav .header-nav-link:visited {
+  color: var(--header-nav-color, #ffffff);
 }
 .header-desktop-nav .header-nav-link::after {
   content: '';
@@ -174,23 +178,11 @@
   width: 0;
   height: 2px;
   border-radius: 10px;
-  background: white;
+  background: var(--header-nav-color, #ffffff);
   transition: width 0.25s ease;
 }
 .header-desktop-nav .header-nav-link:hover::after {
   width: 100%;
-}
-
-.header--light .header-desktop-nav .header-nav-link {
-  color: #0f172a;
-}
-
-.header--light .header-desktop-nav .header-nav-link:hover {
-  color: rgba(15, 23, 42, 0.82);
-}
-
-.header--light .header-desktop-nav .header-nav-link::after {
-  background: #0f172a;
 }
 
 

@@ -76,6 +76,12 @@ export default function Header({
         className={`header ${landingTheme === 'light' ? 'header--light' : ''} ${
           isVisible ? 'translate-y-0 opacity-100' : '-translate-y-full opacity-0 pointer-events-none'
         }`}
+        style={
+          {
+            '--header-nav-color': landingTheme === 'light' ? '#0f172a' : '#ffffff',
+            '--header-nav-hover-color': landingTheme === 'light' ? 'rgba(15, 23, 42, 0.82)' : 'rgba(255, 255, 255, 0.92)',
+          } as React.CSSProperties
+        }
       >
         {/* Moving information banner */}
         {/* <div className="bg-transparent text-black py-0.5 overflow-hidden border-b border-black">
