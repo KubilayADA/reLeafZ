@@ -92,15 +92,15 @@ export default function Hero({
               className="w-88 h-10 object-contain mx-auto lg:mx-0 mt-8 lg:mt-12 mb-0"
             />
             {/* Main heading */}
-            <h1 className="title-gradient-hero mt-0 lg:w-full lg:text-left">
+            <h1 className="title-gradient-hero mt-0 !mb-0 lg:!-mb-6 lg:w-full lg:text-left">
               MEDIZINAL CANNABIS
             </h1>
-            <div className="animated-words-container -mt-2 lg:-mt-5 lg:!-ml-[33px] lg:!w-full lg:!items-start lg:!justify-start">
+            <div className="animated-words-container -mt-5 lg:-mt-12 lg:!-ml-[33px] lg:!w-full lg:!items-start lg:!justify-start">
               <div className="words-wrapper lg:!w-full lg:!items-start">
                 {words.map((word, index) => (
                   <div
                     key={index}
-                    className="word-item font-bold title-gradient-hero leading-tight italic margin-bottom-100 sm:mb-150 lg:!w-full lg:!justify-start lg:!text-left"
+                    className="word-item font-bold title-gradient-hero leading-tight italic mb-0 lg:!w-full lg:!justify-start lg:!text-left"
                   >
                     {word}
                   </div>
