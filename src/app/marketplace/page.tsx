@@ -205,8 +205,18 @@ export default function MarketplacePage() {
   const [isClient, setIsClient] = useState(false)
   const [validationError, setValidationError] = useState<string | null>(null)
   const [expandedPharmacyId, setExpandedPharmacyId] = useState<number | null>(null)
+  const [flippedProductIds, setFlippedProductIds] = useState<Set<number>>(new Set())
 
   const MAX_SELECTIONS = 3
+
+  const toggleProductCardFlip = (productId: number) => {
+    setFlippedProductIds(prev => {
+      const next = new Set(prev)
+      if (next.has(productId)) next.delete(productId)
+      else next.add(productId)
+      return next
+    })
+  }
 
   const products = selectedPharmacyId
     ? (marketplaceData.find(m => m.pharmacy.id === selectedPharmacyId)?.products ?? [])
@@ -566,96 +576,127 @@ export default function MarketplacePage() {
                                 const atSelectionLimit = selectedProducts.size >= MAX_SELECTIONS && !isProductSelected
                                 const currentQty = quantities[product.id] || getDefaultQuantity(product)
                                 const minQty = getMinQuantity(product)
+                                const isFlipped = flippedProductIds.has(product.id)
                                 return (
                                   <div
                                     key={product.id}
-                                    className={`marketplace-product-card${isProductSelected ? ' marketplace-product-card--selected' : ''}${atSelectionLimit ? ' marketplace-product-card--limit' : ''}`}
+                                    onClick={() => toggleProductCardFlip(product.id)}
+                                    className={`marketplace-product-card${isProductSelected ? ' marketplace-product-card--selected' : ''}${atSelectionLimit ? ' marketplace-product-card--limit' : ''}${isFlipped ? ' marketplace-product-card--flipped' : ''}`}
                                   >
-                                    <button
-                                      type="button"
-                                      onClick={e => {
-                                        e.stopPropagation()
-                                        toggleProduct(product.id)
-                                      }}
-                                      disabled={atSelectionLimit}
-                                      aria-label={isProductSelected ? 'Produkt abwählen' : 'Produkt auswählen'}
-                                      className={`marketplace-product-check${isProductSelected ? ' marketplace-product-check--on' : ''}`}
-                                    >
-                                      {isProductSelected && <Check className="shrink-0" aria-hidden />}
-                                    </button>
-                                    <span className={`marketplace-strain-tag marketplace-strain-tag--${strainInfo.variant}`}>
-                                      {strainInfo.type}
-                                    </span>
-                                    <div className="marketplace-product-media">
-                                      <img
-                                        src={imageUrl}
-                                        alt={product.name}
-                                        onError={() => handleImageError(product.id)}
-                                        className="marketplace-product-img"
-                                      />
-                                    </div>
-                                    <div className="marketplace-product-body">
-                                      <h3 className="marketplace-product-name">
-                                        {product.name}
-                                      </h3>
-                                      <div className="marketplace-product-price-row">
-                                        <span className="marketplace-product-price">€{product.price.toFixed(2)}/g</span>
-                                        <span className="marketplace-product-vat">inkl. MwSt.</span>
-                                      </div>
-                                      <div className="marketplace-product-meta">
-                                        <span><b>THC:</b> {product.thcPercent}%</span>
-                                        <span><b>CBD:</b> {product.cbdPercent}%</span>
-                                      </div>
-                                      <button
-                                        type="button"
-                                        onClick={() => toggleProduct(product.id)}
-                                        disabled={atSelectionLimit}
-                                        className={`marketplace-product-action${isProductSelected ? ' marketplace-product-action--selected' : ''}`}
-                                      >
-                                        {isProductSelected ? 'Entfernen' : 'Auswählen'}
-                                      </button>
-                                      <div
-                                        className={`marketplace-qty-reveal ${isProductSelected ? 'marketplace-qty-reveal--open' : 'marketplace-qty-reveal--closed'}`}
-                                        onClick={e => e.stopPropagation()}
-                                      >
-                                        <div className="marketplace-qty-reveal-inner">
-                                        <div className="marketplace-qty-block">
-                                          <div className="marketplace-qty-row">
-                                            <div className="marketplace-qty-labels">
-                                              <small>Menge:</small>
-                                              {isFlower(product) && (
-                                                <span className="marketplace-qty-hint">(nur {FLOWER_INCREMENT}g Schritte)</span>
-                                              )}
-                                            </div>
-                                            <div className="marketplace-qty-controls">
-                                              <button
-                                                type="button"
-                                                onClick={() => {
-                                                  if (currentQty <= minQty) {
-                                                    toggleProduct(product.id)
-                                                    return
-                                                  }
-                                                  handleQuantityChange(product.id, currentQty - getQuantityIncrement(product), 'down')
-                                                }}
-                                                className="marketplace-qty-btn"
-                                                aria-label={currentQty <= minQty ? 'Produkt entfernen' : 'Menge reduzieren'}
-                                              >
-                                                {currentQty <= minQty ? <Trash2 size={12} aria-hidden /> : '-'}
-                                              </button>
-                                              <span className="marketplace-qty-value">{currentQty}g</span>
-                                              <button
-                                                type="button"
-                                                onClick={() => {
-                                                  handleQuantityChange(product.id, currentQty + getQuantityIncrement(product), 'up')
-                                                }}
-                                                disabled={currentQty >= product.stock}
-                                                className="marketplace-qty-btn"
-                                              >
-                                                +
-                                              </button>
+                                    <div className="marketplace-product-card-flip">
+                                      <div className="marketplace-product-card-face marketplace-product-card-face--front">
+                                        <button
+                                          type="button"
+                                          onClick={e => {
+                                            e.stopPropagation()
+                                            toggleProduct(product.id)
+                                          }}
+                                          disabled={atSelectionLimit}
+                                          aria-label={isProductSelected ? 'Produkt abwählen' : 'Produkt auswählen'}
+                                          className={`marketplace-product-check${isProductSelected ? ' marketplace-product-check--on' : ''}`}
+                                        >
+                                          {isProductSelected && <Check className="shrink-0" aria-hidden />}
+                                        </button>
+                                        <span className={`marketplace-strain-tag marketplace-strain-tag--${strainInfo.variant}`}>
+                                          {strainInfo.type}
+                                        </span>
+                                        <div className="marketplace-product-media">
+                                          <img
+                                            src={imageUrl}
+                                            alt={product.name}
+                                            onError={() => handleImageError(product.id)}
+                                            className="marketplace-product-img"
+                                          />
+                                        </div>
+                                        <div className="marketplace-product-body">
+                                          <h3 className="marketplace-product-name">
+                                            {product.name}
+                                          </h3>
+                                          <div className="marketplace-product-price-row">
+                                            <span className="marketplace-product-price">€{product.price.toFixed(2)}/g</span>
+                                            <span className="marketplace-product-vat">inkl. MwSt.</span>
+                                          </div>
+                                          <div className="marketplace-product-meta">
+                                            <span><b>THC:</b> {product.thcPercent}%</span>
+                                            <span><b>CBD:</b> {product.cbdPercent}%</span>
+                                          </div>
+                                          <button
+                                            type="button"
+                                            onClick={e => {
+                                              e.stopPropagation()
+                                              toggleProduct(product.id)
+                                            }}
+                                            disabled={atSelectionLimit}
+                                            className={`marketplace-product-action${isProductSelected ? ' marketplace-product-action--selected' : ''}`}
+                                          >
+                                            {isProductSelected ? 'Entfernen' : 'Auswählen'}
+                                          </button>
+                                          <div
+                                            className={`marketplace-qty-reveal ${isProductSelected ? 'marketplace-qty-reveal--open' : 'marketplace-qty-reveal--closed'}`}
+                                            onClick={e => e.stopPropagation()}
+                                          >
+                                            <div className="marketplace-qty-reveal-inner">
+                                              <div className="marketplace-qty-block">
+                                                <div className="marketplace-qty-row">
+                                                  <div className="marketplace-qty-labels">
+                                                    <small>Menge:</small>
+                                                    {isFlower(product) && (
+                                                      <span className="marketplace-qty-hint">(nur {FLOWER_INCREMENT}g Schritte)</span>
+                                                    )}
+                                                  </div>
+                                                  <div className="marketplace-qty-controls">
+                                                    <button
+                                                      type="button"
+                                                      onClick={e => {
+                                                        e.stopPropagation()
+                                                        if (currentQty <= minQty) {
+                                                          toggleProduct(product.id)
+                                                          return
+                                                        }
+                                                        handleQuantityChange(product.id, currentQty - getQuantityIncrement(product), 'down')
+                                                      }}
+                                                      className="marketplace-qty-btn"
+                                                      aria-label={currentQty <= minQty ? 'Produkt entfernen' : 'Menge reduzieren'}
+                                                    >
+                                                      {currentQty <= minQty ? <Trash2 size={12} aria-hidden /> : '-'}
+                                                    </button>
+                                                    <span className="marketplace-qty-value">{currentQty}g</span>
+                                                    <button
+                                                      type="button"
+                                                      onClick={e => {
+                                                        e.stopPropagation()
+                                                        handleQuantityChange(product.id, currentQty + getQuantityIncrement(product), 'up')
+                                                      }}
+                                                      disabled={currentQty >= product.stock}
+                                                      className="marketplace-qty-btn"
+                                                    >
+                                                      +
+                                                    </button>
+                                                  </div>
+                                                </div>
+                                              </div>
                                             </div>
                                           </div>
                                         </div>
+                                      </div>
+                                      <div className="marketplace-product-card-face marketplace-product-card-face--back">
+                                        <div className="marketplace-product-card-back-inner">
+                                          <p className="marketplace-product-back-label">{strainInfo.type}</p>
+                                          <h3 className="marketplace-product-back-title">{product.name}</h3>
+                                          <p className="marketplace-product-back-placeholder">
+                                            Hier erscheinen später Details zur Sorte.
+                                          </p>
+                                          <button
+                                            type="button"
+                                            className="marketplace-product-back-dismiss"
+                                            onClick={e => {
+                                              e.stopPropagation()
+                                              toggleProductCardFlip(product.id)
+                                            }}
+                                          >
+                                            Zurück
+                                          </button>
+                                          <p className="marketplace-product-back-hint">Oder auf die Karte tippen</p>
                                         </div>
                                       </div>
                                     </div>
