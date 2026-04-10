@@ -459,19 +459,129 @@
     }
   }
   
-  /* Product cards */
+  /* Product cards (3D flip) */
   .marketplace-product-card {
     position: relative;
-    background: #fff;
+    background: transparent;
     border-radius: 0.75rem;
-    overflow: hidden;
+  overflow: hidden;
     cursor: pointer;
-    will-change: transform, box-shadow;
-    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s ease, border-color 0.2s ease, opacity 0.2s ease;
+    perspective: 1100px;
+    transition: box-shadow 0.3s ease, opacity 0.2s ease;
     border-top: 2.5px solid #333;
     border-left: 2.5px solid #333;
     border-right: 4px solid #333;
     border-bottom: 4px solid #333;
+  }
+
+  .marketplace-product-card-flip {
+    position: relative;
+  width: 100%;
+  height: 100%;
+  transform-origin: center center;
+    transform-style: preserve-3d;
+  -webkit-transform-style: preserve-3d;
+  will-change: transform;
+  transition: transform 0.72s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .marketplace-product-card--flipped .marketplace-product-card-flip {
+    transform: rotateY(180deg);
+  }
+
+  .marketplace-product-card-face {
+    border-radius: 0.65rem;
+    overflow: hidden;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    background: #fff;
+  transform-style: preserve-3d;
+  -webkit-transform-style: preserve-3d;
+  }
+
+  .marketplace-product-card-face--front {
+    position: relative;
+    z-index: 2;
+  transform: rotateY(0deg) translateZ(0.1px);
+  }
+
+  .marketplace-product-card-face--back {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+  transform: rotateY(180deg) translateZ(0.1px);
+    display: flex;
+    align-items: stretch;
+    justify-content: center;
+    min-height: 100%;
+  }
+
+  .marketplace-product-card-back-inner {
+    padding: 0.85rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    gap: 0.5rem;
+    width: 100%;
+    min-height: 11rem;
+    box-sizing: border-box;
+  }
+
+  .marketplace-product-back-label {
+    margin: 0;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: #047857;
+  }
+
+  .marketplace-product-back-title {
+    margin: 0;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #111827;
+    line-height: 1.25;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .marketplace-product-back-placeholder {
+    margin: 0;
+    font-size: 0.7rem;
+    line-height: 1.45;
+    color: #6b7280;
+    flex: 1;
+    display: flex;
+    align-items: center;
+  }
+
+  .marketplace-product-back-dismiss {
+    margin-top: auto;
+    padding: 0.4rem 0.85rem;
+    border-radius: 0.5rem;
+    border: 1px solid #cbd5e1;
+    background: #f9fafb;
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: #374151;
+    cursor: pointer;
+    transition: background 0.15s ease, border-color 0.15s ease;
+  }
+
+  .marketplace-product-back-dismiss:hover {
+    background: #f3f4f6;
+    border-color: #94a3b8;
+  }
+
+  .marketplace-product-back-hint {
+    margin: 0;
+    font-size: 9px;
+    color: #9ca3af;
   }
   
   .marketplace-product-card:not(.marketplace-product-card--selected) {
@@ -485,12 +595,10 @@
   .marketplace-product-card:not(.marketplace-product-card--selected):hover {
     border-color: rgba(0, 0, 0, 0.2);
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.08);
-    transform: translateY(-2px);
   }
   
   .marketplace-product-card--selected {
-  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.12);
-  transform: translateY(-2px) scale(1.01);
+    box-shadow: 0 14px 30px rgba(0, 0, 0, 0.12);
   }
   
   .marketplace-product-card--limit {
@@ -573,7 +681,7 @@
     transition: transform 0.3s ease;
   }
   
-  .marketplace-product-card:hover .marketplace-product-img {
+  .marketplace-product-card:not(.marketplace-product-card--flipped):hover .marketplace-product-img {
     transform: scale(1.05);
   }
   
@@ -1019,6 +1127,8 @@
     .marketplace-products-reveal,
     .marketplace-chevron,
     .marketplace-product-card,
+    .marketplace-product-card-flip,
+    .marketplace-product-img,
     .marketplace-floating-cart,
     .marketplace-cart-details,
     .marketplace-loading-icon,
