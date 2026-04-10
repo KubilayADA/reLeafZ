@@ -101,6 +101,7 @@ export default function LandingPage() {
 
         <Hero
           setDialogOpen={setDialogOpen}
+          landingTheme={landingTheme}
           onScrollToAblauf={() => {
             const landingMain = document.getElementById('landing-main')
             const mainTop =

@@ -10,12 +10,34 @@ interface HeroProps {
   setDialogOpen: (open: boolean) => void
   /** Scroll to #ablauf; parent may sync URL with pushState (no overflow lock). */
   onScrollToAblauf: () => void
+  landingTheme: 'dark' | 'light'
 }
 
 export default function Hero({
   setDialogOpen,
   onScrollToAblauf,
+  landingTheme,
 }: HeroProps) {
+  const [isMobile, setIsMobile] = React.useState(false)
+
+  React.useEffect(() => {
+    const mediaQuery = window.matchMedia('(max-width: 767px)')
+    const updateIsMobile = () => setIsMobile(mediaQuery.matches)
+
+    updateIsMobile()
+    mediaQuery.addEventListener('change', updateIsMobile)
+
+    return () => {
+      mediaQuery.removeEventListener('change', updateIsMobile)
+    }
+  }, [])
+
+  const heroVideoSrc = isMobile
+    ? '/mobile-hero.mp4'
+    : landingTheme === 'dark'
+      ? '/hero-night.mp4'
+      : '/bubble-explose.mov'
+
   const heroChecklistItems = [
     'Lieferung in 30-90 Minuten in Berlin',
     'Ganz Deutschland in 1-2 Tagen',
@@ -30,15 +52,15 @@ export default function Hero({
     >
       {/* Background — no hit target so wheel/touch scrolls the page to the next section */}
       <div className="pointer-events-none absolute inset-0 w-full overflow-hidden">
-         <video
+        <video
           className="absolute inset-0 w-full h-full object-cover"
-          src="/bubble-explose.mov"
+          src={heroVideoSrc}
           preload="auto"
           autoPlay
           muted
           loop
           playsInline
-        /> 
+        />
 
         {/* idée mettre map et faire pop des petit leaf the cannabis on the map as a neuro link  */}
     

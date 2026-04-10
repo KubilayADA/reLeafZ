@@ -47,10 +47,17 @@ export default function Header({
   // HOVER SOUND BLOCK loving it 
   const hoverAudioRef = useRef<HTMLAudioElement | null>(null)
   const playHoverSound = () => {
+    const hoverAudioSrc = landingTheme === 'dark' ? '/tekkkk.mp3' : '/auto.mp3'
+
     if (!hoverAudioRef.current) {
-      hoverAudioRef.current = new Audio('/tekkkk.mp3')
+      hoverAudioRef.current = new Audio(hoverAudioSrc)
       hoverAudioRef.current.preload = 'auto'
       hoverAudioRef.current.volume = 0.6
+    }
+
+    if (hoverAudioRef.current.src !== new URL(hoverAudioSrc, window.location.origin).href) {
+      hoverAudioRef.current.src = hoverAudioSrc
+      hoverAudioRef.current.load()
     }
 
     hoverAudioRef.current.currentTime = 0
