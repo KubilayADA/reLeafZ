@@ -3,8 +3,9 @@
 import { useState, useEffect } from 'react'
 import { Product, API_BASE } from '@/lib/api'
 import { useRouter } from 'next/navigation'
-import { Check, Leaf, ArrowRight, ChevronDown, ChevronUp, Package, Loader2 } from 'lucide-react'
+import { Check, Leaf, ArrowRight, ChevronDown, ChevronUp, Package, Loader2, Trash2 } from 'lucide-react'
 import { isLocalAccessBypassEnabled } from '@/lib/devAccess'
+import './marketplace.css'
 
 // =====================================================
 // CENTRALIZED STRAIN IMAGE LIBRARY
@@ -152,15 +153,17 @@ const LOCALHOST_FALLBACK_MARKETPLACE_DATA: MarketplacePharmacy[] = [
 ]
 /* LOCAL ACCESS BYPASS BLOCK END (demo treatment + marketplace fallback data) */
 
-const getStrainType = (name: string): { type: string; color: string } => {
+type StrainTagVariant = 'indica' | 'sativa' | 'hybrid'
+
+const getStrainType = (name: string): { type: string; variant: StrainTagVariant } => {
   const nameLower = name.toLowerCase()
   if (nameLower.includes('indica') || nameLower.includes('kush') || nameLower.includes('og') || nameLower.includes('punch') || nameLower.includes('slurricane')) {
-    return { type: 'Indica', color: 'bg-purple-100 text-purple-700 border-purple-200' }
+    return { type: 'Indica', variant: 'indica' }
   }
   if (nameLower.includes('sativa') || nameLower.includes('haze') || nameLower.includes('lemon') || nameLower.includes('skunk')) {
-    return { type: 'Sativa', color: 'bg-amber-100 text-amber-700 border-amber-200' }
+    return { type: 'Sativa', variant: 'sativa' }
   }
-  return { type: 'Hybrid', color: 'bg-emerald-100 text-emerald-700 border-emerald-200' }
+  return { type: 'Hybrid', variant: 'hybrid' }
 }
 
 const getProductImage = (product: Product): string => {
@@ -429,10 +432,12 @@ export default function MarketplacePage() {
 
   if (!isClient || loading) {
     return (
-      <div className="min-h-screen bg-beige inconsolata flex items-center justify-center">
-        <div className="text-center">
-          <Loader2 className="w-12 h-12 animate-spin text-emerald-600 mx-auto mb-4" />
-          <p className="subtitle-text text-lg">Apotheken werden geladen...</p>
+      <div className="marketplace-page">
+        <div className="marketplace-loading">
+          <div className="marketplace-loading-inner">
+            <Loader2 className="marketplace-loading-icon" aria-hidden />
+            <p className="marketplace-loading-text">Apotheken werden geladen...</p>
+          </div>
         </div>
       </div>
     )
@@ -440,14 +445,16 @@ export default function MarketplacePage() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-beige inconsolata flex items-center justify-center px-4">
-        <div className="text-center max-w-md">
-          <div className="bg-white rounded-3xl border-2 border-black p-8 shadow-2xl">
-            <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Package className="w-8 h-8 text-red-600" />
+      <div className="marketplace-page">
+        <div className="marketplace-error">
+          <div className="marketplace-error-inner">
+            <div className="marketplace-error-card">
+              <div className="marketplace-error-icon-wrap">
+                <Package className="marketplace-error-icon" aria-hidden />
+              </div>
+              <p className="marketplace-error-title">Fehler</p>
+              <p className="marketplace-error-text">{error}</p>
             </div>
-            <p className="text-xl font-bold text-red-600 mb-2">Fehler</p>
-            <p className="subtitle-text">{error}</p>
           </div>
         </div>
       </div>
@@ -455,50 +462,49 @@ export default function MarketplacePage() {
   }
 
   return (
-    <div className="min-h-screen bg-beige inconsolata">
-      <div className="sticky top-0 z-40 bg-beige/95 backdrop-blur-sm border-b border-black/10">
-        <div className="max-w-5xl mx-auto px-4 py-4">
-          <div className="flex items-center justify-center gap-2 sm:gap-4">
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-full bg-emerald-600 flex items-center justify-center">
-                <Check className="w-5 h-5 text-white" />
+    <div className="marketplace-page">
+      <header className="marketplace-header">
+        <div className="marketplace-header-inner">
+          <div className="marketplace-steps">
+            <div className="marketplace-step-group">
+              <div className="marketplace-step-dot">
+                <Check className="shrink-0" aria-hidden />
               </div>
-              <span className="hidden sm:inline text-sm font-medium text-emerald-700">Anfrage</span>
+              <span className="marketplace-step-label marketplace-step-label--active">Anfrage</span>
             </div>
-            <div className="w-8 sm:w-16 h-0.5 bg-emerald-600" />
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-full bg-emerald-600 flex items-center justify-center ring-4 ring-emerald-100">
-                <span className="text-white font-bold text-sm">2</span>
+            <div className="marketplace-step-line" role="presentation" />
+            <div className="marketplace-step-group">
+              <div className="marketplace-step-dot marketplace-step-dot--current">
+                <span className="marketplace-step-num">2</span>
               </div>
-              <span className="hidden sm:inline text-sm font-bold text-emerald-700">Produktauswahl</span>
+              <span className="marketplace-step-label marketplace-step-label--active">Produktauswahl</span>
             </div>
-            <div className="w-8 sm:w-16 h-0.5 bg-gray-300" />
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center">
-                <span className="text-gray-500 font-bold text-sm">3</span>
+            <div className="marketplace-step-line marketplace-step-line--muted" role="presentation" />
+            <div className="marketplace-step-group">
+              <div className="marketplace-step-dot marketplace-step-dot--muted">
+                <span className="marketplace-step-num">3</span>
               </div>
-              <span className="hidden sm:inline text-sm font-medium text-gray-500">Anfrage absenden</span>
+              <span className="marketplace-step-label marketplace-step-label--inactive">Anfrage absenden</span>
             </div>
           </div>
         </div>
-      </div>
+      </header>
 
-      <div className="max-w-6xl mx-auto px-4 py-8 pb-32">
-        <div className="mb-8">
-          <div className="inline-flex items-center px-4 py-2 bg-gradient-to-r-custom rounded-full mb-4">
-            <Leaf className="w-4 h-4 mr-2 text-emerald-700" />
-            <span className="text-sm font-medium subtitle-text">Apotheken & Lieferung</span>
+      <main className="marketplace-main">
+        <div className="marketplace-intro">
+          <div className="marketplace-pill">
+            <Leaf aria-hidden />
+            <span>Apotheken & Lieferung</span>
           </div>
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold title-gradient mb-3 italic">
+          <h1 className="marketplace-title">
             Apotheke & Lieferart wählen
           </h1>
-          <p className="subtitle-text text-base sm:text-lg">
+          <p className="marketplace-lead">
             Wähle eine Apotheke und eine Lieferoption. Anschließend siehst du die verfügbaren Produkte (max. {MAX_SELECTIONS} Blüten).
           </p>
         </div>
 
-        {/* Pharmacy cards */}
-        <div className="space-y-3">
+        <div className="marketplace-pharmacy-list">
           {marketplaceData.map(m => {
             const isExpanded = expandedPharmacyId === m.pharmacy.id
             const isSelected = selectedPharmacyId === m.pharmacy.id
@@ -507,32 +513,31 @@ export default function MarketplacePage() {
             return (
               <div
                 key={m.pharmacy.id}
-                className={`bg-white rounded-xl border-2 overflow-hidden transition-all duration-300 ${
-                  isSelected ? 'border-emerald-500 shadow-lg shadow-emerald-500/10' : 'border-black/10'
-                }`}
+                className={`marketplace-pharmacy-card${isSelected ? ' marketplace-pharmacy-card--selected' : ''}`}
               >
                 <button
                   type="button"
                   onClick={() => setExpandedPharmacyId(isExpanded ? null : m.pharmacy.id)}
-                  className="w-full flex items-center justify-between p-4 text-left hover:bg-gray-50/50 transition-colors"
+                  className="marketplace-pharmacy-toggle"
                 >
                   <div>
-                    <h2 className="font-bold text-lg text-gray-900">{m.pharmacy.name}</h2>
-                    <p className="text-sm text-gray-600">
+                    <h2 className="marketplace-pharmacy-name">{m.pharmacy.name}</h2>
+                    <p className="marketplace-pharmacy-meta">
                       {m.pharmacy.zip} {m.pharmacy.city} · {m.productCount} Produkte
                     </p>
                   </div>
                   {isExpanded ? (
-                    <ChevronUp className="w-5 h-5 text-gray-500 flex-shrink-0" />
+                    <ChevronUp className="marketplace-chevron marketplace-chevron--open" aria-hidden />
                   ) : (
-                    <ChevronDown className="w-5 h-5 text-gray-500 flex-shrink-0" />
+                    <ChevronDown className="marketplace-chevron" aria-hidden />
                   )}
                 </button>
 
-                {isExpanded && (
-                  <div className="px-4 pb-4 border-t border-gray-100">
-                    <p className="text-sm font-medium text-gray-700 mt-3 mb-2">Lieferoptionen:</p>
-                    <div className="flex flex-wrap gap-2 mb-4">
+                <div className={`marketplace-pharmacy-expand ${isExpanded ? 'marketplace-pharmacy-expand--open' : 'marketplace-pharmacy-expand--closed'}`}>
+                  <div className="marketplace-pharmacy-expand-inner">
+                    <div className="marketplace-pharmacy-body">
+                    <p className="marketplace-delivery-label">Lieferoptionen:</p>
+                    <div className="marketplace-delivery-options">
                       {m.deliveryOptions.map(opt => {
                         const active = isSelected && selectedDeliveryMethod === opt.method
                         return (
@@ -541,15 +546,7 @@ export default function MarketplacePage() {
                             type="button"
                             disabled={!opt.available}
                             onClick={() => selectPharmacyAndDelivery(m.pharmacy.id, opt)}
-                            className={`
-                              px-4 py-2 rounded-xl text-sm font-medium border-2 transition-all
-                              ${!opt.available
-                                ? 'border-gray-200 text-gray-400 cursor-not-allowed bg-gray-50'
-                                : active
-                                  ? 'border-emerald-500 bg-emerald-50 text-emerald-800'
-                                  : 'border-black/20 hover:border-emerald-400 hover:bg-emerald-50/50 text-gray-700'
-                              }
-                            `}
+                            className={`marketplace-delivery-btn${active ? ' marketplace-delivery-btn--active' : ''}${!opt.available ? ' marketplace-delivery-btn--disabled' : ''}`}
                           >
                             {opt.label} · €{opt.fee.toFixed(2)} · {opt.estimatedTime}
                           </button>
@@ -557,180 +554,196 @@ export default function MarketplacePage() {
                       })}
                     </div>
 
-                    {showProducts && (
-                      <div className="pt-4">
-                        <p className="text-sm font-bold text-gray-800 mb-3">Produkte:</p>
-                        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
-                          {products.map(product => {
-                            const isProductSelected = selectedProducts.has(product.id)
-                            const strainInfo = getStrainType(product.name)
-                            const imageUrl = failedImages.has(product.id) ? PLACEHOLDER_IMAGE : getProductImage(product)
-                            return (
-                              <div
-                                key={product.id}
-                                onClick={() => toggleProduct(product.id)}
-                                className={`
-                                  relative bg-white rounded-xl overflow-hidden cursor-pointer
-                                  transition-all duration-300 ease-out
-                                  ${isProductSelected
-                                    ? 'ring-2 ring-emerald-500 shadow-lg shadow-emerald-500/20 scale-[1.02]'
-                                    : 'border border-black/10 hover:border-black/20 hover:shadow-md hover:-translate-y-0.5'
-                                  }
-                                  ${selectedProducts.size >= MAX_SELECTIONS && !isProductSelected ? 'opacity-50 cursor-not-allowed' : ''}
-                                `}
-                              >
-                                <div className={`
-                                  absolute top-2 right-2 z-10 w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all duration-200
-                                  ${isProductSelected ? 'bg-emerald-600 border-emerald-600' : 'bg-white/90 border-gray-300 backdrop-blur-sm'}
-                                `}>
-                                  {isProductSelected && <Check className="w-3 h-3 text-white" />}
-                                </div>
-                                <div className="absolute top-2 left-2 z-10">
-                                  <span className={`px-2 py-0.5 text-[10px] font-semibold rounded-full border ${strainInfo.color}`}>
-                                    {strainInfo.type}
-                                  </span>
-                                </div>
-                                <div className="aspect-[4/3] bg-gradient-to-br from-gray-50 to-gray-100 p-3">
-                                  <img
-                                    src={imageUrl}
-                                    alt={product.name}
-                                    onError={() => handleImageError(product.id)}
-                                    className="w-full h-full object-contain transition-transform duration-300 hover:scale-105"
-                                  />
-                                </div>
-                                <div className="p-3">
-                                  <h3 className="font-bold text-xs sm:text-sm text-gray-900 mb-1.5 line-clamp-2 leading-snug">
-                                    {product.name}
-                                  </h3>
-                                  <div className="flex items-center justify-between mb-2">
-                                    <span className="text-sm font-bold text-emerald-700">€{product.price.toFixed(2)}/g</span>
-                                    <span className="text-[10px] text-gray-500 bg-gray-100 px-1.5 py-0.5 rounded">inkl. MwSt.</span>
-                                  </div>
-                                  <div className="flex gap-2 text-xs text-gray-600">
-                                    <span><b>THC:</b> {product.thcPercent}%</span>
-                                    <span><b>CBD:</b> {product.cbdPercent}%</span>
-                                  </div>
-                                  {isProductSelected && (
-                                    <div className="mt-2 pt-2 border-t border-gray-100" onClick={e => e.stopPropagation()}>
-                                      <div className="flex items-center justify-between">
-                                        <div className="flex items-center gap-1">
-                                          <span className="text-xs font-medium text-gray-600">Menge:</span>
-                                          {isFlower(product) && (
-                                            <span className="text-[10px] text-amber-600 font-medium">(nur {FLOWER_INCREMENT}g Schritte)</span>
-                                          )}
+                    <div className={`marketplace-products-reveal ${showProducts ? 'marketplace-products-reveal--open' : 'marketplace-products-reveal--closed'}`}>
+                        <div className="marketplace-products-reveal-inner">
+                          <div className="marketplace-products-inner">
+                            <p className="marketplace-products-title">Produkte:</p>
+                            <div className="marketplace-product-grid">
+                              {products.map(product => {
+                                const isProductSelected = selectedProducts.has(product.id)
+                                const strainInfo = getStrainType(product.name)
+                                const imageUrl = failedImages.has(product.id) ? PLACEHOLDER_IMAGE : getProductImage(product)
+                                const atSelectionLimit = selectedProducts.size >= MAX_SELECTIONS && !isProductSelected
+                                const currentQty = quantities[product.id] || getDefaultQuantity(product)
+                                const minQty = getMinQuantity(product)
+                                return (
+                                  <div
+                                    key={product.id}
+                                    className={`marketplace-product-card${isProductSelected ? ' marketplace-product-card--selected' : ''}${atSelectionLimit ? ' marketplace-product-card--limit' : ''}`}
+                                  >
+                                    <button
+                                      type="button"
+                                      onClick={e => {
+                                        e.stopPropagation()
+                                        toggleProduct(product.id)
+                                      }}
+                                      disabled={atSelectionLimit}
+                                      aria-label={isProductSelected ? 'Produkt abwählen' : 'Produkt auswählen'}
+                                      className={`marketplace-product-check${isProductSelected ? ' marketplace-product-check--on' : ''}`}
+                                    >
+                                      {isProductSelected && <Check className="shrink-0" aria-hidden />}
+                                    </button>
+                                    <span className={`marketplace-strain-tag marketplace-strain-tag--${strainInfo.variant}`}>
+                                      {strainInfo.type}
+                                    </span>
+                                    <div className="marketplace-product-media">
+                                      <img
+                                        src={imageUrl}
+                                        alt={product.name}
+                                        onError={() => handleImageError(product.id)}
+                                        className="marketplace-product-img"
+                                      />
+                                    </div>
+                                    <div className="marketplace-product-body">
+                                      <h3 className="marketplace-product-name">
+                                        {product.name}
+                                      </h3>
+                                      <div className="marketplace-product-price-row">
+                                        <span className="marketplace-product-price">€{product.price.toFixed(2)}/g</span>
+                                        <span className="marketplace-product-vat">inkl. MwSt.</span>
+                                      </div>
+                                      <div className="marketplace-product-meta">
+                                        <span><b>THC:</b> {product.thcPercent}%</span>
+                                        <span><b>CBD:</b> {product.cbdPercent}%</span>
+                                      </div>
+                                      <button
+                                        type="button"
+                                        onClick={() => toggleProduct(product.id)}
+                                        disabled={atSelectionLimit}
+                                        className={`marketplace-product-action${isProductSelected ? ' marketplace-product-action--selected' : ''}`}
+                                      >
+                                        {isProductSelected ? 'Entfernen' : 'Auswählen'}
+                                      </button>
+                                      <div
+                                        className={`marketplace-qty-reveal ${isProductSelected ? 'marketplace-qty-reveal--open' : 'marketplace-qty-reveal--closed'}`}
+                                        onClick={e => e.stopPropagation()}
+                                      >
+                                        <div className="marketplace-qty-reveal-inner">
+                                        <div className="marketplace-qty-block">
+                                          <div className="marketplace-qty-row">
+                                            <div className="marketplace-qty-labels">
+                                              <small>Menge:</small>
+                                              {isFlower(product) && (
+                                                <span className="marketplace-qty-hint">(nur {FLOWER_INCREMENT}g Schritte)</span>
+                                              )}
+                                            </div>
+                                            <div className="marketplace-qty-controls">
+                                              <button
+                                                type="button"
+                                                onClick={() => {
+                                                  if (currentQty <= minQty) {
+                                                    toggleProduct(product.id)
+                                                    return
+                                                  }
+                                                  handleQuantityChange(product.id, currentQty - getQuantityIncrement(product), 'down')
+                                                }}
+                                                className="marketplace-qty-btn"
+                                                aria-label={currentQty <= minQty ? 'Produkt entfernen' : 'Menge reduzieren'}
+                                              >
+                                                {currentQty <= minQty ? <Trash2 size={12} aria-hidden /> : '-'}
+                                              </button>
+                                              <span className="marketplace-qty-value">{currentQty}g</span>
+                                              <button
+                                                type="button"
+                                                onClick={() => {
+                                                  handleQuantityChange(product.id, currentQty + getQuantityIncrement(product), 'up')
+                                                }}
+                                                disabled={currentQty >= product.stock}
+                                                className="marketplace-qty-btn"
+                                              >
+                                                +
+                                              </button>
+                                            </div>
+                                          </div>
                                         </div>
-                                        <div className="flex items-center gap-1">
-                                          <button
-                                            onClick={() => {
-                                              const currentQty = quantities[product.id] || getDefaultQuantity(product)
-                                              handleQuantityChange(product.id, currentQty - getQuantityIncrement(product), 'down')
-                                            }}
-                                            disabled={(quantities[product.id] || getDefaultQuantity(product)) <= getMinQuantity(product)}
-                                            className={`w-6 h-6 rounded flex items-center justify-center font-bold text-sm transition-colors
-                                              ${(quantities[product.id] || getDefaultQuantity(product)) <= getMinQuantity(product)
-                                                ? 'bg-gray-50 text-gray-300 cursor-not-allowed'
-                                                : 'bg-gray-100 hover:bg-gray-200 text-gray-600'
-                                              }`}
-                                          >
-                                            -
-                                          </button>
-                                          <span className="w-8 text-center font-bold text-sm">{quantities[product.id] || getDefaultQuantity(product)}g</span>
-                                          <button
-                                            onClick={() => {
-                                              const currentQty = quantities[product.id] || getDefaultQuantity(product)
-                                              handleQuantityChange(product.id, currentQty + getQuantityIncrement(product), 'up')
-                                            }}
-                                            disabled={(quantities[product.id] || getDefaultQuantity(product)) >= product.stock}
-                                            className={`w-6 h-6 rounded flex items-center justify-center font-bold text-sm transition-colors
-                                              ${(quantities[product.id] || getDefaultQuantity(product)) >= product.stock
-                                                ? 'bg-gray-50 text-gray-300 cursor-not-allowed'
-                                                : 'bg-gray-100 hover:bg-gray-200 text-gray-600'
-                                              }`}
-                                          >
-                                            +
-                                          </button>
                                         </div>
                                       </div>
                                     </div>
-                                  )}
-                                </div>
-                              </div>
-                            )
-                          })}
+                                  </div>
+                                )
+                              })}
+                            </div>
+                          </div>
                         </div>
-                      </div>
-                    )}
+                    </div>
                   </div>
-                )}
+                  </div>
+                </div>
               </div>
             )
           })}
         </div>
-      </div>
+      </main>
 
-      {/* Floating Cart */}
-      <div className={`
-        fixed bottom-6 right-6 z-50 transition-all duration-300 ease-out
-        ${selectedProducts.size > 0 ? 'translate-y-0 opacity-100' : 'translate-y-20 opacity-0 pointer-events-none'}
-      `}>
-        <div className="group relative">
-          <div className="bg-white rounded-2xl shadow-2xl border border-gray-200 overflow-hidden transition-all duration-300 ease-out hover:shadow-[0_20px_60px_-15px_rgba(16,185,129,0.3)]">
-            <div className="flex items-center gap-3 p-4">
-              <div className="relative">
-                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-emerald-500 to-green-600 flex items-center justify-center shadow-lg">
-                  <Leaf className="w-6 h-6 text-white" />
+      <div
+        className={`marketplace-floating-cart${
+          selectedProducts.size > 0 ? ' marketplace-floating-cart--visible' : ' marketplace-floating-cart--hidden'
+        }`}
+      >
+        <div className="marketplace-cart-wrap">
+          <div className="marketplace-cart-panel">
+            <div className="marketplace-cart-row-main">
+              <div className="marketplace-cart-icon-wrap">
+                <div className="marketplace-cart-icon-bg">
+                  <Leaf aria-hidden />
                 </div>
-                <div className="absolute -top-1 -right-1 w-5 h-5 bg-emerald-700 rounded-full flex items-center justify-center text-[10px] font-bold text-white ring-2 ring-white">
-                  {selectedProducts.size}
-                </div>
+                <div className="marketplace-cart-badge">{selectedProducts.size}</div>
               </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-xs text-gray-500 font-medium">Gesamtsumme</p>
-                <p className="text-xl font-bold text-gray-900">
+              <div className="marketplace-cart-totals">
+                <p className="marketplace-cart-label">Gesamtsumme</p>
+                <p className="marketplace-cart-amount">
                   €{(totalPrice + PRESCRIPTION_FEE + displayDeliveryFee).toFixed(2)}
                 </p>
               </div>
               <button
+                type="button"
                 onClick={handleCheckout}
                 disabled={isSubmitDisabled() || submitting}
-                className={`
-                  flex items-center justify-center gap-2 px-5 py-3 rounded-xl font-bold text-sm transition-all duration-200 whitespace-nowrap
-                  ${!isSubmitDisabled()
-                    ? 'bg-gradient-to-r from-emerald-600 to-green-600 text-white hover:shadow-lg hover:scale-105 active:scale-95'
-                    : 'bg-gray-200 text-gray-500 cursor-not-allowed'
-                  }
-                `}
+                className={`marketplace-cart-cta${!isSubmitDisabled() && !submitting ? ' marketplace-cart-cta--active' : ' marketplace-cart-cta--disabled'}`}
               >
-                {submitting ? <Loader2 className="w-5 h-5 animate-spin" /> : (<><span>Weiter</span><ArrowRight className="w-4 h-4" /></>)}
+                {submitting ? (
+                  <Loader2 className="marketplace-cart-spinner" aria-hidden />
+                ) : (
+                  <>
+                    <span>Weiter</span>
+                    <ArrowRight aria-hidden />
+                  </>
+                )}
               </button>
             </div>
-            <div className="max-h-0 overflow-hidden transition-all duration-300 ease-out group-hover:max-h-[300px] border-t-0 group-hover:border-t border-gray-100">
-              <div className="p-4 pt-3 space-y-3">
-                <div className="flex flex-wrap gap-1.5">
+            <div className="marketplace-cart-details">
+              <div className="marketplace-cart-details-inner">
+                <div className="marketplace-cart-chips">
                   {Array.from(selectedProducts).map(id => {
                     const product = products.find(p => p.id === id)
                     if (!product) return null
                     return (
-                      <span
-                        key={id}
-                        className="inline-flex items-center gap-1 bg-emerald-50 text-emerald-700 text-xs font-medium px-2 py-1 rounded-full"
-                      >
+                      <span key={id} className="marketplace-cart-chip">
                         {product.name.split(' - ')[1]?.split(' ')[0] || product.name.split(' ')[0]}
-                        <span className="text-emerald-500">{quantities[id] || getDefaultQuantity(product)}g</span>
+                        <span className="marketplace-cart-chip-qty">{quantities[id] || getDefaultQuantity(product)}g</span>
                       </span>
                     )
                   })}
                 </div>
-                <div className="text-xs space-y-1 text-gray-600">
-                  <div className="flex justify-between"><span>Produkte</span><span className="font-medium text-gray-900">€{totalPrice.toFixed(2)}</span></div>
-                  <div className="flex justify-between"><span>Rezeptgebühr</span><span>€{PRESCRIPTION_FEE.toFixed(2)}</span></div>
-                  <div className="flex justify-between"><span>Lieferung</span><span>€{displayDeliveryFee.toFixed(2)}</span></div>
+                <div className="marketplace-cart-breakdown">
+                  <div className="marketplace-cart-breakdown-row">
+                    <span>Produkte</span>
+                    <span>€{totalPrice.toFixed(2)}</span>
+                  </div>
+                  <div className="marketplace-cart-breakdown-row">
+                    <span>Rezeptgebühr</span>
+                    <span>€{PRESCRIPTION_FEE.toFixed(2)}</span>
+                  </div>
+                  <div className="marketplace-cart-breakdown-row">
+                    <span>Lieferung</span>
+                    <span>€{displayDeliveryFee.toFixed(2)}</span>
+                  </div>
                 </div>
-                {validationError && <p className="text-xs text-red-600 font-medium">{validationError}</p>}
+                {validationError && <p className="marketplace-cart-validation">{validationError}</p>}
               </div>
             </div>
           </div>
-          <div className="absolute inset-0 -z-10 bg-gradient-to-r from-emerald-400 to-green-400 rounded-2xl blur-xl opacity-20 group-hover:opacity-30 transition-opacity" />
+          <div className="marketplace-cart-glow" aria-hidden />
         </div>
       </div>
     </div>
