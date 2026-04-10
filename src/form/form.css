@@ -724,9 +724,9 @@
   border-color: var(--form-accent);
   background: linear-gradient(
     135deg,
-    rgba(102, 156, 112, 0.3) 0%,
-    rgba(102, 156, 112, 0.16) 52%,
-    rgba(102, 156, 112, 0.05) 100%
+    rgba(114, 144, 111, 0.2) 0%,
+    rgba(114, 144, 111, 0.1) 52%,
+    rgba(114, 144, 111, 0.03) 100%
   );
   box-shadow: var(--form-card-shadow);
 }
@@ -797,8 +797,8 @@
 .form-option-card--selected .form-option-icon-wrap {
   background: linear-gradient(
     140deg,
-    rgba(102, 156, 112, 0.42) 0%,
-    rgba(102, 156, 112, 0.22) 100%
+    rgba(114, 144, 111, 0.28) 0%,
+    rgba(114, 144, 111, 0.14) 100%
   );
 }
 .form-option-icon {
@@ -914,8 +914,8 @@
   border-color: var(--form-accent);
   background: linear-gradient(
     135deg,
-    rgba(102, 156, 112, 1) 0%,
-    rgba(102, 156, 112, 0.74) 100%
+    rgba(114, 144, 111, 0.92) 0%,
+    rgba(114, 144, 111, 0.68) 100%
   );
 }
 
