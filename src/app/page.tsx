@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { ArrowRight, ArrowDown, ListCheck, MousePointer, ZapIcon, Sparkles, Brain, Users, Shield, Clock, MapPin, ChevronRight, ChevronDown, Star, BikeIcon, LucideBike, Hospital, HospitalIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -199,7 +199,7 @@ function AddressAutocomplete({ onAddressSelect, onInputChange }: AddressAutocomp
   )
 }
 
-export default function LandingPage() {
+function LandingPage() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const bypass = searchParams.get('preview')
@@ -725,5 +725,13 @@ export default function LandingPage() {
       <FloatingMonkey />
       </div>
     </>
+  )
+}
+
+export default function Page() {
+  return (
+    <Suspense>
+      <LandingPage />
+    </Suspense>
   )
 }
