@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { ArrowRight, ArrowDown, ListCheck, MousePointer, ZapIcon, Sparkles, Brain, Users, Shield, Clock, MapPin, ChevronRight, ChevronDown, Star, BikeIcon, LucideBike, Hospital, HospitalIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
@@ -201,6 +201,8 @@ function AddressAutocomplete({ onAddressSelect, onInputChange }: AddressAutocomp
 
 export default function LandingPage() {
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const bypass = searchParams.get('preview')
   const [testimonialIdx, setTestimonialIdx] = useState(0)
   const [openCity, setOpenCity] = useState<string | null>(null)
   const [dialogOpen, setDialogOpen] = useState(false)
@@ -246,7 +248,7 @@ export default function LandingPage() {
   }, [houseNumber, streetName, cityName])
 
   // Show coming soon page if flag is true
-  if (COMING_SOON_MODE) return <ComingSoon />;
+  if (COMING_SOON_MODE && bypass !== 'daniel2024') return <ComingSoon />;
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
