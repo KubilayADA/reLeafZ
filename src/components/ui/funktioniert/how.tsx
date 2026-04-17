@@ -286,6 +286,17 @@ export default function How({ landingTheme }: HowProps): React.JSX.Element {
                 </div>
               </div>
             ))}
+
+            <div className="cta-block cta-block-mobile">
+              <p className="cta-note">Kostenlos starten.</p>
+              <a href="#" className="btn-cta">Jetzt Rezept beantragen</a>
+              <div className="trust">
+                <div className="trust-item"><span className="trust-dot" />Lizenzierte Ärzte</div>
+                <div className="trust-item"><span className="trust-dot" />DSGVO-konform</div>
+                <div className="trust-item"><span className="trust-dot" />Diskrete Verpackung</div>
+                <div className="trust-item"><span className="trust-dot" />CanG 2024</div>
+              </div>
+            </div>
           </div>
 
         </div>

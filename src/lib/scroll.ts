@@ -62,6 +62,9 @@ export function isLandingPastHero(): boolean {
  * - never rests between those two positions
  */
 export function attachLandingBinarySwitch(): () => void {
+  const mq = window.matchMedia('(max-width: 767px)')
+  if (mq.matches) return () => {}
+
   let snapTimer: number | null = null
   let animating = false
 
