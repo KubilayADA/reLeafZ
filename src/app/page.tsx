@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Header from './header'
-import Hero from './hero'
+import Hero, { MobileHero } from './hero'
 import MobileNavbar from './header/mobile-navbar'
 import CookieBanner from '@/components/ui/cookie'
 import '@/components/ui/Hero/Words-Sliding-Smooth.css'
@@ -119,6 +119,7 @@ export default function LandingPage() {
           data-theme={landingTheme}
         >
 
+          <MobileHero setDialogOpen={setDialogOpen} />
           <PartnerApotheken />
           <How landingTheme={landingTheme} />
 

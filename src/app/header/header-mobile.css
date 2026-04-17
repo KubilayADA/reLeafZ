@@ -133,12 +133,15 @@
   /* Small square icon (rz mark) */
   .mnav__logo-icon {
     position: absolute;
-    right: 3px;
-    width: 26px;
-    height: 26px;
+    top: 45%;
+    left: 40%;
+    width: 24px;
+    height: 24px;
+    transform: translate(-50%, -50%);
+    display: block;
     object-fit: contain;
     opacity: 1;
-    filter: brightness(1.15);
+    filter: none;
     transition: opacity 0.22s ease;
   }
 

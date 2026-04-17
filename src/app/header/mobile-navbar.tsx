@@ -3,9 +3,8 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { Menu } from 'lucide-react'
 
-import { Button } from '@/components/ui/button'
 import './header-mobile.css'
-import { isLandingPastHero, scrollLandingToAblauf } from '@/lib/scroll'
+import { scrollLandingToAblauf } from '@/lib/scroll'
 
 interface MobileNavbarProps {
   setDialogOpen: (open: boolean) => void
@@ -14,10 +13,8 @@ interface MobileNavbarProps {
 }
 
 const NAV_LINKS = [
-  { href: '#ablauf', label: 'Ablauf' },
-  { href: '#partner-apotheken', label: 'Apotheke in Ihrer Nähe' },
-  { href: '#vorteile', label: 'Vorteile' },
-  { href: '#chat', label: 'Chat with us!' },
+  { href: '#ablauf', label: 'So funktionierts' },
+  { href: '#partner-apotheken', label: 'Partner-Apotheken' },
 ]
 
 export default function MobileNavbar({
@@ -35,13 +32,32 @@ export default function MobileNavbar({
   useEffect(() => { isOpenRef.current = isOpen }, [isOpen])
 
   useEffect(() => {
-    const checkVisibility = () => {
-      setIsVisible(isLandingPastHero())
+    const SECTION_IDS = ['partner-apotheken', 'ablauf'] as const
+    const SECTION_ACTIVE_OFFSET = 110
+    const getTargetSections = () =>
+      SECTION_IDS
+        .map((id) => document.getElementById(id))
+        .filter((el): el is HTMLElement => el !== null)
+
+    const updateVisibility = () => {
+      const sections = getTargetSections()
+      if (!sections.length) {
+        setIsVisible(false)
+        return
+      }
+
+      const isInTargetSection = sections.some((section) => {
+        const rect = section.getBoundingClientRect()
+        return rect.top <= SECTION_ACTIVE_OFFSET && rect.bottom > SECTION_ACTIVE_OFFSET
+      })
+
+      setIsVisible(isInTargetSection)
     }
 
+    updateVisibility()
+
     const handleScroll = () => {
-      checkVisibility()
-      // Close menu if user manually scrolls away from where they opened it
+      updateVisibility()
       if (isOpenRef.current && Math.abs(window.scrollY - savedScrollRef.current) > 12) {
         setIsOpen(false)
       }
@@ -53,11 +69,12 @@ export default function MobileNavbar({
       }
     }
 
-    checkVisibility()
     window.addEventListener('scroll', handleScroll, { passive: true })
+    window.addEventListener('resize', updateVisibility)
     document.addEventListener('touchstart', handleTouchOutside, { passive: true })
     return () => {
       window.removeEventListener('scroll', handleScroll)
+      window.removeEventListener('resize', updateVisibility)
       document.removeEventListener('touchstart', handleTouchOutside)
     }
   }, [])
@@ -97,6 +114,12 @@ export default function MobileNavbar({
       ref={containerRef}
       className={`mnav${isVisible ? ' mnav--visible' : ''}${isOpen ? ' mnav--open' : ''}`}
       aria-hidden={!isVisible}
+      style={{
+        borderTop: '2.5px solid #333',
+        borderLeft: '2.5px solid #333',
+        borderRight: '4px solid #333',
+        borderBottom: '4px solid #333',
+      }}
     >
       {/* Header row — always visible when navbar is shown */}
       <div className="mnav__header">
@@ -152,16 +175,23 @@ export default function MobileNavbar({
         </div>
 
         <div className="mnav__cta-wrap">
-          <Button
-            variant="button2"
-            className="w-full shadow-[0_10px_24px_rgba(0,0,0,0.26)]"
+          <button
+            type="button"
+            className="btn-cta w-full"
+            style={{
+              borderTop: '2.5px solid #333',
+              borderLeft: '2.5px solid #333',
+              borderRight: '4px solid #333',
+              borderBottom: '4px solid #333',
+              borderRadius: '12px',
+            }}
             onClick={() => {
               setIsOpen(false)
               setDialogOpen(true)
             }}
           >
-            BEHANDLUNG ANFRAGEN
-          </Button>
+            Jetzt Rezept beantragen →
+          </button>
         </div>
       </div>
     </div>

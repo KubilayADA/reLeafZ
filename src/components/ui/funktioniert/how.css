@@ -80,7 +80,7 @@
 .how-funktioniert__glow-line {
   position: absolute;
   left: 50%;
-  top: 38%;
+  top: 4.3%;
   transform: translate(-50%, -50%);
   width: 120%;
   height: 2px;
@@ -494,6 +494,10 @@
   border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
+.how-funktioniert .cta-block-mobile {
+  display: none;
+}
+
 @media (min-width: 1024px) {
   .how-funktioniert .cta-block {
     padding-top: var(--how-space-lg);
@@ -580,6 +584,25 @@
   border-radius: var(--how-radius-sm);
 }
 
+@media (max-width: 767px) {
+  .how-funktioniert .progress-wrap {
+    display: none;
+  }
+
+  .how-funktioniert .how-sidebar .cta-block {
+    display: none;
+  }
+
+  .how-funktioniert .cta-block-mobile {
+    display: block;
+    text-align: center;
+  }
+
+  .how-funktioniert .cta-block-mobile .trust {
+    justify-content: center;
+  }
+}
+
 @media (max-width: 680px) {
   .how-funktioniert .section {
     padding: 1.5rem var(--how-space-md) 2.5rem;
@@ -592,6 +615,21 @@
   .how-funktioniert .cta-block {
     margin-top: 0;
     padding-top: var(--how-space-xl);
+  }
+}
+
+@media (max-width: 767px) {
+  .how-funktioniert.section-container {
+    padding-top: calc(100px + 1rem);
+  }
+
+  .how-funktioniert .section {
+    padding-left: 1.55rem;
+    padding-right: 1.55rem;
+  }
+
+  .how-funktioniert .how-header {
+    text-align: left;
   }
 }
 

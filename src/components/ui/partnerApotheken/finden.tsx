@@ -77,6 +77,7 @@ const PartnerApotheken = () => {
   const [isInView, setIsInView] = useState(false)
   const [visibleCount, setVisibleCount] = useState(0)
   const [selectedId, setSelectedId] = useState<string | null>(null)
+  const [mobileCardPharmacy, setMobileCardPharmacy] = useState<Pharmacy | null>(null)
   const [isTouchDevice, setIsTouchDevice] = useState(false)
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false)
 
@@ -121,8 +122,9 @@ const PartnerApotheken = () => {
       entries => {
         const [entry] = entries
         if (!entry) return
-        if (entry.isIntersecting) {
-          setIsInView(true)
+        setIsInView(entry.isIntersecting)
+        if (!entry.isIntersecting) {
+          setSelectedId(null)
         }
       },
       { threshold: 0.35 }
@@ -152,10 +154,35 @@ const PartnerApotheken = () => {
     return () => window.clearInterval(interval)
   }, [isInView, prefersReducedMotion])
 
+  useEffect(() => {
+    if (!selectedId || !isTouchDevice) return
+
+    const handlePointerDownOutside = (event: PointerEvent) => {
+      const target = event.target as Node | null
+      if (!target) return
+
+      const clickedInsideCard = target instanceof Element && Boolean(target.closest('.partner-apotheken-mobile-card-content'))
+      const clickedMarker = target instanceof Element && Boolean(target.closest('.partner-apotheken-marker-trigger'))
+
+      if (clickedInsideCard || clickedMarker) return
+
+      setSelectedId(null)
+    }
+
+    document.addEventListener('pointerdown', handlePointerDownOutside)
+    return () => document.removeEventListener('pointerdown', handlePointerDownOutside)
+  }, [selectedId, isTouchDevice])
+
   const selectedPharmacy = useMemo(
     () => PHARMACIES.find(pharmacy => pharmacy.id === selectedId) ?? null,
     [selectedId]
   )
+
+  useEffect(() => {
+    if (selectedPharmacy) {
+      setMobileCardPharmacy(selectedPharmacy)
+    }
+  }, [selectedPharmacy])
 
   const handleMarkerClick = (id: string) => {
     if (!isTouchDevice) return
@@ -226,6 +253,7 @@ const PartnerApotheken = () => {
                   className="partner-apotheken-marker-trigger"
                   onClick={() => handleMarkerClick(pharmacy.id)}
                   aria-label={`${pharmacy.name} anzeigen`}
+                  aria-expanded={selectedId === pharmacy.id}
                 >
                   <img src="/map/leafs.png" alt="" aria-hidden className="partner-apotheken-marker-image" />
                   <span className="partner-apotheken-pulse" aria-hidden />
@@ -241,19 +269,20 @@ const PartnerApotheken = () => {
               </div>
             )
           })}
+
         </div>
 
-        <div className={`partner-apotheken-mobile-card ${selectedPharmacy ? 'is-open' : ''}`}>
-          {selectedPharmacy && (
-            <article className="partner-apotheken-mobile-card-content" aria-live="polite">
-              <h3>{selectedPharmacy.name}</h3>
-              <p>{selectedPharmacy.address}</p>
-              <p>{selectedPharmacy.hours}</p>
-              <a href={selectedPharmacy.mapsUrl} target="_blank" rel="noreferrer">
+        <div className={`partner-apotheken-mobile-card ${selectedPharmacy ? 'is-open' : ''}`} aria-hidden={!selectedPharmacy}>
+          <article className="partner-apotheken-mobile-card-content" aria-live="polite">
+            <h3>{mobileCardPharmacy?.name ?? ''}</h3>
+            <p>{mobileCardPharmacy?.address ?? ''}</p>
+            <p>{mobileCardPharmacy?.hours ?? ''}</p>
+            {mobileCardPharmacy && (
+              <a href={mobileCardPharmacy.mapsUrl} target="_blank" rel="noreferrer">
                 Route in Google Maps
               </a>
-            </article>
-          )}
+            )}
+          </article>
         </div>
       </div>
     </section>

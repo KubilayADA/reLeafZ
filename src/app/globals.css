@@ -147,12 +147,27 @@
     background: transparent;
   }
 
+  @media (max-width: 767px) {
+    html:has(.landing-page) {
+      background: #f8fafc;
+    }
+    body:has(.landing-page) {
+      background: #f8fafc;
+    }
+  }
+
   .landing-page {
     touch-action: pan-y;
   }
 
   @supports (padding: env(safe-area-inset-top)) {
-    @media (max-width: 900px) {
+    @media (max-width: 767px) {
+      html:has(.landing-page),
+      body:has(.landing-page) {
+        background-color: #f8fafc;
+      }
+    }
+    @media (min-width: 768px) and (max-width: 900px) {
       html:has(.landing-page),
       body:has(.landing-page) {
         background-color: transparent;
