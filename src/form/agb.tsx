@@ -2,6 +2,7 @@
 
 import React from 'react'
 import Link from 'next/link'
+import '@/app/main.css'
 import '@/form/form.css'
 
 const LeafLogo = ({ className = 'w-48 h-24 sm:w-56 sm:h-28 md:w-64 md:h-32' }) => (

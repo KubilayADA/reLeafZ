@@ -1,47 +1,20 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { ArrowLeft } from 'lucide-react'
-import StepProgress from '@/form/step-progress'
-import FormLogoHomeExit from '@/form/form-logo-home-exit'
+import '@/app/main.css'
 import '@/form/form.css'
 
 interface Step4Props {
   onNext: (answers: { onset: string; frequency: string }) => void
   onBack?: () => void
-  initialOnsetValue?: string
-  initialFrequencyValue?: string
-  onSelectionChange?: (answers: { onset: string; frequency: string }) => void
 }
 
 type OnsetOption = 'more-than-3-months' | 'less-than-3-months'
 type FrequencyOption = 'always' | 'often' | 'never'
 
-export default function Step4({
-  onNext,
-  onBack,
-  initialOnsetValue = '',
-  initialFrequencyValue = '',
-  onSelectionChange,
-}: Step4Props) {
-  const [selectedOnset, setSelectedOnset] = useState<OnsetOption | ''>(initialOnsetValue as OnsetOption | '')
-  const [selectedFrequency, setSelectedFrequency] = useState<FrequencyOption | ''>(
-    initialFrequencyValue as FrequencyOption | ''
-  )
-
-  useEffect(() => {
-    setSelectedOnset(initialOnsetValue as OnsetOption | '')
-  }, [initialOnsetValue])
-
-  useEffect(() => {
-    setSelectedFrequency(initialFrequencyValue as FrequencyOption | '')
-  }, [initialFrequencyValue])
-
-  useEffect(() => {
-    onSelectionChange?.({
-      onset: selectedOnset,
-      frequency: selectedFrequency,
-    })
-  }, [selectedOnset, selectedFrequency, onSelectionChange])
+export default function Step4({ onNext, onBack }: Step4Props) {
+  const [selectedOnset, setSelectedOnset] = useState<OnsetOption | ''>('')
+  const [selectedFrequency, setSelectedFrequency] = useState<FrequencyOption | ''>('')
 
   const onsetOptions = [
     {
@@ -84,32 +57,40 @@ export default function Step4({
   }
 
   return (
-    <div className="form-page form-page--step4-fit inconsolata">
-      <FormLogoHomeExit />
-      <div className="form-container form-container--step4-fit">
+    <div className="form-page inconsolata">
+      <div className="form-container form-container--center">
         {onBack && (
-          <div className="form-header__back-wrap">
-            <Button onClick={onBack} className="btn-outline form-back-button text-sm sm:text-base">
-              <ArrowLeft className="form-back-icon" />
+          <div className="w-full flex justify-start form-header__back-wrap">
+            <Button onClick={onBack} className="btn-outline text-sm sm:text-base">
+              <ArrowLeft className="w-4 h-4 mr-2" />
               Zurück
             </Button>
           </div>
         )}
 
-        <div className="form-card form-card--rounded-lg form-card--step4-fit">
+        <div className="text-center mb-8 sm:mb-12 px-2 sm:px-8">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-3">
+            Diagnose für dein Rezept
+          </h1>
+          <p className="form-header__subtitle">
+            Folge ein paar einfachen Schritten zu deinem Rezept.
+          </p>
+        </div>
+
+        <div className="form-card form-card--rounded-lg flex flex-col gap-10">
           <h2 className="form-section-title">
             Symptome
           </h2>
 
-          <div className="form-step4-sections form-step4-sections--fit">
-            <section className="form-step4-section form-step4-section--fit">
+          <div className="space-y-12">
+            <section className="text-center">
               <h3 className="form-section-title">
                 Wann traten deine Symptome auf?
               </h3>
               <p className="form-section-hint">
                 Bitte wähle einen Zeitraum.
               </p>
-              <div className="form-step4-options form-step4-options--fit">
+              <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 justify-center items-center">
                 {onsetOptions.map((option) => {
                   const isSelected = selectedOnset === option.id
                   return (
@@ -132,14 +113,14 @@ export default function Step4({
               </div>
             </section>
 
-            <section className="form-step4-section form-step4-section--fit">
+            <section className="text-center">
               <h3 className="form-section-title">
                 Wie häufig treten die Symptome bei dir auf?
               </h3>
               <p className="form-section-hint">
                 Bitte wähle einen Zeitraum.
               </p>
-              <div className="form-step4-options form-step4-options--fit">
+              <div className="flex flex-col-reverse sm:flex-row gap-4 sm:gap-6 justify-center items-center">
                 {frequencyOptions.map((option) => {
                   const isSelected = selectedFrequency === option.id
                   return (
@@ -170,12 +151,11 @@ export default function Step4({
           <Button
             onClick={handleNext}
             disabled={!selectedOnset || !selectedFrequency}
-            className="form-cta btn-secondary form-step4-cta form-cta--step4-fit"
+            className="form-cta btn-secondary mt-10"
           >
             Weiter
           </Button>
         </div>
-        <StepProgress currentStep={4} />
       </div>
     </div>
   )
