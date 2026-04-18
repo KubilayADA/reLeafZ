@@ -4,7 +4,6 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { ArrowLeft, Building2 } from 'lucide-react'
-import '@/app/main.css'
 import '@/form/form.css'
 
 export default function VerifyPrescriptionPage() {
