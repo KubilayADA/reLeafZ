@@ -1,304 +1,397 @@
-'use client'
-import React, { useState, useRef, useEffect, useLayoutEffect, Fragment } from 'react';
+import React, { useState, useRef, Fragment, useEffect } from 'react';
+import type { ComponentType } from 'react';
+import {
+  ClipboardList,
+  FlaskConical,
+  CreditCard,
+  FileCheck,
+  Link,
+  Store,
+  Check,
+  Lock,
+  ShieldCheck,
+  FileText,
+  Banknote,
+  Mail,
+  Truck,
+  Building2,
+  ArrowRight,
+  ChevronLeft,
+  ChevronRight,
+} from 'lucide-react';
 import '@/app/main.css';
 import './how.css';
 
-const TOTAL = 4;
+const TOTAL = 6;
 
-type Particle = {
-  id: number;
-  size: number;
-  left: number;
-  top: number;
-  duration: number;
-  delay: number;
-};
+type IconComponent = ComponentType<{ className?: string; 'aria-hidden'?: boolean }>;
+
+interface StepDetail {
+  Icon: IconComponent;
+  label: string;
+}
 
 interface Step {
+  Icon: IconComponent;
   num: string;
+  timeBadge: string;
   title: string;
   desc: string;
-  imageUrl: string;
+  details: StepDetail[];
+  status: string;
+  miniFlow: string[];
+  activeIdx: number;
 }
 
 const STEPS: Step[] = [
   {
+    Icon: ClipboardList,
     num: '01',
-    title: 'Cannabis-Therapie starten.',
-    desc: 'Fülle einfach unseren medizinischen Online-Fragebogen in 2 Minuten aus - unkompliziert von zuhause oder unterwegs. DSGVO-konform und geschützt.',
-    imageUrl: '/how/how1.png',
+    timeBadge: '~5 min',
+    title: 'Fragebogen ausfüllen',
+    desc: 'Kurzes Formular online — vertraulich.',
+    details: [
+      { Icon: FileText, label: 'Symptome & Ziele' },
+      { Icon: Lock, label: 'Verschlüsselt' },
+    ],
+    status: 'Sicher',
+    miniFlow: ['Formular', 'Produkt', 'Zahlung', '…'],
+    activeIdx: 0,
   },
   {
+    Icon: FlaskConical,
     num: '02',
-    title: 'Cannabis-Blüten auswählen.',
-    desc: 'Entdecke unser vielfältiges Sortiment an ausgewählten medizinischen Cannabis Blüten - geprüfte Qualität ab 4,99 €',
-    imageUrl: '/how/how2.png',
+    timeBadge: 'Deine Wahl',
+    title: 'Produkt wählen',
+    desc: 'Sortiment durchstöbern — Blüten, Öle, Extrakte.',
+    details: [
+      { Icon: FlaskConical, label: 'Filterbar' },
+      { Icon: ShieldCheck, label: 'Lizenziert' },
+    ],
+    status: 'Apothekenpflichtig',
+    miniFlow: ['Formular', 'Produkt', 'Zahlung', '…'],
+    activeIdx: 1,
   },
   {
+    Icon: CreditCard,
     num: '03',
-    title: 'Cannabis-Rezept online erhalten.',
-    desc: 'Ein approbierter Arzt oder Ärztin prüft digital deine Angaben und stellt dir bei Eignung ein Cannabis Rezept aus.',
-    imageUrl: '/how/how3.png',
+    timeBadge: 'Einmalig',
+    title: 'Rezeptgebühr zahlen',
+    desc: "Eine Gebühr — dann geht's zum Arzt.",
+    details: [
+      { Icon: Banknote, label: 'Karte, PayPal' },
+      { Icon: ShieldCheck, label: 'PCI-DSS' },
+    ],
+    status: 'Sicher',
+    miniFlow: ['Formular', 'Produkt', 'Zahlung', 'Arzt'],
+    activeIdx: 2,
   },
   {
+    Icon: FileCheck,
     num: '04',
-    title: 'Deine Lieferung ist unterwegs.',
-    desc: 'Dein medizinisches Cannabis wird aus einer Apotheke zu dir geliefert - per Cannabis Express Lieferung in 60 Minuten, per Cannabis Sofort Lieferung in 1-3 Tagen oder hole es einfach in der nächstgelegenen Apotheke ab.',
-    imageUrl: '/how/how4.png',
+    timeBadge: '24–48 h',
+    title: 'Arzt prüft',
+    desc: 'Lizenzierter Arzt — Rezept per E-Mail.',
+    details: [
+      { Icon: FileCheck, label: 'CanG 2024' },
+      { Icon: Building2, label: 'Digital' },
+    ],
+    status: 'Facharzt',
+    miniFlow: ['Zahlung', 'Arzt', 'Link', '…'],
+    activeIdx: 1,
+  },
+  {
+    Icon: Link,
+    num: '05',
+    timeBadge: 'E-Mail',
+    title: 'Zahlungslink',
+    desc: 'Link zum Bezahlen — Apotheke startet danach.',
+    details: [
+      { Icon: Mail, label: 'Link per E-Mail' },
+      { Icon: Link, label: '48 h gültig' },
+    ],
+    status: 'Signiert',
+    miniFlow: ['Arzt', 'Link', 'Apotheke', 'Fertig'],
+    activeIdx: 1,
+  },
+  {
+    Icon: Store,
+    num: '06',
+    timeBadge: 'Deine Wahl',
+    title: 'Abholen oder liefern',
+    desc: 'Apotheke packt — du holst ab oder lässt liefern.',
+    details: [
+      { Icon: Store, label: 'Abholung' },
+      { Icon: Truck, label: 'Versand + Tracking' },
+    ],
+    status: 'Fertig',
+    miniFlow: ['Link', 'Apotheke', 'Übergabe'],
+    activeIdx: 2,
   },
 ];
 
-const PROG_LABELS: string[] = ['Fragebogen', 'Sortiment', 'Rezept', 'Lieferung'];
+const PROG_LABELS: string[] = ['Fragebogen', 'Produkt', 'Zahlung', 'Arzt', 'Link', 'Abholung'];
 
-interface HowProps {
-  landingTheme: 'dark' | 'light';
+const SUMMARY_TITLES: string[] = [
+  'Fragebogen ausfüllen',
+  'Produkt auswählen',
+  'Rezeptgebühr zahlen',
+  'Arzt prüft & genehmigt',
+  'Zahlungslink erhalten',
+  'Abholen oder liefern lassen',
+];
+
+function CheckIcon(): React.JSX.Element {
+  return <Check className="check-icon" aria-hidden />;
 }
 
-export default function How({ landingTheme }: HowProps): React.JSX.Element {
+export default function How(): React.JSX.Element {
   const [current, setCurrent] = useState<number>(0);
-  const [particles, setParticles] = useState<Particle[]>([]);
-  const sectionRef = useRef<HTMLElement | null>(null);
-  const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
-  const cardsContainerRef = useRef<HTMLDivElement | null>(null);
-  const autoScrollRafRef = useRef<number | null>(null);
-  const autoScrollTargetIdxRef = useRef<number | null>(null);
-  const isAutoScrollingRef = useRef(false);
+  const [maxSeen, setMaxSeen] = useState<number>(0);
+  const [direction, setDirection] = useState<1 | -1>(1);
+  const ctaRef = useRef<HTMLDivElement | null>(null);
+  const viewportRef = useRef<HTMLDivElement | null>(null);
+  const isScrollingFromCode = useRef(false);
 
-  useEffect(() => {
-    setParticles(
-      Array.from({ length: 6 }, (_, i) => ({
-        id: i,
-        size: Math.random() * 4 + 2,
-        left: Math.random() * 100,
-        top: Math.random() * 100,
-        duration: Math.random() * 10 + 10,
-        delay: Math.random() * 5,
-      }))
-    );
-  }, []);
-
-  /** Simple rAF-throttled model: active card follows page scroll. */
-  useLayoutEffect(() => {
-    let scheduled = false;
-    let rafId: number | null = null;
-
-    const computeActive = (): void => {
-      if (isAutoScrollingRef.current) {
-        const lockedIdx = autoScrollTargetIdxRef.current;
-        if (lockedIdx !== null) {
-          setCurrent((c) => (c === lockedIdx ? c : lockedIdx));
-        }
-        return;
-      }
-
-      const cards = cardRefs.current;
-      const vh = window.innerHeight;
-      const focusY = vh * 0.32;
-      let bestIdx = 0;
-      let bestDist = Infinity;
-
-      for (let i = 0; i < cards.length; i++) {
-        const el = cards[i];
-        if (!el) continue;
-        const rect = el.getBoundingClientRect();
-        const center = (rect.top + rect.bottom) / 2;
-        const dist = Math.abs(center - focusY);
-        if (dist < bestDist) {
-          bestDist = dist;
-          bestIdx = i;
-        }
-      }
-
-      setCurrent((c) => (c === bestIdx ? c : bestIdx));
-    };
-
-    const schedule = (): void => {
-      if (scheduled) return;
-      scheduled = true;
-      rafId = requestAnimationFrame(() => {
-        scheduled = false;
-        computeActive();
-      });
-    };
-
-    schedule();
-    const container = cardsContainerRef.current;
-    window.addEventListener('scroll', schedule, { passive: true });
-    container?.addEventListener('scroll', schedule, { passive: true });
-    window.addEventListener('resize', schedule, { passive: true });
-
-    return () => {
-      window.removeEventListener('scroll', schedule);
-      container?.removeEventListener('scroll', schedule);
-      window.removeEventListener('resize', schedule);
-      if (rafId !== null) {
-        cancelAnimationFrame(rafId);
-      }
-      if (autoScrollRafRef.current !== null) {
-        cancelAnimationFrame(autoScrollRafRef.current);
-      }
-    };
-  }, []);
-
-  const scrollToCard = (idx: number): void => {
-    const target = cardRefs.current[idx];
-    if (!target) return;
-
-    const stickyTopRaw = sectionRef.current
-      ? getComputedStyle(sectionRef.current).getPropertyValue('--how-sticky-top')
-      : '';
-    const stickyTop = Number.parseFloat(stickyTopRaw);
-    const topOffset = Number.isFinite(stickyTop) ? stickyTop : 120;
-    const endY = Math.max(0, window.scrollY + target.getBoundingClientRect().top - topOffset - 12);
-    const startY = window.scrollY;
-    const distance = endY - startY;
-
-    if (Math.abs(distance) < 1) {
-      setCurrent(idx);
-      return;
-    }
-
-    if (autoScrollRafRef.current !== null) {
-      cancelAnimationFrame(autoScrollRafRef.current);
-    }
-
-    isAutoScrollingRef.current = true;
-    autoScrollTargetIdxRef.current = idx;
+  const goTo = (idx: number): void => {
+    if (idx < 0 || idx >= TOTAL) return;
+    if (idx > maxSeen) setMaxSeen(idx);
+    setDirection(idx > current ? 1 : -1);
     setCurrent(idx);
-
-    const duration = 420;
-    const start = performance.now();
-    const easeOutCubic = (t: number): number => 1 - Math.pow(1 - t, 3);
-
-    const tick = (now: number): void => {
-      const elapsed = now - start;
-      const t = Math.min(1, elapsed / duration);
-      const eased = easeOutCubic(t);
-      window.scrollTo(0, startY + distance * eased);
-
-      if (t < 1) {
-        autoScrollRafRef.current = requestAnimationFrame(tick);
-        return;
-      }
-
-      isAutoScrollingRef.current = false;
-      autoScrollTargetIdxRef.current = null;
-      autoScrollRafRef.current = null;
-    };
-
-    autoScrollRafRef.current = requestAnimationFrame(tick);
+    // On mobile (narrow viewport), scroll the carousel viewport to the slide
+    const vp = viewportRef.current;
+    if (vp && typeof window !== 'undefined' && window.innerWidth < 1024) {
+      isScrollingFromCode.current = true;
+      const slideWidth = vp.offsetWidth;
+      vp.scrollTo({ left: idx * slideWidth, behavior: 'smooth' });
+      setTimeout(() => { isScrollingFromCode.current = false; }, 500);
+    }
   };
 
+  const navigate = (dir: number): void => {
+    if (current === TOTAL - 1 && dir === 1) {
+      ctaRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      return;
+    }
+    setDirection(dir as 1 | -1);
+    goTo(current + dir);
+  };
+
+  // Sync current index from scroll position (mobile horizontal scroll)
+  useEffect(() => {
+    const vp = viewportRef.current;
+    if (!vp) return;
+    let rafId: number | undefined;
+    const onScroll = (): void => {
+      if (isScrollingFromCode.current) return;
+      rafId = requestAnimationFrame(() => {
+        const width = vp.offsetWidth;
+        if (width <= 0) return;
+        const index = Math.round(vp.scrollLeft / width);
+        const clamped = Math.max(0, Math.min(TOTAL - 1, index));
+        if (clamped !== current) setCurrent(clamped);
+      });
+    };
+    const onScrollEnd = (): void => {
+      isScrollingFromCode.current = false;
+    };
+    vp.addEventListener('scroll', onScroll, { passive: true });
+    vp.addEventListener('scrollend', onScrollEnd);
+    vp.addEventListener('touchend', onScrollEnd);
+    return () => {
+      if (rafId != null) cancelAnimationFrame(rafId);
+      vp.removeEventListener('scroll', onScroll);
+      vp.removeEventListener('scrollend', onScrollEnd);
+      vp.removeEventListener('touchend', onScrollEnd);
+    };
+  }, [current]);
+
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent): void => {
+      const target = e.target as HTMLElement | null;
+      if (target && (/^(INPUT|TEXTAREA|SELECT)$/.test(target.tagName) || target.isContentEditable)) return;
+      if (e.key === 'ArrowLeft') {
+        e.preventDefault();
+        navigate(-1);
+      }
+      if (e.key === 'ArrowRight') {
+        e.preventDefault();
+        navigate(1);
+      }
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [current]);
+
+  const isLastStep = current === TOTAL - 1;
+  const progressPercent = ((current + 1) / TOTAL) * 100;
+
   return (
-    <section
-      ref={sectionRef}
-      id="ablauf"
-      className={`how-funktioniert section-container how-column ${landingTheme === 'light' ? 'theme-light' : 'theme-dark'}`}
-      aria-label="So funktioniert der Ablauf"
-    >
-      <div className="how-funktioniert__bg" aria-hidden>
-        <div className="how-funktioniert__bg-base" />
-        <div className="how-funktioniert__glow-line" />
-        <div className="how-funktioniert__glow-radial" />
-        <div className="how-funktioniert__grid" />
-        {particles.map((particle) => (
-          <div
-            key={particle.id}
-            className="how-funktioniert__particle"
-            style={{
-              width: `${particle.size}px`,
-              height: `${particle.size}px`,
-              left: `${particle.left}%`,
-              top: `${particle.top}%`,
-              animation: `floatParticle ${particle.duration}s ease-in-out infinite`,
-              animationDelay: `${particle.delay}s`,
-            }}
-          />
-        ))}
-      </div>
+    <section id="ablauf" className={`how-funktioniert section-container section carousel ${direction === 1 ? 'carousel-dir-next' : 'carousel-dir-prev'}`} aria-label="So funktioniert der Ablauf">
+      <div className="how-layout">
+        <div className="how-left">
+          <div className="header">
+            <div className="eyebrow">So funktioniert&apos;s</div>
+            <h2 className="title">Dein Rezept in 6 Schritten</h2>
+            <p className="subtitle">
+              Online. Sicher. Bis zur Apotheke.
+            </p>
+          </div>
+          <p className="carousel-hint carousel-hint-mobile" aria-hidden="true">Wischen oder Pfeile nutzen</p>
 
-      <div className="section how-funktioniert__shell">
-        <div className="how-layout">
-
-          {/* ── Left: title + nav pills + CTA — sticky in section (desktop), below site header ── */}
-          <aside className="how-sidebar" aria-label="Ablauf Navigation">
-            <div className="how-sidebar-sticky">
-              <div className="how-header">
-                <div className="eyebrow">So funktioniert&apos;s</div>
-                <h2 className="title">Dein Rezept in 4 Schritten</h2>
-              </div>
-
-              <div className="progress-wrap">
-                {STEPS.map((_, i) => (
-                  <Fragment key={i}>
-                    <div
-                      className={`prog-step ${i === current ? 'active' : ''} ${i < current ? 'done' : ''}`}
-                      onClick={() => scrollToCard(i)}
-                      role="button"
-                      tabIndex={0}
-                      onKeyDown={(e: React.KeyboardEvent) => (e.key === 'Enter' || e.key === ' ') && scrollToCard(i)}
-                    >
-                      <div className="prog-dot">{i + 1}</div>
-                      <div className="prog-label">{PROG_LABELS[i]}</div>
-                    </div>
-                    {i < TOTAL - 1 && (
-                      <div className={`prog-connector ${i < current ? 'done' : ''}`} />
-                    )}
-                  </Fragment>
-                ))}
-              </div>
-
-              <div className="cta-block">
-                <p className="cta-note">Kostenlos starten.</p>
-                <a href="#" className="btn-cta">Jetzt Rezept beantragen →</a>
-                <div className="trust">
-                  <div className="trust-item"><span className="trust-dot" />Lizenzierte Ärzte</div>
-                  <div className="trust-item"><span className="trust-dot" />DSGVO-konform</div>
-                  <div className="trust-item"><span className="trust-dot" />Diskrete Verpackung</div>
-                  <div className="trust-item"><span className="trust-dot" />CanG 2024</div>
+          <div className="progress-wrap">
+            {STEPS.map((_, i) => (
+              <Fragment key={i}>
+                <div
+                  className={`prog-step ${i === current ? 'active' : ''} ${i < current ? 'done' : ''}`}
+                  onClick={() => goTo(i)}
+                  role="tab"
+                  id={`step-tab-${i}`}
+                  aria-selected={i === current}
+                  aria-controls={`step-panel-${i}`}
+                  tabIndex={i === current ? 0 : -1}
+                  onKeyDown={(e: React.KeyboardEvent) => (e.key === 'Enter' || e.key === ' ') && goTo(i)}
+                >
+                  <div className="prog-dot">{i + 1}</div>
+                  <div className="prog-label">{PROG_LABELS[i]}</div>
                 </div>
-              </div>
-            </div>
-          </aside>
+                {i < TOTAL - 1 && (
+                  <div className={`prog-connector ${i < current ? 'done' : ''}`} />
+                )}
+              </Fragment>
+            ))}
+          </div>
 
-          {/* ── Right: scrollable step cards ── */}
-          <div ref={cardsContainerRef} className="how-right">
-            {STEPS.map((step, i) => (
+          <div className="summary-grid">
+            {STEPS.map((step, i) => {
+              const StepIcon = step.Icon;
+              return (
+                <div
+                  key={`summary-${i}`}
+                  className={`summary-item ${i === current ? 'current' : ''} ${i < current ? 'done-item' : ''}`}
+                  data-num={step.num}
+                  data-idx={i}
+                  onClick={() => goTo(i)}
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={(e: React.KeyboardEvent) => (e.key === 'Enter' || e.key === ' ') && goTo(i)}
+                >
+                  <span className="si-icon">
+                    <StepIcon className="summary-step-icon" aria-hidden />
+                  </span>
+                  <div className="si-title">{SUMMARY_TITLES[i]}</div>
+                  <div className="si-done">
+                    <CheckIcon />
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        <div className="how-right">
+          <div className="carousel-viewport" ref={viewportRef} aria-live="polite" aria-atomic="true">
+            <div className="carousel-track" style={{ transform: `translateX(-${current * 100}%)` }}>
+          {STEPS.map((step, i) => {
+            const StepIcon = step.Icon;
+            return (
               <div
                 key={`card-${i}`}
-                ref={el => { cardRefs.current[i] = el; }}
-                className={`how-col-card ${i === current ? 'active' : ''}`}
+                className={`step-card carousel-slide ${i === current ? 'active' : ''}`}
+                role="tabpanel"
+                id={`step-panel-${i}`}
+                aria-labelledby={`step-tab-${i}`}
+                aria-hidden={i !== current}
               >
-                <img
-                  src={step.imageUrl}
-                  alt={step.title}
-                  className="how-col-image"
-                  loading="lazy"
-                  onError={(e) => {
-                    e.currentTarget.src = '/map/map-1.png'
-                  }}
-                />
-                <span className="how-col-ghost-num" aria-hidden>{step.num}</span>
-                <div className="how-col-body">
-                  <span className="how-col-num">Schritt {step.num}</span>
-                  <h3 className="how-col-title">{step.title}</h3>
-                  <p className="how-col-desc">{step.desc}</p>
+                <div className="card-inner">
+                  <div className="card-hero">
+                    <div className="card-icon-wrap">
+                      <StepIcon className="step-icon" aria-hidden />
+                    </div>
+                    <div className="card-num">
+                      Schritt {step.num} <span className="time-badge">{step.timeBadge}</span>
+                    </div>
+                    <h3 className="card-title">{step.title}</h3>
+                    <p className="card-desc">{step.desc}</p>
+                  </div>
+                  <div className="card-visual">
+                    <div className="detail-icons">
+                      {step.details.map((item, j) => {
+                        const DetailIcon = item.Icon;
+                        return (
+                          <div key={j} className="detail-icon-item" title={item.label}>
+                            <DetailIcon className="detail-icon" aria-hidden />
+                            <span className="detail-icon-label">{item.label}</span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                    <div className="mini-flow" aria-hidden="true">
+                      {step.miniFlow.map((node, j) => (
+                        <span key={j}>
+                          <span className={`mini-node ${j === step.activeIdx ? 'active-node' : ''}`}>
+                            {node}
+                          </span>
+                          {j < step.miniFlow.length - 1 && (
+                            <ArrowRight className="mini-arrow-icon" aria-hidden />
+                          )}
+                        </span>
+                      ))}
+                    </div>
+                    <span className="status-pill">{step.status}</span>
+                  </div>
                 </div>
               </div>
-            ))}
-
-            <div className="cta-block cta-block-mobile">
-              <p className="cta-note">Kostenlos starten.</p>
-              <a href="#" className="btn-cta">Jetzt Rezept beantragen</a>
-              <div className="trust">
-                <div className="trust-item"><span className="trust-dot" />Lizenzierte Ärzte</div>
-                <div className="trust-item"><span className="trust-dot" />DSGVO-konform</div>
-                <div className="trust-item"><span className="trust-dot" />Diskrete Verpackung</div>
-                <div className="trust-item"><span className="trust-dot" />CanG 2024</div>
-              </div>
+            );
+          })}
             </div>
           </div>
 
+          {/* Slide controls directly under carousel — little gap, green accent */}
+          <div className="nav-row nav-row-under-slides">
+            <button
+              type="button"
+              className="btn-nav btn-nav-prev"
+              onClick={() => navigate(-1)}
+              disabled={current === 0}
+              aria-label="Vorheriger Schritt (wischen nach links)"
+            >
+              <ChevronLeft className="btn-nav-icon" aria-hidden />
+            </button>
+            <span className="step-counter" aria-hidden="true">
+              <span className="step-current">{current + 1}</span>
+              <span className="step-sep">/</span>
+              <span className="step-total">6</span>
+            </span>
+            <button
+              type="button"
+              className={`btn-nav btn-nav-next ${isLastStep ? 'primary' : ''}`}
+              onClick={() => navigate(1)}
+              aria-label={isLastStep ? 'Zum Abschluss' : 'Nächster Schritt (wischen nach rechts)'}
+            >
+              <ChevronRight className="btn-nav-icon" aria-hidden />
+            </button>
+          </div>
+
+          <div className="carousel-progress" role="progressbar" aria-valuenow={current + 1} aria-valuemin={1} aria-valuemax={TOTAL} aria-label="Schritt im Ablauf">
+            <div className="carousel-progress-fill" style={{ width: `${progressPercent}%` }} />
+          </div>
+          <p className="carousel-step-label">
+            Schritt <strong>{current + 1}</strong> von {TOTAL}: {STEPS[current].title}
+          </p>
+
+          <div className="cta-block" ref={ctaRef}>
+        <p className="cta-note">Kostenlos starten.</p>
+        <a href="#" className="btn-cta">
+          Jetzt Rezept beantragen →
+        </a>
+          <div className="trust">
+            <div className="trust-item"><span className="trust-dot" />Lizenzierte Ärzte</div>
+            <div className="trust-item"><span className="trust-dot" />DSGVO-konform</div>
+            <div className="trust-item"><span className="trust-dot" />Diskrete Verpackung</div>
+            <div className="trust-item"><span className="trust-dot" />CanG 2024</div>
+          </div>
+          </div>
         </div>
       </div>
     </section>

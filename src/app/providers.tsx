@@ -1,22 +1,9 @@
 'use client'
 import posthog from 'posthog-js'
 import { PostHogProvider } from 'posthog-js/react'
-import { createContext, useContext, useEffect } from 'react'
-import type { LandingTheme } from '@/lib/landing-theme'
+import { useEffect } from 'react'
 
-const LandingThemeInitialContext = createContext<LandingTheme>('light')
-
-export function useLandingThemeInitial(): LandingTheme {
-  return useContext(LandingThemeInitialContext)
-}
-
-export function PHProvider({
-  children,
-  landingThemeInitial,
-}: {
-  children: React.ReactNode
-  landingThemeInitial: LandingTheme
-}) {
+export function PHProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (typeof window !== 'undefined') {
       posthog.init(
@@ -30,11 +17,5 @@ export function PHProvider({
     }
   }, [])
 
-  return (
-    <PostHogProvider client={posthog}>
-      <LandingThemeInitialContext.Provider value={landingThemeInitial}>
-        {children}
-      </LandingThemeInitialContext.Provider>
-    </PostHogProvider>
-  )
+  return <PostHogProvider client={posthog}>{children}</PostHogProvider>
 }

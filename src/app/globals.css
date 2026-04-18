@@ -128,65 +128,13 @@
     width: 100%;
     height: 100%;
     overflow-x: hidden;
-    overflow-y: scroll;
-    scrollbar-gutter: stable both-edges;
     scroll-behavior: smooth;
-  }
-
-  /*
-   * Landing (home): free scroll in main; hero↔main bridge snap is handled in `attachLandingHeroBridgeSnap`.
-   */
-  html:has(.landing-page) {
-    scroll-behavior: auto;
-    overscroll-behavior-y: none;
-    background: transparent;
-  }
-
-  body:has(.landing-page) {
-    overscroll-behavior-y: none;
-    background: transparent;
-  }
-
-  /* Mobile landing chrome: match toggled theme (`data-releafz-landing-theme` on <html>, see `lib/landing-theme.ts`). */
-  @media (max-width: 767px) {
-    html[data-releafz-landing-theme='dark']:has(.landing-page),
-    html[data-releafz-landing-theme='dark'] body:has(.landing-page) {
-      background: var(--releafz-bg, #0a0a0a);
-    }
-    html:not([data-releafz-landing-theme='dark']):has(.landing-page),
-    html:not([data-releafz-landing-theme='dark']) body:has(.landing-page) {
-      background: #f8fafc;
-    }
-  }
-
-  .landing-page {
-    touch-action: pan-y;
-  }
-
-  @supports (padding: env(safe-area-inset-top)) {
-    @media (max-width: 767px) {
-      html[data-releafz-landing-theme='dark']:has(.landing-page),
-      html[data-releafz-landing-theme='dark'] body:has(.landing-page) {
-        background-color: var(--releafz-bg, #0a0a0a);
-      }
-      html:not([data-releafz-landing-theme='dark']):has(.landing-page),
-      html:not([data-releafz-landing-theme='dark']) body:has(.landing-page) {
-        background-color: #f8fafc;
-      }
-    }
-    @media (min-width: 768px) and (max-width: 900px) {
-      html:has(.landing-page),
-      body:has(.landing-page) {
-        background-color: transparent;
-      }
-    }
   }
   body {
     @apply bg-background text-foreground;
     margin: 0;
     padding: 0;
     width: 100%;
-    height: 100%;
     min-height: 100vh;
     min-height: 100dvh;
   }

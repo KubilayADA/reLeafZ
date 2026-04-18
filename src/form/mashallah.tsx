@@ -5,9 +5,9 @@ import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { ArrowLeft, Lock, CheckCircle2, X } from 'lucide-react'
 import { useRouter } from 'next/navigation'
-import FormLogoHomeExit from '@/form/form-logo-home-exit'
+import '@/app/main.css'
 import '@/form/form.css'
-import { isLocalAccessBypassEnabled } from '@/lib/devAccess'
+import { API_BASE } from '@/lib/api'
 
 interface MashallahFormProps {
   postcode: string
@@ -25,12 +25,11 @@ export default function MashallahForm({
   onBack,
 }: MashallahFormProps) {
   const router = useRouter()
-  const streetPlaceholder = `${street} ${houseNumber}`.trim()
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
     phone: '',
-    street: '',
+    street: `${street} ${houseNumber}`.trim(),
     city: city.trim(),
   })
   const [loading, setLoading] = useState(false)
@@ -42,18 +41,11 @@ export default function MashallahForm({
   const [showWelcomeNotification, setShowWelcomeNotification] = useState(false)
   const [consentHealth, setConsentHealth] = useState(false)
   const [consentTerms, setConsentTerms] = useState(false)
-  /* LOCAL ACCESS BYPASS BLOCK START (toggle usage) */
-  const canBypassAccess = isLocalAccessBypassEnabled()
-  /* LOCAL ACCESS BYPASS BLOCK END (toggle usage) */
-  
-  const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
 
-  // Validate form fields
-  const isFormValid = formData.fullName.trim() !== '' && 
-                     formData.email.trim() !== '' && 
-                     formData.phone.trim() !== '' && 
-                     formData.street.trim() !== '' &&
-                     formData.city.trim() !== '' &&
+  // Validate form fields (street/city come from props; not gated here)
+  const isFormValid = formData.fullName.trim() !== '' &&
+                     formData.email.trim() !== '' &&
+                     formData.phone.trim() !== '' &&
                      consentHealth === true &&
                      consentTerms === true
 
@@ -63,10 +55,8 @@ export default function MashallahForm({
                       // 🔒 SECURITY: Clear authentication tokens when email changes
                       // This prevents using old tokens with new email addresses
                       if (name === 'email') {
-                        console.log('🧹 Clearing tokens due to email change')
-                        localStorage.removeItem('token')
-                        localStorage.removeItem('treatmentRequest')
-                        localStorage.removeItem('assignedPharmacyId')
+                        sessionStorage.removeItem('treatmentRequest')
+                        sessionStorage.removeItem('assignedPharmacyId')
                         // Reset OTP modal state if it was open
                         setOtpModalOpen(false)
                         setOtpCode('')
@@ -98,6 +88,7 @@ export default function MashallahForm({
       const response = await fetch(`${API_BASE}/api/auth/verify-otp`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({
           email: formData.email,
           otpCode: otpCode
@@ -106,15 +97,16 @@ export default function MashallahForm({
 
       const result = await response.json()
 
-      if (response.ok && result.token) {
-        localStorage.setItem('token', result.token)
+      if (response.ok) {
         setOtpModalOpen(false)
         router.push('/questionnaire')
       } else {
         setOtpError(result.message || 'Ungültiger Code. Bitte versuchen Sie es erneut.')
       }
     } catch (error) {
-      console.error('OTP verification error:', error)
+      if (process.env.NODE_ENV === 'development') {
+        console.error('OTP verification error:', error)
+      }
       setOtpError('Fehler bei der Verifizierung. Bitte versuchen Sie es erneut.')
     } finally {
       setVerifyingOtp(false)
@@ -125,23 +117,6 @@ export default function MashallahForm({
   // Returns success + optional error message so caller can show validation errors.
   const submitTreatmentRequest = async (): Promise<{ success: true } | { success: false; message: string }> => {
     try {
-      /* LOCAL ACCESS BYPASS BLOCK START (local submit short-circuit) */
-      if (canBypassAccess) {
-        const localTreatmentRequestData = {
-          id: Date.now(),
-          patientId: null,
-          pharmacyId: null,
-          postcode,
-          zip: postcode,
-          ...formData,
-        }
-        localStorage.setItem('treatmentRequest', JSON.stringify(localTreatmentRequestData))
-        sessionStorage.setItem('treatmentRequest', JSON.stringify(localTreatmentRequestData))
-        localStorage.setItem('formPostcode', postcode)
-        return { success: true }
-      }
-      /* LOCAL ACCESS BYPASS BLOCK END (local submit short-circuit) */
-
       const response = await fetch(`${API_BASE}/api/treatment/submit`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -183,22 +158,20 @@ export default function MashallahForm({
 
       // Only store when API returned a real treatment request
       if (result.data.pharmacyId != null) {
-        localStorage.setItem('assignedPharmacyId', result.data.pharmacyId.toString())
+        sessionStorage.setItem('assignedPharmacyId', result.data.pharmacyId.toString())
       }
       const treatmentRequestData = {
         id: result.data.id,
-        patientId: result.data.patientId ?? null,
-        pharmacyId: result.data.pharmacyId ?? null,
+        city: formData.city,
         postcode,
-        zip: postcode,
-        ...formData,
       }
-      localStorage.setItem('treatmentRequest', JSON.stringify(treatmentRequestData))
       sessionStorage.setItem('treatmentRequest', JSON.stringify(treatmentRequestData))
-      localStorage.setItem('formPostcode', postcode)
+      sessionStorage.setItem('formPostcode', postcode)
       return { success: true }
     } catch (error) {
-      console.error('Error creating treatment request:', error)
+      if (process.env.NODE_ENV === 'development') {
+        console.error('Error creating treatment request:', error)
+      }
       return {
         success: false,
         message: 'Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut.',
@@ -220,17 +193,11 @@ export default function MashallahForm({
         return
       }
 
-      /* LOCAL ACCESS BYPASS BLOCK START (skip auth/OTP locally) */
-      if (canBypassAccess) {
-        router.push('/questionnaire')
-        return
-      }
-      /* LOCAL ACCESS BYPASS BLOCK END (skip auth/OTP locally) */
-
       // Step 2: Check if user exists and if OTP is required (may send OTP email)
       const loginResponse = await fetch(`${API_BASE}/api/auth/patient-login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({ email: formData.email }),
       })
       const loginResult = await loginResponse.json()
@@ -248,8 +215,7 @@ export default function MashallahForm({
       }
 
       // Case 2: Existing user - known device (same IP)
-      if (loginResult.token && !loginResult.otpRequired) {
-        localStorage.setItem('token', loginResult.token)
+      if (!loginResult.otpRequired) {
         setShowWelcomeNotification(true)
         setTimeout(() => setShowWelcomeNotification(false), 3000)
         router.push('/questionnaire')
@@ -266,7 +232,9 @@ export default function MashallahForm({
       setSubmitError('Ein unerwarteter Fehler ist aufgetreten. Bitte versuchen Sie es erneut.')
       setLoading(false)
     } catch (error) {
-      console.error('Error during submit:', error)
+      if (process.env.NODE_ENV === 'development') {
+        console.error('Error during submit:', error)
+      }
       setSubmitError('Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut.')
       setLoading(false)
     }
@@ -309,29 +277,25 @@ export default function MashallahForm({
         </div>
       )}
 
-      <div className="form-page form-page--mashallah inconsolata">
-        <FormLogoHomeExit />
-        <div className="form-container form-container--narrow form-container--mashallah">
+      <div className="form-page inconsolata">
+        <div className="form-container form-container--narrow">
           <div className="form-header">
-            <div className="form-header__title-card">
-              <h1 className="form-header__title form-header__title-card-title title-gradient">
-                Medizinische Anfrage
-              </h1>
+            <div className="form-header__back-wrap">
+              <Button onClick={onBack} className="btn-outline text-sm sm:text-base">
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Zurück
+              </Button>
             </div>
-          </div>
-
-          <div className="form-header__back-wrap form-header__back-wrap--with-postcode">
-            <Button onClick={onBack} className="btn-outline form-back-button text-sm sm:text-base">
-              <ArrowLeft className="form-back-icon" />
-              Zurück
-            </Button>
-            <p className="form-header__postcode-inline form-header__postcode-inline--boxed">
-              Postleitzahl: <span className="form-header__postcode-value">{postcode}</span>
+            <h1 className="form-header__title text-2xl sm:text-3xl md:text-4xl font-bold title-gradient mb-2">
+              Medizinische Anfrage
+            </h1>
+            <p className="form-header__subtitle text-base sm:text-lg">
+              Postleitzahl: <span className="font-semibold text-emerald-600">{postcode}</span>
             </p>
           </div>
 
-          <div className="form-card form-card--mashallah">
-            <form onSubmit={handleSubmit} className="form-fields form-fields--mashallah">
+          <div className="form-card">
+            <form onSubmit={handleSubmit} className="form-fields">
               <div className="form-field">
                 <label htmlFor="fullName" className="form-label">
                   Vollständiger Name
@@ -343,6 +307,7 @@ export default function MashallahForm({
                   value={formData.fullName}
                   onChange={handleChange}
                   required
+                  maxLength={100}
                   disabled={loading}
                   className="form-input inconsolata"
                   placeholder="Max Mustermann"
@@ -360,6 +325,7 @@ export default function MashallahForm({
                   value={formData.email}
                   onChange={handleChange}
                   required
+                  maxLength={254}
                   disabled={loading}
                   className="form-input inconsolata"
                   placeholder="max@example.com"
@@ -377,6 +343,7 @@ export default function MashallahForm({
                   value={formData.phone}
                   onChange={handleChange}
                   required
+                  maxLength={20}
                   disabled={loading}
                   className="form-input inconsolata"
                   placeholder="+49 30 12345678"
@@ -400,12 +367,12 @@ export default function MashallahForm({
                     id="street"
                     name="street"
                     value={formData.street}
-                    onChange={handleChange}
+                    readOnly
                     required
                     maxLength={200}
-                    disabled={loading}
                     className="form-input inconsolata form-input--confirmed"
-                    placeholder={streetPlaceholder || 'z.B. Hauptstraße 42'}
+                    placeholder="z.B. Hauptstraße 42"
+                    aria-readonly="true"
                   />
                 </div>
               </div>
@@ -430,8 +397,8 @@ export default function MashallahForm({
                       value={formData.city}
                       readOnly
                       required
-                      disabled={loading}
-                      className={`form-input inconsolata form-input--with-icon-left ${formData.city ? 'has-value' : ''}`}
+                      maxLength={100}
+                      className="form-input inconsolata form-input--confirmed"
                       placeholder="Berlin"
                       aria-readonly="true"
                     />
@@ -453,6 +420,40 @@ export default function MashallahForm({
                   />
                 </div>
               </div>
+              {/* GDPR Consent Checkboxes */}
+<div className="space-y-3">
+  <div className="flex items-start gap-3">
+    <input
+      type="checkbox"
+      id="consentTerms"
+      checked={consentTerms}
+      onChange={(e) => setConsentTerms(e.target.checked)}
+      disabled={loading}
+      className="mt-1 h-4 w-4 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500 cursor-pointer"
+    />
+    <label htmlFor="consentTerms" className="text-sm text-gray-700 cursor-pointer">
+      Ich akzeptiere die{' '}
+      <a href="/agb" target="_blank" className="text-emerald-600 underline hover:text-emerald-700">AGB</a>
+      {' '}und die{' '}
+      <a href="/datenschutz" target="_blank" className="text-emerald-600 underline hover:text-emerald-700">Datenschutzerklärung</a>
+      {' '}von releafZ. *
+    </label>
+  </div>
+
+      <div className="flex items-start gap-3">
+    <input
+      type="checkbox"
+      id="consentHealth"
+      checked={consentHealth}
+      onChange={(e) => setConsentHealth(e.target.checked)}
+      disabled={loading}
+      className="mt-1 h-4 w-4 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500 cursor-pointer"
+    />
+        <label htmlFor="consentHealth" className="text-sm text-gray-700 cursor-pointer">
+          Ich willige ausdrücklich in die Verarbeitung meiner Gesundheitsdaten (Symptome, Diagnosen, Rezepte) durch releafZ zur Vermittlung medizinischer Leistungen ein (Art. 9 Abs. 2 lit. a DSGVO). *
+        </label>
+      </div>
+    </div>
 
               <div className="space-y-3">
                 <div className="form-checkbox-row">
@@ -503,7 +504,7 @@ export default function MashallahForm({
             </form>
           </div>
 
-          <div className="form-message-box form-message-box--info form-message-box--mashallah-info mt-6 sm:mt-8">
+          <div className="form-message-box form-message-box--info mt-6 sm:mt-8">
             <h3 className="form-message-box__title">
               Lieferung in Berlin
             </h3>
@@ -588,13 +589,16 @@ export default function MashallahForm({
                     await fetch(`${API_BASE}/api/auth/patient-login`, {
                       method: 'POST',
                       headers: { 'Content-Type': 'application/json' },
+                      credentials: 'include',
                       body: JSON.stringify({ email: formData.email })
                     })
                     alert('Neuer Code wurde gesendet!')
                     setOtpCode('')
                     setOtpError('')
                   } catch (error) {
-                    console.error('Resend OTP error:', error)
+                    if (process.env.NODE_ENV === 'development') {
+                      console.error('Resend OTP error:', error)
+                    }
                   }
                 }}
                 className="text-sm text-emerald-600 hover:text-emerald-700 underline"
