@@ -1,0 +1,35 @@
+{
+  "cookies": [
+    {
+      "name": "token",
+      "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjMsInJvbGUiOiJQQVRJRU5UIiwiaWF0IjoxNzc2NTI0OTkwLCJleHAiOjE3NzY1MzIxOTB9.GYd8DCAkGZY0on8LKie84NRBG_htqs_ROpxtKpdyrg0",
+      "domain": "localhost",
+      "path": "/",
+      "expires": 1776532190.391255,
+      "httpOnly": true,
+      "secure": false,
+      "sameSite": "Lax"
+    },
+    {
+      "name": "ph_phc_FFsEUEJmG8OUoAKFd7QFwXuhFLkyTFiSQbKDkZgunw9_posthog",
+      "value": "%7B%22%24device_id%22%3A%22019da124-0901-7da9-96fc-373289a18fb9%22%2C%22distinct_id%22%3A%22019da124-0901-7da9-96fc-373289a18fb9%22%2C%22%24sesid%22%3A%5B1776524990529%2C%22019da124-0a1d-7c6e-9664-40f9ce73c4ff%22%2C1776524986909%5D%2C%22%24user_state%22%3A%22anonymous%22%7D",
+      "domain": "localhost",
+      "path": "/",
+      "expires": 1808060991,
+      "httpOnly": false,
+      "secure": false,
+      "sameSite": "Lax"
+    }
+  ],
+  "origins": [
+    {
+      "origin": "http://localhost:3000",
+      "localStorage": [
+        {
+          "name": "ph_phc_FFsEUEJmG8OUoAKFd7QFwXuhFLkyTFiSQbKDkZgunw9_posthog",
+          "value": "{\"$initialization_time\":\"2026-04-18T15:09:46.622Z\",\"$configured_session_timeout_ms\":1800000,\"distinct_id\":\"019da124-0901-7da9-96fc-373289a18fb9\",\"$device_id\":\"019da124-0901-7da9-96fc-373289a18fb9\",\"$user_state\":\"anonymous\",\"$error_tracking_suppression_rules\":[],\"$session_recording_remote_config\":{\"cache_timestamp\":1776524986909,\"enabled\":true,\"canvasFps\":null,\"canvasQuality\":null,\"consoleLogRecordingEnabled\":true,\"endpoint\":\"/s/\",\"eventTriggers\":[],\"linkedFlag\":null,\"masking\":null,\"minimumDurationMilliseconds\":null,\"networkPayloadCapture\":{\"capturePerformance\":{\"network_timing\":true,\"web_vitals\":true,\"web_vitals_allowed_metrics\":null}},\"recordCanvas\":false,\"recorderVersion\":\"v2\",\"sampleRate\":null,\"scriptConfig\":{\"script\":\"posthog-recorder\"},\"triggerMatchType\":null,\"urlBlocklist\":[],\"urlTriggers\":[],\"version\":1,\"canvasRecording\":{\"enabled\":false,\"fps\":null,\"quality\":null}},\"$autocapture_disabled_server_side\":false,\"$product_tours_enabled_server_side\":false,\"$heatmaps_enabled_server_side\":true,\"$web_vitals_enabled_server_side\":true,\"$web_vitals_allowed_metrics\":null,\"$exception_capture_enabled_server_side\":false,\"$dead_clicks_enabled_server_side\":false,\"$sesid\":[1776524990529,\"019da124-0a1d-7c6e-9664-40f9ce73c4ff\",1776524986909],\"$client_session_props\":{\"sessionId\":\"019da124-0a1d-7c6e-9664-40f9ce73c4ff\",\"props\":{\"r\":\"$direct\",\"u\":\"http://localhost:3000/form?postcode=13086&address=Langhansstra%C3%9Fe+77&street=Langhansstra%C3%9Fe&houseNumber=77&city=Berlin\"}},\"$debug_first_full_snapshot_timestamp\":1776524986921,\"$sess_rec_flush_size\":74387}"
+        }
+      ]
+    }
+  ]
+}
