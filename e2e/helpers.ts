@@ -1,0 +1,9 @@
+export const TEST_EMAIL = 'kubilayada.26@gmail.com';
+export const TEST_ZIP = '13086';
+export const TEST_CITY = 'Berlin';
+export const STRIPE_TEST_CARD = '4242424242424242';
+export const STRIPE_EXPIRY = '12/30';
+export const STRIPE_CVC = '123';
+export const DOCTOR_EMAIL = 'snips_remains.2m@icloud.com';
+export const PHARMACY_EMAIL = 'pharmacy3@example.com';
+export const PHARMACY_PASSWORD = 'pharmacy123';
