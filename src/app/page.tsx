@@ -12,8 +12,10 @@ import How from '@/components/ui/funktioniert/how'
 import PartnerApotheken from '@/components/ui/partnerApotheken/finden'
 import Footer from '@/components/ui/footer/footer'
 import { attachLandingBinarySwitch } from '@/lib/scroll'
+import { useLandingTheme } from '@/lib/use-landing-theme'
+import { useLandingThemeInitial } from './providers'
 
-const COMING_SOON_MODE = false
+const COMING_SOON_MODE = true
 
 const inconsolataStyle = {
   fontFamily: '"Inconsolata", monospace',
@@ -26,13 +28,8 @@ export default function LandingPage() {
   const [dialogOpen, setDialogOpen] = useState(false)
   const [showHeader, setShowHeader] = useState(false)
   const [zipInput, setZipInput] = useState('')
-  const LANDING_THEME_STORAGE_KEY = 'releafz-landing-theme'
-  const [landingTheme, setLandingTheme] = useState<'dark' | 'light'>(() => {
-    if (typeof window === 'undefined') return 'light'
-    const storedTheme = window.localStorage.getItem(LANDING_THEME_STORAGE_KEY)
-    if (storedTheme === 'dark' || storedTheme === 'light') return storedTheme
-    return 'light'
-  })
+  const initialLandingTheme = useLandingThemeInitial()
+  const [landingTheme, setLandingTheme] = useLandingTheme(initialLandingTheme)
 
   useEffect(() => {
     const updateHeaderVisibility = () => {
@@ -54,10 +51,6 @@ export default function LandingPage() {
   useEffect(() => {
     return attachLandingBinarySwitch()
   }, [])
-
-  useEffect(() => {
-    window.localStorage.setItem(LANDING_THEME_STORAGE_KEY, landingTheme)
-  }, [landingTheme])
 
   if (COMING_SOON_MODE) {
     return <ComingSoon />
@@ -117,8 +110,8 @@ export default function LandingPage() {
           id="landing-main"
           className="landing-main landing-snap-target"
           data-theme={landingTheme}
+          suppressHydrationWarning
         >
-
           <MobileHero setDialogOpen={setDialogOpen} />
           <PartnerApotheken />
           <How landingTheme={landingTheme} />
