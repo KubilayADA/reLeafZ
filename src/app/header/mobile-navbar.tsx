@@ -27,9 +27,14 @@ export default function MobileNavbar({
   const containerRef = useRef<HTMLDivElement>(null)
   const isOpenRef = useRef(false)
   const savedScrollRef = useRef(0)
+  const themeSliderValRef = useRef<0 | 1>(landingTheme === 'light' ? 1 : 0)
 
   // Keep ref in sync so scroll/touch handlers can read current value without stale closure
   useEffect(() => { isOpenRef.current = isOpen }, [isOpen])
+
+  useEffect(() => {
+    themeSliderValRef.current = landingTheme === 'light' ? 1 : 0
+  }, [landingTheme])
 
   useEffect(() => {
     const SECTION_IDS = ['partner-apotheken', 'ablauf'] as const
@@ -90,6 +95,13 @@ export default function MobileNavbar({
       savedScrollRef.current = window.scrollY
       setIsOpen(true)
     }
+  }
+
+  const handleThemeSlider = (raw: number) => {
+    const value = raw === 1 ? 1 : 0
+    if (value === themeSliderValRef.current) return
+    themeSliderValRef.current = value
+    onThemeToggle()
   }
 
   const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
@@ -160,18 +172,33 @@ export default function MobileNavbar({
         </nav>
 
         <div className="mnav__theme-row">
-          <span className="mnav__theme-label">Theme</span>
-          <button
-            type="button"
-            onClick={onThemeToggle}
-            className={`mnav__theme-toggle ${landingTheme === 'light' ? 'is-light' : ''}`}
-            aria-pressed={landingTheme === 'light'}
-            aria-label={`Switch to ${landingTheme === 'dark' ? 'light' : 'dark'} mode`}
+          <span className="mnav__theme-label" id="mnav-theme-label">
+            Theme
+          </span>
+          <div
+            className={`mnav__theme-switch${landingTheme === 'light' ? ' mnav__theme-switch--light' : ''}`}
+            role="group"
+            aria-labelledby="mnav-theme-label"
           >
-            <span className="mnav__theme-thumb" aria-hidden />
-            <span className={`mnav__theme-state ${landingTheme === 'dark' ? 'is-active' : ''}`}>Dark</span>
-            <span className={`mnav__theme-state ${landingTheme === 'light' ? 'is-active' : ''}`}>Light</span>
-          </button>
+            <span className="mnav__theme-end-label" aria-hidden>
+              Dark
+            </span>
+            <input
+              type="range"
+              className="mnav__theme-range"
+              min={0}
+              max={1}
+              step={1}
+              value={landingTheme === 'light' ? 1 : 0}
+              onChange={(e) => handleThemeSlider(Number(e.target.value))}
+              onInput={(e) => handleThemeSlider(Number(e.currentTarget.value))}
+              aria-label="Choose light or dark theme"
+              aria-valuetext={landingTheme === 'light' ? 'Light' : 'Dark'}
+            />
+            <span className="mnav__theme-end-label" aria-hidden>
+              Light
+            </span>
+          </div>
         </div>
 
         <div className="mnav__cta-wrap">

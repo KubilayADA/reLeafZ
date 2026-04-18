@@ -56,6 +56,12 @@ Use this if you want local access without the postcode/session gate.
   - `ENABLE_LOCAL_ACCESS_BYPASS = false` disables it
   - Bypass only applies on `localhost` / `127.0.0.1`
 
+  to remove it go to @devAccess.ts and set it to true to be able to access and false to turn it off  in lib
+
+  To remove this feature later, search for: 
+
+`LOCAL ACCESS BYPASS BLOCK START`
+
 ### Where code was changed
 
 - `src/lib/devAccess.ts`
@@ -79,6 +85,4 @@ Use this if you want local access without the postcode/session gate.
   - Stores treatment request in both `localStorage` and `sessionStorage`
   - Wrapped each changed region with `LOCAL ACCESS BYPASS BLOCK START/END` comments
 
-To remove this feature later, search for:
 
-`LOCAL ACCESS BYPASS BLOCK START`

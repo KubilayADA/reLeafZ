@@ -384,3 +384,104 @@
   opacity: 0.96;
 }
 
+/* ── Dark mode (landing theme toggle; matches how-funktioniert / partner-apotheken) ── */
+
+#landing-main[data-theme='dark'] .mobile-hero {
+  background: var(--releafz-bg, #0a0a0a);
+  color: var(--releafz-text, #ffffff);
+}
+
+#landing-main[data-theme='dark'] .mobile-hero__bg-base {
+  background: linear-gradient(to bottom, #0a0a0a 0%, #0f0f0f 50%, #0a0a0a 100%);
+}
+
+#landing-main[data-theme='dark'] .mobile-hero__bg-glow-radial {
+  background: radial-gradient(
+    ellipse at center,
+    rgba(34, 211, 238, 0.14) 0%,
+    rgba(16, 185, 129, 0.1) 30%,
+    transparent 70%
+  );
+}
+
+#landing-main[data-theme='dark'] .mobile-hero__bg-grid {
+  opacity: 0.05;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.1) 1px, transparent 1px);
+}
+
+#landing-main[data-theme='dark'] .mobile-hero__bg-particle {
+  background: rgba(34, 211, 238, 0.65);
+  box-shadow:
+    0 0 15px rgba(34, 211, 238, 0.75),
+    0 0 30px rgba(34, 211, 238, 0.35);
+}
+
+#landing-main[data-theme='dark'] .mobile-hero__lang-item {
+  color: var(--releafz-text, #ffffff);
+}
+
+#landing-main[data-theme='dark'] .mobile-hero__row {
+  border-top-color: var(--releafz-border, rgba(255, 255, 255, 0.14));
+}
+
+#landing-main[data-theme='dark'] .mobile-hero__row:last-child {
+  border-bottom-color: var(--releafz-border, rgba(255, 255, 255, 0.14));
+}
+
+#landing-main[data-theme='dark'] .mobile-hero__row-trigger {
+  color: var(--releafz-text, #ffffff);
+}
+
+#landing-main[data-theme='dark'] .mobile-hero__row-indicator {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+#landing-main[data-theme='dark'] .mobile-hero__trust-group-label {
+  color: var(--releafz-muted-dim, rgba(255, 255, 255, 0.5));
+}
+
+#landing-main[data-theme='dark'] .mobile-hero__trust-card {
+  background: var(--releafz-glass-elevated, rgba(26, 26, 26, 0.75));
+  border-color: var(--releafz-border, rgba(255, 255, 255, 0.14));
+}
+
+#landing-main[data-theme='dark'] .mobile-hero__trust-icon {
+  color: rgba(255, 255, 255, 0.55);
+}
+
+#landing-main[data-theme='dark'] .mobile-hero__trust-title {
+  color: var(--releafz-text, #ffffff);
+}
+
+#landing-main[data-theme='dark'] .mobile-hero__trust-sub {
+  color: var(--releafz-muted, rgba(255, 255, 255, 0.72));
+}
+
+#landing-main[data-theme='dark'] .mobile-hero__trust-check {
+  border-color: rgba(255, 255, 255, 0.2);
+  color: rgba(255, 255, 255, 0.45);
+}
+
+#landing-main[data-theme='dark'] .mobile-hero__cta-copy {
+  color: var(--releafz-muted, rgba(255, 255, 255, 0.72));
+}
+
+#landing-main[data-theme='dark'] .mobile-hero__cta-btn {
+  background: #141414;
+  border-top-color: #e2e8f0;
+  border-left-color: #e2e8f0;
+  border-right-color: #64748b;
+  border-bottom-color: #64748b;
+  color: #f8fafc;
+}
+
+#landing-main[data-theme='dark'] .mobile-hero__cta-btn:hover {
+  filter: brightness(1.06);
+}
+
+#landing-main[data-theme='dark'] .mobile-hero__cta-btn:focus-visible {
+  outline-color: #22d3ee;
+}
+

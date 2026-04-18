@@ -178,9 +178,9 @@ export default function Hero({
 
   const heroChecklistItems = [
     'Lieferung in 30-90 Minuten in Berlin',
-    'Ganz Deutschland in 1-2 Tagen',
-    '100% Legal & Secure Wallah',
-    'i am a banana',
+    'Rezept direkt vom Arzt online',
+    'Ärztlich geprüft & empfohlen',
+    'Verschlüsselte Arzt-Patienten-Kommunikation',
   ]
 
   return (

@@ -147,11 +147,14 @@
     background: transparent;
   }
 
+  /* Mobile landing chrome: match toggled theme (`data-releafz-landing-theme` on <html>, see `lib/landing-theme.ts`). */
   @media (max-width: 767px) {
-    html:has(.landing-page) {
-      background: #f8fafc;
+    html[data-releafz-landing-theme='dark']:has(.landing-page),
+    html[data-releafz-landing-theme='dark'] body:has(.landing-page) {
+      background: var(--releafz-bg, #0a0a0a);
     }
-    body:has(.landing-page) {
+    html:not([data-releafz-landing-theme='dark']):has(.landing-page),
+    html:not([data-releafz-landing-theme='dark']) body:has(.landing-page) {
       background: #f8fafc;
     }
   }
@@ -162,8 +165,12 @@
 
   @supports (padding: env(safe-area-inset-top)) {
     @media (max-width: 767px) {
-      html:has(.landing-page),
-      body:has(.landing-page) {
+      html[data-releafz-landing-theme='dark']:has(.landing-page),
+      html[data-releafz-landing-theme='dark'] body:has(.landing-page) {
+        background-color: var(--releafz-bg, #0a0a0a);
+      }
+      html:not([data-releafz-landing-theme='dark']):has(.landing-page),
+      html:not([data-releafz-landing-theme='dark']) body:has(.landing-page) {
         background-color: #f8fafc;
       }
     }
