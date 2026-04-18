@@ -50,6 +50,35 @@ async function completeToSymptoms(page: any) {
 
   await page.locator('button:has-text("Weiter")').last().click();
   await page.waitForTimeout(1000);
+
+  await expect(page.locator('text=Apotheke & Lieferart')).toBeVisible({ timeout: 15000 });
+}
+
+async function completeToPayment(page: any) {
+  await completeToSymptoms(page);
+
+  // Wait for marketplace to load
+  await expect(page.locator('text=Apotheke & Lieferart')).toBeVisible({ timeout: 15000 });
+
+  // Click on pharmacy to expand
+  await page.locator('text=Test Apotheke').click();
+  await page.waitForTimeout(1000);
+
+  // Take screenshot to see products
+  await page.screenshot({ path: 'e2e/screenshots/pharmacy-expanded.png' });
+
+  await page.locator('button:has-text("Lieferung")').first().click();
+  await page.waitForTimeout(1000);
+  await page.screenshot({ path: 'e2e/screenshots/delivery-selected.png' });
+
+  // Click first product card by name
+  await page.getByText('Bediol').click();
+  await page.waitForTimeout(1000);
+  await page.screenshot({ path: 'e2e/screenshots/product-selected.png' });
+
+  // Click Weiter to proceed to payment
+  await page.locator('button:has-text("Weiter")').last().click();
+  await page.waitForTimeout(2000);
 }
 
 test.describe('Patient Flow - E2E', () => {
@@ -100,6 +129,11 @@ test.describe('Patient Flow - E2E', () => {
     await page.screenshot({ path: 'e2e/screenshots/after-questionnaire.png' });
     // Assert marketplace or payment step visible
     await expect(page.locator('text=Apotheke, text=Marktplatz, text=14,99, text=Weiter')).toBeVisible({ timeout: 15000 }).catch(() => {});
+  });
+
+  test('7. select pharmacy and product', async ({ page }) => {
+    await completeToPayment(page);
+    await page.screenshot({ path: 'e2e/screenshots/after-product-select.png' });
   });
 
 });
