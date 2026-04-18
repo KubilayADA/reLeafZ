@@ -73,6 +73,36 @@
     font-variation-settings: "wdth" 108;
 }
 
+.helvetica-neue-regular {
+    font-family: "Helvetica Neue", sans-serif;
+    font-weight: 800;
+    font-optical-sizing: auto;
+    font-style: normal;
+}
+
+.helvetica-neue-medium {
+    font-family: "Helvetica Neue", sans-serif;
+    font-weight: 400;
+    font-optical-sizing: auto;
+    font-style: normal;
+}
+
+/* ── Shared dark landing palette (how-funktioniert, partner-apotheken, ComingSoon) ── */
+:root {
+    --releafz-bg: #0a0a0a;
+    --releafz-bg-mid: #0f0f0f;
+    --releafz-accent: #10b981;
+    --releafz-cyan: #22d3ee;
+    --releafz-text: #ffffff;
+    --releafz-muted: rgba(255, 255, 255, 0.72);
+    --releafz-muted-dim: rgba(255, 255, 255, 0.5);
+    --releafz-border: rgba(255, 255, 255, 0.14);
+    --releafz-glass: rgba(26, 26, 26, 0.72);
+    --releafz-glass-elevated: rgba(26, 26, 26, 0.75);
+    --releafz-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    --releafz-mono: "Inconsolata", monospace;
+}
+
 /* setting background color */
 
 body {
@@ -96,18 +126,135 @@ body {
     background: linear-gradient(to left, #fbfdfb, #ffffff);
 }
 
-/* Text Color Classes for Mashallah Form */
+/* Text Color Classes for Mashallah Form and hero section */
+
+.title-gradient-hero {
+    background: linear-gradient(to bottom, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.55));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+    font-size: 1.875rem;
+    font-weight: 900;
+    margin-bottom: 0.15rem;
+    line-height: 1.5;
+}
 
 .title-gradient {
     background: linear-gradient(to right, #111827, #000000);
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
-    color: #111827; /* Fallback for browsers that don't support background-clip: text */
+    color: transparent;
+    font-size: 1.875rem;
+    font-weight: 900;
+    margin-bottom: 0.15rem;
+    line-height: 1.25;
+}
+
+.logo-hero {
+    margin-top: -2.5rem;
+    width: 120px;
+    height: 120px;
+    object-fit: contain;
+}
+
+@media (min-width: 640px) {
+    .logo-hero {
+        margin-top: -4rem;
+        width: 190px;
+        height: 190px;
+    }
+
+    .title-gradient {
+        font-size: 3rem;
+        font-weight: 900;
+        margin-bottom: 1rem;
+        position: relative;
+        left: 0.5rem;
+    }
+}
+
+@media (min-width: 768px) {
+    .title-gradient {
+        font-size: 4.5rem;
+    }
+}
+
+@media (min-width: 640px) {
+    .title-gradient-hero {
+        font-size: clamp(3rem, 6vw, 4.5rem);
+        font-weight: 900;
+        margin-bottom: 1rem;
+    }
+}
+
+.trust-badges {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem 1.25rem;
+    font-size: 0.975rem;
+    font-weight: 700;
+    color: white;
+    margin-bottom: 0.5rem;
+    max-width: 100%;
+}
+
+.trust-badge-item {
+    display: flex;
+    align-items: center;
 }
 
 .subtitle-text {
     color: #111827;
+    font-size: 0.875rem;
+    font-family: 'Helvetica Neue', sans-serif;
+    margin-bottom: 0.25rem;
+    max-width: 56rem;
+    margin-left: auto;
+    margin-right: auto;
+    line-height: 1.625;
+    padding-left: 1rem;
+    padding-right: 1rem;
+}
+
+@media (min-width: 640px) {
+    .subtitle-text {
+        font-size: 1rem;
+    }
+}
+
+@media (min-width: 768px) {
+    .subtitle-text {
+        font-size: 1.125rem;
+    }
+}
+
+.subtitle-text-hero {
+    color: white;
+    font-size: 0.975rem;
+    font-family: 'Helvetica Neue', sans-serif;
+    margin-bottom: 1rem;
+    max-width: 56rem;
+    margin-left: auto;
+    margin-right: auto;
+    line-height: 1.625;
+    padding-left: 1rem;
+    padding-right: 1rem;
+}
+
+@media (min-width: 640px) {
+    .subtitle-text-hero {
+        font-size: 1rem;
+    }
+}
+
+@media (min-width: 768px) {
+    .subtitle-text-hero {
+        font-size: 1.125rem;
+    }
 }
 
 .form-label {
@@ -165,20 +312,57 @@ button[disabled] {
 
 /* Shared button styling - colors, font, shadows */
 .btn-primary,
-.behandlung-button,
-.behandlung-button-hero {
+.behandlung-button {
     font-family: "Inconsolata", monospace;
     font-weight: 550;
     font-size: 14px;
     line-height: 24px;
-    background-color: #72906F;
-    color: white;
-    border: 1.1px solid #000000;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-    transition: all 0.3s ease;
+    margin-top: 100px;
 }
 
-/* Header button - absolute positioned only when inside the site header */
+@property --border-angle {
+    syntax: '<angle>';
+    initial-value: 0deg;
+    inherits: false;
+}
+
+.behandlung-button-hero {
+    position: relative;
+    font-family: "Inconsolata", monospace;
+    font-weight: 900;
+    font-size: 15px;
+    line-height: 24px;
+    margin-top: 15rem;
+    color: rgba(255, 255, 255, 0.95);
+    border: 2px solid transparent;
+    background-clip: padding-box, border-box;
+    background-origin: padding-box, border-box;
+    background-image:
+        linear-gradient(#72906f, #72906f),
+        conic-gradient(
+            from var(--border-angle),
+            #72906f 0deg,
+            #8aaa87 45deg,
+            #b8d9b5 90deg,
+            #e8f5e8 135deg,
+            #ffffff 180deg,
+            #e8f5e8 225deg,
+            #b8d9b5 270deg,
+            #8aaa87 315deg,
+            #72906f 360deg
+        );
+    box-shadow: 0 0 8px 1px rgba(168, 213, 162, 0.2), 0 4px 6px -1px rgba(0, 0, 0, 0.12);
+    animation: spin-border 6s linear infinite;
+    transition: box-shadow 0.4s ease, transform 0.3s ease;
+}
+
+@keyframes spin-border {
+    to {
+        --border-angle: 360deg;
+    }
+}
+
+/* Header button — absolute only inside site header */
 header .btn-primary,
 header .behandlung-button {
     position: absolute;
@@ -186,15 +370,14 @@ header .behandlung-button {
     right: 50px;
 }
 
-/* Hero button - stays in normal document flow so you can position it with flex/margin/padding */
-.behandlung-button-hero {
-    position: relative;
+.btn-primary:hover:not(:disabled),
+.behandlung-button:hover:not(:disabled) {
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    transform: translateY(-1px);
 }
 
-.btn-primary:hover:not(:disabled),
-.behandlung-button:hover:not(:disabled),
 .behandlung-button-hero:hover:not(:disabled) {
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 0 22px 6px rgba(168, 213, 162, 0.6), 0 10px 15px -3px rgba(0, 0, 0, 0.15);
     transform: translateY(-1px);
 }
 
@@ -238,7 +421,7 @@ header .behandlung-button {
     transition: all 0.3s ease;
 }
 
-.btn-outline:hover:not(:disabled) { 
+.btn-outline:hover:not(:disabled) {
     background-color: #fbfdfb;
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
     transform: translateY(-1px);
@@ -356,30 +539,336 @@ header .behandlung-button {
 }
 
 .hero-section {
-    background: #fbfdfb;
-    border-left: 1px solid #000000;
-    border-right: 1px solid #000000;
-    max-width: calc(100% - 200px);
-    margin-left: 250px;
-    margin-right: 250px;
+    background: transparent;
+    width: 100%;
+    max-width: none;
+    margin-left: 0;
+    margin-right: 0;
     z-index: 1;
 }
 
-@media (max-width: 768px) {
-    .hero-section {
-        border-left: none;
-        border-right: none;
-        max-width: 100%;
-        margin-left: 0;
-        margin-right: 0;
+/*
+ * Fixed hero: no inner scroll — document scrolls `.landing-main` over the hero.
+ * `pointer-events` for pass-through scrolling is set on the section in hero.tsx (`pointer-events-none` + `auto` on interactive nodes).
+ */
+.hero-section.hero-section--fixed {
+    z-index: 0;
+    overflow: hidden;
+    overscroll-behavior: none;
+    touch-action: pan-y;
+}
+
+/* Landing: two-section bridge with snap from fixed hero to main content */
+.landing-snap-scroll {
+    scroll-snap-type: y mandatory;
+}
+
+.landing-hero-snap-target {
+    min-height: 100dvh;
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+    pointer-events: none;
+}
+
+.landing-main {
+    position: relative;
+    z-index: 10;
+    background: var(--releafz-bg);
+    color: var(--releafz-text);
+    -webkit-font-smoothing: antialiased;
+}
+
+/* Scrollable landing column: match how/partner dark sections + downstream blocks */
+.landing-main .section-container {
+    background: var(--releafz-bg);
+}
+
+.landing-main .bg-gradient-to-br-custom {
+    background: linear-gradient(to bottom, var(--releafz-bg) 0%, var(--releafz-bg-mid) 50%, var(--releafz-bg) 100%);
+}
+
+.landing-main .bg-gradient-to-r-custom {
+    background: linear-gradient(to right, var(--releafz-bg), var(--releafz-bg-mid), var(--releafz-bg));
+}
+
+.landing-main .bg-gradient-to-l-custom {
+    background: linear-gradient(to left, var(--releafz-bg-mid), var(--releafz-bg));
+}
+
+.landing-main .subtitle-text {
+    color: var(--releafz-muted);
+}
+
+.landing-main .title-gradient {
+    background: linear-gradient(to right, #f8fafc, rgba(34, 211, 238, 0.95));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+}
+
+.landing-snap-target {
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+}
+
+/* Hero CTA: button centered; text+arrow absolutely placed */
+.hero-cta-wrap {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2rem;
+    margin-bottom: 3rem;
+    width: 100%;
+    overflow: visible;
+}
+
+/* Text block — absolutely positioned, right side of hero */
+.hero-cta-text-block {
+    position: absolute;
+    right: -5rem;
+    top: -3rem;
+    overflow: visible;
+    margin-top: 15rem;
+}
+
+/* Arrow block — absolutely positioned, right side of hero, below text */
+.hero-cta-arrow-block {
+    position: absolute;
+    right: 22.5rem;
+    top: -3rem;
+    overflow: visible;
+    margin-top: 15rem;
+}
+
+/* Button independent, stays centered */
+.hero-cta-center {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+}
+
+.hero-cta-text {
+    font-family: var(--font-inconsolata), "Inconsolata", monospace;
+    font-size: 0.995rem;
+    font-weight: 900;
+    line-height: 1.1;
+    position: relative;
+    margin-top: 0;
+    text-align: right;
+    color: #ffffff;
+    max-width: 18rem;
+}
+
+@media (min-width: 640px) {
+    .hero-cta-text {
+        font-size: 1rem;
     }
 }
 
+/* Hero scroll CTA ("Entdecke wie es funktioniert") */
+.hero-scroll-cta {
+    position: absolute;
+    left: 50%;
+    bottom: 2rem;
+    transform: translateX(-50%);
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    text-decoration: none;
+    color: inherit;
+    transition: opacity 150ms ease;
+}
+
+.hero-scroll-cta:hover {
+    opacity: 1;
+}
+
+.hero-scroll-cta:hover .hero-scroll-cta-icon {
+    transform: translateY(3px);
+    box-shadow: 0 0 0 6px rgba(255,255,255,0.15);
+}
+
+.hero-scroll-cta-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: 50%;
+    border: 1.5px solid rgba(255,255,255,0.55);
+    background: rgba(255,255,255,0.08);
+    color: rgba(255,255,255,0.95);
+    backdrop-filter: blur(4px);
+    transition: transform 200ms ease, box-shadow 200ms ease;
+    animation: hero-cta-pulse 2.5s ease-in-out infinite;
+}
+
+@keyframes hero-cta-pulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(255,255,255,0.25); }
+    50%       { box-shadow: 0 0 0 8px rgba(255,255,255,0); }
+}
+
+.hero-scroll-cta-text {
+    font-family: "Helvetica Neue", sans-serif;
+    font-size: 0.995rem;
+    font-weight: 900;
+    text-align: center;
+    color: rgba(255, 255, 255, 0.95);
+    text-shadow: 0 1px 2px rgba(0,0,0,0.8);
+}
+
+@media (min-width: 640px) {
+    .hero-scroll-cta-text {
+        font-size: 1rem;
+    }
+}
+
+
+.hero-cta-arrow {
+    position: absolute;
+    bottom: 1rem;
+    width: 7rem;
+    min-width: 7rem;
+    height: auto;
+    flex-shrink: 0;
+    object-fit: contain;
+    display: block;
+}
+@media (min-width: 640px) {
+    .hero-cta-arrow {
+        width: 10rem;
+        min-width: 10rem;
+    }
+}
+
+/* ── Hero: Mobile & Tablet Responsive ───────────────────────── */
+
+/* iPad and below: stack decorative text+arrow in flow (desktop keeps absolute right placement) */
+@media (max-width: 1024px) {
+    .hero-cta-text-block,
+    .hero-cta-arrow-block {
+        position: static;
+        right: auto;
+        left: auto;
+        top: auto;
+        margin-top: 0;
+        margin-left: auto;
+        margin-right: auto;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        overflow: visible;
+        width: 100%;
+        max-width: 100%;
+    }
+
+    .hero-cta-text-block {
+        margin-top: 1rem;
+        padding-left: 0.5rem;
+        padding-right: 0.5rem;
+    }
+
+    .hero-cta-arrow-block {
+        margin-top: 0.35rem;
+        margin-bottom: 0.25rem;
+    }
+
+    .hero-cta-text {
+        text-align: center;
+        max-width: min(22rem, 100%);
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .hero-section {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-start;
+        padding-top: 4.75rem;
+        padding-bottom: 7rem;
+    }
+
+    .trust-badges {
+        margin-bottom: 1rem;
+        gap: 0.5rem 0.85rem;
+    }
+}
+
+/* Mobile portrait — old hero hidden; mobile-hero renders instead */
+@media (max-width: 767px) {
+    .hero-section {
+        display: none !important;
+    }
+
+    .landing-hero-snap-target {
+        display: none !important;
+    }
+}
+
+/* Small mobile — kept for tablet-range fallback only */
+@media (min-width: 768px) and (max-width: 1023px) {
+    .trust-badges {
+        margin-bottom: 1rem;
+        gap: 0.5rem 0.85rem;
+    }
+}
+
+/* ── Animated Words Slider ─────────────────────────────────────── */
+/*
+ * --word-h controls the visible window (container + word-item height).
+ * .words-wrapper is height:auto so translateY percentages are relative to
+ * the full stacked content (7 × --word-h). Each 14.285% step = one word.
+ * align-items:flex-start anchors the wrapper at y=0, no subpixel drift.
+ */
+.animated-words-container {
+    --word-h: clamp(40px, 11vw, 90px);
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    height: var(--word-h);
+    width: 100%;
+    overflow: hidden;
+    margin: -0.5rem 0 0.5rem 0;
+}
+
+h1 + .animated-words-container {
+    margin-top: clamp(-0.5rem, -1vw, -0.75rem);
+}
+
+.words-wrapper {
+    display: flex;
+    flex-direction: column;
+    animation: wordSlider 24s infinite ease-in-out;
+    height: auto;
+}
+
+.word-item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: var(--word-h);
+    min-height: var(--word-h);
+    flex-shrink: 0;
+    width: 100%;
+    text-align: center;
+    white-space: nowrap;
+    color: #000000;
+    padding: 0 clamp(0.25rem, 1vw, 1rem);
+}
+/* ─────────────────────────────────────────────────────────────── */
+
 /* Section Styling — full-width sections, top/bottom lines only (no side borders) */
 .section-container {
-    background:     #fbfdfb;
-    border-top: 1px solid #000000;
-    border-bottom: 1px solid #000000;
+    background: #fbfdfb;
+    border-top: 0 solid #000000;
+    border-bottom: 0 solid #000000;
     padding: 3rem 1rem;
     margin: 0;
     width: 100%;
@@ -415,18 +904,6 @@ header .behandlung-button {
 }
 
 /* Modern AI-style background animations */
-@keyframes gradientShift {
-    0% {
-        background-position: 0% 50%;
-    }
-    50% {
-        background-position: 100% 50%;
-    }
-    100% {
-        background-position: 0% 50%;
-    }
-}
-
 @keyframes meshMove {
     0%, 100% {
         opacity: 0.7;
