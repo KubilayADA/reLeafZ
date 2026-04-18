@@ -154,7 +154,7 @@ export default function QuestionnairePage() {
       setCurrentStep((prev) => prev - 1)
     } else {
       localStorage.removeItem(QUESTIONNAIRE_DRAFT_KEY)
-      router.push('/form')
+      router.back()
     }
   }
 

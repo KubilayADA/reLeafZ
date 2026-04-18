@@ -44,3 +44,4 @@ next-env.d.ts
 !.env.example
 e2e/storageState.json
 test-results/
+e2e/screenshots/*.png
