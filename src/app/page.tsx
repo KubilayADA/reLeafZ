@@ -1,7 +1,7 @@
 'use client'
 
-import React, { useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
+import React, { Suspense, useEffect, useState } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import Header from './header'
 import Hero, { MobileHero } from './hero'
 import MobileNavbar from './header/mobile-navbar'
@@ -166,8 +166,10 @@ function AddressAutocomplete({ onAddressSelect, onInputChange, onInputFocus, onI
   )
 }
 
-export default function LandingPage() {
+function LandingPageContent() {
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const bypass = searchParams.get('preview')
   const [dialogOpen, setDialogOpen] = useState(false)
   const [showHeader, setShowHeader] = useState(false)
   const [dialogFieldFocused, setDialogFieldFocused] = useState(false)
@@ -224,7 +226,7 @@ export default function LandingPage() {
     return () => clearTimeout(timer)
   }, [houseNumber, streetName, cityName])
 
-  if (COMING_SOON_MODE) {
+  if (COMING_SOON_MODE && bypass !== 'daniel2024') {
     return <ComingSoon />
   }
 
@@ -392,5 +394,13 @@ export default function LandingPage() {
         </div>
       </div>
     </>
+  )
+}
+
+export default function LandingPage() {
+  return (
+    <Suspense fallback={null}>
+      <LandingPageContent />
+    </Suspense>
   )
 }
