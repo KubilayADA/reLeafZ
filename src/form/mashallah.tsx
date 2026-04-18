@@ -30,7 +30,7 @@ export default function MashallahForm({
     fullName: '',
     email: '',
     phone: '',
-    street: '',
+    street: `${street} ${houseNumber}`.trim(),
     city: city.trim(),
   })
   const [loading, setLoading] = useState(false)
@@ -62,16 +62,16 @@ export default function MashallahForm({
                       setSubmitError('')
                       // 🔒 SECURITY: Clear authentication tokens when email changes
                       // This prevents using old tokens with new email addresses
-                      if (name === 'email') {
-                        console.log('🧹 Clearing tokens due to email change')
-                        localStorage.removeItem('token')
-                        localStorage.removeItem('treatmentRequest')
-                        localStorage.removeItem('assignedPharmacyId')
-                        // Reset OTP modal state if it was open
-                        setOtpModalOpen(false)
-                        setOtpCode('')
-                        setOtpError('')
-                      }
+                     if (name === 'email') {
+                       sessionStorage.removeItem('treatmentRequest')
+                       sessionStorage.removeItem('assignedPharmacyId')
+                       localStorage.removeItem('treatmentRequest')
+                       localStorage.removeItem('assignedPharmacyId')
+                       // Reset OTP modal state if it was open
+                       setOtpModalOpen(false)
+                       setOtpCode('')
+                       setOtpError('')
+                     }
                       setFormData(prev => ({ ...prev, [name]: value }))
                     }
 
@@ -98,6 +98,7 @@ export default function MashallahForm({
       const response = await fetch(`${API_BASE}/api/auth/verify-otp`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({
           email: formData.email,
           otpCode: otpCode
@@ -106,8 +107,7 @@ export default function MashallahForm({
 
       const result = await response.json()
 
-      if (response.ok && result.token) {
-        localStorage.setItem('token', result.token)
+      if (response.ok) {
         setOtpModalOpen(false)
         router.push('/questionnaire')
       } else {
@@ -145,6 +145,7 @@ export default function MashallahForm({
       const response = await fetch(`${API_BASE}/api/treatment/submit`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({
           ...formData,
           postcode,
@@ -231,6 +232,7 @@ export default function MashallahForm({
       const loginResponse = await fetch(`${API_BASE}/api/auth/patient-login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({ email: formData.email }),
       })
       const loginResult = await loginResponse.json()
@@ -248,8 +250,7 @@ export default function MashallahForm({
       }
 
       // Case 2: Existing user - known device (same IP)
-      if (loginResult.token && !loginResult.otpRequired) {
-        localStorage.setItem('token', loginResult.token)
+      if (!loginResult.otpRequired) {
         setShowWelcomeNotification(true)
         setTimeout(() => setShowWelcomeNotification(false), 3000)
         router.push('/questionnaire')
@@ -401,10 +402,11 @@ export default function MashallahForm({
                     name="street"
                     value={formData.street}
                     onChange={handleChange}
+                    readOnly={true}
                     required
                     maxLength={200}
                     disabled={loading}
-                    className="form-input inconsolata form-input--confirmed"
+                    className="form-input inconsolata form-input--confirmed bg-gray-50"
                     placeholder={streetPlaceholder || 'z.B. Hauptstraße 42'}
                   />
                 </div>
@@ -588,6 +590,7 @@ export default function MashallahForm({
                     await fetch(`${API_BASE}/api/auth/patient-login`, {
                       method: 'POST',
                       headers: { 'Content-Type': 'application/json' },
+                      credentials: 'include',
                       body: JSON.stringify({ email: formData.email })
                     })
                     alert('Neuer Code wurde gesendet!')

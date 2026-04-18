@@ -21,10 +21,10 @@ const LeafLogo = ({ className = 'logo-header' }) => (
 interface HeaderProps {
   dialogOpen: boolean
   setDialogOpen: (open: boolean) => void
-  zipInput: string
-  setZipInput: (input: string) => void
   handlePostcodeSubmit: () => void
-  isValidBerlinPostcode: (postcode: string) => boolean
+  postcodeDialogSection: React.ReactNode
+  postcodeSubmitDisabled: boolean
+  dialogFieldFocused: boolean
   isVisible: boolean
   landingTheme: 'dark' | 'light'
   onThemeToggle: () => void
@@ -33,17 +33,16 @@ interface HeaderProps {
 export default function Header({ 
   dialogOpen, 
   setDialogOpen, 
-  zipInput, 
-  setZipInput, 
   handlePostcodeSubmit, 
-  isValidBerlinPostcode,
+  postcodeDialogSection,
+  postcodeSubmitDisabled,
+  dialogFieldFocused,
   isVisible,
   landingTheme,
   onThemeToggle,
 }: HeaderProps) {
   const [mobileNavOpen, setMobileNavOpen] = useState(false)
   const dialogCardRef = useRef<HTMLDivElement | null>(null)
-  const [isPostcodeFocused, setIsPostcodeFocused] = useState(false)
   // HOVER SOUND BLOCK loving it 
   const hoverAudioRef = useRef<HTMLAudioElement | null>(null)
   const playHoverSound = () => {
@@ -72,10 +71,6 @@ export default function Header({
     hoverAudioRef.current.currentTime = 0
   }
   // END HOVER SOUND BLOCK
-
-  const sanitizedZipInput = zipInput.trim().replace(/\D/g, '')
-  const showInvalidPostcodeNote =
-    sanitizedZipInput.length > 0 && !isValidBerlinPostcode(sanitizedZipInput)
 
   return (
     <>
@@ -179,7 +174,7 @@ export default function Header({
             <DialogContent
               ref={dialogCardRef}
               className={`left-1/2 -translate-x-1/2 w-[calc(100vw-1.5rem)] max-w-[24rem] max-h-[calc(100dvh-1.5rem)] overflow-y-auto rounded-xl bg-white/95 p-3 border-0 transition-[top,transform] duration-300 ${
-                isPostcodeFocused
+                dialogFieldFocused
                   ? 'top-[max(0.75rem,env(safe-area-inset-top))] translate-y-0'
                   : 'top-1/2 -translate-y-1/2'
               } sm:top-[50%] sm:max-h-none sm:-translate-y-1/2 sm:p-4`}
@@ -199,47 +194,20 @@ export default function Header({
               </div>
               <DialogHeader>
                 <DialogTitle className="text-base sm:text-lg font-bold" style={{ fontFamily: '"Helvetica Neue", sans-serif' }}>
-                  Postleitzahl eingeben
+                  Ihre Adresse eingeben
                 </DialogTitle>
                 <DialogDescription
                   className="text-xs sm:text-sm text-gray-600"
                   style={{ fontFamily: '"Helvetica Neue", sans-serif' }}
                 >
-                  Bitte geben Sie Ihre Postleitzahl ein, um zu prüfen, ob wir in Ihrer Region liefern können.
+                  Bitte geben Sie Ihre Adresse ein, damit wir die nächste Apotheke für Sie finden können.
                 </DialogDescription>
               </DialogHeader>
-              <div className="py-2 sm:py-3">
-                <input
-                  type="text"
-                  name="zip"
-                  placeholder="z.B. 10115"
-                  value={zipInput}
-                  onChange={(e) => setZipInput(e.target.value)}
-                  onFocus={() => setIsPostcodeFocused(true)}
-                  onBlur={() => setIsPostcodeFocused(false)}
-                  className="w-full h-10 sm:h-11 p-2.5 rounded-lg text-sm sm:text-base outline-none"
-                  style={{
-                    fontFamily: '"Helvetica Neue", sans-serif',
-                    borderTop: '2.5px solid #333',
-                    borderLeft: '2.5px solid #333',
-                    borderRight: '4px solid #333',
-                    borderBottom: '4px solid #333',
-                  }}
-                  maxLength={5}
-                />
-                {showInvalidPostcodeNote && (
-                  <p
-                    className="mt-2 text-xs sm:text-sm text-red-600"
-                    style={{ fontFamily: '"Helvetica Neue", sans-serif' }}
-                  >
-                    Bitte gueltige Berliner Postleitzahl eingeben.
-                  </p>
-                )}
-              </div>
+              {postcodeDialogSection}
               <DialogFooter>
                 <Button
                   onClick={handlePostcodeSubmit}
-                  disabled={!sanitizedZipInput || !isValidBerlinPostcode(sanitizedZipInput)}
+                  disabled={postcodeSubmitDisabled}
                   className="w-full h-10 sm:h-11 rounded-lg bg-[#72906F] text-white font-medium py-2.5 hover:bg-[#5f795d] disabled:opacity-50"
                   style={{ fontFamily: '"Helvetica Neue", sans-serif' }}
                 >

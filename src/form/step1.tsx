@@ -20,6 +20,9 @@ export default function Step1({ onNext, onBack, initialValue = '', onSelectionCh
   const [selectedOption, setSelectedOption] = useState<ConsultationOption | ''>(
     initialValue as ConsultationOption | ''
   )
+  const [externalRedirectNotice, setExternalRedirectNotice] = useState<
+    'video' | 'onsite' | null
+  >(null)
 
   useEffect(() => {
     setSelectedOption(initialValue as ConsultationOption | '')
@@ -50,8 +53,25 @@ export default function Step1({ onNext, onBack, initialValue = '', onSelectionCh
   ]
 
   const handleNext = () => {
-    if (selectedOption) {
-      onNext(selectedOption)
+    if (!selectedOption) return
+
+    if (selectedOption === 'questionnaire') {
+      onNext('questionnaire')
+      return
+    }
+
+    if (selectedOption === 'video') {
+      window.open('https://drterp.de', '_blank')
+      setExternalRedirectNotice('video')
+      return
+    }
+
+    if (selectedOption === 'onsite') {
+      window.open(
+        'https://www.cannabis-aerzte.de/karte/?type=arzt',
+        '_blank',
+      )
+      setExternalRedirectNotice('onsite')
     }
   }
 
@@ -81,6 +101,7 @@ export default function Step1({ onNext, onBack, initialValue = '', onSelectionCh
                 <div
                   key={option.id}
                   onClick={() => {
+                    setExternalRedirectNotice(null)
                     setSelectedOption(option.id)
                     onSelectionChange?.(option.id)
                   }}
@@ -117,6 +138,18 @@ export default function Step1({ onNext, onBack, initialValue = '', onSelectionCh
           >
             Weiter
           </Button>
+
+          {externalRedirectNotice === 'video' && (
+            <p className="mt-4 text-sm text-gray-600 text-center max-w-xl mx-auto">
+              Sie werden zu unserem Video-Konsultationsanbieter weitergeleitet. Kehren
+              Sie zurück, wenn Sie Ihr Rezept erhalten haben.
+            </p>
+          )}
+          {externalRedirectNotice === 'onsite' && (
+            <p className="mt-4 text-sm text-gray-600 text-center max-w-xl mx-auto">
+              Sie werden zur Karte der Cannabis-Ärzte weitergeleitet.
+            </p>
+          )}
         </div>
         <StepProgress currentStep={1} />
       </div>
