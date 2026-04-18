@@ -1,4 +1,4 @@
-/* Moving text banner styles */
+/* Moving text banner styles not in useeee*/
 .moving-text {
   display: flex;
   align-items: center;
@@ -46,60 +46,141 @@
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
-  .moving-text {
-    font-size: 10px;
-    animation-duration: 15s; /* Faster on mobile */
-  }
-  
-  .moving-text span {
-    margin: 0 12px;
-  }
-  
-  .moving-text span:nth-child(even) {
-    font-size: 10px;
-  }
+  .header {
+    display: none;
+  } 
 }
 
 .header {
-  background-color: #fbfdfb;
-  z-index: 100;
+  position: fixed;
+  left: 50%;
+  transform: translate(-50%, 0);
+  width: fit-content;
+  min-width: 1500px;
+  max-width: 90vw;
+  border-radius: 8px;
+  margin-top: 12px;
+  background: transparent;
+  border-top: 2.5px solid 	#333;    /* Lighter shade for the top */
+  border-left: 2.5px solid 	#333;   /* Lighter shade for the left */
+  border-right: 4px solid #333;  /* Darker shade for the right */
+  border-bottom: 4px solid 	#333;
+  backdrop-filter: blur(150px);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
+  transition: all 0.3s ease;
+  z-index: 50;
+}
+
+.header--visible {
+  transform: translate(-50%, 0);
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.header--hidden {
+  transform: translate(-50%, -100%);
+  opacity: 0;
+  pointer-events: none;
 }
 
 .logo-header {
   position: absolute;
-  top: -60px;
+  top: -65px;
   left: 50px;
 }
 
-/* Vertical lines aligned with hero — float (inset from top/bottom) */
-.header-line--hero-left,
-.header-line--hero-right {
-  position: absolute;
-  top: 0.5rem;
-  bottom: 0.5rem;
-  width: 1px;
-  background: rgba(0, 0, 0, 0.2);
-  pointer-events: none;
-}
-.header-line--hero-left {
-  left: 250px;
-}
-.header-line--hero-right {
-  right: 250px;
+.header-text {
+  font-family: "Inconsolata", monospace;
+  font-weight: 900;
+  font-size: 0.5rem;
+  letter-spacing: 0.1em;
+  gap: 1rem;
 }
 
-@media (max-width: 768px) {
-  .header-line--hero-left,
-  .header-line--hero-right {
-    display: none;
-  }
+.header-center-controls {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.header-button {
+  position: absolute;
+  top: 18px;
+  right: 50px;
+  scale: 1.1;
+  text-transform: uppercase;
+}
+
+.header-theme-icon-toggle {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  min-width: 66px;
+  height: 32px;
+  padding: 0.25rem 0.5rem;
+  border-radius: 999px;
+  border-top: 2.5px solid #333;
+  border-left: 2.5px solid #333;
+  border-right: 4px solid #333;
+  border-bottom: 4px solid #333;
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(14px);
+  transition: background 220ms ease, transform 220ms ease;
+}
+
+.header-theme-icon-toggle:hover {
+  transform: translateY(-1px);
+}
+
+.header-theme-icon-toggle:focus-visible {
+  outline: 2px solid rgba(16, 185, 129, 0.65);
+  outline-offset: 2px;
+}
+
+.header-theme-icon {
+  color: rgba(255, 255, 255, 0.48);
+  transition: color 220ms ease, opacity 220ms ease, transform 220ms ease;
+  opacity: 0.8;
+}
+
+.header-theme-icon.is-active {
+  color: #ffffff;
+  opacity: 1;
+  transform: scale(1.06);
+}
+
+.header-theme-icon-toggle.is-light {
+  background: rgba(255, 255, 255, 0.82);
+}
+
+.header-theme-icon-toggle.is-light .header-theme-icon {
+  color: rgba(15, 23, 42, 0.42);
+}
+
+.header-theme-icon-toggle.is-light .header-theme-icon.is-active {
+  color: #0f172a;
 }
 
 /* Desktop nav link — hover underline (line draws underneath) */
 .header-desktop-nav .header-nav-link {
   position: relative;
-  color: inherit;
+  color: var(--header-nav-color, #ffffff);
   text-decoration: none;
+  transition: color 0.22s ease;
+}
+
+.header-desktop-nav .header-nav-link:hover {
+  color: var(--header-nav-hover-color, rgba(255, 255, 255, 0.92));
+}
+
+.header-desktop-nav .header-nav-link:visited {
+  color: var(--header-nav-color, #ffffff);
 }
 .header-desktop-nav .header-nav-link::after {
   content: '';
@@ -107,8 +188,9 @@
   left: 0;
   bottom: -2px;
   width: 0;
-  height: 1px;
-  background: currentColor;
+  height: 2px;
+  border-radius: 10px;
+  background: var(--header-nav-color, #ffffff);
   transition: width 0.25s ease;
 }
 .header-desktop-nav .header-nav-link:hover::after {
