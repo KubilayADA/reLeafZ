@@ -1,20 +1,29 @@
  'use client'
 
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { ArrowLeft, MoonStar, Activity, Brain, Sparkles } from 'lucide-react'
-import '@/app/main.css'
+import StepProgress from '@/form/step-progress'
+import FormLogoHomeExit from '@/form/form-logo-home-exit'
 import '@/form/form.css'
 
 interface Step3Props {
   onNext: (selectedOption: string) => void
   onBack?: () => void
+  initialValue?: string
+  onSelectionChange?: (selectedOption: string) => void
 }
 
 type ConditionOption = 'sleep-disorder' | 'chronic-pain' | 'adhd' | 'migraine'
 
-export default function Step3({ onNext, onBack }: Step3Props) {
-  const [selectedOption, setSelectedOption] = useState<ConditionOption | ''>('')
+export default function Step3({ onNext, onBack, initialValue = '', onSelectionChange }: Step3Props) {
+  const [selectedOption, setSelectedOption] = useState<ConditionOption | ''>(
+    initialValue as ConditionOption | ''
+  )
+
+  useEffect(() => {
+    setSelectedOption(initialValue as ConditionOption | '')
+  }, [initialValue])
 
   const options = [
     {
@@ -50,35 +59,27 @@ export default function Step3({ onNext, onBack }: Step3Props) {
   }
 
   return (
-    <div className="form-page inconsolata">
-      <div className="form-container form-container--center form-container--wide">
+    <div className="form-page form-page--step3-fit inconsolata">
+      <FormLogoHomeExit />
+      <div className="form-container form-container--step3-fit">
         {onBack && (
-          <div className="w-full flex justify-start form-header__back-wrap">
-            <Button onClick={onBack} className="btn-outline text-sm sm:text-base">
-              <ArrowLeft className="w-4 h-4 mr-2" />
+          <div className="form-header__back-wrap">
+            <Button onClick={onBack} className="btn-outline form-back-button text-sm sm:text-base">
+              <ArrowLeft className="form-back-icon" />
               Zurück
             </Button>
           </div>
         )}
 
-        <div className="text-center mb-6 sm:mb-10 px-2 sm:px-8">
-          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-3">
-            Diagnose für dein Rezept
-          </h1>
-          <p className="form-header__subtitle">
-            Folge ein paar einfachen Schritten zu deinem Rezept.
-          </p>
-        </div>
-
-        <div className="form-card form-card--rounded-lg max-w-5xl">
+        <div className="form-card form-card--rounded-lg form-card--step3-fit">
           <h2 className="form-section-title">
             Welche Beschwerde hast du?
           </h2>
-          <p className="form-section-hint mb-10 px-2 sm:px-12">
+          <p className="form-section-hint form-step3-hint">
             Wähle eine Beschwerde aus, die deinen Zustand am besten beschreibt.
           </p>
 
-          <div className="form-options form-options--cols-4 form-options--center mb-10">
+          <div className="form-options form-options--cols-4 form-options--center form-options--step3-fit">
             {options.map((option) => {
               const Icon = option.icon
               const isSelected = selectedOption === option.id
@@ -86,14 +87,17 @@ export default function Step3({ onNext, onBack }: Step3Props) {
                 <button
                   key={option.id}
                   type="button"
-                  onClick={() => setSelectedOption(option.id)}
-                  className={`form-option-card form-option-card--rounded-lg form-option-card--max-width form-option-card--text-center flex flex-col items-center gap-4 ${isSelected ? 'form-option-card--selected' : ''}`}
+                  onClick={() => {
+                    setSelectedOption(option.id)
+                    onSelectionChange?.(option.id)
+                  }}
+                  className={`form-option-card form-option-card--rounded-lg form-option-card--max-width form-option-card--text-center form-step3-option-card ${isSelected ? 'form-option-card--selected' : ''}`}
                 >
                   <div className="form-option-icon-wrap form-option-icon-wrap--circle">
-                    <Icon className="form-option-icon w-8 h-8 sm:w-10 sm:h-10" />
+                    <Icon className="form-option-icon form-step3-option-icon" />
                   </div>
                   <h3 className="form-option-title">{option.title}</h3>
-                  <p className="form-option-desc leading-relaxed break-all">{option.description}</p>
+                  <p className="form-option-desc form-step3-option-desc">{option.description}</p>
                 </button>
               )
             })}
@@ -102,11 +106,12 @@ export default function Step3({ onNext, onBack }: Step3Props) {
           <Button
             onClick={handleNext}
             disabled={!selectedOption}
-            className="form-cta btn-secondary"
+            className="form-cta form-cta--step3-fit btn-secondary"
           >
             Weiter
           </Button>
         </div>
+        <StepProgress currentStep={3} />
       </div>
     </div>
   )
