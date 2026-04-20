@@ -3,15 +3,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import '@/app/main.css'
 import './finden.css'
-
-type Particle = {
-  id: number
-  size: number
-  left: number
-  top: number
-  duration: number
-  delay: number
-}
+import SectionParticlesBackground from '@/components/ui/SectionParticlesBackground'
 
 type Pharmacy = {
   id: string
@@ -73,26 +65,12 @@ const PHARMACIES: Pharmacy[] = [
 
 const PartnerApotheken = () => {
   const sectionRef = useRef<HTMLElement | null>(null)
-  const [particles, setParticles] = useState<Particle[]>([])
   const [isInView, setIsInView] = useState(false)
   const [visibleCount, setVisibleCount] = useState(0)
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [mobileCardPharmacy, setMobileCardPharmacy] = useState<Pharmacy | null>(null)
   const [isTouchDevice, setIsTouchDevice] = useState(false)
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false)
-
-  useEffect(() => {
-    setParticles(
-      Array.from({ length: 6 }, (_, i) => ({
-        id: i,
-        size: Math.random() * 4 + 2,
-        left: Math.random() * 100,
-        top: Math.random() * 100,
-        duration: Math.random() * 10 + 10,
-        delay: Math.random() * 5,
-      }))
-    )
-  }, [])
 
   useEffect(() => {
     if (typeof window === 'undefined') return
@@ -198,23 +176,9 @@ const PartnerApotheken = () => {
     >
       <div className="partner-apotheken__bg" aria-hidden>
         <div className="partner-apotheken__bg-base" />
-        <div className="partner-apotheken__glow-line" />
+        <SectionParticlesBackground className="partner-apotheken__particles" />
         <div className="partner-apotheken__glow-radial" />
         <div className="partner-apotheken__grid" />
-        {particles.map((particle) => (
-          <div
-            key={particle.id}
-            className="partner-apotheken__particle"
-            style={{
-              width: `${particle.size}px`,
-              height: `${particle.size}px`,
-              left: `${particle.left}%`,
-              top: `${particle.top}%`,
-              animation: `floatParticle ${particle.duration}s ease-in-out infinite`,
-              animationDelay: `${particle.delay}s`,
-            }}
-          />
-        ))}
       </div>
 
       <div className="partner-apotheken-inner partner-apotheken__shell">

@@ -1,18 +1,10 @@
 'use client'
-import React, { useState, useRef, useEffect, useLayoutEffect, Fragment } from 'react';
+import React, { useState, useRef, useLayoutEffect, Fragment } from 'react';
 import '@/app/main.css';
 import './how.css';
+import SectionParticlesBackground from '@/components/ui/SectionParticlesBackground';
 
 const TOTAL = 4;
-
-type Particle = {
-  id: number;
-  size: number;
-  left: number;
-  top: number;
-  duration: number;
-  delay: number;
-};
 
 interface Step {
   num: string;
@@ -56,7 +48,6 @@ interface HowProps {
 
 export default function How({ landingTheme }: HowProps): React.JSX.Element {
   const [current, setCurrent] = useState<number>(0);
-  const [particles, setParticles] = useState<Particle[]>([]);
   const sectionRef = useRef<HTMLElement | null>(null);
   const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
   const cardsContainerRef = useRef<HTMLDivElement | null>(null);
@@ -64,20 +55,7 @@ export default function How({ landingTheme }: HowProps): React.JSX.Element {
   const autoScrollTargetIdxRef = useRef<number | null>(null);
   const isAutoScrollingRef = useRef(false);
 
-  useEffect(() => {
-    setParticles(
-      Array.from({ length: 6 }, (_, i) => ({
-        id: i,
-        size: Math.random() * 4 + 2,
-        left: Math.random() * 100,
-        top: Math.random() * 100,
-        duration: Math.random() * 10 + 10,
-        delay: Math.random() * 5,
-      }))
-    );
-  }, []);
-
-  /** Simple rAF-throttled model: active card follows page scroll. */
+  /** One rAF-throttled scroll model: avoids multiple IntersectionObservers fighting over `current`. */
   useLayoutEffect(() => {
     let scheduled = false;
     let rafId: number | null = null;
@@ -198,23 +176,9 @@ export default function How({ landingTheme }: HowProps): React.JSX.Element {
     >
       <div className="how-funktioniert__bg" aria-hidden>
         <div className="how-funktioniert__bg-base" />
-        <div className="how-funktioniert__glow-line" />
+        <SectionParticlesBackground className="how-funktioniert__particles" />
         <div className="how-funktioniert__glow-radial" />
         <div className="how-funktioniert__grid" />
-        {particles.map((particle) => (
-          <div
-            key={particle.id}
-            className="how-funktioniert__particle"
-            style={{
-              width: `${particle.size}px`,
-              height: `${particle.size}px`,
-              left: `${particle.left}%`,
-              top: `${particle.top}%`,
-              animation: `floatParticle ${particle.duration}s ease-in-out infinite`,
-              animationDelay: `${particle.delay}s`,
-            }}
-          />
-        ))}
       </div>
 
       <div className="section how-funktioniert__shell">
