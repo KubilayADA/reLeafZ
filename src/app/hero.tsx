@@ -227,7 +227,6 @@ export default function Hero({
             onScrollToAblauf()
           }}
         >
-          <span className="hero-scroll-cta-text">Tap anywhere or click to go to the next section</span>
         </a>
 
         <div className="pointer-events-none relative max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 overflow-visible w-full">
@@ -269,14 +268,22 @@ export default function Hero({
             <div className="hero-cta-wrap -mt-4 lg:-mt-10 lg:mr-auto lg:ml-[-380px]">
               <div className="hero-cta-center pointer-events-auto">
                 <Button
-                  variant="button2"
                   className="behandlung-button relative z-20 md:scale-125 lg:scale-150 min-w-44 sm:min-w-56 md:min-w-64 w-auto"
+                  style={{
+                    background: '#ffffff',
+                    color: '#0f172a',
+                    borderTop: '2.5px solid #333',
+                    borderLeft: '2.5px solid #333',
+                    borderRight: '4px solid #333',
+                    borderBottom: '4px solid #333',
+                    borderRadius: '12px',
+                  }}
                   onClick={(e) => {
                     e.stopPropagation()
                     setDialogOpen(true)
                   }}
                 >
-                  BEHANDLUNG ANFRAGEN
+                  BEHANDLUNG ANFRAGEN →
                 </Button>
               </div>
 

@@ -46,7 +46,8 @@ export default function Header({
   // HOVER SOUND BLOCK loving it 
   const hoverAudioRef = useRef<HTMLAudioElement | null>(null)
   const playHoverSound = () => {
-    const hoverAudioSrc = landingTheme === 'dark' ? '/tekkkk.mp3' : '/auto.mp3'
+    if (landingTheme === 'light') return
+    const hoverAudioSrc = '/auto.mp3'
 
     if (!hoverAudioRef.current) {
       hoverAudioRef.current = new Audio(hoverAudioSrc)
@@ -103,13 +104,13 @@ export default function Header({
         </div>
       </div> */}
       
-      <div className="header-row-wrap relative w-full h-22">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-14">
-          <div className="flex justify-between items-center h-14">
+      <div className="header-row-wrap relative w-full h-[84px]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full">
+          <div className="flex justify-between items-center h-full">
             {/* Logo geniş, navbar sabit yükseklikte - your turkish is not friendly to me*/}
             <button
               type="button"
-              className="flex items-center h-14 overflow-visible"
+              className="flex items-center h-full overflow-visible"
               onClick={() => {
                 scrollToLandingTop()
               }}
@@ -120,7 +121,8 @@ export default function Header({
             
             {/* Desktop Nav */}
             <div className="header-center-controls hidden md:flex">
-              <nav className="header-desktop-nav header-text space-x-10 ">
+              <nav className="header-desktop-nav header-text w-full justify-center">
+                <a href="#partner-apotheken" className="header-nav-link text-mg md:text-xl leading-relaxed">Apotheke in Ihrer Nähe</a>
                 <a
                   href="#ablauf"
                   className="header-nav-link text-mg md:text-xl leading-relaxed"
@@ -131,8 +133,6 @@ export default function Header({
                 >
                   Ablauf
                 </a>
-                <a href="#partner-apotheken" className="header-nav-link text-mg md:text-xl leading-relaxed">Apotheke in Ihrer Nähe</a>
-                <a href="#vorteile" className="header-nav-link text-lg md:text-xl leading-relaxed">Vorteile</a>
                 <a href="#chat" className="header-nav-link text-lg md:text-xl leading-relaxed">Chat with us!</a>
               </nav>
 
@@ -150,12 +150,36 @@ export default function Header({
             
             {/* Desktop Button - Hidden on mobile, only in hamburger menu wish i believe is better let me know if you see this UwUwuu*/}
             <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-            <div className="hidden lg:block text-black">
+            <div className="hidden lg:block text-black lg:mr-[-8px]">
               <DialogTrigger asChild>
                 <Button
-                  className="header-button"
-                  variant="button2"
-                  style={{ "--c-color": "#000000", color: "#000000" } as React.CSSProperties}
+                  className="header-button lg:!ml-0 !font-bold"
+                  variant={landingTheme === 'dark' ? 'button2' : undefined}
+                  style={
+                    landingTheme === 'dark'
+                      ? ({
+                          minHeight: '54px',
+                          paddingTop: '0.7rem',
+                          paddingBottom: '0.7rem',
+                          borderTop: '2.5px solid #333',
+                          borderLeft: '2.5px solid #333',
+                          borderRight: '4px solid #333',
+                          borderBottom: '4px solid #333',
+                          borderRadius: '12px',
+                        } as React.CSSProperties)
+                      : ({
+                          background: '#ffffff',
+                          color: '#0f172a',
+                          minHeight: '54px',
+                          paddingTop: '0.7rem',
+                          paddingBottom: '0.7rem',
+                          borderTop: '2.5px solid #333',
+                          borderLeft: '2.5px solid #333',
+                          borderRight: '4px solid #333',
+                          borderBottom: '4px solid #333',
+                          borderRadius: '12px',
+                        } as React.CSSProperties)
+                  }
                   onMouseEnter={playHoverSound}
                   onMouseLeave={stopHoverSound}
                 >
@@ -243,7 +267,7 @@ export default function Header({
                   className="behandlung-button2 w-full px-6 py-3 flex items-center justify-center"
                   onClick={() => setDialogOpen(true)}
                 >
-                  BEHANDLUNG ANFRAGEN
+                  BEHANDLUNG ANFRAGEN →
                 </Button>
               </div>
             </nav>
