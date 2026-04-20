@@ -428,6 +428,24 @@ export default function MarketplacePage() {
     sessionStorage.setItem('selectedDeliveryMethod', selectedDeliveryMethod)
     sessionStorage.setItem('deliveryFee', selectedDeliveryFee.toString())
 
+    const treatmentRequestId = parseInt(sessionStorage.getItem('pendingTreatmentRequestId') || '0')
+    if (treatmentRequestId > 0) {
+      try {
+        await fetch(`${API_BASE}/api/treatment/${treatmentRequestId}/selection`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({
+            pharmacyId: selectedPharmacyId,
+            deliveryMethod: selectedDeliveryMethod,
+            selectedProducts: selectedItems
+          })
+        })
+      } catch (err) {
+        if (process.env.NODE_ENV === 'development') console.error('Selection save failed:', err)
+      }
+    }
+
     router.push('/payment/prescription')
   }
 
