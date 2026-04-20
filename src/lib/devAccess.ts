@@ -3,7 +3,7 @@
  * Toggle local access bypass for development.
  * Set to `true` to allow direct access to guarded flows locally.
  */
-export const ENABLE_LOCAL_ACCESS_BYPASS = false
+export const ENABLE_LOCAL_ACCESS_BYPASS = true
 
 export const isBrowserLocalhost = (): boolean => {
   if (typeof window === 'undefined') return false
