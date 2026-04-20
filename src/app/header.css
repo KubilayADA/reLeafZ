@@ -75,17 +75,17 @@
 /* Desktop dark mode: white chunky border */
 @media (min-width: 768px) {
   .header:not(.header--light) {
-    border-top-color: #fff;
-    border-left-color: #fff;
-    border-right-color: #fff;
-    border-bottom-color: #fff;
+    border-top-color: #72906F;
+    border-left-color: #72906F;
+    border-right-color: #72906F;
+    border-bottom-color: #72906F;
   }
 
   .header:not(.header--light) .header-theme-icon-toggle {
-    border-top-color: #fff;
-    border-left-color: #fff;
-    border-right-color: #fff;
-    border-bottom-color: #fff;
+    border-top-color: #72906F;
+    border-left-color: #72906F;
+    border-right-color: #72906F;
+    border-bottom-color: #72906F;
   }
 }
 

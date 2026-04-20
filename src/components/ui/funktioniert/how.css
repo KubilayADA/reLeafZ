@@ -19,8 +19,8 @@
   --how-muted-light: var(--releafz-muted-dim);
   --how-border: var(--releafz-border);
   /* Chunky “neumorphic” card/button edges — dark: light edges so they read on #0a0a0a */
-  --how-chunk-border-tl: #ffffff;
-  --how-chunk-border-br: #ffffff;
+  --how-chunk-border-tl: #72906F;
+  --how-chunk-border-br: #72906F;
   --how-mono: var(--releafz-mono);
   --how-sans: var(--releafz-sans);
   --how-ease: cubic-bezier(0.4, 0, 0.2, 1);
