@@ -470,10 +470,10 @@
 
 #landing-main[data-theme='dark'] .mobile-hero__cta-btn {
   background: #141414;
-  border-top-color: #e2e8f0;
-  border-left-color: #e2e8f0;
-  border-right-color: #64748b;
-  border-bottom-color: #64748b;
+  border-top-color: #fff;
+  border-left-color: #fff;
+  border-right-color: #fff;
+  border-bottom-color: #fff;
   color: #f8fafc;
 }
 

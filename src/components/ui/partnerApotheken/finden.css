@@ -12,7 +12,7 @@
   --pa-muted: var(--releafz-muted);
   --pa-muted-dim: var(--releafz-muted-dim);
   --pa-border: var(--releafz-border);
-  --pa-map-frame: #333;
+  --pa-map-frame: #ffffff;
   --pa-glass: var(--releafz-glass-elevated);
   --pa-sans: var(--releafz-sans);
   --pa-mono: var(--releafz-mono);
@@ -181,10 +181,16 @@
 .partner-apotheken-map {
   display: block;
   width: 100%;
+  height: auto;
   aspect-ratio: 16 / 9;
-  object-fit: cover;
+  object-fit: contain;
+  background: rgba(0, 0, 0, 0.18);
   border-radius: 1.25rem;
   opacity: 0.92;
+}
+
+.partner-apotheken-map--light {
+  display: none;
 }
 
 .partner-apotheken-map-wrap::after {
@@ -475,6 +481,7 @@
   --pa-muted: rgba(15, 23, 42, 0.74);
   --pa-muted-dim: rgba(15, 23, 42, 0.56);
   --pa-border: rgba(15, 23, 42, 0.14);
+  --pa-map-frame: #333;
   --pa-glass: rgba(255, 255, 255, 0.86);
 }
 
@@ -491,6 +498,25 @@
 
 #landing-main[data-theme='light'] .partner-apotheken-map-wrap {
   box-shadow: 0 18px 42px rgba(2, 6, 23, 0.12), 0 0 0 1px rgba(2, 132, 199, 0.1);
+}
+
+#landing-main[data-theme='light'] .partner-apotheken-map--dark {
+  display: none;
+}
+
+#landing-main[data-theme='light'] .partner-apotheken-map--light {
+  display: block;
+  opacity: 1;
+  background: transparent;
+}
+
+#landing-main[data-theme='light'] .partner-apotheken-map-wrap::after {
+  background: none;
+}
+
+#landing-main[data-theme='light'] .partner-apotheken-grid-overlay {
+  opacity: 0.16;
+  mix-blend-mode: normal;
 }
 
 #landing-main[data-theme='light'] .partner-apotheken-tooltip {
