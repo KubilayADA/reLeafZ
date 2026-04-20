@@ -16,7 +16,7 @@ import { useLandingTheme } from '@/lib/use-landing-theme'
 import { useLandingThemeInitial } from './providers'
 import { APIProvider, useMapsLibrary } from '@vis.gl/react-google-maps'
 
-const COMING_SOON_MODE = true;
+const COMING_SOON_MODE = false;
 
 const inconsolataStyle = {
   fontFamily: '"Inconsolata", monospace',
@@ -31,6 +31,7 @@ const dialogInputStyle: React.CSSProperties = {
   borderRight: '4px solid #333',
   borderBottom: '4px solid #333',
 }
+
 
 const dialogInputClass =
   'w-full h-10 sm:h-11 p-2.5 rounded-lg text-sm sm:text-base outline-none'
