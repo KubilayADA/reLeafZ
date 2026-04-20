@@ -228,7 +228,18 @@ const PartnerApotheken = () => {
         </div>
 
         <div className="partner-apotheken-map-wrap">
-          <img className="partner-apotheken-map" src="/map/map-1.png" alt="Berlin Karte mit Partner-Apotheken" />
+          <img
+            className="partner-apotheken-map partner-apotheken-map--dark"
+            src="/dark-map.png"
+            alt="Berlin Karte mit Partner-Apotheken"
+            loading="lazy"
+          />
+          <img
+            className="partner-apotheken-map partner-apotheken-map--light"
+            src="/light-map.png"
+            alt="Berlin Karte mit Partner-Apotheken"
+            loading="lazy"
+          />
 
           <div className="partner-apotheken-grid-overlay" aria-hidden />
 

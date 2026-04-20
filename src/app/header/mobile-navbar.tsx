@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState, useEffect, useRef } from 'react'
-import { Menu } from 'lucide-react'
+import { Menu, Moon, Sun } from 'lucide-react'
 
 import './header-mobile.css'
 import { scrollLandingToAblauf } from '@/lib/scroll'
@@ -27,14 +27,9 @@ export default function MobileNavbar({
   const containerRef = useRef<HTMLDivElement>(null)
   const isOpenRef = useRef(false)
   const savedScrollRef = useRef(0)
-  const themeSliderValRef = useRef<0 | 1>(landingTheme === 'light' ? 1 : 0)
 
   // Keep ref in sync so scroll/touch handlers can read current value without stale closure
   useEffect(() => { isOpenRef.current = isOpen }, [isOpen])
-
-  useEffect(() => {
-    themeSliderValRef.current = landingTheme === 'light' ? 1 : 0
-  }, [landingTheme])
 
   useEffect(() => {
     const SECTION_IDS = ['partner-apotheken', 'ablauf'] as const
@@ -97,10 +92,7 @@ export default function MobileNavbar({
     }
   }
 
-  const handleThemeSlider = (raw: number) => {
-    const value = raw === 1 ? 1 : 0
-    if (value === themeSliderValRef.current) return
-    themeSliderValRef.current = value
+  const handleThemeToggleClick = () => {
     onThemeToggle()
   }
 
@@ -124,14 +116,8 @@ export default function MobileNavbar({
   return (
     <div
       ref={containerRef}
-      className={`mnav${isVisible ? ' mnav--visible' : ''}${isOpen ? ' mnav--open' : ''}`}
+      className={`mnav${isVisible ? ' mnav--visible' : ''}${isOpen ? ' mnav--open' : ''}${landingTheme === 'dark' ? ' mnav--dark' : ''}`}
       aria-hidden={!isVisible}
-      style={{
-        borderTop: '2.5px solid #333',
-        borderLeft: '2.5px solid #333',
-        borderRight: '4px solid #333',
-        borderBottom: '4px solid #333',
-      }}
     >
       {/* Header row — always visible when navbar is shown */}
       <div className="mnav__header">
@@ -180,24 +166,24 @@ export default function MobileNavbar({
             role="group"
             aria-labelledby="mnav-theme-label"
           >
-            <span className="mnav__theme-end-label" aria-hidden>
-              Dark
+            <span className="mnav__theme-label-stack" aria-hidden>
+              <span className={`mnav__theme-end-label mnav__theme-end-label--dark${landingTheme === 'dark' ? ' is-active' : ''}`}>
+                Dark
+              </span>
+              <span className={`mnav__theme-end-label mnav__theme-end-label--light${landingTheme === 'light' ? ' is-active' : ''}`}>
+                Light
+              </span>
             </span>
-            <input
-              type="range"
-              className="mnav__theme-range"
-              min={0}
-              max={1}
-              step={1}
-              value={landingTheme === 'light' ? 1 : 0}
-              onChange={(e) => handleThemeSlider(Number(e.target.value))}
-              onInput={(e) => handleThemeSlider(Number(e.currentTarget.value))}
-              aria-label="Choose light or dark theme"
-              aria-valuetext={landingTheme === 'light' ? 'Light' : 'Dark'}
-            />
-            <span className="mnav__theme-end-label" aria-hidden>
-              Light
-            </span>
+            <button
+              type="button"
+              className="mnav__theme-icon-btn"
+              onClick={handleThemeToggleClick}
+              aria-label={landingTheme === 'light' ? 'Switch to dark mode' : 'Switch to light mode'}
+              aria-pressed={landingTheme === 'light'}
+            >
+              <Moon className={`mnav__theme-icon mnav__theme-icon--moon${landingTheme === 'dark' ? ' is-active' : ''}`} size={15} />
+              <Sun className={`mnav__theme-icon mnav__theme-icon--sun${landingTheme === 'light' ? ' is-active' : ''}`} size={15} />
+            </button>
           </div>
         </div>
 
@@ -206,11 +192,12 @@ export default function MobileNavbar({
             type="button"
             className="btn-cta w-full"
             style={{
-              borderTop: '2.5px solid #333',
-              borderLeft: '2.5px solid #333',
-              borderRight: '4px solid #333',
-              borderBottom: '4px solid #333',
+              borderTop: `2.5px solid ${landingTheme === 'dark' ? '#fff' : '#333'}`,
+              borderLeft: `2.5px solid ${landingTheme === 'dark' ? '#fff' : '#333'}`,
+              borderRight: `4px solid ${landingTheme === 'dark' ? '#fff' : '#333'}`,
+              borderBottom: `4px solid ${landingTheme === 'dark' ? '#fff' : '#333'}`,
               borderRadius: '12px',
+              color: landingTheme === 'dark' ? '#fff' : undefined,
             }}
             onClick={() => {
               setIsOpen(false)
