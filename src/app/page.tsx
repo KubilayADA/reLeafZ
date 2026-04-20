@@ -16,7 +16,7 @@ import { useLandingTheme } from '@/lib/use-landing-theme'
 import { useLandingThemeInitial } from './providers'
 import { APIProvider, useMapsLibrary } from '@vis.gl/react-google-maps'
 
-const COMING_SOON_MODE = false;
+const COMING_SOON_MODE = true;
 
 const inconsolataStyle = {
   fontFamily: '"Inconsolata", monospace',
