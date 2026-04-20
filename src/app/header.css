@@ -157,7 +157,7 @@
 
 @media (min-width: 1024px) {
   .header-theme-icon-toggle {
-    margin-right: -5px;
+    margin-right: 5px;
   }
 
   .header-button {
