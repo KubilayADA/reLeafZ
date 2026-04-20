@@ -434,16 +434,29 @@
 
 .how-funktioniert .how-col-ghost-num {
   position: absolute;
-  bottom: -0.25rem;
-  right: 0.5rem;
+  bottom: clamp(0.55rem, 2vw, 0.9rem);
+  right: clamp(0.55rem, 2vw, 0.9rem);
+  width: clamp(2rem, 4.5vw, 2.35rem);
+  height: clamp(2rem, 4.5vw, 2.35rem);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   font-family: var(--how-mono);
-  font-size: 4.5rem;
-  font-weight: 900;
-  color: var(--how-accent-cyan);
-  opacity: 0.1;
+  font-size: clamp(0.72rem, 1.4vw, 0.84rem);
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  color: var(--how-text);
+  border-top: 2.5px solid var(--how-chunk-border-tl);
+  border-left: 2.5px solid var(--how-chunk-border-tl);
+  border-right: 4px solid var(--how-chunk-border-br);
+  border-bottom: 4px solid var(--how-chunk-border-br);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--how-card) 88%, transparent);
+  opacity: 0.92;
   line-height: 1;
   pointer-events: none;
   user-select: none;
+  z-index: 2;
 }
 
 .how-funktioniert .how-col-num {
@@ -676,6 +689,13 @@
 #landing-main[data-theme='light'] .how-funktioniert .how-col-card,
 .how-funktioniert.theme-light .how-col-card {
   box-shadow: 0 10px 36px rgba(2, 6, 23, 0.08);
+}
+
+#landing-main[data-theme='light'] .how-funktioniert .how-col-ghost-num,
+.how-funktioniert.theme-light .how-col-ghost-num {
+  background: rgba(255, 255, 255, 0.94);
+  color: #0f172a;
+  opacity: 1;
 }
 
 #landing-main[data-theme='light'] .how-funktioniert .prog-dot,
