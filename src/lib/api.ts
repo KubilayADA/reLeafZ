@@ -324,45 +324,6 @@ export async function fetchPharmacyProducts(
 // ORDER ENDPOINTS
 // ============================================
 
-export async function createOrder(
-  items: OrderItem[],
-  deliveryMethod: 'PICKUP' | 'DELIVERY',
-  deliveryAddress: string | null
-): Promise<Order> {
-  try {
-    const body: Record<string, unknown> = {
-      items,
-      deliveryMethod,
-    };
-
-    if (deliveryMethod === 'DELIVERY' && deliveryAddress) {
-      body.deliveryAddress = deliveryAddress;
-    }
-
-    const response = await fetch(`${API_BASE}/api/orders`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      credentials: 'include',
-      body: JSON.stringify(body),
-    });
-
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.message || 'Failed to create order');
-    }
-
-    const data = await response.json();
-    return data.data;
-  } catch (error) {
-    if (process.env.NODE_ENV === 'development') {
-      console.error('Error creating order:', error);
-    }
-    throw error;
-  }
-}
-
 export async function getOrderDetails(orderId: number): Promise<Order> {
   try {
     const response = await fetch(`${API_BASE}/api/orders/${orderId}`, {
