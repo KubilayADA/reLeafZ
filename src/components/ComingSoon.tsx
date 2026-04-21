@@ -1,13 +1,16 @@
 'use client'
 
 import Link from 'next/link'
-import { useMemo, useRef, useState } from 'react'
+import { useLayoutEffect, useMemo, useRef, useState } from 'react'
 import type { ISourceOptions } from '@tsparticles/engine'
 import { Button } from '@/components/ui/button'
 import words from '@/constants/index'
 import SectionParticlesBackground from '@/components/ui/SectionParticlesBackground'
 import '@/components/ui/Hero/Words-Sliding-Smooth.css'
 import './ComingSoon.css'
+
+/** Set on `<html>` while this page is mounted; `ComingSoon.css` matches body/html to `.cs-root`. */
+const COMING_SOON_HTML_ATTR = 'data-releafz-coming-soon' as const
 
 const comingSoonParticlesOptions: ISourceOptions = {
   fullScreen: { enable: false },
@@ -98,6 +101,14 @@ export default function ComingSoon() {
 
   const stars = useMemo(() => buildStars(200), [])
   const starsLayerRef = useRef<HTMLDivElement | null>(null)
+
+  useLayoutEffect(() => {
+    const html = document.documentElement
+    html.setAttribute(COMING_SOON_HTML_ATTR, 'true')
+    return () => {
+      html.removeAttribute(COMING_SOON_HTML_ATTR)
+    }
+  }, [])
 
   const handleStarBurst = (e: React.MouseEvent<HTMLDivElement>) => {
     const layer = starsLayerRef.current
