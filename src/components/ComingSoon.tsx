@@ -100,28 +100,45 @@ export default function ComingSoon() {
         body: JSON.stringify({ firstName: fn, lastName: ln, email: em }),
       })
 
-      let data: { error?: string; alreadyRegistered?: boolean; reason?: string } | null = null
+      let data:
+        | {
+            success?: boolean
+            message?: string
+            error?: string
+            alreadyRegistered?: boolean
+            reason?: string
+          }
+        | null = null
       try {
         data = await res.json()
       } catch {
         data = null
       }
 
+      const backendMsg = data?.message || data?.error
+      const isDuplicate =
+        data?.alreadyRegistered === true ||
+        (typeof backendMsg === 'string' && /already|bereits|duplicate/i.test(backendMsg))
+
       if (!res.ok) {
         console.error('[waitlist] request failed', { status: res.status, data })
         let msg: string
         if (res.status === 429) {
-          msg = 'Zu viele Anfragen. Bitte kurz warten und erneut versuchen.'
+          msg = backendMsg
+            ? 'Zu viele Anfragen. Bitte in ca. 15 Minuten erneut versuchen.'
+            : 'Zu viele Anfragen. Bitte kurz warten und erneut versuchen.'
         } else if (res.status === 502) {
           msg = 'Server nicht erreichbar. Bitte in einer Minute erneut versuchen.'
-        } else if (data?.error) {
-          msg = data.error
+        } else if (isDuplicate) {
+          msg = 'Diese E-Mail ist bereits auf der Liste.'
+        } else if (backendMsg) {
+          msg = backendMsg
         } else {
           msg = `Etwas ist schiefgelaufen (Status ${res.status}). Bitte erneut versuchen.`
         }
         setError(msg)
-      } else if (data?.alreadyRegistered) {
-        setError('Diese E-Mail ist bereits auf der Liste.')
+      } else if (data?.success === false || isDuplicate) {
+        setError(isDuplicate ? 'Diese E-Mail ist bereits auf der Liste.' : backendMsg || 'Etwas ist schiefgelaufen. Bitte erneut versuchen.')
       } else {
         setSubmitted(true)
         setFirstName('')
