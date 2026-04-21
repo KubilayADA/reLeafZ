@@ -1,7 +1,17 @@
+/* Root chrome (overscroll): same as .cs-root — beats single-attribute html rules in main.css. */
+html[data-releafz-coming-soon="true"][data-releafz-landing-theme] {
+  --cs-chrome-bg: #050d1a;
+  background-color: var(--cs-chrome-bg);
+}
+
+html[data-releafz-coming-soon="true"][data-releafz-landing-theme] body {
+  background-color: var(--cs-chrome-bg);
+}
+
 .cs-root {
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-  color: #ffffff;
-  background: #050d1a;
+  color: #000000;
+  background: var(--cs-chrome-bg, #050d1a);
   width: 100%;
   position: relative;
   overflow: hidden;
