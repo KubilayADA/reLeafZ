@@ -133,7 +133,7 @@ export default function ComingSoon() {
 
   const hoverAudioRef = useRef<HTMLAudioElement | null>(null)
   const playHoverSound = () => {
-    const src = '/auto.mp3'
+    const src = '/tekkkk.mp3'
     if (!hoverAudioRef.current) {
       hoverAudioRef.current = new Audio(src)
       hoverAudioRef.current.preload = 'auto'
@@ -269,7 +269,6 @@ export default function ComingSoon() {
           <nav className="cs-nav cs-fade">
             <div className="cs-logo">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/logo1.png" alt="releafZ" className="cs-logo-img" />
             </div>
             <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
               <Link href="/pharmacies" className="cs-nav-btn">
@@ -283,9 +282,10 @@ export default function ComingSoon() {
 
           <main className="cs-main">
             <section className="cs-hero">
-              <div className="cs-eyebrow cs-fade cs-d1">
-                MEDIZINAL CANNABIS · BERLIN · 2025
-              </div>
+              <div className="cs-logo">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/logo1.png" alt="releafZ" className="cs-logo-img h-12 w-auto" />
+            </div>
               <h1 className="cs-headline cs-fade cs-d2">
                 MEDIZINAL CANNABIS
               </h1>
