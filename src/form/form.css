@@ -423,6 +423,49 @@
   align-items: center;
   margin-bottom: var(--form-spacing-2xl);
 }
+/* Legal pages with only the fixed corner logo (no inline logo block) */
+.form-header__title-wrap--corner-logo {
+  width: 100%;
+  padding-top: 3.25rem;
+  align-items: stretch; /* override .form-header__title-wrap center so the h1 can be full width */
+}
+@media (min-width: 640px) {
+  .form-header__title-wrap--corner-logo {
+    padding-top: 1rem;
+  }
+}
+@media (min-width: 768px) {
+  .form-header__title-wrap--corner-logo {
+    padding-top: 1.5rem;
+  }
+}
+.form-header__title-wrap--corner-logo .form-header__title {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0; /* allow flex item to shrink so long titles don’t overflow */
+  box-sizing: border-box;
+  text-align: center;
+}
+/* Long legal titles: override global .title-gradient sizes + offset so text fits on desktop */
+.form-header__title-wrap--corner-logo .form-header__title.title-gradient {
+  left: 0;
+  overflow-wrap: break-word;
+  word-break: break-word;
+  font-size: clamp(1.625rem, 2vw + 1rem, 1.875rem);
+  line-height: 1.15;
+}
+@media (min-width: 640px) {
+  .form-header__title-wrap--corner-logo .form-header__title.title-gradient {
+    font-size: clamp(1.75rem, 2.2vw + 0.85rem, 2.75rem);
+    margin-bottom: 0.75rem;
+  }
+}
+@media (min-width: 768px) {
+  .form-header__title-wrap--corner-logo .form-header__title.title-gradient {
+    font-size: clamp(2rem, 2.5vw + 0.75rem, 3.25rem);
+    line-height: 1.12;
+  }
+}
 .form-header__title {
   text-align: center;
   margin-bottom: var(--form-spacing-md);
