@@ -284,7 +284,7 @@ export default function ComingSoon() {
             <section className="cs-hero">
               <div className="cs-logo">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/logo1.png" alt="releafZ" className="cs-logo-img h-12 w-auto" />
+              <img src="/logo1.png" alt="releafZ" className="cs-logo-img" />
             </div>
               <h1 className="cs-headline cs-fade cs-d2">
                 MEDIZINAL CANNABIS
