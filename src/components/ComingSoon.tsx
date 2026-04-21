@@ -99,10 +99,27 @@ export default function ComingSoon() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ firstName: fn, lastName: ln, email: em }),
       })
-      const data = await res.json().catch(() => null)
+
+      let data: { error?: string; alreadyRegistered?: boolean; reason?: string } | null = null
+      try {
+        data = await res.json()
+      } catch {
+        data = null
+      }
 
       if (!res.ok) {
-        setError(data?.error || 'Etwas ist schiefgelaufen. Bitte erneut versuchen.')
+        console.error('[waitlist] request failed', { status: res.status, data })
+        let msg: string
+        if (res.status === 429) {
+          msg = 'Zu viele Anfragen. Bitte kurz warten und erneut versuchen.'
+        } else if (res.status === 502) {
+          msg = 'Server nicht erreichbar. Bitte in einer Minute erneut versuchen.'
+        } else if (data?.error) {
+          msg = data.error
+        } else {
+          msg = `Etwas ist schiefgelaufen (Status ${res.status}). Bitte erneut versuchen.`
+        }
+        setError(msg)
       } else if (data?.alreadyRegistered) {
         setError('Diese E-Mail ist bereits auf der Liste.')
       } else {
@@ -111,8 +128,9 @@ export default function ComingSoon() {
         setLastName('')
         setEmail('')
       }
-    } catch {
-      setError('Etwas ist schiefgelaufen. Bitte erneut versuchen.')
+    } catch (err) {
+      console.error('[waitlist] network error', err)
+      setError('Netzwerkfehler. Bitte Internetverbindung prüfen und erneut versuchen.')
     } finally {
       setLoading(false)
     }
