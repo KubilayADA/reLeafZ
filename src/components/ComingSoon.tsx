@@ -47,6 +47,7 @@ function buildStars(count: number): Star[] {
 
 export default function ComingSoon() {
   const [firstName, setFirstName] = useState('')
+  const [lastName, setLastName] = useState('')
   const [email, setEmail] = useState('')
   const [submitted, setSubmitted] = useState(false)
   const [loading, setLoading] = useState(false)
@@ -79,10 +80,11 @@ export default function ComingSoon() {
   const handleSubmit = async () => {
     setError('')
     const fn = firstName.trim()
+    const ln = lastName.trim()
     const em = email.trim()
 
-    if (!fn) {
-      setError('Bitte Vornamen eingeben.')
+    if (!fn || !ln) {
+      setError('Bitte Vor- und Nachnamen eingeben.')
       return
     }
     if (!EMAIL_RE.test(em)) {
@@ -95,7 +97,7 @@ export default function ComingSoon() {
       const res = await fetch('/api/waitlist', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ firstName: fn, email: em }),
+        body: JSON.stringify({ firstName: fn, lastName: ln, email: em }),
       })
       const data = await res.json().catch(() => null)
 
@@ -106,6 +108,7 @@ export default function ComingSoon() {
       } else {
         setSubmitted(true)
         setFirstName('')
+        setLastName('')
         setEmail('')
       }
     } catch {
@@ -461,9 +464,9 @@ export default function ComingSoon() {
           .cs-hero { display: flex; flex-direction: column; gap: 14px; max-width: 860px; }
           .cs-form-row {
             display: grid;
-            grid-template-columns: 220px 1fr auto;
-            gap: 12px;
-            max-width: 720px;
+            grid-template-columns: minmax(140px, 180px) minmax(140px, 180px) minmax(200px, 1fr) auto;
+            gap: 10px;
+            max-width: 840px;
             align-items: stretch;
           }
           .cs-steps {
@@ -594,6 +597,17 @@ export default function ComingSoon() {
                     placeholder="Vorname"
                     aria-label="Vorname"
                     autoComplete="given-name"
+                    maxLength={80}
+                  />
+                  <input
+                    type="text"
+                    className="cs-input"
+                    value={lastName}
+                    onChange={(e) => setLastName(e.target.value)}
+                    onKeyDown={onKey}
+                    placeholder="Nachname"
+                    aria-label="Nachname"
+                    autoComplete="family-name"
                     maxLength={80}
                   />
                   <input
