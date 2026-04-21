@@ -169,6 +169,17 @@
   align-items: center;
   line-height: 1;
 }
+
+/* Hero: nudge logo slightly higher in the column */
+.cs-hero > .cs-logo {
+  margin-top: -0.25rem;
+  align-self: flex-start;
+}
+@media (min-width: 768px) {
+  .cs-hero > .cs-logo {
+    margin-top: -5.75rem;
+  }
+}
 .cs-logo-img {
   height: 48px;
   width: auto;
@@ -177,6 +188,12 @@
 @media (max-width: 767px) {
   .cs-logo-img {
     height: 40px;
+  }
+}
+@media (min-width: 768px) {
+  .cs-hero .cs-logo-img {
+    height: 64px;
+    width: auto;
   }
 }
 
@@ -298,9 +315,56 @@
 .cs-submit-btn2 {
   align-self: center;
   font-family: inherit;
+  transition:
+    background 260ms ease,
+    color 260ms ease,
+    border-radius 260ms ease,
+    box-shadow 300ms ease,
+    filter 300ms ease,
+    transform 220ms ease !important;
 }
 .cs-submit-btn2 .wrapper > span:first-child {
   letter-spacing: 0.04em;
+  transition: color 260ms ease, transform 220ms ease;
+}
+
+/* Idle state: mimic hero.tsx chunky white button.
+   The .uiverse base already provides the chunky borders (2.5px/2.5px/4px/4px #333),
+   so we only override the "balloon" visuals (gradient bg, glow, animation, radius, circles). */
+.cs-submit-btn2:not(:hover):not(:focus-visible) {
+  background: #ffffff !important;
+  color: #0f172a !important;
+  border-radius: 12px !important;
+  box-shadow: none !important;
+  filter: none !important;
+  animation: none !important;
+  transform: none !important;
+}
+
+.cs-submit-btn2:not(:hover):not(:focus-visible)::before {
+  box-shadow: none !important;
+  border-radius: 12px !important;
+}
+
+.cs-submit-btn2:not(:hover):not(:focus-visible) .wrapper {
+  background: transparent !important;
+  border-radius: 12px !important;
+}
+
+.cs-submit-btn2:not(:hover):not(:focus-visible) .wrapper > span:first-child {
+  color: #0f172a !important;
+}
+
+.cs-submit-btn2:not(:hover):not(:focus-visible) .circle {
+  opacity: 0 !important;
+  transition: opacity 260ms ease;
+}
+
+/* Hover state: let the original button2 (uiverse) styling come through.
+   Fade the glowing circles back in. */
+.cs-submit-btn2:hover .circle,
+.cs-submit-btn2:focus-visible .circle {
+  transition: opacity 260ms ease;
 }
 
 .cs-step {
@@ -511,6 +575,9 @@
     flex-direction: column;
     gap: 14px;
   }
+  .cs-hero > .cs-logo {
+    align-self: center;
+  }
   .cs-form-row {
     display: flex;
     flex-direction: column;
@@ -525,6 +592,11 @@
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
+    justify-content: center;
+  }
+  .cs-note,
+  .cs-error {
+    text-align: center;
   }
   .cs-footer {
     font-size: 11px;
