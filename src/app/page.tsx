@@ -32,6 +32,7 @@ const dialogInputStyle: React.CSSProperties = {
   borderBottom: '4px solid #333',
 }
 
+
 const dialogInputClass =
   'w-full h-10 sm:h-11 p-2.5 rounded-lg text-sm sm:text-base outline-none'
 

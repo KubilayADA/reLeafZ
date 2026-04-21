@@ -19,8 +19,8 @@
   --how-muted-light: var(--releafz-muted-dim);
   --how-border: var(--releafz-border);
   /* Chunky “neumorphic” card/button edges — dark: light edges so they read on #0a0a0a */
-  --how-chunk-border-tl: #e2e8f0;
-  --how-chunk-border-br: #64748b;
+  --how-chunk-border-tl: #72906F;
+  --how-chunk-border-br: #72906F;
   --how-mono: var(--releafz-mono);
   --how-sans: var(--releafz-sans);
   --how-ease: cubic-bezier(0.4, 0, 0.2, 1);
@@ -80,33 +80,21 @@
   background: linear-gradient(to bottom, #0a0a0a 0%, #0f0f0f 50%, #0a0a0a 100%);
 }
 
-.how-funktioniert__glow-line {
+.how-funktioniert__particles {
   position: absolute;
-  left: 50%;
-  top: 4.3%;
-  transform: translate(-50%, -50%);
-  width: 120%;
-  height: 1px;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
   z-index: 0;
-  background: linear-gradient(
-    90deg,
-    transparent 0%,
-    rgba(34, 211, 238, 0.55) 20%,
-    rgba(16, 185, 129, 0.75) 50%,
-    rgba(34, 211, 238, 0.55) 80%,
-    transparent 100%
-  );
-  box-shadow:
-    0 0 60px rgba(34, 211, 238, 0.45),
-    0 0 120px rgba(16, 185, 129, 0.35),
-    0 0 180px rgba(34, 211, 238, 0.2);
-  animation: glowPulse 4s ease-in-out infinite;
 }
 
-@media (min-width: 768px) {
-  .how-funktioniert__glow-line {
-    height: 3px;
-  }
+.how-funktioniert__particles canvas {
+  position: absolute !important;
+  left: 0 !important;
+  top: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
 }
 
 .how-funktioniert__glow-radial {
@@ -141,15 +129,6 @@
     linear-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px),
     linear-gradient(90deg, rgba(255, 255, 255, 0.1) 1px, transparent 1px);
   background-size: 50px 50px;
-}
-
-.how-funktioniert__particle {
-  position: absolute;
-  border-radius: 999px;
-  background: rgba(34, 211, 238, 0.65);
-  box-shadow:
-    0 0 15px rgba(34, 211, 238, 0.75),
-    0 0 30px rgba(34, 211, 238, 0.35);
 }
 
 .how-funktioniert .how-funktioniert__shell {

@@ -22,13 +22,11 @@
 
 .footer__brand {
   padding: 1.2rem 1.2rem 1.4rem;
-  border-top: 2.5px solid #333;
-  border-left: 2.5px solid #333;
-  border-right: 4px solid #333;
-  border-bottom: 4px solid #333;
-  border-radius: 10px;
-  background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(10px);
+  border: none;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 0;
+  background: transparent;
+  backdrop-filter: none;
   transition: background 300ms ease, border-color 300ms ease, box-shadow 300ms ease;
 }
 
@@ -129,11 +127,8 @@
 }
 
 #landing-main[data-theme='light'] .footer__brand {
-  border-top-color: #333;
-  border-left-color: #333;
-  border-right-color: #333;
-  border-bottom-color: #333;
-  background: rgba(255, 255, 255, 0.82);
+  border-bottom-color: rgba(15, 23, 42, 0.24);
+  background: transparent;
 }
 
 #landing-main[data-theme='light'] .footer__tagline {
