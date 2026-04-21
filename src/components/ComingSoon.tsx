@@ -90,6 +90,7 @@ function buildStars(count: number): Star[] {
 
 export default function ComingSoon() {
   const [firstName, setFirstName] = useState('')
+  const [lastName, setLastName] = useState('')
   const [email, setEmail] = useState('')
   const [submitted, setSubmitted] = useState(false)
   const [loading, setLoading] = useState(false)
@@ -155,10 +156,11 @@ export default function ComingSoon() {
   const handleSubmit = async () => {
     setError('')
     const fn = firstName.trim()
+    const ln = lastName.trim()
     const em = email.trim()
 
-    if (!fn) {
-      setError('Bitte Vornamen eingeben.')
+    if (!fn || !ln) {
+      setError('Bitte Vor- und Nachnamen eingeben.')
       return
     }
     if (!EMAIL_RE.test(em)) {
@@ -171,21 +173,57 @@ export default function ComingSoon() {
       const res = await fetch('/api/waitlist', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ firstName: fn, email: em }),
+        body: JSON.stringify({ firstName: fn, lastName: ln, email: em }),
       })
-      const data = await res.json().catch(() => null)
+
+      let data:
+        | {
+            success?: boolean
+            message?: string
+            error?: string
+            alreadyRegistered?: boolean
+            reason?: string
+          }
+        | null = null
+      try {
+        data = await res.json()
+      } catch {
+        data = null
+      }
+
+      const backendMsg = data?.message || data?.error
+      const isDuplicate =
+        data?.alreadyRegistered === true ||
+        (typeof backendMsg === 'string' && /already|bereits|duplicate/i.test(backendMsg))
 
       if (!res.ok) {
-        setError(data?.error || 'Etwas ist schiefgelaufen. Bitte erneut versuchen.')
-      } else if (data?.alreadyRegistered) {
-        setError('Diese E-Mail ist bereits auf der Liste.')
+        console.error('[waitlist] request failed', { status: res.status, data })
+        let msg: string
+        if (res.status === 429) {
+          msg = backendMsg
+            ? 'Zu viele Anfragen. Bitte in ca. 15 Minuten erneut versuchen.'
+            : 'Zu viele Anfragen. Bitte kurz warten und erneut versuchen.'
+        } else if (res.status === 502) {
+          msg = 'Server nicht erreichbar. Bitte in einer Minute erneut versuchen.'
+        } else if (isDuplicate) {
+          msg = 'Diese E-Mail ist bereits auf der Liste.'
+        } else if (backendMsg) {
+          msg = backendMsg
+        } else {
+          msg = `Etwas ist schiefgelaufen (Status ${res.status}). Bitte erneut versuchen.`
+        }
+        setError(msg)
+      } else if (data?.success === false || isDuplicate) {
+        setError(isDuplicate ? 'Diese E-Mail ist bereits auf der Liste.' : backendMsg || 'Etwas ist schiefgelaufen. Bitte erneut versuchen.')
       } else {
         setSubmitted(true)
         setFirstName('')
+        setLastName('')
         setEmail('')
       }
-    } catch {
-      setError('Etwas ist schiefgelaufen. Bitte erneut versuchen.')
+    } catch (err) {
+      console.error('[waitlist] network error', err)
+      setError('Netzwerkfehler. Bitte Internetverbindung prüfen und erneut versuchen.')
     } finally {
       setLoading(false)
     }
@@ -288,6 +326,17 @@ export default function ComingSoon() {
                     placeholder="Vorname"
                     aria-label="Vorname"
                     autoComplete="given-name"
+                    maxLength={80}
+                  />
+                  <input
+                    type="text"
+                    className="cs-input"
+                    value={lastName}
+                    onChange={(e) => setLastName(e.target.value)}
+                    onKeyDown={onKey}
+                    placeholder="Nachname"
+                    aria-label="Nachname"
+                    autoComplete="family-name"
                     maxLength={80}
                   />
                   <input
