@@ -103,10 +103,18 @@
     --releafz-mono: "Inconsolata", monospace;
 }
 
-/* setting background color */
+/* Root background: matches landing light/dark (see `data-releafz-landing-theme` on <html> in layout + theme toggle).
+   Body stays transparent so route-level wrappers (e.g. admin `bg-beige`) paint as before; overscroll chrome follows html. */
+html[data-releafz-landing-theme="dark"] {
+    background-color: var(--releafz-bg);
+}
+
+html[data-releafz-landing-theme="light"] {
+    background-color: #fbfdfb;
+}
 
 body {
-    background-color: #fbfdfb;
+    background-color: transparent;
 }
 
 /* Beige background utility class */

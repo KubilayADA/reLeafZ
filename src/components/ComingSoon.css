@@ -1,7 +1,17 @@
+/* Root chrome (overscroll): same as .cs-root — beats single-attribute html rules in main.css. */
+html[data-releafz-coming-soon="true"][data-releafz-landing-theme] {
+  --cs-chrome-bg: #050d1a;
+  background-color: var(--cs-chrome-bg);
+}
+
+html[data-releafz-coming-soon="true"][data-releafz-landing-theme] body {
+  background-color: var(--cs-chrome-bg);
+}
+
 .cs-root {
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-  color: #ffffff;
-  background: #050d1a;
+  color: #000000;
+  background: var(--cs-chrome-bg, #050d1a);
   width: 100%;
   position: relative;
   overflow: hidden;
@@ -170,29 +180,36 @@
   line-height: 1;
 }
 
-/* Hero: nudge logo slightly higher in the column */
+/* Hero: in-flow logo (≤767px); desktop logo uses fixed positioning */
 .cs-hero > .cs-logo {
-  margin-top: -0.25rem;
+  margin-top: -0.15rem;
   align-self: flex-start;
 }
+
+/* Desktop: logo at horizontal center of viewport, top edge (not limited to hero column width) */
 @media (min-width: 768px) {
   .cs-hero > .cs-logo {
-    margin-top: -5.75rem;
+    position: fixed;
+    top: max(24px, calc(env(safe-area-inset-top, 0px) + 12px));
+    left: 50%;
+    transform: translateX(-50%);
+    margin-top: 0;
+    z-index: 10;
   }
 }
 .cs-logo-img {
-  height: 48px;
+  height: 64px;
   width: auto;
   display: block;
 }
 @media (max-width: 767px) {
   .cs-logo-img {
-    height: 40px;
+    height: 56px;
   }
 }
 @media (min-width: 768px) {
   .cs-hero .cs-logo-img {
-    height: 64px;
+    height: 100px;
     width: auto;
   }
 }
@@ -229,28 +246,44 @@
   color: #4ade80;
   text-shadow: 0 0 20px rgba(74, 222, 128, 0.5);
 }
+/* Shared size for headline + rotating line (set on .cs-hero as --cs-title) */
+.cs-hero {
+  --cs-title: clamp(34px, 5.6vw, 68px);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  align-items: flex-start;
+  text-align: left;
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  margin-left: max(0.75rem, env(safe-area-inset-left, 0px));
+  padding-right: 0.75rem;
+}
 .cs-headline {
   font-family: inherit;
   font-weight: 700;
-  font-size: clamp(36px, 6vw, 72px);
+  font-size: var(--cs-title);
   line-height: 1.02;
   letter-spacing: 0.05em;
   text-transform: uppercase;
   color: #ffffff;
   text-shadow: 0 0 40px rgba(255, 255, 255, 0.3);
   margin: 0;
+  width: 100%;
+  text-align: left;
 }
 .cs-headline-accent {
   color: #4ade80;
   text-shadow: 0 0 40px rgba(74, 222, 128, 0.5);
 }
 
-/* Rotating tagline — same slider as landing hero, restyled for space theme */
+/* Rotating tagline — same font size as .cs-headline via --cs-title */
 .cs-rotator {
-  --word-h: clamp(42px, 6.4vw, 78px);
+  --word-h: var(--cs-title);
   height: var(--word-h);
   width: 100%;
-  max-width: 880px;
+  max-width: 100%;
   overflow: hidden;
   display: flex;
   justify-content: flex-start;
@@ -266,9 +299,9 @@
   width: 100%;
 }
 .cs-rotator .word-item {
-  font-family: "Inconsolata", monospace;
+  font-family: "Helvetica Neue", sans-serif;
   font-weight: 700;
-  font-size: clamp(34px, 5.6vw, 68px);
+  font-size: var(--cs-title);
   line-height: 1;
   letter-spacing: 0.04em;
   text-transform: uppercase;
@@ -276,18 +309,15 @@
   height: var(--word-h);
   min-height: var(--word-h);
   padding: 0;
+  display: flex;
+  align-items: center;
   justify-content: flex-start;
   text-align: left;
   white-space: nowrap;
+  box-sizing: border-box;
   width: 100%;
-}
-@media (max-width: 767px) {
-  .cs-rotator {
-    --word-h: clamp(36px, 10vw, 52px);
-  }
-  .cs-rotator .word-item {
-    font-size: clamp(26px, 8vw, 42px);
-  }
+  min-width: 100%;
+  max-width: none;
 }
 .cs-sub {
   font-family: inherit;
@@ -514,17 +544,14 @@
     min-height: 0;
   }
   .cs-hero {
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
-    max-width: 860px;
+    max-width: min(1040px, 100%);
   }
   .cs-form-row {
     display: grid;
-    grid-template-columns: 220px 1fr auto;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1.25fr) auto;
     gap: 12px;
-    max-width: 720px;
-    align-items: stretch;
+    max-width: min(960px, 100%);
+    align-items: center;
   }
   .cs-steps {
     display: grid;
@@ -571,9 +598,17 @@
     gap: 22px;
   }
   .cs-hero {
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
+    --cs-title: clamp(14px, 4.6vw, 26px);
+    margin-left: max(0.5rem, env(safe-area-inset-left, 0px));
+    padding-right: 0.5rem;
+  }
+  .cs-headline {
+    letter-spacing: 0.035em;
+    margin-top: 1.75rem;
+    margin-bottom: -0.35rem;
+  }
+  .cs-rotator .word-item {
+    letter-spacing: 0.022em;
   }
   .cs-hero > .cs-logo {
     align-self: center;
@@ -582,6 +617,9 @@
     display: flex;
     flex-direction: column;
     gap: 10px;
+  }
+  .cs-form-row .cs-submit-btn2 {
+    margin-top: 1rem;
   }
   .cs-steps {
     display: grid;
@@ -607,5 +645,17 @@
   }
   .cs-sub {
     font-size: 14px;
+  }
+}
+
+@media (max-width: 380px) {
+  .cs-hero {
+    --cs-title: clamp(12px, 3.6vw, 22px);
+  }
+  .cs-headline {
+    letter-spacing: 0.03em;
+  }
+  .cs-rotator .word-item {
+    letter-spacing: 0.018em;
   }
 }
