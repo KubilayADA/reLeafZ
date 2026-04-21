@@ -2,9 +2,52 @@
 
 import Link from 'next/link'
 import { useMemo, useRef, useState } from 'react'
+import type { ISourceOptions } from '@tsparticles/engine'
 import { Button } from '@/components/ui/button'
 import words from '@/constants/index'
+import SectionParticlesBackground from '@/components/ui/SectionParticlesBackground'
 import '@/components/ui/Hero/Words-Sliding-Smooth.css'
+import './ComingSoon.css'
+
+const comingSoonParticlesOptions: ISourceOptions = {
+  fullScreen: { enable: false },
+  background: { color: { value: 'transparent' } },
+  fpsLimit: 60,
+  detectRetina: true,
+  particles: {
+    number: { value: 190, density: { enable: false } },
+    color: { value: ['#a7c79a', '#72906f', '#cfe8c4', '#ffffff'] },
+    shape: { type: 'circle' },
+    opacity: {
+      value: { min: 0.2, max: 0.65 },
+      animation: { enable: true, speed: 0.6, sync: false },
+    },
+    size: {
+      value: { min: 0.3, max: 3.2 },
+      animation: { enable: true, speed: 2, sync: false, startValue: 'random' },
+    },
+    links: { enable: false },
+    move: {
+      enable: true,
+      random: true,
+      speed: 0.9,
+      direction: 'top',
+      straight: false,
+      outModes: { default: 'out' },
+    },
+  },
+  interactivity: {
+    detectsOn: 'window',
+    events: {
+      onHover: { enable: true, mode: 'bubble' },
+      onClick: { enable: true, mode: 'repulse' },
+    },
+    modes: {
+      bubble: { distance: 220, duration: 2, size: 5, opacity: 0.9 },
+      repulse: { distance: 360, duration: 1.2 },
+    },
+  },
+}
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/
 
@@ -54,6 +97,39 @@ export default function ComingSoon() {
   const [error, setError] = useState('')
 
   const stars = useMemo(() => buildStars(200), [])
+  const starsLayerRef = useRef<HTMLDivElement | null>(null)
+
+  const handleStarBurst = (e: React.MouseEvent<HTMLDivElement>) => {
+    const layer = starsLayerRef.current
+    if (!layer) return
+    const rect = layer.getBoundingClientRect()
+    const cx = e.clientX - rect.left
+    const cy = e.clientY - rect.top
+    const radius = 260
+    const maxPush = 120
+
+    const nodes = layer.querySelectorAll<HTMLSpanElement>('.cs-star')
+    nodes.forEach((node) => {
+      const nx = node.offsetLeft + node.offsetWidth / 2
+      const ny = node.offsetTop + node.offsetHeight / 2
+      const dx = nx - cx
+      const dy = ny - cy
+      const dist = Math.hypot(dx, dy) || 1
+      if (dist > radius) return
+
+      const falloff = 1 - dist / radius
+      const pushX = (dx / dist) * maxPush * falloff
+      const pushY = (dy / dist) * maxPush * falloff
+
+      node.style.transition = 'translate 520ms cubic-bezier(0.2, 0.8, 0.2, 1)'
+      node.style.translate = `${pushX}px ${pushY}px`
+
+      window.setTimeout(() => {
+        node.style.transition = 'translate 900ms cubic-bezier(0.2, 0.8, 0.2, 1)'
+        node.style.translate = '0px 0px'
+      }, 520)
+    })
+  }
 
   const hoverAudioRef = useRef<HTMLAudioElement | null>(null)
   const playHoverSound = () => {
@@ -161,400 +237,18 @@ export default function ComingSoon() {
   }
 
   return (
-    <>
-      <style>{`
-        .cs-root {
-          font-family: "Inconsolata", monospace;
-          color: #ffffff;
-          background: #050d1a;
-          width: 100%;
-          position: relative;
-          overflow: hidden;
-        }
-        .cs-root * { box-sizing: border-box; }
-
-        .cs-stars { position: absolute; inset: 0; z-index: 0; pointer-events: none; }
-        .cs-star {
-          position: absolute;
-          color: rgba(255,255,255,0.55);
-          font-family: "Inconsolata", monospace;
-          font-weight: 400;
-          line-height: 1;
-          letter-spacing: 0;
-          user-select: none;
-          text-shadow: 0 0 3px rgba(255,255,255,0.15);
-          animation-name: cs-twinkle;
-          animation-iteration-count: infinite;
-          animation-direction: alternate;
-          animation-timing-function: ease-in-out;
-        }
-        .cs-star.cs-star-green {
-          color: rgba(74,222,128,0.5);
-          text-shadow: 0 0 4px rgba(74,222,128,0.2);
-        }
-        @keyframes cs-twinkle {
-          0%   { opacity: 0.08; }
-          100% { opacity: 0.5; }
-        }
-
-        .cs-orb {
-          position: absolute;
-          width: 600px; height: 600px;
-          left: 50%; top: 50%;
-          transform: translate(-50%, -50%);
-          background: radial-gradient(circle, rgba(74,222,128,0.08) 0%, rgba(74,222,128,0.03) 35%, transparent 70%);
-          animation: cs-float 20s ease-in-out infinite;
-          pointer-events: none;
-          z-index: 0;
-          filter: blur(8px);
-        }
-        .cs-orb-2 {
-          position: absolute;
-          width: 500px; height: 500px;
-          right: -120px; top: -120px;
-          background: radial-gradient(circle, rgba(34,211,238,0.05) 0%, transparent 70%);
-          animation: cs-float 26s ease-in-out infinite reverse;
-          pointer-events: none;
-          z-index: 0;
-          filter: blur(10px);
-        }
-        @keyframes cs-float {
-          0%, 100% { transform: translate(-50%, calc(-50% - 30px)); }
-          50%      { transform: translate(-50%, calc(-50% + 30px)); }
-        }
-
-        .cs-input::placeholder { color: rgba(255,255,255,0.4); }
-        .cs-input:focus {
-          outline: none;
-          border-color: #4ade80;
-          box-shadow: 0 0 0 2px rgba(74,222,128,0.4), 0 0 24px rgba(74,222,128,0.15);
-        }
-        .cs-input:-webkit-autofill {
-          -webkit-text-fill-color: #ffffff;
-          -webkit-box-shadow: 0 0 0 1000px #050d1a inset, 0 0 0 2px rgba(74,222,128,0.25);
-          caret-color: #ffffff;
-        }
-
-        .cs-fade { opacity: 0; transform: translateY(12px); animation: cs-in 800ms ease-out forwards; }
-        .cs-d1 { animation-delay: 80ms; }
-        .cs-d2 { animation-delay: 180ms; }
-        .cs-d3 { animation-delay: 280ms; }
-        .cs-d4 { animation-delay: 380ms; }
-        .cs-d5 { animation-delay: 480ms; }
-        .cs-d6 { animation-delay: 580ms; }
-        .cs-d7 { animation-delay: 680ms; }
-        @keyframes cs-in { to { opacity: 1; transform: translateY(0); } }
-
-        .cs-logo {
-          position: relative;
-          display: inline-flex;
-          align-items: center;
-          line-height: 1;
-          isolation: isolate;
-        }
-        .cs-logo::before {
-          content: "";
-          position: absolute;
-          inset: -20% -100%;
-          z-index: -1;
-          background:
-            radial-gradient(ellipse at center,
-              rgba(74,222,128,0.22) 0%,
-              rgba(74,222,128,0.10) 35%,
-              transparent 70%);
-          filter: blur(10px);
-          animation: cs-logo-pulse 4.8s ease-in-out infinite;
-          pointer-events: none;
-        }
-        .cs-logo-img {
-          height: 36px;
-          width: auto;
-          display: block;
-          position: relative;
-          z-index: 1;
-          filter:
-            brightness(1.08)
-            drop-shadow(0 0 4px rgba(74,222,128,0.35))
-            drop-shadow(0 0 10px rgba(74,222,128,0.18));
-        }
-        @keyframes cs-logo-pulse {
-          0%, 100% { opacity: 0.75; transform: scale(1); }
-          50%      { opacity: 0.95; transform: scale(1.02); }
-        }
-        @media (max-width: 767px) {
-          .cs-logo-img { height: 30px; }
-          .cs-logo::before { filter: blur(8px); }
-        }
-
-        .cs-nav-btn {
-          display: inline-flex; align-items: center; gap: 8px;
-          padding: 8px 16px;
-          background: transparent;
-          color: #ffffff;
-          border: 1px solid rgba(255,255,255,0.25);
-          border-radius: 6px;
-          font-family: "Inconsolata", monospace;
-          font-size: 13px;
-          letter-spacing: 0.05em;
-          line-height: 1;
-          cursor: pointer;
-          text-decoration: none;
-          transition: background-color 180ms ease, border-color 180ms ease;
-        }
-        .cs-nav-btn:hover {
-          background: rgba(255,255,255,0.1);
-          border-color: rgba(255,255,255,0.4);
-        }
-
-        .cs-eyebrow {
-          font-family: "Inconsolata", monospace;
-          font-size: 12px;
-          letter-spacing: 0.3em;
-          text-transform: uppercase;
-          color: #4ade80;
-          text-shadow: 0 0 20px rgba(74,222,128,0.5);
-        }
-        .cs-headline {
-          font-family: "Inconsolata", monospace;
-          font-weight: 700;
-          font-size: clamp(36px, 6vw, 72px);
-          line-height: 1.02;
-          letter-spacing: 0.05em;
-          text-transform: uppercase;
-          color: #ffffff;
-          text-shadow: 0 0 40px rgba(255,255,255,0.3);
-          margin: 0;
-        }
-        .cs-headline-accent { color: #4ade80; text-shadow: 0 0 40px rgba(74,222,128,0.5); }
-
-        /* Rotating tagline — same slider as landing hero, restyled for space theme */
-        .cs-rotator {
-          --word-h: clamp(42px, 6.4vw, 78px);
-          height: var(--word-h);
-          width: 100%;
-          max-width: 880px;
-          overflow: hidden;
-          display: flex;
-          justify-content: flex-start;
-          align-items: flex-start;
-          margin: 2px 0 0;
-          padding: 0;
-        }
-        .cs-rotator .words-wrapper {
-          display: flex;
-          flex-direction: column;
-          animation: wordSlider 24s infinite ease-in-out;
-          height: auto;
-          width: 100%;
-        }
-        .cs-rotator .word-item {
-          font-family: "Inconsolata", monospace;
-          font-weight: 700;
-          font-size: clamp(34px, 5.6vw, 68px);
-          line-height: 1;
-          letter-spacing: 0.04em;
-          text-transform: uppercase;
-          color: #4ade80;
-          text-shadow: 0 0 40px rgba(74,222,128,0.45), 0 0 80px rgba(74,222,128,0.18);
-          height: var(--word-h);
-          min-height: var(--word-h);
-          padding: 0;
-          justify-content: flex-start;
-          text-align: left;
-          white-space: nowrap;
-          width: 100%;
-        }
-        @media (max-width: 767px) {
-          .cs-rotator {
-            --word-h: clamp(36px, 10vw, 52px);
-          }
-          .cs-rotator .word-item {
-            font-size: clamp(26px, 8vw, 42px);
-          }
-        }
-        .cs-sub {
-          font-family: "Inconsolata", monospace;
-          font-size: 15px;
-          line-height: 1.5;
-          color: rgba(255,255,255,0.65);
-          max-width: 640px;
-          margin: 0;
-        }
-
-        .cs-input {
-          background: transparent;
-          border: 1px solid rgba(255,255,255,0.2);
-          border-radius: 8px;
-          color: #ffffff;
-          font-family: "Inconsolata", monospace;
-          font-size: 15px;
-          padding: 12px 16px;
-          width: 100%;
-          transition: border-color 160ms ease, box-shadow 160ms ease;
-        }
-
-        .cs-submit-btn2 { align-self: center; font-family: "Inconsolata", monospace; }
-        .cs-submit-btn2 .wrapper > span:first-child { letter-spacing: 0.04em; }
-
-        .cs-step {
-          background: rgba(255,255,255,0.04);
-          border: 1px solid rgba(255,255,255,0.1);
-          -webkit-backdrop-filter: blur(10px);
-          backdrop-filter: blur(10px);
-          border-radius: 12px;
-          padding: 18px 22px;
-          min-height: 0;
-        }
-        .cs-step-num {
-          font-family: "Inconsolata", monospace;
-          font-weight: 700;
-          font-size: 13px;
-          color: #4ade80;
-          letter-spacing: 0.15em;
-          margin-bottom: 8px;
-          text-shadow: 0 0 16px rgba(74,222,128,0.4);
-        }
-        .cs-step-title {
-          font-family: "Inconsolata", monospace;
-          font-weight: 700;
-          font-size: 16px;
-          letter-spacing: 0.06em;
-          color: #ffffff;
-          margin: 0 0 6px;
-          line-height: 1.2;
-        }
-        .cs-step-body {
-          font-family: "Inconsolata", monospace;
-          font-size: 13px;
-          color: rgba(255,255,255,0.6);
-          margin: 0;
-          line-height: 1.4;
-        }
-
-        .cs-badge {
-          display: inline-flex; align-items: center; gap: 8px;
-          padding: 7px 14px;
-          border: 1px solid rgba(74,222,128,0.4);
-          border-radius: 999px;
-          color: #ffffff;
-          font-family: "Inconsolata", monospace;
-          font-size: 12px;
-          letter-spacing: 0.04em;
-          background: rgba(74,222,128,0.04);
-          -webkit-backdrop-filter: blur(10px);
-          backdrop-filter: blur(10px);
-        }
-        .cs-badge-dot {
-          width: 6px; height: 6px; border-radius: 999px;
-          background: #4ade80;
-          box-shadow: 0 0 8px rgba(74,222,128,0.8);
-        }
-
-        .cs-success {
-          display: inline-flex; align-items: center; gap: 12px;
-          padding: 14px 20px;
-          background: rgba(74,222,128,0.08);
-          border: 1px solid rgba(74,222,128,0.4);
-          border-radius: 12px;
-          -webkit-backdrop-filter: blur(10px);
-          backdrop-filter: blur(10px);
-          color: #ffffff;
-          font-family: "Inconsolata", monospace;
-          font-size: 15px;
-        }
-        .cs-success-mark {
-          display: inline-flex; align-items: center; justify-content: center;
-          width: 24px; height: 24px; border-radius: 999px;
-          background: #4ade80; color: #050d1a;
-          font-size: 13px; font-weight: 700;
-          box-shadow: 0 0 16px rgba(74,222,128,0.6);
-        }
-        .cs-note { font-family: "Inconsolata", monospace; font-size: 12px; color: rgba(255,255,255,0.5); margin: 0; letter-spacing: 0.04em; }
-        .cs-error { font-family: "Inconsolata", monospace; font-size: 12px; color: #fca5a5; margin: 0; letter-spacing: 0.04em; }
-
-        .cs-footer a { color: rgba(255,255,255,0.55); text-decoration: none; transition: color 160ms ease; }
-        .cs-footer a:hover { color: #ffffff; }
-        .cs-footer span.sep { margin: 0 8px; opacity: 0.4; }
-
-        /* Desktop: single viewport, no scroll */
-        @media (min-width: 768px) {
-          .cs-page {
-            position: relative; z-index: 1;
-            height: 100dvh;
-            overflow: hidden;
-            display: grid;
-            grid-template-rows: 64px minmax(0, 1fr) 48px;
-            padding: 0 48px;
-          }
-          .cs-nav {
-            display: flex; align-items: center; justify-content: space-between;
-          }
-          .cs-main {
-            display: flex; flex-direction: column;
-            justify-content: center;
-            gap: 22px;
-            padding: 12px 0;
-            min-height: 0;
-          }
-          .cs-hero { display: flex; flex-direction: column; gap: 14px; max-width: 860px; }
-          .cs-form-row {
-            display: grid;
-            grid-template-columns: minmax(140px, 180px) minmax(140px, 180px) minmax(200px, 1fr) auto;
-            gap: 10px;
-            max-width: 840px;
-            align-items: stretch;
-          }
-          .cs-steps {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 14px;
-            max-width: 980px;
-          }
-          .cs-badges {
-            display: flex; flex-wrap: wrap; gap: 10px;
-          }
-          .cs-footer {
-            display: flex; align-items: center; justify-content: center;
-            font-size: 11px; color: rgba(255,255,255,0.45);
-            letter-spacing: 0.04em;
-          }
-        }
-
-        /* Mobile: stack vertically, scroll allowed */
-        @media (max-width: 767px) {
-          .cs-page {
-            position: relative; z-index: 1;
-            min-height: 100dvh;
-            padding: 16px 20px 28px;
-            display: flex;
-            flex-direction: column;
-            gap: 24px;
-          }
-          .cs-nav {
-            display: flex; align-items: center; justify-content: space-between;
-            flex-wrap: wrap; gap: 10px;
-          }
-          .cs-main { display: flex; flex-direction: column; gap: 22px; }
-          .cs-hero { display: flex; flex-direction: column; gap: 14px; }
-          .cs-form-row { display: flex; flex-direction: column; gap: 10px; }
-          .cs-steps { display: grid; grid-template-columns: 1fr; gap: 12px; }
-          .cs-badges { display: flex; flex-wrap: wrap; gap: 8px; }
-          .cs-footer {
-            font-size: 11px; color: rgba(255,255,255,0.5);
-            text-align: center;
-            letter-spacing: 0.04em;
-            padding-top: 8px;
-          }
-          .cs-sub { font-size: 14px; }
-        }
-      `}</style>
-
-      <div className="cs-root">
-        <div className="cs-stars" aria-hidden>
+    <div className="cs-root" onClick={handleStarBurst}>
+        <div className="cs-bg" aria-hidden>
+          <SectionParticlesBackground
+            className="cs-particles"
+            options={comingSoonParticlesOptions}
+          />
+        </div>
+        <div className="cs-stars" aria-hidden ref={starsLayerRef}>
           {stars.map((s, i) => (
             <span
               key={i}
-              className={`cs-star${i % 11 === 0 ? ' cs-star-green' : ''}`}
+              className={`cs-star${i % 4 === 0 ? ' cs-star-green' : i % 9 === 0 ? ' cs-star-green-soft' : ''}`}
               style={{
                 left: `${s.left}%`,
                 top: `${s.top}%`,
@@ -575,7 +269,6 @@ export default function ComingSoon() {
           <nav className="cs-nav cs-fade">
             <div className="cs-logo">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/logo1.png" alt="releafZ" className="cs-logo-img" />
             </div>
             <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
               <Link href="/pharmacies" className="cs-nav-btn">
@@ -589,9 +282,10 @@ export default function ComingSoon() {
 
           <main className="cs-main">
             <section className="cs-hero">
-              <div className="cs-eyebrow cs-fade cs-d1">
-                MEDIZINAL CANNABIS · BERLIN · 2025
-              </div>
+              <div className="cs-logo">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/logo1.png" alt="releafZ" className="cs-logo-img h-12 w-auto" />
+            </div>
               <h1 className="cs-headline cs-fade cs-d2">
                 MEDIZINAL CANNABIS
               </h1>
@@ -712,6 +406,5 @@ export default function ComingSoon() {
           </footer>
         </div>
       </div>
-    </>
   )
 }

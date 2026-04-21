@@ -1,6 +1,6 @@
 /* From Uiverse.io by Ashon-G */ 
 .uiverse {
-  --duration: 7s;
+  --duration: 15s;
   --easing: cubic-bezier(0.37, 0, 0.2, 1);
   --c-color-1: rgba(255, 163, 26, 0.7);
   --c-color-2: #1a23ff;
@@ -11,7 +11,7 @@
   --c-shadow-inset-bottom: rgba(255, 250, 215, 0.8);
   --c-radial-inner: #ffd215;
   --c-radial-outer: #fff172;
-  --c-color: #fff;
+  --c-color: #000;
   -webkit-tap-highlight-color: transparent;
   -webkit-appearance: none;
   appearance: none;
@@ -23,11 +23,14 @@
   border-right: 4px solid #333;
   border-bottom: 4px solid #333;
   box-sizing: border-box;
-  display: table;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   overflow: hidden;
-  border-radius: 10px;
+  border-radius: 50px;
   padding: 0;
   margin: 0;
+  min-height: 54px;
   text-align: center;
   font-weight: 600;
   font-size: 16px;
@@ -53,7 +56,7 @@
   top: 0;
   right: 0;
   bottom: 0;
-  border-radius: 10px;
+  border-radius: 12px;
   box-shadow:
     inset 0 3px 12px var(--c-shadow-inset-top),
     inset 0 -3px 4px var(--c-shadow-inset-bottom);
@@ -63,10 +66,12 @@
   -webkit-mask-image: -webkit-radial-gradient(white, black);
   mask-image: radial-gradient(white, black);
   overflow: hidden;
-  border-radius: 10px;
+  border-radius: 12px;
   min-width: 132px;
-  padding: 12px 0;
-  display: block;
+  padding: 12px 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   position: relative;
   isolation: isolate;
 }

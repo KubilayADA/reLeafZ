@@ -184,12 +184,14 @@
   -webkit-tap-highlight-color: transparent;
 }
 
+
 .mobile-hero__row-label {
   font-size: clamp(30px, 8vw, 42px);
   font-weight: 800;
   letter-spacing: -0.02em;
   line-height: 1.05;
 }
+
 
 .mobile-hero__row-indicator {
   font-size: 32px;
@@ -434,6 +436,7 @@
   color: var(--releafz-text, #ffffff);
 }
 
+
 #landing-main[data-theme='dark'] .mobile-hero__row-indicator {
   color: rgba(255, 255, 255, 0.5);
 }
@@ -470,10 +473,10 @@
 
 #landing-main[data-theme='dark'] .mobile-hero__cta-btn {
   background: #141414;
-  border-top-color: #e2e8f0;
-  border-left-color: #e2e8f0;
-  border-right-color: #64748b;
-  border-bottom-color: #64748b;
+  border-top-color: #fff;
+  border-left-color: #fff;
+  border-right-color: #fff;
+  border-bottom-color: #fff;
   color: #f8fafc;
 }
 
