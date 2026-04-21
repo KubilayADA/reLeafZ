@@ -42,6 +42,7 @@ export default function MashallahForm({
   const [showWelcomeNotification, setShowWelcomeNotification] = useState(false)
   const [consentHealth, setConsentHealth] = useState(false)
   const [consentTerms, setConsentTerms] = useState(false)
+  const [dateOfBirth, setDateOfBirth] = useState('')
   /* LOCAL ACCESS BYPASS BLOCK START (toggle usage) */
   const canBypassAccess = isLocalAccessBypassEnabled()
   /* LOCAL ACCESS BYPASS BLOCK END (toggle usage) */
@@ -52,10 +53,26 @@ export default function MashallahForm({
   const isFormValid = formData.fullName.trim() !== '' && 
                      formData.email.trim() !== '' && 
                      formData.phone.trim() !== '' && 
+                     dateOfBirth.trim() !== '' &&
                      formData.street.trim() !== '' &&
                      formData.city.trim() !== '' &&
                      consentHealth === true &&
                      consentTerms === true
+
+  const validate = () => {
+    const errors: Record<string, string> = {}
+
+    if (!dateOfBirth) errors.dateOfBirth = 'Geburtsdatum ist erforderlich'
+    else {
+      const dob = new Date(dateOfBirth)
+      const today = new Date()
+      const age = today.getFullYear() - dob.getFullYear() -
+        (today < new Date(today.getFullYear(), dob.getMonth(), dob.getDate()) ? 1 : 0)
+      if (age < 18) errors.dateOfBirth = 'Sie müssen mindestens 18 Jahre alt sein'
+    }
+
+    return errors
+  }
 
                      const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
                       const { name, value } = e.target
@@ -148,6 +165,7 @@ export default function MashallahForm({
         credentials: 'include',
         body: JSON.stringify({
           ...formData,
+          dateOfBirth: dateOfBirth,
           postcode,
           healthDataConsentGiven: consentHealth,
           termsAccepted: consentTerms,
@@ -211,6 +229,13 @@ export default function MashallahForm({
     e.preventDefault()
     setLoading(true)
     setSubmitError('')
+    const errors = validate()
+
+    if (errors.dateOfBirth) {
+      setSubmitError(errors.dateOfBirth)
+      setLoading(false)
+      return
+    }
 
     try {
       // Step 1: Submit treatment request first (validates form, creates request). Only then auth/OTP.
@@ -381,6 +406,22 @@ export default function MashallahForm({
                   disabled={loading}
                   className="form-input inconsolata"
                   placeholder="+49 30 12345678"
+                />
+              </div>
+
+              <div className="form-field">
+                <label htmlFor="dateOfBirth" className="form-label">
+                  Geburtsdatum *
+                </label>
+                <input
+                  type="date"
+                  id="dateOfBirth"
+                  name="dateOfBirth"
+                  value={dateOfBirth}
+                  onChange={(e) => setDateOfBirth(e.target.value)}
+                  required
+                  disabled={loading}
+                  className="form-input inconsolata"
                 />
               </div>
 
