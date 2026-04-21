@@ -587,7 +587,12 @@ export default function MarketplacePage() {
                           <div className="marketplace-products-inner">
                             <p className="marketplace-products-title">Produkte:</p>
                             <div className="marketplace-product-grid">
-                              {products.map(product => {
+                              {products
+                                .filter(product => {
+                                  const minQty = product.form === 'FLOWER' ? MIN_FLOWER_QUANTITY : MIN_OTHER_QUANTITY
+                                  return product.stock >= minQty
+                                })
+                                .map(product => {
                                 const isProductSelected = selectedProducts.has(product.id)
                                 const strainInfo = getStrainType(product.name)
                                 const imageUrl = failedImages.has(product.id) ? PLACEHOLDER_IMAGE : getProductImage(product)

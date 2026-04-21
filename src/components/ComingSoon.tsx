@@ -1,507 +1,668 @@
 'use client'
 
-import React, { useState, useEffect } from 'react';
-import Link from 'next/link';
-import { ZapIcon, Brain, Leaf, CheckCircle, ArrowRight } from 'lucide-react';
+import Link from 'next/link'
+import { useMemo, useRef, useState } from 'react'
+import { Button } from '@/components/ui/button'
+import words from '@/constants/index'
+import '@/components/ui/Hero/Words-Sliding-Smooth.css'
 
-const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/
 
-const ComingSoon: React.FC = () => {
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
-  const [email, setEmail] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isSuccess, setIsSuccess] = useState(false);
-  const [error, setError] = useState('');
-  const [particles, setParticles] = useState<Array<{
-    id: number;
-    size: number;
-    left: number;
-    top: number;
-    duration: number;
-    delay: number;
-  }>>([]);
+const steps = [
+  { num: '01', title: 'FRAGEBOGEN', body: 'Medizinischer Fragebogen in 2 Minuten ausgefüllt.' },
+  { num: '02', title: 'ARZT PRÜFT', body: 'Approbierter Deutscher Arzt prüft innerhalb 24h.' },
+  { num: '03', title: 'LIEFERUNG', body: 'Berliner Partnerapotheke liefert in 30–90 Min.' },
+]
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
+const badges = [
+  'DSGVO-konform',
+  'Deutsche Ärzte',
+  'CanG 2024 legal',
+  'Berliner Apotheken',
+]
 
-    const trimmedFirst = firstName.trim();
-    const trimmedLast = lastName.trim();
-    const trimmedEmail = email.trim();
+type Star = {
+  left: number
+  top: number
+  size: number
+  duration: number
+  delay: number
+  rotate: number
+}
 
-    if (!trimmedFirst || !trimmedLast) {
-      setError('Please enter your first and last name.');
-      return;
+function buildStars(count: number): Star[] {
+  const stars: Star[] = []
+  for (let i = 0; i < count; i++) {
+    const left = ((i * 7919) % 10000) / 100
+    const top = ((i * 6151 + 17) % 10000) / 100
+    const sizes = [9, 10, 11, 13, 16]
+    const size = sizes[i % sizes.length]
+    const duration = 2 + (i % 6)
+    const delay = ((i * 131) % 100) / 25
+    const rotate = ((i * 53) % 40) - 20
+    stars.push({ left, top, size, duration, delay, rotate })
+  }
+  return stars
+}
+
+export default function ComingSoon() {
+  const [firstName, setFirstName] = useState('')
+  const [email, setEmail] = useState('')
+  const [submitted, setSubmitted] = useState(false)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
+
+  const stars = useMemo(() => buildStars(200), [])
+
+  const hoverAudioRef = useRef<HTMLAudioElement | null>(null)
+  const playHoverSound = () => {
+    const src = '/tekkkk.mp3'
+    if (!hoverAudioRef.current) {
+      hoverAudioRef.current = new Audio(src)
+      hoverAudioRef.current.preload = 'auto'
+      hoverAudioRef.current.volume = 0.6
     }
-    if (!EMAIL_RE.test(trimmedEmail)) {
-      setError('Please enter a valid email address.');
-      return;
+    const expected = new URL(src, window.location.origin).href
+    if (hoverAudioRef.current.src !== expected) {
+      hoverAudioRef.current.src = src
+      hoverAudioRef.current.load()
+    }
+    hoverAudioRef.current.currentTime = 0
+    void hoverAudioRef.current.play().catch(() => {})
+  }
+  const stopHoverSound = () => {
+    if (!hoverAudioRef.current) return
+    hoverAudioRef.current.pause()
+    hoverAudioRef.current.currentTime = 0
+  }
+
+  const handleSubmit = async () => {
+    setError('')
+    const fn = firstName.trim()
+    const em = email.trim()
+
+    if (!fn) {
+      setError('Bitte Vornamen eingeben.')
+      return
+    }
+    if (!EMAIL_RE.test(em)) {
+      setError('Bitte gültige E-Mail-Adresse eingeben.')
+      return
     }
 
-    setIsSubmitting(true);
-
+    setLoading(true)
     try {
       const res = await fetch('/api/waitlist', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ firstName: trimmedFirst, lastName: trimmedLast, email: trimmedEmail }),
-      });
-
-      const data = await res.json().catch(() => null);
+        body: JSON.stringify({ firstName: fn, email: em }),
+      })
+      const data = await res.json().catch(() => null)
 
       if (!res.ok) {
-        throw new Error(data?.error || 'Something went wrong. Please try again.');
-      }
-
-      if (data?.alreadyRegistered) {
-        setError('This email is already on the waiting list.');
-        return;
-      }
-
-      setIsSuccess(true);
-      setFirstName('');
-      setLastName('');
-      setEmail('');
-    } catch (err) {
-      if (err instanceof TypeError) {
-        setError('Unable to connect. Please check your internet connection and try again.');
+        setError(data?.error || 'Etwas ist schiefgelaufen. Bitte erneut versuchen.')
+      } else if (data?.alreadyRegistered) {
+        setError('Diese E-Mail ist bereits auf der Liste.')
       } else {
-        setError(err instanceof Error ? err.message : 'Something went wrong. Please try again.');
+        setSubmitted(true)
+        setFirstName('')
+        setEmail('')
       }
+    } catch {
+      setError('Etwas ist schiefgelaufen. Bitte erneut versuchen.')
     } finally {
-      setIsSubmitting(false);
+      setLoading(false)
     }
-  };
+  }
 
-  // Generate particle positions only on client side to avoid hydration mismatch
-  useEffect(() => {
-    setParticles(
-      Array.from({ length: 6 }, (_, i) => ({
-        id: i,
-        size: Math.random() * 4 + 2,
-        left: Math.random() * 100,
-        top: Math.random() * 100,
-        duration: Math.random() * 10 + 10,
-        delay: Math.random() * 5,
-      }))
-    );
-  }, []);
-
-  // Set dark background on html/body only for ComingSoon page
-  useEffect(() => {
-    const html = document.documentElement;
-    const body = document.body;
-    const originalHtmlBg = html.style.background;
-    const originalBodyBg = body.style.background;
-
-    html.style.background = '#0a0a0a';
-    body.style.background = '#0a0a0a';
-
-    return () => {
-      html.style.background = originalHtmlBg;
-      body.style.background = originalBodyBg;
-    };
-  }, []);
+  const onKey = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      e.preventDefault()
+      handleSubmit()
+    }
+  }
 
   return (
-    <div 
-      className="coming-soon-page min-h-screen min-h-dvh relative overflow-y-auto"
-      style={{
-        background: '#0a0a0a',
-        fontFamily: '"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
-        margin: 0,
-        padding: 0,
-      }}
-    >
-      {/* Futuristic glowing background elements */}
-      <div 
-        className="fixed overflow-hidden pointer-events-none"
-          style={{
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          zIndex: 0,
-        }}
-      >
-        {/* Base dark background */}
-        <div 
-          className="absolute"
-          style={{
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            background: 'linear-gradient(to bottom, #0a0a0a 0%, #0f0f0f 50%, #0a0a0a 100%)',
-          }}
-        />
-        
-        {/* Glowing horizontal ring/line - positioned behind form elements */}
-        <div 
-          className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[2px] md:h-[3px] z-0"
-          style={{
-            background: 'linear-gradient(90deg, transparent 0%, rgba(34, 211, 238, 0.6) 20%, rgba(16, 185, 129, 0.8) 50%, rgba(34, 211, 238, 0.6) 80%, transparent 100%)',
-            boxShadow: '0 0 60px rgba(34, 211, 238, 0.6), 0 0 120px rgba(16, 185, 129, 0.5), 0 0 180px rgba(34, 211, 238, 0.3)',
-            animation: 'glowPulse 4s ease-in-out infinite',
-          }}
-        />
-        
-        {/* Additional glow layers for depth */}
-        <div 
-          className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[100%] h-[300px] md:h-[400px] z-0"
-          style={{
-            background: 'radial-gradient(ellipse at center, rgba(34, 211, 238, 0.2) 0%, rgba(16, 185, 129, 0.15) 30%, transparent 70%)',
-            animation: 'glowPulse 6s ease-in-out infinite',
-            animationDelay: '1s',
-          }}
-        />
-        
-        {/* Subtle grid pattern */}
-        <div 
-          className="absolute inset-0 opacity-[0.05]"
-          style={{
-            backgroundImage: 'linear-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.1) 1px, transparent 1px)',
-            backgroundSize: '50px 50px',
-          }}
-        />
-        
-        {/* Floating particles/glow dots */}
-        {particles.map((particle) => (
-          <div 
-            key={particle.id}
-            className="absolute rounded-full"
-            style={{
-              width: `${particle.size}px`,
-              height: `${particle.size}px`,
-              left: `${particle.left}%`,
-              top: `${particle.top}%`,
-              background: 'rgba(34, 211, 238, 0.7)',
-              boxShadow: '0 0 15px rgba(34, 211, 238, 0.8), 0 0 30px rgba(34, 211, 238, 0.4)',
-              animation: `floatParticle ${particle.duration}s ease-in-out infinite`,
-              animationDelay: `${particle.delay}s`,
-            }}
-          />
-        ))}
-          </div>
+    <>
+      <style>{`
+        .cs-root {
+          font-family: "Inconsolata", monospace;
+          color: #ffffff;
+          background: #050d1a;
+          width: 100%;
+          position: relative;
+          overflow: hidden;
+        }
+        .cs-root * { box-sizing: border-box; }
 
-      {/* Main content */}
-          <div 
-        className="relative z-10 w-full max-w-4xl mx-auto text-center flex flex-col items-center justify-center min-h-screen min-h-dvh py-8"
-            style={{
-          paddingTop: 'max(env(safe-area-inset-top, 0px), 2rem)',
-          paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 2rem)',
-          paddingLeft: 'max(env(safe-area-inset-left, 0px), 1rem)',
-          paddingRight: 'max(env(safe-area-inset-right, 0px), 1rem)',
-        }}
-      >
-        {/* Logo */}
-        <div className="flex justify-center mb-8 md:mb-12">
-          <img
-            src="/logo1.png"
-            alt="reLeafZ Logo"
-            className="w-40 h-auto sm:w-56 md:w-64 lg:w-72"
-            style={{ 
-              filter: 'drop-shadow(0 0 20px rgba(34, 211, 238, 0.3))',
-            }}
-          />
-        </div>
+        .cs-stars { position: absolute; inset: 0; z-index: 0; pointer-events: none; }
+        .cs-star {
+          position: absolute;
+          color: rgba(255,255,255,0.55);
+          font-family: "Inconsolata", monospace;
+          font-weight: 400;
+          line-height: 1;
+          letter-spacing: 0;
+          user-select: none;
+          text-shadow: 0 0 3px rgba(255,255,255,0.15);
+          animation-name: cs-twinkle;
+          animation-iteration-count: infinite;
+          animation-direction: alternate;
+          animation-timing-function: ease-in-out;
+        }
+        .cs-star.cs-star-green {
+          color: rgba(74,222,128,0.5);
+          text-shadow: 0 0 4px rgba(74,222,128,0.2);
+        }
+        @keyframes cs-twinkle {
+          0%   { opacity: 0.08; }
+          100% { opacity: 0.5; }
+        }
 
-        {/* Main headline */}
-        <h1 
-          className="text-2xl sm:text-2xl md:text-4xl lg:text-5xl font-bold mb-6 md:mb-8 leading-tight px-4"
-          style={{ 
-            color: '#ffffff',
-            textShadow: '0 0 30px rgba(255, 255, 255, 0.1)',
-          }}
-        >
-          Strain recommendations tailored based on {' '}
-          <span style={{ color: '#22d3ee' }}>your medical needs</span>.
-        </h1>
+        .cs-orb {
+          position: absolute;
+          width: 600px; height: 600px;
+          left: 50%; top: 50%;
+          transform: translate(-50%, -50%);
+          background: radial-gradient(circle, rgba(74,222,128,0.08) 0%, rgba(74,222,128,0.03) 35%, transparent 70%);
+          animation: cs-float 20s ease-in-out infinite;
+          pointer-events: none;
+          z-index: 0;
+          filter: blur(8px);
+        }
+        .cs-orb-2 {
+          position: absolute;
+          width: 500px; height: 500px;
+          right: -120px; top: -120px;
+          background: radial-gradient(circle, rgba(34,211,238,0.05) 0%, transparent 70%);
+          animation: cs-float 26s ease-in-out infinite reverse;
+          pointer-events: none;
+          z-index: 0;
+          filter: blur(10px);
+        }
+        @keyframes cs-float {
+          0%, 100% { transform: translate(-50%, calc(-50% - 30px)); }
+          50%      { transform: translate(-50%, calc(-50% + 30px)); }
+        }
 
-        {/* Sub-text */}
-        <p 
-          className="text-sm sm:text-base md:text-lg mb-8 md:mb-12 text-gray-300 leading-relaxed max-w-2xl mx-auto px-4"
-          style={{ 
-            color: 'rgba(255, 255, 255, 0.8)',
-          }}
-        >
-          Be among the first to find the perfect strain matched to you.{' '} <br />
-          <strong style={{ color: '#22d3ee' }}>Waiting list is live !</strong>
-        </p>
+        .cs-input::placeholder { color: rgba(255,255,255,0.4); }
+        .cs-input:focus {
+          outline: none;
+          border-color: #4ade80;
+          box-shadow: 0 0 0 2px rgba(74,222,128,0.4), 0 0 24px rgba(74,222,128,0.15);
+        }
+        .cs-input:-webkit-autofill {
+          -webkit-text-fill-color: #ffffff;
+          -webkit-box-shadow: 0 0 0 1000px #050d1a inset, 0 0 0 2px rgba(74,222,128,0.25);
+          caret-color: #ffffff;
+        }
 
-        {/* Email form / Success state */}
-        {isSuccess ? (
-          <div className="max-w-2xl mx-auto px-4 relative z-10 flex flex-col items-center gap-4 animate-in fade-in">
-            <CheckCircle
-              className="w-12 h-12 md:w-14 md:h-14"
+        .cs-fade { opacity: 0; transform: translateY(12px); animation: cs-in 800ms ease-out forwards; }
+        .cs-d1 { animation-delay: 80ms; }
+        .cs-d2 { animation-delay: 180ms; }
+        .cs-d3 { animation-delay: 280ms; }
+        .cs-d4 { animation-delay: 380ms; }
+        .cs-d5 { animation-delay: 480ms; }
+        .cs-d6 { animation-delay: 580ms; }
+        .cs-d7 { animation-delay: 680ms; }
+        @keyframes cs-in { to { opacity: 1; transform: translateY(0); } }
+
+        .cs-logo {
+          position: relative;
+          display: inline-flex;
+          align-items: center;
+          line-height: 1;
+          isolation: isolate;
+        }
+        .cs-logo::before {
+          content: "";
+          position: absolute;
+          inset: -20% -100%;
+          z-index: -1;
+          background:
+            radial-gradient(ellipse at center,
+              rgba(74,222,128,0.22) 0%,
+              rgba(74,222,128,0.10) 35%,
+              transparent 70%);
+          filter: blur(10px);
+          animation: cs-logo-pulse 4.8s ease-in-out infinite;
+          pointer-events: none;
+        }
+        .cs-logo-img {
+          height: 36px;
+          width: auto;
+          display: block;
+          position: relative;
+          z-index: 1;
+          filter:
+            brightness(1.08)
+            drop-shadow(0 0 4px rgba(74,222,128,0.35))
+            drop-shadow(0 0 10px rgba(74,222,128,0.18));
+        }
+        @keyframes cs-logo-pulse {
+          0%, 100% { opacity: 0.75; transform: scale(1); }
+          50%      { opacity: 0.95; transform: scale(1.02); }
+        }
+        @media (max-width: 767px) {
+          .cs-logo-img { height: 30px; }
+          .cs-logo::before { filter: blur(8px); }
+        }
+
+        .cs-nav-btn {
+          display: inline-flex; align-items: center; gap: 8px;
+          padding: 8px 16px;
+          background: transparent;
+          color: #ffffff;
+          border: 1px solid rgba(255,255,255,0.25);
+          border-radius: 6px;
+          font-family: "Inconsolata", monospace;
+          font-size: 13px;
+          letter-spacing: 0.05em;
+          line-height: 1;
+          cursor: pointer;
+          text-decoration: none;
+          transition: background-color 180ms ease, border-color 180ms ease;
+        }
+        .cs-nav-btn:hover {
+          background: rgba(255,255,255,0.1);
+          border-color: rgba(255,255,255,0.4);
+        }
+
+        .cs-eyebrow {
+          font-family: "Inconsolata", monospace;
+          font-size: 12px;
+          letter-spacing: 0.3em;
+          text-transform: uppercase;
+          color: #4ade80;
+          text-shadow: 0 0 20px rgba(74,222,128,0.5);
+        }
+        .cs-headline {
+          font-family: "Inconsolata", monospace;
+          font-weight: 700;
+          font-size: clamp(36px, 6vw, 72px);
+          line-height: 1.02;
+          letter-spacing: 0.05em;
+          text-transform: uppercase;
+          color: #ffffff;
+          text-shadow: 0 0 40px rgba(255,255,255,0.3);
+          margin: 0;
+        }
+        .cs-headline-accent { color: #4ade80; text-shadow: 0 0 40px rgba(74,222,128,0.5); }
+
+        /* Rotating tagline — same slider as landing hero, restyled for space theme */
+        .cs-rotator {
+          --word-h: clamp(42px, 6.4vw, 78px);
+          height: var(--word-h);
+          width: 100%;
+          max-width: 880px;
+          overflow: hidden;
+          display: flex;
+          justify-content: flex-start;
+          align-items: flex-start;
+          margin: 2px 0 0;
+          padding: 0;
+        }
+        .cs-rotator .words-wrapper {
+          display: flex;
+          flex-direction: column;
+          animation: wordSlider 24s infinite ease-in-out;
+          height: auto;
+          width: 100%;
+        }
+        .cs-rotator .word-item {
+          font-family: "Inconsolata", monospace;
+          font-weight: 700;
+          font-size: clamp(34px, 5.6vw, 68px);
+          line-height: 1;
+          letter-spacing: 0.04em;
+          text-transform: uppercase;
+          color: #4ade80;
+          text-shadow: 0 0 40px rgba(74,222,128,0.45), 0 0 80px rgba(74,222,128,0.18);
+          height: var(--word-h);
+          min-height: var(--word-h);
+          padding: 0;
+          justify-content: flex-start;
+          text-align: left;
+          white-space: nowrap;
+          width: 100%;
+        }
+        @media (max-width: 767px) {
+          .cs-rotator {
+            --word-h: clamp(36px, 10vw, 52px);
+          }
+          .cs-rotator .word-item {
+            font-size: clamp(26px, 8vw, 42px);
+          }
+        }
+        .cs-sub {
+          font-family: "Inconsolata", monospace;
+          font-size: 15px;
+          line-height: 1.5;
+          color: rgba(255,255,255,0.65);
+          max-width: 640px;
+          margin: 0;
+        }
+
+        .cs-input {
+          background: transparent;
+          border: 1px solid rgba(255,255,255,0.2);
+          border-radius: 8px;
+          color: #ffffff;
+          font-family: "Inconsolata", monospace;
+          font-size: 15px;
+          padding: 12px 16px;
+          width: 100%;
+          transition: border-color 160ms ease, box-shadow 160ms ease;
+        }
+
+        .cs-submit-btn2 { align-self: center; font-family: "Inconsolata", monospace; }
+        .cs-submit-btn2 .wrapper > span:first-child { letter-spacing: 0.04em; }
+
+        .cs-step {
+          background: rgba(255,255,255,0.04);
+          border: 1px solid rgba(255,255,255,0.1);
+          -webkit-backdrop-filter: blur(10px);
+          backdrop-filter: blur(10px);
+          border-radius: 12px;
+          padding: 18px 22px;
+          min-height: 0;
+        }
+        .cs-step-num {
+          font-family: "Inconsolata", monospace;
+          font-weight: 700;
+          font-size: 13px;
+          color: #4ade80;
+          letter-spacing: 0.15em;
+          margin-bottom: 8px;
+          text-shadow: 0 0 16px rgba(74,222,128,0.4);
+        }
+        .cs-step-title {
+          font-family: "Inconsolata", monospace;
+          font-weight: 700;
+          font-size: 16px;
+          letter-spacing: 0.06em;
+          color: #ffffff;
+          margin: 0 0 6px;
+          line-height: 1.2;
+        }
+        .cs-step-body {
+          font-family: "Inconsolata", monospace;
+          font-size: 13px;
+          color: rgba(255,255,255,0.6);
+          margin: 0;
+          line-height: 1.4;
+        }
+
+        .cs-badge {
+          display: inline-flex; align-items: center; gap: 8px;
+          padding: 7px 14px;
+          border: 1px solid rgba(74,222,128,0.4);
+          border-radius: 999px;
+          color: #ffffff;
+          font-family: "Inconsolata", monospace;
+          font-size: 12px;
+          letter-spacing: 0.04em;
+          background: rgba(74,222,128,0.04);
+          -webkit-backdrop-filter: blur(10px);
+          backdrop-filter: blur(10px);
+        }
+        .cs-badge-dot {
+          width: 6px; height: 6px; border-radius: 999px;
+          background: #4ade80;
+          box-shadow: 0 0 8px rgba(74,222,128,0.8);
+        }
+
+        .cs-success {
+          display: inline-flex; align-items: center; gap: 12px;
+          padding: 14px 20px;
+          background: rgba(74,222,128,0.08);
+          border: 1px solid rgba(74,222,128,0.4);
+          border-radius: 12px;
+          -webkit-backdrop-filter: blur(10px);
+          backdrop-filter: blur(10px);
+          color: #ffffff;
+          font-family: "Inconsolata", monospace;
+          font-size: 15px;
+        }
+        .cs-success-mark {
+          display: inline-flex; align-items: center; justify-content: center;
+          width: 24px; height: 24px; border-radius: 999px;
+          background: #4ade80; color: #050d1a;
+          font-size: 13px; font-weight: 700;
+          box-shadow: 0 0 16px rgba(74,222,128,0.6);
+        }
+        .cs-note { font-family: "Inconsolata", monospace; font-size: 12px; color: rgba(255,255,255,0.5); margin: 0; letter-spacing: 0.04em; }
+        .cs-error { font-family: "Inconsolata", monospace; font-size: 12px; color: #fca5a5; margin: 0; letter-spacing: 0.04em; }
+
+        .cs-footer a { color: rgba(255,255,255,0.55); text-decoration: none; transition: color 160ms ease; }
+        .cs-footer a:hover { color: #ffffff; }
+        .cs-footer span.sep { margin: 0 8px; opacity: 0.4; }
+
+        /* Desktop: single viewport, no scroll */
+        @media (min-width: 768px) {
+          .cs-page {
+            position: relative; z-index: 1;
+            height: 100dvh;
+            overflow: hidden;
+            display: grid;
+            grid-template-rows: 64px minmax(0, 1fr) 48px;
+            padding: 0 48px;
+          }
+          .cs-nav {
+            display: flex; align-items: center; justify-content: space-between;
+          }
+          .cs-main {
+            display: flex; flex-direction: column;
+            justify-content: center;
+            gap: 22px;
+            padding: 12px 0;
+            min-height: 0;
+          }
+          .cs-hero { display: flex; flex-direction: column; gap: 14px; max-width: 860px; }
+          .cs-form-row {
+            display: grid;
+            grid-template-columns: 220px 1fr auto;
+            gap: 12px;
+            max-width: 720px;
+            align-items: stretch;
+          }
+          .cs-steps {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 14px;
+            max-width: 980px;
+          }
+          .cs-badges {
+            display: flex; flex-wrap: wrap; gap: 10px;
+          }
+          .cs-footer {
+            display: flex; align-items: center; justify-content: center;
+            font-size: 11px; color: rgba(255,255,255,0.45);
+            letter-spacing: 0.04em;
+          }
+        }
+
+        /* Mobile: stack vertically, scroll allowed */
+        @media (max-width: 767px) {
+          .cs-page {
+            position: relative; z-index: 1;
+            min-height: 100dvh;
+            padding: 16px 20px 28px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+          }
+          .cs-nav {
+            display: flex; align-items: center; justify-content: space-between;
+            flex-wrap: wrap; gap: 10px;
+          }
+          .cs-main { display: flex; flex-direction: column; gap: 22px; }
+          .cs-hero { display: flex; flex-direction: column; gap: 14px; }
+          .cs-form-row { display: flex; flex-direction: column; gap: 10px; }
+          .cs-steps { display: grid; grid-template-columns: 1fr; gap: 12px; }
+          .cs-badges { display: flex; flex-wrap: wrap; gap: 8px; }
+          .cs-footer {
+            font-size: 11px; color: rgba(255,255,255,0.5);
+            text-align: center;
+            letter-spacing: 0.04em;
+            padding-top: 8px;
+          }
+          .cs-sub { font-size: 14px; }
+        }
+      `}</style>
+
+      <div className="cs-root">
+        <div className="cs-stars" aria-hidden>
+          {stars.map((s, i) => (
+            <span
+              key={i}
+              className={`cs-star${i % 11 === 0 ? ' cs-star-green' : ''}`}
               style={{
-                color: '#10b981',
-                filter: 'drop-shadow(0 0 14px rgba(16, 185, 129, 0.7))',
+                left: `${s.left}%`,
+                top: `${s.top}%`,
+                fontSize: `${s.size}px`,
+                transform: `rotate(${s.rotate}deg)`,
+                animationDuration: `${s.duration}s`,
+                animationDelay: `${s.delay}s`,
               }}
-            />
-            <p className="text-lg md:text-xl font-semibold" style={{ color: '#ffffff' }}>
-              You&apos;re on the list!
-            </p>
-            <p className="text-sm md:text-base" style={{ color: 'rgba(255, 255, 255, 0.7)' }}>
-              We&apos;ll notify you as soon as releafZ launches.
-            </p>
-          </div>
-        ) : (
-          <form onSubmit={handleSubmit} className="max-w-2xl mx-auto px-4 relative z-10">
-            {/* Desktop/Tablet layout */}
-            <div className="hidden sm:flex flex-col gap-4">
-              <div className="flex gap-4 justify-center">
-                <input
-                  type="text"
-                  value={firstName}
-                  onChange={(e) => setFirstName(e.target.value)}
-                  placeholder="First Name"
-                  required
-                  aria-label="First name"
-                  autoComplete="given-name"
-                  className="flex-1 max-w-[240px] px-4 py-3 md:py-4 bg-[#1a1a1a] border border-white/20 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-[#22d3ee] focus:ring-1 focus:ring-[#22d3ee] transition-all text-center"
-                  style={{
-                    background: 'rgba(26, 26, 26, 0.8)',
-                    backdropFilter: 'blur(10px)',
-                  }}
-                />
-                <input
-                  type="text"
-                  value={lastName}
-                  onChange={(e) => setLastName(e.target.value)}
-                  placeholder="Last Name"
-                  required
-                  aria-label="Last name"
-                  autoComplete="family-name"
-                  className="flex-1 max-w-[240px] px-4 py-3 md:py-4 bg-[#1a1a1a] border border-white/20 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-[#22d3ee] focus:ring-1 focus:ring-[#22d3ee] transition-all text-center"
-                  style={{
-                    background: 'rgba(26, 26, 26, 0.8)',
-                    backdropFilter: 'blur(10px)',
-                  }}
-                />
-              </div>
-              <div className="flex gap-4 justify-center">
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="Your Email Address"
-                  required
-                  aria-label="Email address"
-                  autoComplete="email"
-                  className="flex-1 max-w-md px-4 py-3 md:py-4 bg-[#1a1a1a] border border-white/20 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-[#22d3ee] focus:ring-1 focus:ring-[#22d3ee] transition-all text-center"
-                  style={{
-                    background: 'rgba(26, 26, 26, 0.8)',
-                    backdropFilter: 'blur(10px)',
-                  }}
-                />
-                <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="px-6 md:px-8 py-3 md:py-4 bg-transparent border border-white/20 rounded-lg text-white font-medium hover:border-[#22d3ee] hover:text-[#22d3ee] transition-all whitespace-nowrap disabled:opacity-60 disabled:cursor-not-allowed"
-                  style={{
-                    backdropFilter: 'blur(10px)',
-                  }}
-                >
-                  {isSubmitting ? 'Submitting...' : 'Get Notified'}
-                </button>
-              </div>
-            </div>
-
-            {/* Mobile: Vertical layout */}
-            <div className="flex flex-col gap-4 sm:hidden">
-              <input
-                type="text"
-                value={firstName}
-                onChange={(e) => setFirstName(e.target.value)}
-                placeholder="First Name"
-                required
-                aria-label="First name"
-                autoComplete="given-name"
-                className="w-full px-4 py-4 bg-[#1a1a1a] border border-white/20 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-[#22d3ee] focus:ring-1 focus:ring-[#22d3ee] transition-all text-center"
-                style={{
-                  background: 'rgba(26, 26, 26, 0.8)',
-                  backdropFilter: 'blur(10px)',
-                }}
-              />
-              <input
-                type="text"
-                value={lastName}
-                onChange={(e) => setLastName(e.target.value)}
-                placeholder="Last Name"
-                required
-                aria-label="Last name"
-                autoComplete="family-name"
-                className="w-full px-4 py-4 bg-[#1a1a1a] border border-white/20 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-[#22d3ee] focus:ring-1 focus:ring-[#22d3ee] transition-all text-center"
-                style={{
-                  background: 'rgba(26, 26, 26, 0.8)',
-                  backdropFilter: 'blur(10px)',
-                }}
-              />
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="Your Email Address"
-                required
-                aria-label="Email address"
-                autoComplete="email"
-                className="w-full px-4 py-4 bg-[#1a1a1a] border border-white/20 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-[#22d3ee] focus:ring-1 focus:ring-[#22d3ee] transition-all text-center"
-                style={{
-                  background: 'rgba(26, 26, 26, 0.8)',
-                  backdropFilter: 'blur(10px)',
-                }}
-              />
-              <button
-                type="submit"
-                disabled={isSubmitting}
-                className="w-full px-6 py-4 bg-transparent border border-white/20 rounded-lg text-white font-medium hover:border-[#22d3ee] hover:text-[#22d3ee] transition-all disabled:opacity-60 disabled:cursor-not-allowed"
-                style={{
-                  backdropFilter: 'blur(10px)',
-                }}
-              >
-                {isSubmitting ? 'Submitting...' : 'Get Notified'}
-              </button>
-            </div>
-
-            {error && (
-              <p className="mt-3 text-sm text-red-400 text-center">{error}</p>
-            )}
-          </form>
-        )}
-
-        {/* Features grid - 3 icons */}
-        <div className="grid grid-cols-3 gap-4 sm:gap-6 md:gap-8 mt-12 md:mt-16 max-w-2xl mx-auto px-4">
-          {/* Feature 1 - AI Strain Matching */}
-          <div className="text-center transition-all duration-300 hover:scale-105">
-            <div className="flex justify-center mb-4">
-              <Brain 
-                className="w-10 h-10 md:w-12 md:h-12" 
-                style={{ 
-                  color: '#10b981',
-                  filter: 'drop-shadow(0 0 10px rgba(16, 185, 129, 0.6))',
-                }} 
-              />
-            </div>
-            <h3 
-              className="text-sm md:text-base font-semibold mb-2"
-              style={{ color: '#ffffff' }}
             >
-              STRAIN MATCHING
-            </h3>
-            <p 
-              className="text-xs md:text-sm font-light"
-              style={{ color: 'rgba(255, 255, 255, 0.7)' }}
-            >
-              Personalized recommendations
-            </p>
-          </div>
-
-          {/* Feature 2 - Fast Delivery */}
-          <div className="text-center transition-all duration-300 hover:scale-105">
-            <div className="flex justify-center mb-4">
-              <ZapIcon 
-                className="w-10 h-10 md:w-12 md:h-12" 
-                style={{ 
-                  color: '#22d3ee',
-                  filter: 'drop-shadow(0 0 10px rgba(34, 211, 238, 0.6))',
-                }} 
-              />
-            </div>
-            <h3 
-              className="text-sm md:text-base font-semibold mb-2"
-              style={{ color: '#ffffff' }}
-            >
-              FAST DELIVERY
-            </h3>
-            <p 
-              className="text-xs md:text-sm font-light"
-              style={{ color: 'rgba(255, 255, 255, 0.7)' }}
-            >
-              Ultra quick service
-            </p>
-          </div>
-
-          {/* Feature 3 - Medical Cannabis */}
-          <div className="text-center transition-all duration-300 hover:scale-105">
-            <div className="flex justify-center mb-4">
-              <Leaf 
-                className="w-10 h-10 md:w-12 md:h-12" 
-                style={{ 
-                  color: '#22d3ee',
-                  filter: 'drop-shadow(0 0 10px rgba(34, 211, 238, 0.6))',
-                }} 
-              />
-            </div>
-            <h3 
-              className="text-sm md:text-base font-semibold mb-2"
-              style={{ color: '#ffffff' }}
-            >
-              MEDICAL CANNABIS
-            </h3>
-            <p 
-              className="text-xs md:text-sm font-light"
-              style={{ color: 'rgba(255, 255, 255, 0.7)' }}
-            >
-              Premium quality
-            </p>
-          </div>
+              z
+            </span>
+          ))}
         </div>
+        <div className="cs-orb" aria-hidden />
+        <div className="cs-orb-2" aria-hidden />
 
-        {/* Partner CTA */}
-        <div className="mt-14 md:mt-20 px-4 flex flex-wrap items-center justify-center gap-4">
-          <Link
-            href="/pharmacies"
-            className="group inline-flex items-center gap-3 px-6 py-3 rounded-full text-sm font-medium transition-all duration-300 hover:scale-[1.03]"
-            style={{
-              color: 'rgba(255, 255, 255, 0.6)',
-              border: '1px solid rgba(255, 255, 255, 0.1)',
-              background: 'rgba(255, 255, 255, 0.03)',
-              backdropFilter: 'blur(10px)',
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.borderColor = 'rgba(34, 211, 238, 0.4)';
-              e.currentTarget.style.color = '#22d3ee';
-              e.currentTarget.style.boxShadow = '0 0 20px rgba(34, 211, 238, 0.1)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.1)';
-              e.currentTarget.style.color = 'rgba(255, 255, 255, 0.6)';
-              e.currentTarget.style.boxShadow = 'none';
-            }}
-          >
-            Für Apotheken
-            <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
-          </Link>
-          <Link
-            href="/partners"
-            className="group inline-flex items-center gap-3 px-6 py-3 rounded-full text-sm font-medium transition-all duration-300 hover:scale-[1.03]"
-            style={{
-              color: 'rgba(255, 255, 255, 0.6)',
-              border: '1px solid rgba(255, 255, 255, 0.1)',
-              background: 'rgba(255, 255, 255, 0.03)',
-              backdropFilter: 'blur(10px)',
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.borderColor = 'rgba(34, 211, 238, 0.4)';
-              e.currentTarget.style.color = '#22d3ee';
-              e.currentTarget.style.boxShadow = '0 0 20px rgba(34, 211, 238, 0.1)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.1)';
-              e.currentTarget.style.color = 'rgba(255, 255, 255, 0.6)';
-              e.currentTarget.style.boxShadow = 'none';
-            }}
-          >
-            Für Ärzte & Partner
-            <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
-          </Link>
+        <div className="cs-page">
+          <nav className="cs-nav cs-fade">
+            <div className="cs-logo">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/logo1.png" alt="releafZ" className="cs-logo-img" />
+            </div>
+            <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+              <Link href="/pharmacies" className="cs-nav-btn">
+                FÜR APOTHEKEN <span aria-hidden>→</span>
+              </Link>
+              <Link href="/partners" className="cs-nav-btn">
+                FÜR ÄRZTE <span aria-hidden>→</span>
+              </Link>
+            </div>
+          </nav>
+
+          <main className="cs-main">
+            <section className="cs-hero">
+              <div className="cs-eyebrow cs-fade cs-d1">
+                MEDIZINAL CANNABIS · BERLIN · 2025
+              </div>
+              <h1 className="cs-headline cs-fade cs-d2">
+                MEDIZINAL CANNABIS
+              </h1>
+              <div
+                className="cs-rotator animated-words-container cs-fade cs-d2"
+                aria-live="polite"
+              >
+                <div className="words-wrapper">
+                  {words.map((word, i) => (
+                    <div key={i} className="word-item cs-word">
+                      {word}
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <p className="cs-sub cs-fade cs-d3">
+                Ihr Rezept, Ihre Apotheke, in 60 Minuten. Verschrieben von approbierten
+                Deutschen Ärzten. Geliefert von Berliner Partnerapotheken.
+              </p>
+            </section>
+
+            {submitted ? (
+              <div className="cs-fade cs-d4">
+                <div className="cs-success" role="status" aria-live="polite">
+                  <span className="cs-success-mark" aria-hidden>✓</span>
+                  Sie sind auf der Liste.
+                </div>
+              </div>
+            ) : (
+              <>
+                <div className="cs-form-row cs-fade cs-d4">
+                  <input
+                    type="text"
+                    className="cs-input"
+                    value={firstName}
+                    onChange={(e) => setFirstName(e.target.value)}
+                    onKeyDown={onKey}
+                    placeholder="Vorname"
+                    aria-label="Vorname"
+                    autoComplete="given-name"
+                    maxLength={80}
+                  />
+                  <input
+                    type="email"
+                    className="cs-input"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    onKeyDown={onKey}
+                    placeholder="E-Mail-Adresse"
+                    aria-label="E-Mail-Adresse"
+                    autoComplete="email"
+                    maxLength={200}
+                  />
+                  <Button
+                    type="button"
+                    variant="button2"
+                    className="cs-submit-btn2"
+                    style={{ "--c-color": "#000000", color: "#000000" } as React.CSSProperties}
+                    onClick={handleSubmit}
+                    onMouseEnter={playHoverSound}
+                    onMouseLeave={stopHoverSound}
+                    disabled={loading}
+                  >
+                    {loading ? 'SENDEN…' : 'JETZT ANMELDEN →'}
+                  </Button>
+                </div>
+                <div className="cs-fade cs-d5">
+                  {error ? (
+                    <p className="cs-error" role="alert">{error}</p>
+                  ) : (
+                    <p className="cs-note">KEIN SPAM · WIR MELDEN UNS, WENN WIR STARTEN</p>
+                  )}
+                </div>
+              </>
+            )}
+
+            <div className="cs-steps cs-fade cs-d6">
+              {steps.map((s) => (
+                <div key={s.num} className="cs-step">
+                  <div className="cs-step-num">{s.num}</div>
+                  <h3 className="cs-step-title">{s.title}</h3>
+                  <p className="cs-step-body">{s.body}</p>
+                </div>
+              ))}
+            </div>
+
+            <div className="cs-badges cs-fade cs-d7">
+              {badges.map((b) => (
+                <span key={b} className="cs-badge">
+                  <span className="cs-badge-dot" aria-hidden />
+                  {b}
+                </span>
+              ))}
+            </div>
+          </main>
+
+          <footer className="cs-footer">
+            <div>
+              © 2025 releafZ
+              <span className="sep">·</span>
+              SC CODE UG
+              <span className="sep">·</span>
+              <Link href="/impressum">Impressum</Link>
+              <span className="sep">·</span>
+              <Link href="/datenschutz">Datenschutz</Link>
+            </div>
+          </footer>
         </div>
       </div>
-
-    </div>
-  );
-};
-
-export default ComingSoon;
+    </>
+  )
+}
