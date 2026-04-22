@@ -18,13 +18,16 @@ async function globalSetup() {
   await dobInput.fill('1990-01-01');
   await page.waitForTimeout(300);
 
-  const checkboxes = page.locator('input[type="checkbox"]');
-  const count = await checkboxes.count();
-  for (let i = 0; i < count; i++) {
-    if (!await checkboxes.nth(i).isChecked()) {
-      await checkboxes.nth(i).check();
-      await page.waitForTimeout(200);
-    }
+  // Check consent checkboxes by ID
+  const termsCheckbox = page.locator('#consentTerms');
+  const healthCheckbox = page.locator('#consentHealth');
+  if (!await termsCheckbox.isChecked()) {
+    await termsCheckbox.check({ force: true });
+    await page.waitForTimeout(200);
+  }
+  if (!await healthCheckbox.isChecked()) {
+    await healthCheckbox.check({ force: true });
+    await page.waitForTimeout(200);
   }
 
   await page.locator('button:has-text("Weiter")').first().click();
