@@ -305,7 +305,7 @@ html[data-releafz-coming-soon="true"][data-releafz-landing-theme] body {
   line-height: 1;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  color: #4ade80;
+  color: #72906f;
   height: var(--word-h);
   min-height: var(--word-h);
   padding: 0;
@@ -318,6 +318,20 @@ html[data-releafz-coming-soon="true"][data-releafz-landing-theme] body {
   width: 100%;
   min-width: 100%;
   max-width: none;
+  -webkit-text-stroke: 0.5px #2b2c2b;
+  text-shadow:
+    /* thinner top/right edge */
+    0 -1px 1.2px rgba(43, 44, 43, 0.72),
+    1.5px 0 1.2px rgba(43, 44, 43, 0.72),
+    /* thicker left edge */
+    -1.2px 0 1.1px rgba(43, 44, 43, 0.88),
+    -2.8px 0 1.6px rgba(43, 44, 43, 0.82),
+    -4.3px 0 2px rgba(43, 44, 43, 0.7),
+    -5.2px 0 2.3px rgba(43, 44, 43, 0.52),
+    /* thicker bottom edge */
+    0 1px 1.1px rgba(43, 44, 43, 0.88),
+    0 2.5px 1.6px rgba(43, 44, 43, 0.82),
+    0 4px 2px rgba(43, 44, 43, 0.7);
 }
 .cs-sub {
   font-family: inherit;
@@ -506,6 +520,32 @@ html[data-releafz-coming-soon="true"][data-releafz-landing-theme] body {
   letter-spacing: 0.04em;
 }
 
+.cs-consent-box {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.cs-consent-checkbox {
+  margin-top: 2px;
+  width: 16px;
+  height: 16px;
+  accent-color: #72906f;
+  cursor: pointer;
+  flex: 0 0 auto;
+}
+
+.cs-consent-text {
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 12px;
+  line-height: 1.45;
+  letter-spacing: 0.02em;
+}
+
 .cs-footer a {
   color: rgba(255, 255, 255, 0.55);
   text-decoration: none;
@@ -552,6 +592,20 @@ html[data-releafz-coming-soon="true"][data-releafz-landing-theme] body {
     gap: 12px;
     max-width: min(960px, 100%);
     align-items: center;
+  }
+  .cs-consent-box {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    justify-self: start;
+    width: fit-content;
+    max-width: 100%;
+  }
+  .cs-consent-text {
+    white-space: nowrap;
+  }
+  .cs-form-row .cs-submit-btn2 {
+    grid-column: 4;
+    grid-row: 1;
   }
   .cs-steps {
     display: grid;
