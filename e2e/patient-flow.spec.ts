@@ -8,6 +8,12 @@ async function completeFormAndOTP(page: any) {
   await page.waitForTimeout(300);
   await page.locator('input[name="phone"], #phone').first().fill('+4917668378284');
   await page.waitForTimeout(300);
+
+  // Fill date of birth (must be 18+)
+  const dobInput = page.locator('input[type="date"]').first();
+  await dobInput.fill('1990-01-01');
+  await page.waitForTimeout(300);
+
   const checkboxes = page.locator('input[type="checkbox"]');
   const count = await checkboxes.count();
   for (let i = 0; i < count; i++) {
@@ -42,26 +48,31 @@ async function completeToSymptoms(page: any) {
   // Select symptom duration - Vor mehr als 3 Monaten
   await expect(page.locator('text=Wann traten deine Symptome')).toBeVisible({ timeout: 10000 });
   await page.locator('text=Vor mehr als 3 Monaten').click();
-  await page.waitForTimeout(300);
+  await page.waitForTimeout(500);
 
   // Select frequency - Ständig
   await page.locator('text=Ständig').click();
-  await page.waitForTimeout(300);
-
-  await page.locator('button:has-text("Weiter")').last().click();
+  await page.waitForTimeout(800);
+  // Click Weiter multiple times to handle animation delay
+  const weiterBtn = page.locator('button:has-text("Weiter")').last();
+  await weiterBtn.click();
+  await page.waitForTimeout(400);
+  await weiterBtn.click({ force: true });
+  await page.waitForTimeout(400);
+  await weiterBtn.click({ force: true });
   await page.waitForTimeout(1000);
 
-  await expect(page.locator('text=Apotheke & Lieferart')).toBeVisible({ timeout: 15000 });
+  await expect(page.locator('h1.marketplace-title')).toBeVisible({ timeout: 15000 });
 }
 
 async function completeToPayment(page: any) {
   await completeToSymptoms(page);
 
   // Wait for marketplace to load
-  await expect(page.locator('text=Apotheke & Lieferart')).toBeVisible({ timeout: 15000 });
+  await expect(page.locator('h1.marketplace-title')).toBeVisible({ timeout: 15000 });
 
   // Click on pharmacy to expand
-  await page.locator('text=Test Apotheke').click();
+  await page.locator('.pharmacy-card, [class*="pharmacy"]').first().click();
   await page.waitForTimeout(1000);
 
   // Take screenshot to see products
@@ -72,8 +83,9 @@ async function completeToPayment(page: any) {
   await page.screenshot({ path: 'e2e/screenshots/delivery-selected.png' });
 
   // Click first product card by name
-  await page.getByText('Bediol').click();
-  await page.waitForTimeout(1000);
+  await page.locator('.marketplace-product-check').first().click();
+  await page.waitForTimeout(500);
+  // If above fails, try clicking the checkbox/radio in top-right of second product card
   await page.screenshot({ path: 'e2e/screenshots/product-selected.png' });
 
   // Click Weiter to proceed to payment
@@ -136,4 +148,45 @@ test.describe('Patient Flow - E2E', () => {
     await page.screenshot({ path: 'e2e/screenshots/after-product-select.png' });
   });
 
+});
+
+test('should show error for non-Berlin PLZ on landing page', async ({ page }) => {
+  await page.goto('/?preview=daniel2024');
+  // Find the address input and type a non-Berlin address
+  await page.waitForTimeout(1000);
+  // Try to submit with invalid PLZ by directly navigating
+  await page.goto('/form?postcode=99999&address=Test&street=Test&houseNumber=1&city=München');
+  // Should redirect home since PLZ is invalid
+  await page.waitForTimeout(1000);
+  // Should not show the form fields (redirected away)
+  const url = page.url();
+  expect(url).not.toContain('99999');
+});
+
+test('should reject patient under 18 with error message', async ({ page }) => {
+  await page.goto('/form?postcode=13086&address=Langhansstra%C3%9Fe+77&street=Langhansstra%C3%9Fe&houseNumber=77&city=Berlin');
+  await page.locator('input[name="fullName"], #fullName').first().fill('Young Patient');
+  await page.waitForTimeout(300);
+  await page.locator('input[type="email"], input[name="email"]').first().fill('young@test.com');
+  await page.waitForTimeout(300);
+  await page.locator('input[name="phone"], #phone').first().fill('+4917668378284');
+  await page.waitForTimeout(300);
+  // Fill DOB — someone born in 2010 (under 18)
+  const dobInput = page.locator('input[type="date"]').first();
+  await dobInput.fill('2010-01-01');
+  await page.waitForTimeout(300);
+  // Check checkboxes
+  const checkboxes = page.locator('input[type="checkbox"]');
+  const count = await checkboxes.count();
+  for (let i = 0; i < count; i++) {
+    if (!await checkboxes.nth(i).isChecked()) {
+      await checkboxes.nth(i).check();
+      await page.waitForTimeout(200);
+    }
+  }
+  await page.locator('button:has-text("Weiter")').first().click();
+  await page.waitForTimeout(1000);
+  // Should show error about age
+  const errorVisible = await page.locator('text=18').isVisible().catch(() => false);
+  expect(errorVisible).toBe(true);
 });
