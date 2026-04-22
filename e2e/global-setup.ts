@@ -13,6 +13,11 @@ async function globalSetup() {
   await page.locator('input[name="phone"], #phone').first().fill('+4917668378284');
   await page.waitForTimeout(300);
 
+  // Fill date of birth (must be 18+)
+  const dobInput = page.locator('input[type="date"]').first();
+  await dobInput.fill('1990-01-01');
+  await page.waitForTimeout(300);
+
   const checkboxes = page.locator('input[type="checkbox"]');
   const count = await checkboxes.count();
   for (let i = 0; i < count; i++) {
