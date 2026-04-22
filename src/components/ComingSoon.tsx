@@ -95,6 +95,7 @@ export default function ComingSoon() {
   const [firstName, setFirstName] = useState('')
   const [lastName, setLastName] = useState('')
   const [email, setEmail] = useState('')
+  const [consentAccepted, setConsentAccepted] = useState(false)
   const [submitted, setSubmitted] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -178,13 +179,27 @@ export default function ComingSoon() {
       setError('Bitte gültige E-Mail-Adresse eingeben.')
       return
     }
+    if (!consentAccepted) {
+      setError('Bitte Zustimmung zur Speicherung und E-Mail-Info bestätigen.')
+      return
+    }
 
     setLoading(true)
     try {
+      const consentTimestamp = new Date().toISOString()
       const res = await fetch('/api/waitlist', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ firstName: fn, lastName: ln, email: em }),
+        body: JSON.stringify({
+          firstName: fn,
+          lastName: ln,
+          email: em,
+          consentAccepted: true,
+          consentText:
+            'Ich stimme zu, dass Releafz meine Daten speichert und mich per E-Mail über den Launch und Neuigkeiten informiert.',
+          consentVersion: 'coming-soon-v1',
+          consentTimestamp,
+        }),
       })
 
       let data:
@@ -231,6 +246,7 @@ export default function ComingSoon() {
         setFirstName('')
         setLastName('')
         setEmail('')
+        setConsentAccepted(false)
       }
     } catch (err) {
       console.error('[waitlist] network error', err)
@@ -361,6 +377,19 @@ export default function ComingSoon() {
                     autoComplete="email"
                     maxLength={200}
                   />
+                  <label className="cs-consent-box">
+                    <input
+                      type="checkbox"
+                      className="cs-consent-checkbox"
+                      checked={consentAccepted}
+                      onChange={(e) => setConsentAccepted(e.target.checked)}
+                      aria-label="Zustimmung zur Datenspeicherung und E-Mail-Benachrichtigung"
+                    />
+                    <span className="cs-consent-text">
+                      Ich stimme zu, dass Releafz meine Daten speichert und mich per E-Mail
+                      über den Launch und Neuigkeiten informiert.
+                    </span>
+                  </label>
                   <Button
                     type="button"
                     variant="button2"
