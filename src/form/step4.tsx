@@ -11,6 +11,7 @@ interface Step4Props {
   initialOnsetValue?: string
   initialFrequencyValue?: string
   onSelectionChange?: (answers: { onset: string; frequency: string }) => void
+  submitting?: boolean
 }
 
 type OnsetOption = 'more-than-3-months' | 'less-than-3-months'
@@ -22,6 +23,7 @@ export default function Step4({
   initialOnsetValue = '',
   initialFrequencyValue = '',
   onSelectionChange,
+  submitting = false,
 }: Step4Props) {
   const [selectedOnset, setSelectedOnset] = useState<OnsetOption | ''>(initialOnsetValue as OnsetOption | '')
   const [selectedFrequency, setSelectedFrequency] = useState<FrequencyOption | ''>(
@@ -35,13 +37,6 @@ export default function Step4({
   useEffect(() => {
     setSelectedFrequency(initialFrequencyValue as FrequencyOption | '')
   }, [initialFrequencyValue])
-
-  useEffect(() => {
-    onSelectionChange?.({
-      onset: selectedOnset,
-      frequency: selectedFrequency,
-    })
-  }, [selectedOnset, selectedFrequency, onSelectionChange])
 
   const onsetOptions = [
     {
@@ -89,7 +84,7 @@ export default function Step4({
       <div className="form-container form-container--step4-fit">
         {onBack && (
           <div className="form-header__back-wrap">
-            <Button onClick={onBack} className="btn-outline form-back-button text-sm sm:text-base">
+            <Button onClick={onBack} disabled={submitting} className="btn-outline form-back-button text-sm sm:text-base">
               <ArrowLeft className="form-back-icon" />
               Zurück
             </Button>
@@ -116,7 +111,10 @@ export default function Step4({
                     <button
                       key={option.id}
                       type="button"
-                      onClick={() => setSelectedOnset(option.id)}
+                      onClick={() => {
+                        setSelectedOnset(option.id)
+                        onSelectionChange?.({ onset: option.id, frequency: selectedFrequency })
+                      }}
                       className={`form-option-card form-option-card--row form-option-card--max-width ${isSelected ? 'form-option-card--selected' : ''}`}
                     >
                       <div className="form-option-row__content">
@@ -146,7 +144,10 @@ export default function Step4({
                     <button
                       key={option.id}
                       type="button"
-                      onClick={() => setSelectedFrequency(option.id)}
+                      onClick={() => {
+                        setSelectedFrequency(option.id)
+                        onSelectionChange?.({ onset: selectedOnset, frequency: option.id })
+                      }}
                       className={`form-option-card form-option-card--row form-option-card--max-width ${isSelected ? 'form-option-card--selected' : ''}`}
                     >
                       <div className="form-option-row__content">
@@ -169,10 +170,10 @@ export default function Step4({
 
           <Button
             onClick={handleNext}
-            disabled={!selectedOnset || !selectedFrequency}
+            disabled={!selectedOnset || !selectedFrequency || submitting}
             className="form-cta btn-secondary form-step4-cta form-cta--step4-fit"
           >
-            Weiter
+            {submitting ? 'Wird gesendet...' : 'Weiter'}
           </Button>
         </div>
         <StepProgress currentStep={4} />
