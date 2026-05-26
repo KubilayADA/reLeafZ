@@ -16,6 +16,8 @@ type QuestionnaireFormData = {
   condition: string
   onset: string
   frequency: string
+  severity: string
+  diagnosisText: string
 }
 
 type QuestionnaireDraft = {
@@ -34,7 +36,9 @@ export default function QuestionnairePage() {
     deliveryMethod: '',
     condition: '',
     onset: '',
-    frequency: ''
+    frequency: '',
+    severity: '',
+    diagnosisText: '',
   })
   const [hasHydratedDraft, setHasHydratedDraft] = useState(false)
 
@@ -70,6 +74,8 @@ export default function QuestionnairePage() {
         condition: typeof draftForm.condition === 'string' ? draftForm.condition : '',
         onset: typeof draftForm.onset === 'string' ? draftForm.onset : '',
         frequency: typeof draftForm.frequency === 'string' ? draftForm.frequency : '',
+        severity: typeof draftForm.severity === 'string' ? draftForm.severity : '',
+        diagnosisText: typeof draftForm.diagnosisText === 'string' ? draftForm.diagnosisText : '',
       })
       setCurrentStep(draftStep)
       setRenderedStep(draftStep)
@@ -105,11 +111,13 @@ export default function QuestionnairePage() {
   }
 
   // Step4: FINAL - Send to backend!
-  const handleStep4Next = async (answers: { onset: string; frequency: string }) => {
+  const handleStep4Next = async (answers: { onset: string; frequency: string; severity: string; diagnosisText: string }) => {
     const completeData = {
       ...formData,
       onset: answers.onset,
-      frequency: answers.frequency
+      frequency: answers.frequency,
+      severity: answers.severity,
+      diagnosisText: answers.diagnosisText,
     }
     setFormData(completeData)
     setLoading(true)
@@ -226,7 +234,11 @@ export default function QuestionnairePage() {
           onBack={handleBack}
           initialOnsetValue={formData.onset}
           initialFrequencyValue={formData.frequency}
-          onSelectionChange={({ onset, frequency }) => setFormData((prev) => ({ ...prev, onset, frequency }))}
+          initialSeverityValue={formData.severity}
+          initialDiagnosisTextValue={formData.diagnosisText}
+          onSelectionChange={({ onset, frequency, severity, diagnosisText }) =>
+            setFormData((prev) => ({ ...prev, onset, frequency, severity, diagnosisText }))
+          }
           submitting={loading}
         />
       )}
