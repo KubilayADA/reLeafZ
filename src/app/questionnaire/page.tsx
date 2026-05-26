@@ -58,9 +58,15 @@ export default function QuestionnairePage() {
           : 1
 
       const draftForm = draft.formData ?? {}
+      const migrateDeliveryMethod = (value: unknown): string => {
+        if (typeof value !== 'string') return ''
+        if (value === 'courier') return 'BOTENDIENST'
+        if (value === 'shipping') return 'PICKUP'
+        return value
+      }
       setFormData({
         consultationType: typeof draftForm.consultationType === 'string' ? draftForm.consultationType : '',
-        deliveryMethod: typeof draftForm.deliveryMethod === 'string' ? draftForm.deliveryMethod : '',
+        deliveryMethod: migrateDeliveryMethod(draftForm.deliveryMethod),
         condition: typeof draftForm.condition === 'string' ? draftForm.condition : '',
         onset: typeof draftForm.onset === 'string' ? draftForm.onset : '',
         frequency: typeof draftForm.frequency === 'string' ? draftForm.frequency : '',
@@ -221,6 +227,7 @@ export default function QuestionnairePage() {
           initialOnsetValue={formData.onset}
           initialFrequencyValue={formData.frequency}
           onSelectionChange={({ onset, frequency }) => setFormData((prev) => ({ ...prev, onset, frequency }))}
+          submitting={loading}
         />
       )}
     </div>
