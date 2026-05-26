@@ -6,22 +6,37 @@ import FormLogoHomeExit from '@/form/form-logo-home-exit'
 import '@/form/form.css'
 
 interface Step4Props {
-  onNext: (answers: { onset: string; frequency: string }) => void
+  onNext: (answers: {
+    onset: string
+    frequency: string
+    severity: string
+    diagnosisText: string
+  }) => void
   onBack?: () => void
   initialOnsetValue?: string
   initialFrequencyValue?: string
-  onSelectionChange?: (answers: { onset: string; frequency: string }) => void
+  initialSeverityValue?: string
+  initialDiagnosisTextValue?: string
+  onSelectionChange?: (answers: {
+    onset: string
+    frequency: string
+    severity: string
+    diagnosisText: string
+  }) => void
   submitting?: boolean
 }
 
 type OnsetOption = 'more-than-3-months' | 'less-than-3-months'
 type FrequencyOption = 'always' | 'often' | 'never'
+type SeverityOption = 'sehr-leicht' | 'leicht' | 'mittel' | 'stark' | 'sehr-stark'
 
 export default function Step4({
   onNext,
   onBack,
   initialOnsetValue = '',
   initialFrequencyValue = '',
+  initialSeverityValue = '',
+  initialDiagnosisTextValue = '',
   onSelectionChange,
   submitting = false,
 }: Step4Props) {
@@ -29,6 +44,10 @@ export default function Step4({
   const [selectedFrequency, setSelectedFrequency] = useState<FrequencyOption | ''>(
     initialFrequencyValue as FrequencyOption | ''
   )
+  const [selectedSeverity, setSelectedSeverity] = useState<SeverityOption | ''>(
+    initialSeverityValue as SeverityOption | ''
+  )
+  const [diagnosisText, setDiagnosisText] = useState<string>(initialDiagnosisTextValue)
 
   useEffect(() => {
     setSelectedOnset(initialOnsetValue as OnsetOption | '')
@@ -37,6 +56,14 @@ export default function Step4({
   useEffect(() => {
     setSelectedFrequency(initialFrequencyValue as FrequencyOption | '')
   }, [initialFrequencyValue])
+
+  useEffect(() => {
+    setSelectedSeverity(initialSeverityValue as SeverityOption | '')
+  }, [initialSeverityValue])
+
+  useEffect(() => {
+    setDiagnosisText(initialDiagnosisTextValue)
+  }, [initialDiagnosisTextValue])
 
   const onsetOptions = [
     {
@@ -69,11 +96,21 @@ export default function Step4({
     }
   ]
 
+  const severityOptions = [
+    { id: 'sehr-leicht' as SeverityOption, title: 'Sehr leicht', description: 'Kaum wahrnehmbar' },
+    { id: 'leicht' as SeverityOption, title: 'Leicht', description: 'Spürbar, aber wenig belastend' },
+    { id: 'mittel' as SeverityOption, title: 'Mittel', description: 'Deutlich belastend im Alltag' },
+    { id: 'stark' as SeverityOption, title: 'Stark', description: 'Stark einschränkend' },
+    { id: 'sehr-stark' as SeverityOption, title: 'Sehr stark', description: 'Lebensqualität erheblich reduziert' },
+  ]
+
   const handleNext = () => {
-    if (selectedOnset && selectedFrequency) {
+    if (selectedOnset && selectedFrequency && selectedSeverity) {
       onNext({
         onset: selectedOnset,
-        frequency: selectedFrequency
+        frequency: selectedFrequency,
+        severity: selectedSeverity,
+        diagnosisText: diagnosisText.trim(),
       })
     }
   }
@@ -113,7 +150,7 @@ export default function Step4({
                       type="button"
                       onClick={() => {
                         setSelectedOnset(option.id)
-                        onSelectionChange?.({ onset: option.id, frequency: selectedFrequency })
+                        onSelectionChange?.({ onset: option.id, frequency: selectedFrequency, severity: selectedSeverity, diagnosisText })
                       }}
                       className={`form-option-card form-option-card--row form-option-card--max-width ${isSelected ? 'form-option-card--selected' : ''}`}
                     >
@@ -146,7 +183,7 @@ export default function Step4({
                       type="button"
                       onClick={() => {
                         setSelectedFrequency(option.id)
-                        onSelectionChange?.({ onset: selectedOnset, frequency: option.id })
+                        onSelectionChange?.({ onset: selectedOnset, frequency: option.id, severity: selectedSeverity, diagnosisText })
                       }}
                       className={`form-option-card form-option-card--row form-option-card--max-width ${isSelected ? 'form-option-card--selected' : ''}`}
                     >
@@ -162,6 +199,75 @@ export default function Step4({
                 })}
               </div>
             </section>
+
+            <section className="form-step4-section form-step4-section--fit">
+              <h3 className="form-section-title">
+                Wie stark belasten dich deine Symptome?
+              </h3>
+              <p className="form-section-hint">
+                Bitte wähle eine Stufe.
+              </p>
+              <div className="form-step4-options form-step4-options--fit">
+                {severityOptions.map((option) => {
+                  const isSelected = selectedSeverity === option.id
+                  return (
+                    <button
+                      key={option.id}
+                      type="button"
+                      onClick={() => {
+                        setSelectedSeverity(option.id)
+                        onSelectionChange?.({
+                          onset: selectedOnset,
+                          frequency: selectedFrequency,
+                          severity: option.id,
+                          diagnosisText,
+                        })
+                      }}
+                      className={`form-option-card form-option-card--row form-option-card--max-width ${isSelected ? 'form-option-card--selected' : ''}`}
+                    >
+                      <div className="form-option-row__content">
+                        <p className="form-option-row__title">{option.title}</p>
+                        <p className="form-option-row__desc">{option.description}</p>
+                      </div>
+                      <span className="form-option-radio form-option-radio--inline">
+                        {isSelected && <span className="form-option-radio__inner" />}
+                      </span>
+                    </button>
+                  )
+                })}
+              </div>
+            </section>
+
+            <section className="form-step4-section form-step4-section--fit">
+              <h3 className="form-section-title">
+                Hast du bereits eine Diagnose oder weitere Beschwerden?
+              </h3>
+              <p className="form-section-hint">
+                Optional. Falls bekannt, gib einen ICD-Code oder beschreibe deine Befunde kurz.
+              </p>
+              <textarea
+                value={diagnosisText}
+                onChange={(e) => {
+                  const next = e.target.value.slice(0, 2000)
+                  setDiagnosisText(next)
+                  onSelectionChange?.({
+                    onset: selectedOnset,
+                    frequency: selectedFrequency,
+                    severity: selectedSeverity,
+                    diagnosisText: next,
+                  })
+                }}
+                placeholder="z.B. M54.5 Lumbago, seit 6 Monaten, ärztliche Diagnose vorhanden"
+                maxLength={2000}
+                rows={4}
+                disabled={submitting}
+                className="form-input form-textarea inconsolata"
+                style={{ width: '100%', resize: 'vertical', minHeight: '6rem', padding: '0.75rem', borderRadius: '0.5rem' }}
+              />
+              <p className="form-section-hint" style={{ textAlign: 'right', marginTop: '0.25rem', fontSize: '0.75rem' }}>
+                {diagnosisText.length}/2000
+              </p>
+            </section>
           </div>
 
           <p className="form-warning-text">
@@ -170,7 +276,7 @@ export default function Step4({
 
           <Button
             onClick={handleNext}
-            disabled={!selectedOnset || !selectedFrequency || submitting}
+            disabled={!selectedOnset || !selectedFrequency || !selectedSeverity || submitting}
             className="form-cta btn-secondary form-step4-cta form-cta--step4-fit"
           >
             {submitting ? 'Wird gesendet...' : 'Weiter'}
