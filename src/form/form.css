@@ -1513,6 +1513,8 @@
 @media (min-width: 640px) {
   .form-step4-options {
     flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
     gap: 1.5rem;
   }
 }
