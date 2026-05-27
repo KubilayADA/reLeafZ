@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import {Eye, EyeOff, Lock, Mail, User, Clock, CheckCircle, XCircle, FileText, Phone, MapPin, AlertCircle, LogOut, Package } from 'lucide-react';
+import {Eye, EyeOff, Lock, Mail, User, Clock, CheckCircle, XCircle, FileText, Phone, MapPin, LogOut, Package } from 'lucide-react';
 import { API_BASE } from '@/lib/api'
 
 const SEVERITY_LABELS: Record<string, string> = {
@@ -539,13 +539,7 @@ export default function DoctorDashboard() {
                     </CardHeader>
                     <CardContent>
                       <div className="mb-4">
-                        <div className="flex items-start gap-2 mb-2">
-                          <AlertCircle size={16} className="text-gray-400 mt-0.5 flex-shrink-0" />
-                          <div>
-                            <p className="text-sm font-medium text-gray-700 mb-1">Symptome</p>
-                            <p className="text-sm text-gray-600">{req.symptoms}</p>
-                          </div>
-                        </div>
+                        <MedicalHistorySection req={req} />
                         {/* ⬇️ NEW: Selected Products ⬇️ */}
                         {req.selectedProducts && req.selectedProducts.length > 0 && (
                           <div className="flex items-start gap-2 pt-3 border-t border-gray-100">
