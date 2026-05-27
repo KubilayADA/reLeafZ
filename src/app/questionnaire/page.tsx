@@ -6,6 +6,10 @@ import Step1 from '@/form/step1'
 import Step2 from '@/form/step2'
 import Step3 from '@/form/step3'
 import Step4 from '@/form/step4'
+import Step5 from '@/form/step5'
+import Step6 from '@/form/step6'
+import Step7 from '@/form/step7'
+import Step8 from '@/form/step8'
 import { API_BASE } from '@/lib/api'
 
 const QUESTIONNAIRE_DRAFT_KEY = 'questionnaireDraft'
@@ -16,6 +20,19 @@ type QuestionnaireFormData = {
   condition: string
   onset: string
   frequency: string
+  severity: string
+  diagnosisText: string
+  hasSeenDoctor: boolean | null
+  treatmentLocations: string[]
+  hasTakenMedication: boolean | null
+  medicationDetails: string
+  nonMedicalTherapies: string[]
+  isPregnantOrBreastfeeding: boolean | null
+  exceededMonthlyLimit: boolean | null
+  preExistingConditions: string[]
+  previousCannabisExperience: boolean | null
+  hadSideEffects: boolean | null
+  treatmentExpectations: string[]
 }
 
 type QuestionnaireDraft = {
@@ -34,7 +51,20 @@ export default function QuestionnairePage() {
     deliveryMethod: '',
     condition: '',
     onset: '',
-    frequency: ''
+    frequency: '',
+    severity: '',
+    diagnosisText: '',
+    hasSeenDoctor: null as boolean | null,
+    treatmentLocations: [] as string[],
+    hasTakenMedication: null as boolean | null,
+    medicationDetails: '',
+    nonMedicalTherapies: [] as string[],
+    isPregnantOrBreastfeeding: null as boolean | null,
+    exceededMonthlyLimit: null as boolean | null,
+    preExistingConditions: [] as string[],
+    previousCannabisExperience: null as boolean | null,
+    hadSideEffects: null as boolean | null,
+    treatmentExpectations: [] as string[],
   })
   const [hasHydratedDraft, setHasHydratedDraft] = useState(false)
 
@@ -53,17 +83,36 @@ export default function QuestionnairePage() {
       }
 
       const draftStep =
-        typeof draft.currentStep === 'number' && draft.currentStep >= 1 && draft.currentStep <= 4
+        typeof draft.currentStep === 'number' && draft.currentStep >= 1 && draft.currentStep <= 8
           ? draft.currentStep
           : 1
 
       const draftForm = draft.formData ?? {}
+      const migrateDeliveryMethod = (value: unknown): string => {
+        if (typeof value !== 'string') return ''
+        if (value === 'courier') return 'BOTENDIENST'
+        if (value === 'shipping') return 'PICKUP'
+        return value
+      }
       setFormData({
         consultationType: typeof draftForm.consultationType === 'string' ? draftForm.consultationType : '',
-        deliveryMethod: typeof draftForm.deliveryMethod === 'string' ? draftForm.deliveryMethod : '',
+        deliveryMethod: migrateDeliveryMethod(draftForm.deliveryMethod),
         condition: typeof draftForm.condition === 'string' ? draftForm.condition : '',
         onset: typeof draftForm.onset === 'string' ? draftForm.onset : '',
         frequency: typeof draftForm.frequency === 'string' ? draftForm.frequency : '',
+        severity: typeof draftForm.severity === 'string' ? draftForm.severity : '',
+        diagnosisText: typeof draftForm.diagnosisText === 'string' ? draftForm.diagnosisText : '',
+        hasSeenDoctor: typeof draftForm.hasSeenDoctor === 'boolean' ? draftForm.hasSeenDoctor : null,
+        treatmentLocations: Array.isArray(draftForm.treatmentLocations) ? draftForm.treatmentLocations : [],
+        hasTakenMedication: typeof draftForm.hasTakenMedication === 'boolean' ? draftForm.hasTakenMedication : null,
+        medicationDetails: typeof draftForm.medicationDetails === 'string' ? draftForm.medicationDetails : '',
+        nonMedicalTherapies: Array.isArray(draftForm.nonMedicalTherapies) ? draftForm.nonMedicalTherapies : [],
+        isPregnantOrBreastfeeding: typeof draftForm.isPregnantOrBreastfeeding === 'boolean' ? draftForm.isPregnantOrBreastfeeding : null,
+        exceededMonthlyLimit: typeof draftForm.exceededMonthlyLimit === 'boolean' ? draftForm.exceededMonthlyLimit : null,
+        preExistingConditions: Array.isArray(draftForm.preExistingConditions) ? draftForm.preExistingConditions : [],
+        previousCannabisExperience: typeof draftForm.previousCannabisExperience === 'boolean' ? draftForm.previousCannabisExperience : null,
+        hadSideEffects: typeof draftForm.hadSideEffects === 'boolean' ? draftForm.hadSideEffects : null,
+        treatmentExpectations: Array.isArray(draftForm.treatmentExpectations) ? draftForm.treatmentExpectations : [],
       })
       setCurrentStep(draftStep)
       setRenderedStep(draftStep)
@@ -98,16 +147,70 @@ export default function QuestionnairePage() {
     setCurrentStep(4)
   }
 
-  // Step4: FINAL - Send to backend!
-  const handleStep4Next = async (answers: { onset: string; frequency: string }) => {
-    const completeData = {
-      ...formData,
+  // Step4: Collect symptoms, advance to Step 5
+  const handleStep4Next = (answers: { onset: string; frequency: string; severity: string; diagnosisText: string }) => {
+    setFormData(prev => ({
+      ...prev,
       onset: answers.onset,
-      frequency: answers.frequency
-    }
-    setFormData(completeData)
-    setLoading(true)
+      frequency: answers.frequency,
+      severity: answers.severity,
+      diagnosisText: answers.diagnosisText,
+    }))
+    setCurrentStep(5)
+  }
 
+  // Step5: Collect previous treatment history
+  const handleStep5Next = (answers: {
+    hasSeenDoctor: boolean
+    treatmentLocations: string[]
+    hasTakenMedication: boolean
+    medicationDetails: string
+    nonMedicalTherapies: string[]
+  }) => {
+    setFormData(prev => ({
+      ...prev,
+      hasSeenDoctor: answers.hasSeenDoctor,
+      treatmentLocations: answers.treatmentLocations,
+      hasTakenMedication: answers.hasTakenMedication,
+      medicationDetails: answers.medicationDetails,
+      nonMedicalTherapies: answers.nonMedicalTherapies,
+    }))
+    setCurrentStep(6)
+  }
+
+  // Step6: Collect exclusion criteria
+  const handleStep6Next = (answers: {
+    isPregnantOrBreastfeeding: boolean
+    exceededMonthlyLimit: boolean
+    preExistingConditions: string[]
+  }) => {
+    setFormData(prev => ({
+      ...prev,
+      isPregnantOrBreastfeeding: answers.isPregnantOrBreastfeeding,
+      exceededMonthlyLimit: answers.exceededMonthlyLimit,
+      preExistingConditions: answers.preExistingConditions,
+    }))
+    setCurrentStep(7)
+  }
+
+  // Step7: Collect cannabis experience
+  const handleStep7Next = (answers: {
+    previousCannabisExperience: boolean
+    hadSideEffects: boolean | null
+    treatmentExpectations: string[]
+  }) => {
+    setFormData(prev => ({
+      ...prev,
+      previousCannabisExperience: answers.previousCannabisExperience,
+      hadSideEffects: answers.hadSideEffects,
+      treatmentExpectations: answers.treatmentExpectations,
+    }))
+    setCurrentStep(8)
+  }
+
+  // Step8: FINAL — Send complete formData to backend
+  const handleStep8Submit = async () => {
+    setLoading(true)
     try {
       const treatmentData = sessionStorage.getItem('treatmentRequest')
       if (!treatmentData) {
@@ -128,7 +231,7 @@ export default function QuestionnairePage() {
           'Content-Type': 'application/json',
         },
         credentials: 'include',
-        body: JSON.stringify(completeData),
+        body: JSON.stringify(formData),
       })
 
       const result = await response.json()
@@ -147,6 +250,10 @@ export default function QuestionnairePage() {
     } finally {
       setLoading(false)
     }
+  }
+
+  const handleEditStep = (stepNumber: number) => {
+    setCurrentStep(stepNumber)
   }
 
   const handleBack = () => {
@@ -220,7 +327,58 @@ export default function QuestionnairePage() {
           onBack={handleBack}
           initialOnsetValue={formData.onset}
           initialFrequencyValue={formData.frequency}
-          onSelectionChange={({ onset, frequency }) => setFormData((prev) => ({ ...prev, onset, frequency }))}
+          initialSeverityValue={formData.severity}
+          initialDiagnosisTextValue={formData.diagnosisText}
+          onSelectionChange={({ onset, frequency, severity, diagnosisText }) =>
+            setFormData((prev) => ({ ...prev, onset, frequency, severity, diagnosisText }))
+          }
+        />
+      )}
+      {renderedStep === 5 && (
+        <Step5
+          onNext={handleStep5Next}
+          onBack={handleBack}
+          initialHasSeenDoctor={formData.hasSeenDoctor}
+          initialTreatmentLocations={formData.treatmentLocations}
+          initialHasTakenMedication={formData.hasTakenMedication}
+          initialMedicationDetails={formData.medicationDetails}
+          initialNonMedicalTherapies={formData.nonMedicalTherapies}
+          onSelectionChange={({ hasSeenDoctor, treatmentLocations, hasTakenMedication, medicationDetails, nonMedicalTherapies }) =>
+            setFormData((prev) => ({ ...prev, hasSeenDoctor, treatmentLocations, hasTakenMedication, medicationDetails, nonMedicalTherapies }))
+          }
+        />
+      )}
+      {renderedStep === 6 && (
+        <Step6
+          onNext={handleStep6Next}
+          onBack={handleBack}
+          initialIsPregnantOrBreastfeeding={formData.isPregnantOrBreastfeeding}
+          initialExceededMonthlyLimit={formData.exceededMonthlyLimit}
+          initialPreExistingConditions={formData.preExistingConditions}
+          onSelectionChange={({ isPregnantOrBreastfeeding, exceededMonthlyLimit, preExistingConditions }) =>
+            setFormData((prev) => ({ ...prev, isPregnantOrBreastfeeding, exceededMonthlyLimit, preExistingConditions }))
+          }
+        />
+      )}
+      {renderedStep === 7 && (
+        <Step7
+          onNext={handleStep7Next}
+          onBack={handleBack}
+          initialPreviousCannabisExperience={formData.previousCannabisExperience}
+          initialHadSideEffects={formData.hadSideEffects}
+          initialTreatmentExpectations={formData.treatmentExpectations}
+          onSelectionChange={({ previousCannabisExperience, hadSideEffects, treatmentExpectations }) =>
+            setFormData((prev) => ({ ...prev, previousCannabisExperience, hadSideEffects, treatmentExpectations }))
+          }
+        />
+      )}
+      {renderedStep === 8 && (
+        <Step8
+          formData={formData}
+          onSubmit={handleStep8Submit}
+          onBack={handleBack}
+          onEditStep={handleEditStep}
+          submitting={loading}
         />
       )}
     </div>

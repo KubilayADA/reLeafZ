@@ -7,7 +7,7 @@ interface StepProgressProps {
   totalSteps?: number
 }
 
-export default function StepProgress({ currentStep, totalSteps = 4 }: StepProgressProps) {
+export default function StepProgress({ currentStep, totalSteps = 8 }: StepProgressProps) {
   const safeCurrentStep = Math.min(Math.max(currentStep, 1), totalSteps)
   const completionRatio = totalSteps > 1 ? (safeCurrentStep - 1) / (totalSteps - 1) : 1
   const progressPercent = Math.round(completionRatio * 100)
