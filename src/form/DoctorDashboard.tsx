@@ -2,8 +2,81 @@
 
 import React, { useState, useEffect } from 'react'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import {Eye, EyeOff, Lock, Mail, User, Clock, CheckCircle, XCircle, FileText, Phone, MapPin, AlertCircle, LogOut, Package } from 'lucide-react';
+import {Eye, EyeOff, Lock, Mail, User, Clock, CheckCircle, XCircle, FileText, Phone, MapPin, LogOut, Package } from 'lucide-react';
 import { API_BASE } from '@/lib/api'
+
+const SEVERITY_LABELS: Record<string, string> = {
+  'sehr-leicht': 'Sehr leicht',
+  'leicht': 'Leicht',
+  'mittel': 'Mittel',
+  'stark': 'Stark',
+  'sehr-stark': 'Sehr stark',
+}
+
+const TREATMENT_LOCATION_LABELS: Record<string, string> = {
+  Hausarzt: 'Hausarzt',
+  Facharzt: 'Facharzt',
+  Klinik: 'Klinik',
+  Notaufnahme: 'Notaufnahme',
+  Sonstiges: 'Sonstiges',
+}
+
+const NON_MEDICAL_THERAPY_LABELS: Record<string, string> = {
+  Physiotherapie: 'Physiotherapie',
+  Psychotherapie: 'Psychotherapie',
+  Akupunktur: 'Akupunktur',
+  Yoga: 'Yoga / Meditation',
+  Ernaehrungsberatung: 'Ernährungsberatung',
+  Keine: 'Keine',
+}
+
+const PRE_EXISTING_CONDITION_LABELS: Record<string, string> = {
+  HerzKreislauf: 'Herz-Kreislauf-Erkrankungen',
+  Atemwegserkrankungen: 'Atemwegserkrankungen',
+  Lebererkrankungen: 'Lebererkrankungen',
+  Nierenerkrankungen: 'Nierenerkrankungen',
+  Persoenlichkeitsstoerung: 'Persönlichkeitsstörung',
+  Psychose: 'Psychose / Schizophrenie',
+  Abhaengigkeit: 'Suchterkrankung',
+  Keine: 'Keine',
+}
+
+const TREATMENT_EXPECTATION_LABELS: Record<string, string> = {
+  Schmerzlinderung: 'Schmerzlinderung',
+  Schlafverbesserung: 'Schlafverbesserung',
+  Angstreduktion: 'Angstreduktion',
+  Lebensqualitaet: 'Lebensqualität',
+  Arbeitsfaehigkeit: 'Arbeitsfähigkeit',
+  Appetit: 'Appetitanregung',
+  Sonstiges: 'Sonstiges',
+}
+
+const yesNo = (value: boolean | null | undefined): string => {
+  if (value === true) return 'Ja'
+  if (value === false) return 'Nein'
+  return '—'
+}
+
+const mapArray = (
+  values: string[] | null | undefined,
+  labels: Record<string, string>
+): string => {
+  if (!values || values.length === 0) return 'Keine angegeben'
+  return values.map((v) => labels[v] ?? v).join(', ')
+}
+
+const orDash = (value: string | null | undefined): string => {
+  if (!value || value.trim() === '') return '—'
+  return value
+}
+
+const labelFor = (
+  value: string | null | undefined,
+  labels: Record<string, string>
+): string => {
+  if (!value) return '—'
+  return labels[value] ?? value
+}
 
 interface SelectedProduct {
   productId: number
@@ -19,6 +92,19 @@ interface TreatmentRequest {
   phone: string
   city: string
   symptoms: string
+  severity?: string | null
+  diagnosisText?: string | null
+  hasSeenDoctor?: boolean | null
+  treatmentLocations?: string[] | null
+  hasTakenMedication?: boolean | null
+  medicationDetails?: string | null
+  nonMedicalTherapies?: string[] | null
+  isPregnantOrBreastfeeding?: boolean | null
+  exceededMonthlyLimit?: boolean | null
+  preExistingConditions?: string[] | null
+  previousCannabisExperience?: boolean | null
+  hadSideEffects?: boolean | null
+  treatmentExpectations?: string[] | null
   status: string
   createdAt?: string
   updatedAt?: string
@@ -27,6 +113,76 @@ interface TreatmentRequest {
 }
 
 type ViewType = 'pending' | 'past'
+
+function MedicalHistorySection({ req }: { req: TreatmentRequest }) {
+  return (
+    <div className="mb-4 space-y-4">
+      <Section title="Hauptbeschwerde">
+        <Row label="Schweregrad" value={labelFor(req.severity, SEVERITY_LABELS)} />
+        <Row label="Diagnose / ICD" value={orDash(req.diagnosisText)} />
+      </Section>
+
+      <Section title="Bisherige Behandlung">
+        <Row label="Bisheriger Arztbesuch" value={yesNo(req.hasSeenDoctor)} />
+        <Row
+          label="Behandelnde Stellen"
+          value={mapArray(req.treatmentLocations, TREATMENT_LOCATION_LABELS)}
+        />
+        <Row label="Medikamente eingenommen" value={yesNo(req.hasTakenMedication)} />
+        <Row label="Medikamentendetails" value={orDash(req.medicationDetails)} />
+        <Row
+          label="Nicht-medikamentöse Therapien"
+          value={mapArray(req.nonMedicalTherapies, NON_MEDICAL_THERAPY_LABELS)}
+        />
+      </Section>
+
+      <Section title="Ausschlusskriterien">
+        <Row label="Schwanger / Stillend" value={yesNo(req.isPregnantOrBreastfeeding)} />
+        <Row label="Monatslimit überschritten" value={yesNo(req.exceededMonthlyLimit)} />
+        <Row
+          label="Vorerkrankungen"
+          value={mapArray(req.preExistingConditions, PRE_EXISTING_CONDITION_LABELS)}
+        />
+      </Section>
+
+      <Section title="Cannabis-Erfahrung">
+        <Row label="Vorerfahrung" value={yesNo(req.previousCannabisExperience)} />
+        <Row label="Nebenwirkungen erlebt" value={yesNo(req.hadSideEffects)} />
+        <Row
+          label="Behandlungserwartungen"
+          value={mapArray(req.treatmentExpectations, TREATMENT_EXPECTATION_LABELS)}
+        />
+      </Section>
+
+      {req.symptoms && req.symptoms.trim() !== '' && (
+        <details className="text-xs text-gray-500 pt-2 border-t border-gray-100">
+          <summary className="cursor-pointer select-none">Originaldaten anzeigen</summary>
+          <p className="mt-2 whitespace-pre-wrap">{req.symptoms}</p>
+        </details>
+      )}
+    </div>
+  )
+}
+
+function Section({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <div>
+      <p className="text-xs font-semibold uppercase tracking-wide text-gray-500 mb-2">
+        {title}
+      </p>
+      <div className="space-y-1">{children}</div>
+    </div>
+  )
+}
+
+function Row({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="flex items-start gap-3 text-sm">
+      <span className="text-gray-500 w-44 flex-shrink-0">{label}</span>
+      <span className="text-gray-800">{value}</span>
+    </div>
+  )
+}
 
 export default function DoctorDashboard() {
   const [email, setEmail] = useState('')
@@ -383,13 +539,7 @@ export default function DoctorDashboard() {
                     </CardHeader>
                     <CardContent>
                       <div className="mb-4">
-                        <div className="flex items-start gap-2 mb-2">
-                          <AlertCircle size={16} className="text-gray-400 mt-0.5 flex-shrink-0" />
-                          <div>
-                            <p className="text-sm font-medium text-gray-700 mb-1">Symptome</p>
-                            <p className="text-sm text-gray-600">{req.symptoms}</p>
-                          </div>
-                        </div>
+                        <MedicalHistorySection req={req} />
                         {/* ⬇️ NEW: Selected Products ⬇️ */}
                         {req.selectedProducts && req.selectedProducts.length > 0 && (
                           <div className="flex items-start gap-2 pt-3 border-t border-gray-100">
