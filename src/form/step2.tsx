@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
-import { ArrowLeft, Bike, Package } from 'lucide-react'
+import { ArrowLeft, Bike, Store } from 'lucide-react'
 import StepProgress from '@/form/step-progress'
 import FormLogoHomeExit from '@/form/form-logo-home-exit'
 import '@/form/form.css'
@@ -14,7 +14,7 @@ interface Step2Props {
   onSelectionChange?: (selectedOption: string) => void
 }
 
-type DeliveryOption = 'courier' | 'shipping'
+type DeliveryOption = 'BOTENDIENST' | 'PICKUP'
 
 export default function Step2({ onNext, onBack, initialValue = '', onSelectionChange }: Step2Props) {
   const [selectedOption, setSelectedOption] = useState<DeliveryOption | ''>(
@@ -27,18 +27,18 @@ export default function Step2({ onNext, onBack, initialValue = '', onSelectionCh
 
   const options = [
     {
-      id: 'courier' as DeliveryOption,
-      title: 'Rezept + Kurier: 60-90min',
-      description: 'Mo-So: 09-21:30 Uhr | Die Herz Apotheke Berlin',
+      id: 'BOTENDIENST' as DeliveryOption,
+      title: 'Express-Kurier',
+      description: 'Lieferung in 60–90 Min. durch Apotheken-Botendienst (Mo–So: 09:00–21:30 Uhr)',
       icon: Bike,
-      time: '60-90min'
+      time: '60-90 Min.'
     },
     {
-      id: 'shipping' as DeliveryOption,
-      title: 'Rezept + Versand: 1-2 Tage',
-      description: 'Internationale HBF Apotheke',
-      icon: Package,
-      time: '1-2 Tage'
+      id: 'PICKUP' as DeliveryOption,
+      title: 'Abholung in der Apotheke',
+      description: 'Holen Sie Ihre Medikamente direkt in der Berliner Apotheke ab. Sofort nach Rezeptausstellung verfügbar.',
+      icon: Store,
+      time: 'Sofort verfügbar'
     }
   ]
 
@@ -99,7 +99,7 @@ export default function Step2({ onNext, onBack, initialValue = '', onSelectionCh
 
           <div className="form-disclaimer form-disclaimer--center form-disclaimer--step2-fit">
             <p className="form-disclaimer__text">
-              * Die Versandart kann nach der Rezeptausstellung ausgewählt werden.
+              releafZ liefert ausschließlich über Berliner Apotheken-Botendienst oder zur Abholung. Die endgültige Apotheke wird im nächsten Schritt ausgewählt.
             </p>
           </div>
 
