@@ -19,6 +19,19 @@ interface TreatmentRequest {
   phone: string
   city: string
   symptoms: string
+  severity?: string | null
+  diagnosisText?: string | null
+  hasSeenDoctor?: boolean | null
+  treatmentLocations?: string[] | null
+  hasTakenMedication?: boolean | null
+  medicationDetails?: string | null
+  nonMedicalTherapies?: string[] | null
+  isPregnantOrBreastfeeding?: boolean | null
+  exceededMonthlyLimit?: boolean | null
+  preExistingConditions?: string[] | null
+  previousCannabisExperience?: boolean | null
+  hadSideEffects?: boolean | null
+  treatmentExpectations?: string[] | null
   status: string
   createdAt?: string
   updatedAt?: string
