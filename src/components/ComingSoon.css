@@ -9,6 +9,8 @@ html[data-releafz-coming-soon="true"][data-releafz-landing-theme] body {
 }
 
 .cs-root {
+  --cs-logo-h: clamp(32px, 8svh, 56px);
+  --cs-logo-gap: clamp(10px, 2.5svh, 20px);
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
   color: #000000;
   background: var(--cs-chrome-bg, #050d1a);
@@ -182,15 +184,21 @@ html[data-releafz-coming-soon="true"][data-releafz-landing-theme] body {
 
 /* Hero: in-flow logo (≤767px); desktop logo uses fixed positioning */
 .cs-hero > .cs-logo {
-  margin-top: -0.15rem;
-  align-self: flex-start;
+  align-self: center;
+  flex-shrink: 0;
 }
 
-/* Desktop: logo at horizontal center of viewport, top edge (not limited to hero column width) */
+/* Desktop: logo centered on viewport top; main reserves space so headline never overlaps */
 @media (min-width: 768px) {
+  .cs-root {
+    --cs-logo-h: clamp(36px, 9svh, 100px);
+    --cs-logo-gap: clamp(8px, 1.5svh, 20px);
+    --cs-logo-offset: max(24px, calc(env(safe-area-inset-top, 0px) + 12px));
+  }
+
   .cs-hero > .cs-logo {
     position: fixed;
-    top: max(24px, calc(env(safe-area-inset-top, 0px) + 12px));
+    top: var(--cs-logo-offset);
     left: 50%;
     transform: translateX(-50%);
     margin-top: 0;
@@ -198,20 +206,9 @@ html[data-releafz-coming-soon="true"][data-releafz-landing-theme] body {
   }
 }
 .cs-logo-img {
-  height: 64px;
+  height: var(--cs-logo-h);
   width: auto;
   display: block;
-}
-@media (max-width: 767px) {
-  .cs-logo-img {
-    height: 56px;
-  }
-}
-@media (min-width: 768px) {
-  .cs-hero .cs-logo-img {
-    height: 100px;
-    width: auto;
-  }
 }
 
 .cs-nav-btn {
@@ -248,10 +245,10 @@ html[data-releafz-coming-soon="true"][data-releafz-landing-theme] body {
 }
 /* Shared size for headline + rotating line (set on .cs-hero as --cs-title) */
 .cs-hero {
-  --cs-title: clamp(34px, 5.6vw, 68px);
+  --cs-title: clamp(34px, min(5.6vw, 5.5svh), 68px);
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: var(--cs-logo-gap);
   align-items: flex-start;
   text-align: left;
   width: 100%;
@@ -578,10 +575,16 @@ html[data-releafz-coming-soon="true"][data-releafz-landing-theme] body {
   .cs-main {
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    gap: 22px;
-    padding: 12px 0;
+    /* safe center: when content is tall, align from top so fixed logo is not covered */
+    justify-content: safe center;
+    gap: clamp(14px, 2.5svh, 22px);
+    padding: max(
+        0px,
+        calc(var(--cs-logo-offset) + var(--cs-logo-h) + var(--cs-logo-gap) - 64px)
+      )
+      12px 0;
     min-height: 0;
+    overflow-y: auto;
   }
   .cs-hero {
     max-width: min(1040px, 100%);
@@ -628,6 +631,23 @@ html[data-releafz-coming-soon="true"][data-releafz-landing-theme] body {
   }
 }
 
+/* Short desktop: keep logo in flow so it cannot cover centered headline */
+@media (min-width: 768px) and (max-height: 680px) {
+  .cs-hero > .cs-logo {
+    position: relative;
+    top: auto;
+    left: auto;
+    transform: none;
+    align-self: center;
+    width: 100%;
+    justify-content: center;
+  }
+
+  .cs-main {
+    padding-top: 8px;
+  }
+}
+
 /* Mobile: stack vertically, scroll allowed */
 @media (max-width: 767px) {
   .cs-page {
@@ -652,20 +672,17 @@ html[data-releafz-coming-soon="true"][data-releafz-landing-theme] body {
     gap: 22px;
   }
   .cs-hero {
-    --cs-title: clamp(14px, 4.6vw, 26px);
+    --cs-title: clamp(14px, min(4.6vw, 6svh), 26px);
     margin-left: max(0.5rem, env(safe-area-inset-left, 0px));
     padding-right: 0.5rem;
   }
   .cs-headline {
     letter-spacing: 0.035em;
-    margin-top: 1.75rem;
+    margin-top: 0;
     margin-bottom: -0.35rem;
   }
   .cs-rotator .word-item {
     letter-spacing: 0.022em;
-  }
-  .cs-hero > .cs-logo {
-    align-self: center;
   }
   .cs-form-row {
     display: flex;
@@ -702,9 +719,16 @@ html[data-releafz-coming-soon="true"][data-releafz-landing-theme] body {
   }
 }
 
+@media (max-width: 767px) and (max-height: 560px) {
+  .cs-root {
+    --cs-logo-h: clamp(26px, 7svh, 44px);
+    --cs-logo-gap: clamp(8px, 2svh, 14px);
+  }
+}
+
 @media (max-width: 380px) {
   .cs-hero {
-    --cs-title: clamp(12px, 3.6vw, 22px);
+    --cs-title: clamp(12px, min(3.6vw, 5.5svh), 22px);
   }
   .cs-headline {
     letter-spacing: 0.03em;
