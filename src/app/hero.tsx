@@ -174,7 +174,7 @@ export default function Hero({
 }: HeroProps) {
   const heroVideoSrc = landingTheme === 'dark'
     ? '/hero-night.mp4'
-    : '/bubble-explose.mov'
+    : '/bubble-explose.mp4'
 
   const heroChecklistItems = [
     'Lieferung in 30-90 Minuten in Berlin',

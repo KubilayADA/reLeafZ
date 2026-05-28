@@ -44,9 +44,10 @@ const PROG_LABELS: string[] = ['Fragebogen', 'Sortiment', 'Rezept', 'Lieferung']
 
 interface HowProps {
   landingTheme: 'dark' | 'light';
+  setDialogOpen: (open: boolean) => void;
 }
 
-export default function How({ landingTheme }: HowProps): React.JSX.Element {
+export default function How({ landingTheme, setDialogOpen }: HowProps): React.JSX.Element {
   const [current, setCurrent] = useState<number>(0);
   const sectionRef = useRef<HTMLElement | null>(null);
   const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
@@ -214,7 +215,9 @@ export default function How({ landingTheme }: HowProps): React.JSX.Element {
 
               <div className="cta-block">
                 <p className="cta-note">Kostenlos starten.</p>
-                <a href="#" className="btn-cta">Jetzt Rezept beantragen →</a>
+                <button type="button" className="btn-cta" onClick={() => setDialogOpen(true)}>
+                  Jetzt Rezept beantragen →
+                </button>
                 <div className="trust">
                   <div className="trust-item"><span className="trust-dot" />Lizenzierte Ärzte</div>
                   <div className="trust-item"><span className="trust-dot" />DSGVO-konform</div>
@@ -253,7 +256,9 @@ export default function How({ landingTheme }: HowProps): React.JSX.Element {
 
             <div className="cta-block cta-block-mobile">
               <p className="cta-note">Kostenlos starten.</p>
-              <a href="#" className="btn-cta">Jetzt Rezept beantragen</a>
+              <button type="button" className="btn-cta" onClick={() => setDialogOpen(true)}>
+                Jetzt Rezept beantragen
+              </button>
               <div className="trust">
                 <div className="trust-item"><span className="trust-dot" />Lizenzierte Ärzte</div>
                 <div className="trust-item"><span className="trust-dot" />DSGVO-konform</div>
