@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Menu, Moon, Sun, X } from 'lucide-react'
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
@@ -36,13 +36,70 @@ export default function Header({
   handlePostcodeSubmit, 
   postcodeDialogSection,
   postcodeSubmitDisabled,
-  dialogFieldFocused,
   isVisible,
   landingTheme,
   onThemeToggle,
 }: HeaderProps) {
   const [mobileNavOpen, setMobileNavOpen] = useState(false)
   const dialogCardRef = useRef<HTMLDivElement | null>(null)
+
+  // Keep the address dialog perfectly centered in the *visible* area on every
+  // device. The dialog uses `position: fixed; inset: 0; margin: auto;` which
+  // auto-centers based on the inset rectangle. We just shrink that rectangle
+  // when the mobile keyboard opens so the dialog re-centers above the keyboard.
+  //   --rl-vh        : visual viewport height (caps max-height)
+  //   --rl-vy        : visual viewport offsetTop (top inset)
+  //   --rl-kb-bottom : space taken by the on-screen keyboard (bottom inset)
+  useEffect(() => {
+    if (!dialogOpen) return
+    if (typeof window === 'undefined') return
+
+    const root = document.documentElement
+    const vv = window.visualViewport
+
+    const update = () => {
+      if (!vv) {
+        root.style.setProperty('--rl-vh', `${window.innerHeight}px`)
+        root.style.setProperty('--rl-vy', '0px')
+        root.style.setProperty('--rl-kb-bottom', '0px')
+        return
+      }
+      const kb = Math.max(0, window.innerHeight - vv.height - vv.offsetTop)
+      root.style.setProperty('--rl-vh', `${Math.round(vv.height)}px`)
+      root.style.setProperty('--rl-vy', `${Math.round(vv.offsetTop)}px`)
+      root.style.setProperty('--rl-kb-bottom', `${Math.round(kb)}px`)
+    }
+
+    // Safe defaults the instant the dialog opens (perfectly centered, no offset)
+    root.style.setProperty('--rl-vh', `${vv?.height ?? window.innerHeight}px`)
+    root.style.setProperty('--rl-vy', '0px')
+    root.style.setProperty('--rl-kb-bottom', '0px')
+    update()
+
+    const handleFocusIn = (e: FocusEvent) => {
+      const target = e.target as HTMLElement | null
+      if (!target) return
+      if (!dialogCardRef.current?.contains(target)) return
+      if (!target.matches('input, textarea, select')) return
+      window.setTimeout(() => {
+        update()
+        target.scrollIntoView({ block: 'center', behavior: 'smooth' })
+      }, 280)
+    }
+
+    vv?.addEventListener('resize', update)
+    vv?.addEventListener('scroll', update)
+    document.addEventListener('focusin', handleFocusIn)
+
+    return () => {
+      vv?.removeEventListener('resize', update)
+      vv?.removeEventListener('scroll', update)
+      document.removeEventListener('focusin', handleFocusIn)
+      root.style.setProperty('--rl-vy', '0px')
+      root.style.setProperty('--rl-kb-bottom', '0px')
+      root.style.removeProperty('--rl-vh')
+    }
+  }, [dialogOpen])
   // HOVER SOUND BLOCK loving it 
   const hoverAudioRef = useRef<HTMLAudioElement | null>(null)
   const playHoverSound = () => {
@@ -197,26 +254,16 @@ export default function Header({
             </button>
             <DialogContent
               ref={dialogCardRef}
-              className={`left-1/2 -translate-x-1/2 w-[calc(100vw-1.5rem)] max-w-[24rem] max-h-[calc(100dvh-1.5rem)] overflow-y-auto rounded-xl bg-white/95 p-3 border-0 transition-[top,transform] duration-300 ${
-                dialogFieldFocused
-                  ? 'top-[max(0.75rem,env(safe-area-inset-top))] translate-y-0'
-                  : 'top-1/2 -translate-y-1/2'
-              } sm:top-[50%] sm:max-h-none sm:-translate-y-1/2 sm:p-4`}
-              style={{
-                borderTop: '2.5px solid #333',
-                borderLeft: '2.5px solid #333',
-                borderRight: '4px solid #333',
-                borderBottom: '4px solid #333',
-              }}
+              className="releafz-dialog bg-white/95"
             >
-              <div className="mb-1">
+              <div className="mb-1 shrink-0">
                 <img
                   src="/logo1.png"
                   alt="reLeafZ"
                   className="h-7 w-auto object-contain sm:h-8"
                 />
               </div>
-              <DialogHeader>
+              <DialogHeader className="shrink-0">
                 <DialogTitle className="text-base sm:text-lg font-bold" style={{ fontFamily: '"Helvetica Neue", sans-serif' }}>
                   Ihre Adresse eingeben
                 </DialogTitle>
@@ -227,12 +274,14 @@ export default function Header({
                   Bitte geben Sie Ihre Adresse ein, damit wir die nächste Apotheke für Sie finden können.
                 </DialogDescription>
               </DialogHeader>
-              {postcodeDialogSection}
+              <div className="releafz-dialog__body">
+                {postcodeDialogSection}
+              </div>
               <DialogFooter>
                 <Button
                   onClick={handlePostcodeSubmit}
                   disabled={postcodeSubmitDisabled}
-                  className="w-full h-10 sm:h-11 rounded-lg bg-[#72906F] text-white font-medium py-2.5 hover:bg-[#5f795d] disabled:opacity-50"
+                  className="w-full h-12 rounded-lg bg-[#72906F] text-white font-medium py-2.5 hover:bg-[#5f795d] disabled:opacity-50"
                   style={{ fontFamily: '"Helvetica Neue", sans-serif' }}
                 >
                   Weiter

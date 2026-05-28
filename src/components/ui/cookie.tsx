@@ -14,7 +14,10 @@ type CookiePreferences = {
   marketing: boolean
 }
 
+type BannerView = 'compact' | 'detailed'
+
 const COOKIE_STORAGE_KEY = 'cookieConsentPreferences'
+const MOBILE_BREAKPOINT = '(max-width: 640px)'
 
 const CATEGORY_CONFIG: {
   key: CookieCategoryKey
@@ -56,10 +59,23 @@ const defaultPreferences: CookiePreferences = {
 
 const CookieBanner = () => {
   const [isVisible, setIsVisible] = useState(false)
+  const [view, setView] = useState<BannerView>('compact')
+  const [isMobile, setIsMobile] = useState(false)
   const [selectedCategory, setSelectedCategory] =
     useState<CookieCategoryKey>('essential')
   const [preferences, setPreferences] =
     useState<CookiePreferences>(defaultPreferences)
+  const [showNoConsentToast, setShowNoConsentToast] = useState(false)
+
+  // Track mobile breakpoint so the compact view is only used on small screens
+  useEffect(() => {
+    if (typeof window === 'undefined' || !window.matchMedia) return
+    const mql = window.matchMedia(MOBILE_BREAKPOINT)
+    setIsMobile(mql.matches)
+    const handler = (e: MediaQueryListEvent) => setIsMobile(e.matches)
+    mql.addEventListener('change', handler)
+    return () => mql.removeEventListener('change', handler)
+  }, [])
 
   useEffect(() => {
     const stored = localStorage.getItem(COOKIE_STORAGE_KEY)
@@ -83,16 +99,18 @@ const CookieBanner = () => {
     }
   }, [])
 
-  // Lock page scroll when the banner is visible
+  // Lock page scroll only when the full (detailed) banner is showing.
+  // The compact mobile bottom banner is non-blocking so the user can keep reading.
   useEffect(() => {
-    if (isVisible) {
+    const shouldLock = isVisible && !(isMobile && view === 'compact')
+    if (shouldLock) {
       const originalOverflow = document.body.style.overflow
       document.body.style.overflow = 'hidden'
       return () => {
         document.body.style.overflow = originalOverflow
       }
     }
-  }, [isVisible])
+  }, [isVisible, isMobile, view])
 
   const persistPreferences = (prefs: CookiePreferences) => {
     localStorage.setItem(
@@ -136,12 +154,79 @@ const CookieBanner = () => {
 
   const handleClose = () => {
     // Closing without saving still keeps the banner visible on next visit,
-    // so we just hide it for the current session.
+    // so we just hide it for the current session and surface a toast so the
+    // user knows nothing was recorded.
     setIsVisible(false)
+    setShowNoConsentToast(true)
   }
 
+  const noConsentToast = showNoConsentToast ? (
+    <div className="cookie-toast" role="status" aria-live="polite">
+      <div className="cookie-toast__inner">
+        <div className="cookie-toast__text">
+          <p className="cookie-toast__title">No consent recorded</p>
+          <p className="cookie-toast__subtitle">
+          Your cookie preferences have not been saved. 
+          Please note that accepting essential cookies is required to complete the prescription form.
+          </p>
+        </div>
+        <button
+          type="button"
+          className="cookie-toast__close"
+          onClick={() => setShowNoConsentToast(false)}
+          aria-label="Dismiss notification"
+        >
+          <X className="cookie-toast__close-icon" />
+        </button>
+      </div>
+    </div>
+  ) : null
+
   if (!isVisible) {
-    return null
+    return noConsentToast
+  }
+
+  // Mobile: show a slim bottom banner first.
+  // Tapping "Select my preferences" expands into the full detailed modal below.
+  if (isMobile && view === 'compact') {
+    return (
+      <>
+      <div className="cookie-compact" role="dialog" aria-live="polite">
+        <div className="cookie-compact__inner">
+          <div className="cookie-compact__header">
+            <img
+              src="/cookie.png"
+              alt=""
+              aria-hidden="true"
+              className="cookie-compact__icon"
+            />
+            <p className="cookie-compact__title">A quick word about cookies</p>
+          </div>
+          <p className="cookie-compact__text">
+            We use cookies to run our platform and understand how it is used.
+            You decide what is OK.
+          </p>
+          <div className="cookie-compact__actions">
+            <button
+              type="button"
+              className="cookie-compact__btn cookie-compact__btn--secondary"
+              onClick={() => setView('detailed')}
+            >
+              Select my preferences
+            </button>
+            <button
+              type="button"
+              className="cookie-compact__btn cookie-compact__btn--primary"
+              onClick={handleAcceptAll}
+            >
+              Accept all
+            </button>
+          </div>
+        </div>
+      </div>
+      {noConsentToast}
+      </>
+    )
   }
 
   const activeCategory = CATEGORY_CONFIG.find(
@@ -149,6 +234,7 @@ const CookieBanner = () => {
   )!
 
   return (
+    <>
     <div className="cookie-banner">
       <div className="cookie-banner__container">
         <div className="cookie-banner__content">
@@ -270,6 +356,8 @@ const CookieBanner = () => {
         </div>
       </div>
     </div>
+    {noConsentToast}
+    </>
   )
 }
 
