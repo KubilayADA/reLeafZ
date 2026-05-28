@@ -52,8 +52,8 @@ const CATEGORY_CONFIG: {
 
 const defaultPreferences: CookiePreferences = {
   essential: true,
-  analytics: true,
-  functional: true,
+  analytics: false,
+  functional: false,
   marketing: false,
 }
 
@@ -149,6 +149,18 @@ const CookieBanner = () => {
     }
     setPreferences(allOn)
     persistPreferences(allOn)
+    setIsVisible(false)
+  }
+
+  const handleRejectAll = () => {
+    const allOff: CookiePreferences = {
+      essential: true,
+      analytics: false,
+      functional: false,
+      marketing: false,
+    }
+    setPreferences(allOff)
+    persistPreferences(allOff)
     setIsVisible(false)
   }
 
@@ -345,6 +357,12 @@ const CookieBanner = () => {
               className="cookie-banner__button cookie-banner__button--decline"
             >
               Save my choices
+            </Button>
+            <Button
+              onClick={handleRejectAll}
+              className="cookie-banner__button cookie-banner__button--reject"
+            >
+              Reject all
             </Button>
             <Button
               onClick={handleAcceptAll}
