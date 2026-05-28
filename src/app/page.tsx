@@ -389,7 +389,7 @@ function LandingPageContent() {
         >
           <MobileHero setDialogOpen={setDialogOpen} />
           <PartnerApotheken />
-          <How landingTheme={landingTheme} />
+          <How landingTheme={landingTheme} setDialogOpen={setDialogOpen} />
 
           <Footer />
         </div>
