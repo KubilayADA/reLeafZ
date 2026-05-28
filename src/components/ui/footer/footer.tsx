@@ -3,10 +3,21 @@
 import React from 'react'
 import './footer.css'
 
+const FOOTER_LINK_HREFS: Record<string, string> = {
+  'How it Works': '#ablauf',
+  Community: 'https://www.instagram.com/releafz.hq/',
+  'For Doctors': '/partners',
+  'For Pharmacies': '/pharmacies',
+  'Partner with Us': 'mailto:kubilay.ada@releafz.de',
+  'Privacy Policy': '/datenschutz',
+  'Terms of Service': '/agb',
+  'GDPR Compliance': '/datenschutz',
+}
+
 const FOOTER_LINK_GROUPS = [
   {
     title: 'For Patients',
-    links: ['How it Works', 'Strain Library', 'Treatment Tracking', 'Community'],
+    links: ['How it Works', 'Community'],
   },
   {
     title: 'For Professionals',
@@ -43,7 +54,7 @@ export default function Footer() {
             <ul className="footer__links">
               {group.links.map((label) => (
                 <li key={label}>
-                  <a href="#" className="footer__link">
+                  <a href={FOOTER_LINK_HREFS[label] ?? '#'} className="footer__link">
                     {label}
                   </a>
                 </li>
