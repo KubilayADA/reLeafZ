@@ -18,14 +18,12 @@ import { APIProvider, useMapsLibrary } from '@vis.gl/react-google-maps'
 
 const COMING_SOON_MODE = true;
 
-const inconsolataStyle = {
-  fontFamily: '"Inconsolata", monospace',
-  fontWeight: 400,
-  lineHeight: '35px',
+const helveticaNeueStyle: React.CSSProperties = {
+  fontFamily: '"Helvetica Neue", Helvetica, Arial, sans-serif',
 }
 
 const dialogInputStyle: React.CSSProperties = {
-  fontFamily: '"Helvetica Neue", sans-serif',
+  ...helveticaNeueStyle,
   borderTop: '2.5px solid #333',
   borderLeft: '2.5px solid #333',
   borderRight: '4px solid #333',
@@ -349,7 +347,7 @@ function LandingPageContent() {
   return (
     <>
       <CookieBanner />
-      <div className="landing-page landing-snap-scroll min-h-screen bg-beige inconsolata" style={inconsolataStyle}>
+      <div className="landing-page landing-snap-scroll min-h-screen bg-beige" style={helveticaNeueStyle}>
         <Header
           dialogOpen={dialogOpen}
           setDialogOpen={setDialogOpen}
