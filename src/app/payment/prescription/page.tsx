@@ -7,6 +7,7 @@ import { Elements, PaymentElement, useStripe, useElements } from '@stripe/react-
 import { Button } from '@/components/ui/button'
 import { CreditCard, CheckCircle2, AlertCircle } from 'lucide-react'
 import { API_BASE } from '@/lib/api'
+import '../payment.css'
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!)
 
@@ -64,7 +65,7 @@ function PaymentForm({ treatmentRequestId, selectedProducts, totalPrice }: {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl border-2 border-black p-6">
+      <div className="payment-card payment-card--summary p-6">
         <h3 className="text-lg font-bold mb-4 title-gradient italic">Order Summary</h3>
         
         <div className="space-y-3 mb-4">
@@ -94,7 +95,7 @@ function PaymentForm({ treatmentRequestId, selectedProducts, totalPrice }: {
         </div>
       </div>
 
-      <div className="bg-white rounded-xl border-2 border-black p-6">
+      <div className="payment-section">
         <PaymentElement />
       </div>
 
@@ -108,7 +109,8 @@ function PaymentForm({ treatmentRequestId, selectedProducts, totalPrice }: {
       <Button
         type="submit"
         disabled={!stripe || processing}
-        className="w-full btn-success inconsolata font-medium py-4 text-lg disabled:opacity-50"
+        variant="outline"
+        className="payment-btn payment-btn--submit payment-btn--block payment-btn--lg"
       >
         {processing ? (
           <span className="flex items-center justify-center gap-2">
@@ -198,7 +200,7 @@ function PrescriptionPaymentContent() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-beige inconsolata flex items-center justify-center">
+      <div className="payment-page payment-page--centered">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-4 border-green-600 border-t-transparent mx-auto mb-4"></div>
           <p className="subtitle-text">Preparing payment...</p>
@@ -209,28 +211,27 @@ function PrescriptionPaymentContent() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-beige inconsolata flex items-center justify-center px-4">
-        <div className="max-w-md w-full">
-          <div className="bg-white rounded-2xl border-2 border-black p-8 text-center">
-            <AlertCircle className="w-16 h-16 text-red-600 mx-auto mb-4" />
-            <h2 className="text-2xl font-bold mb-2">Payment Error</h2>
-            <p className="subtitle-text mb-6">{error}</p>
-            <Button 
-              onClick={() => router.push('/marketplace')}
-              className="btn-primary inconsolata"
-            >
-              Back to Marketplace
-            </Button>
-          </div>
+      <div className="payment-page payment-page--centered px-4">
+        <div className="payment-shell payment-shell--narrow text-center">
+          <AlertCircle className="w-16 h-16 text-red-600 mx-auto" />
+          <h2 className="text-2xl font-bold">Payment Error</h2>
+          <p className="subtitle-text">{error}</p>
+          <Button
+            onClick={() => router.push('/marketplace')}
+            variant="outline"
+            className="payment-btn payment-btn--nav payment-btn--block"
+          >
+            Back to Marketplace
+          </Button>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-beige inconsolata py-12 px-4">
-      <div className="max-w-2xl mx-auto">
-        <div className="text-center mb-8">
+    <div className="payment-page">
+      <div className="payment-shell">
+        <div className="payment-shell__intro">
           <div className="inline-flex items-center px-4 py-2 bg-gradient-to-r-custom mb-4">
             <CreditCard className="w-4 h-4 mr-2" />
             <span className="text-sm font-medium subtitle-text">Secure Payment</span>
@@ -243,19 +244,17 @@ function PrescriptionPaymentContent() {
           </p>
         </div>
 
-        <div className="bg-white rounded-2xl border-2 border-black p-6 sm:p-8 shadow-xl">
-          {clientSecret && (
-            <Elements stripe={stripePromise} options={{ clientSecret }}>
-              <PaymentForm 
-                treatmentRequestId={treatmentRequestId}
-                selectedProducts={selectedProducts}
-                totalPrice={totalPrice}
-              />
-            </Elements>
-          )}
-        </div>
+        {clientSecret && (
+          <Elements stripe={stripePromise} options={{ clientSecret }}>
+            <PaymentForm
+              treatmentRequestId={treatmentRequestId}
+              selectedProducts={selectedProducts}
+              totalPrice={totalPrice}
+            />
+          </Elements>
+        )}
 
-        <div className="mt-8 text-center">
+        <div className="payment-shell__footer">
           <div className="flex items-center justify-center gap-4 text-sm subtitle-text">
             <div className="flex items-center gap-2">
               <CheckCircle2 className="w-4 h-4 text-green-600" />
@@ -275,7 +274,7 @@ function PrescriptionPaymentContent() {
 export default function PrescriptionPaymentPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen bg-beige inconsolata flex items-center justify-center">
+      <div className="payment-page payment-page--centered">
         <div className="animate-spin rounded-full h-12 w-12 border-4 border-green-600 border-t-transparent mx-auto mb-4"></div>
       </div>
     }>
