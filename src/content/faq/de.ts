@@ -18,7 +18,7 @@ export const faqDe: FaqContent = {
       id: 'was-ist-medizinisches-cannabis',
       question: 'Was ist medizinisches Cannabis?',
       answer:
-        'Medizinisches Cannabis beschreibt cannabisbasierte Arzneimittel, die zu therapeutischen Zwecken eingesetzt werden. Die Pflanze enthält viele Inhaltsstoffe wie Cannabinoide, Terpene und Flavonoide, deren Zusammenspiel unterschiedliche Wirkungen haben kann. Diese interagieren mit Deinem körpereigenen Endocannabinoidsystem und unterstützen Deinen Körper dabei, einen Gleichgewichtszustand zu erreichen, wiederherzustellen oder aufrechtzuerhalten. Die bekanntesten Cannabinoide sind THC und CBD.',
+        'Medizinisches Cannabis Blüten beschreibt cannabisbasierte Arzneimittel, die zu therapeutischen Zwecken eingesetzt werden. Die Pflanze enthält viele Inhaltsstoffe wie Cannabinoide, Terpene und Flavonoide, deren Zusammenspiel unterschiedliche Wirkungen haben kann. Diese interagieren mit Deinem körpereigenen Endocannabinoidsystem und unterstützen Deinen Körper dabei, einen Gleichgewichtszustand zu erreichen, wiederherzustellen oder aufrechtzuerhalten. Die bekanntesten Cannabinoide sind THC und CBD.',
     },
     {
       id: 'ohne-rezept',
