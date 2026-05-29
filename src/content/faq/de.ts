@@ -16,45 +16,45 @@ export const faqDe: FaqContent = {
   items: [
     {
       id: 'was-ist-medizinisches-cannabis',
-      question: 'Was ist medizinisches Cannabis?',
+      question: 'Was steckt hinter medizinischem Cannabis?',
       answer:
-        'Medizinisches Cannabis Blüten beschreibt cannabisbasierte Arzneimittel, die zu therapeutischen Zwecken eingesetzt werden. Die Pflanze enthält viele Inhaltsstoffe wie Cannabinoide, Terpene und Flavonoide, deren Zusammenspiel unterschiedliche Wirkungen haben kann. Diese interagieren mit Deinem körpereigenen Endocannabinoidsystem und unterstützen Deinen Körper dabei, einen Gleichgewichtszustand zu erreichen, wiederherzustellen oder aufrechtzuerhalten. Die bekanntesten Cannabinoide sind THC und CBD.',
+        'Cannabis als Medizin ist weit mehr als ein einzelner Wirkstoff. Die Pflanze vereint eine Vielzahl an Inhaltsstoffen – darunter Cannabinoide, Terpene und Flavonoide – die gemeinsam auf Deinen Körper wirken. Sie sprechen das Endocannabinoidsystem an, ein natürliches Regulationssystem, das dabei hilft, innere Balance zu fördern und aufrechtzuerhalten. Besonders bekannt sind die Cannabinoide THC und CBD.',
     },
     {
       id: 'ohne-rezept',
-      question: 'Kann ich medizinisches Cannabis auch ohne Rezept bestellen?',
+      question: 'Brauche ich zwingend ein Rezept?',
       answer:
-        'Nein, ohne ein gültiges Rezept ist die Abgabe von Medizinalcannabis nicht möglich.',
+        'Ja, absolut. Medizinalcannabis ist ein verschreibungspflichtiges Arzneimittel und darf ausschließlich mit einem gültigen Rezept abgegeben werden. Eine Bestellung ohne Rezept ist gesetzlich nicht möglich.',
     },
     {
       id: 'rezept-erhalten',
-      question: 'Wie erhalte ich ein Rezept?',
+      question: 'Wie komme ich an mein Rezept?',
       answer:
-        'Um ein Rezept für Medizinalcannabis zu bekommen, besprich bitte mit Deiner Ärztin oder Deinem Arzt, ob diese Therapie für Dich geeignet ist. Sie können entscheiden, ob eine Behandlung sinnvoll ist und Dir das passende Rezept ausstellen. Falls Du keine behandelnde Ärztin oder keinen behandelnden Arzt hast, kannst Du Dich auch an eine Telemedizinplattform oder einen Online-Arzt wenden.',
+        'Der erste Schritt ist ein offenes Gespräch mit Deiner Ärztin oder Deinem Arzt. Gemeinsam könnt ihr besprechen, ob eine Therapie mit Medizinalcannabis für Dich in Frage kommt. Hast Du aktuell keine hausärztliche Betreuung, stehen Dir auch Telemedizinplattformen und Online-Ärzte zur Verfügung, die Dich schnell und unkompliziert beraten können.',
     },
     {
       id: 'bezahlung',
-      question: 'Wie bezahle ich mein Medikament?',
+      question: 'Wie läuft die Bezahlung bei Releafz ab?',
       answer:
-        'Für alle Bestellungen stehen Dir bei Releafz verschiedene Zahlungsmöglichkeiten zur Verfügung. Weitere Informationen zu den verfügbaren Zahlungsoptionen findest Du in Deinem Kundenkonto oder beim Checkout.',
+        'Bei Releafz stehen Dir verschiedene Zahlungsmöglichkeiten zur Verfügung, damit Du flexibel und bequem bezahlen kannst. Alle verfügbaren Optionen findest Du übersichtlich in Deinem Kundenkonto oder direkt im Checkout-Prozess.',
     },
     {
       id: 'versanddauer',
-      question: 'Wie lange dauert der Versand?',
+      question: 'Wann kommt mein Paket an?',
       answer:
-        'Dein Paket wird mit unserem Versanddienstleister verschickt. Sobald die Bestellung übergeben wurde, dauert es in der Regel 1–3 Werktage bis zur Zustellung. Wir versenden an die Lieferadresse, die in Deinem Releafz-Kundenkonto hinterlegt ist.',
+        'Nach der Übergabe an unseren Versandpartner ist Deine Bestellung in der Regel innerhalb von 1–3 Werktagen bei Dir. Der Versand erfolgt an die Lieferadresse, die Du in Deinem Releafz-Konto hinterlegt hast. Sobald Dein Paket unterwegs ist, erhältst Du eine Versandbestätigung.',
     },
     {
       id: 'diskrete-lieferung',
-      question: 'Kommt meine Bestellung diskret bei mir an?',
+      question: 'Wird meine Bestellung diskret verpackt?',
       answer:
-        'Deine Bestellung wird in einem neutralen Karton verschickt. Zusätzlich sind die Behälter unserer Cannabisblüten geruchsdicht verschlossen, sodass niemand den Inhalt erkennen kann.',
+        'Absolut. Deine Privatsphäre liegt uns am Herzen. Jede Bestellung wird in einem unauffälligen, neutralen Karton verschickt – ohne Hinweise auf den Inhalt. Die Verpackung unserer Produkte ist zudem geruchsdicht, sodass der Inhalt zu keinem Zeitpunkt erkennbar ist.',
     },
     {
       id: 'abholung',
-      question: 'Kann ich meine Bestellung auch vor Ort abholen?',
+      question: 'Kann ich meine Bestellung auch persönlich abholen?',
       answer:
-        'Du kannst Deine Bestellung von Montag bis Freitag zwischen 10:00 und 18:00 Uhr in unserer Apotheke abholen. Wenn Dein Originalrezept bis 12:00 Uhr bei uns eingeht und Deine Zahlung verbucht wurde, ist Deine Bestellung in der Regel noch am selben Werktag ab 15:00 Uhr abholbereit. Final abholbereit ist Deine Bestellung, sobald Du unsere Abholbestätigung per E-Mail erhalten hast.',
+        'Ja, eine Abholung vor Ort ist möglich. Unsere Apotheke ist montags bis freitags von 10:00 bis 18:00 Uhr für Dich geöffnet. Geht Dein Originalrezept bis 12:00 Uhr bei uns ein und Deine Zahlung ist bestätigt, ist Deine Bestellung in der Regel noch am selben Tag ab 15:00 Uhr bereit. Die offizielle Abholbereitschaft teilen wir Dir per E-Mail mit.',
     },
   ],
 }
