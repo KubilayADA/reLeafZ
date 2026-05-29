@@ -179,7 +179,6 @@ export default function Header({
             {/* Desktop Nav */}
             <div className="header-center-controls hidden md:flex">
               <nav className="header-desktop-nav header-text w-full justify-center">
-                <a href="#partner-apotheken" className="header-nav-link text-mg md:text-xl leading-relaxed">Apotheke in Ihrer Nähe</a>
                 <a
                   href="#ablauf"
                   className="header-nav-link text-mg md:text-xl leading-relaxed"
@@ -190,6 +189,8 @@ export default function Header({
                 >
                   Ablauf
                 </a>
+                <a href="#partner-apotheken" className="header-nav-link text-mg md:text-xl leading-relaxed">Apotheke in Ihrer Nähe</a>
+                <a href="#faq" className="header-nav-link text-mg md:text-xl leading-relaxed">FAQ</a>
                 <a href="#chat" className="header-nav-link text-lg md:text-xl leading-relaxed">Chat with us!</a>
               </nav>
 
@@ -218,10 +219,10 @@ export default function Header({
                           minHeight: '54px',
                           paddingTop: '0.7rem',
                           paddingBottom: '0.7rem',
-                          borderTop: '2.5px solid #333',
-                          borderLeft: '2.5px solid #333',
-                          borderRight: '4px solid #333',
-                          borderBottom: '4px solid #333',
+                          borderTop: '2.5px solid #fff',
+                          borderLeft: '2.5px solid #fff',
+                          borderRight: '4px solid #fff',
+                          borderBottom: '4px solid #fff',
                           borderRadius: '12px',
                         } as React.CSSProperties)
                       : ({
@@ -308,13 +309,27 @@ export default function Header({
               >
                 Ablauf
               </a>
-              <a href="#partner-apotheken" className="text-xl text-black-800 inconsolata" onClick={() => setMobileNavOpen(false)}>Apotheke in Ihrer Nähe</a>
+              <a
+                href="#partner-apotheken"
+                className="text-xl text-black-800 inconsolata"
+                onClick={() => setMobileNavOpen(false)}
+              >
+                Apotheke in Ihrer Nähe
+              </a>
+              <a href="#faq" className="text-xl text-black-800 inconsolata" onClick={() => setMobileNavOpen(false)}>FAQ</a>
               <a href="#vorteile" className="text-xl text-black-800 inconsolata" onClick={() => setMobileNavOpen(false)}>Vorteile</a>
               <a href="#chat" className="text-xl text-black-800 inconsolata" onClick={() => setMobileNavOpen(false)}>Chat with us!</a>
               <div className="w-full px-4">
                 <Button
                   className="behandlung-button2 w-full px-6 py-3 flex items-center justify-center"
                   onClick={() => setDialogOpen(true)}
+                  style={{
+                    borderTop: `2.5px solid ${landingTheme === 'dark' ? '#fff' : '#000'}`,
+                    borderLeft: `2.5px solid ${landingTheme === 'dark' ? '#fff' : '#000'}`,
+                    borderRight: `4px solid ${landingTheme === 'dark' ? '#fff' : '#000'}`,
+                    borderBottom: `4px solid ${landingTheme === 'dark' ? '#fff' : '#000'}`,
+                    borderRadius: '12px',
+                  }}
                 >
                   BEHANDLUNG ANFRAGEN →
                 </Button>

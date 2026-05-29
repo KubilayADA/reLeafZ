@@ -15,6 +15,7 @@ interface MobileNavbarProps {
 const NAV_LINKS = [
   { href: '#ablauf', label: 'So funktionierts' },
   { href: '#partner-apotheken', label: 'Partner-Apotheken' },
+  { href: '#faq', label: 'FAQ' },
 ]
 
 export default function MobileNavbar({
@@ -32,7 +33,7 @@ export default function MobileNavbar({
   useEffect(() => { isOpenRef.current = isOpen }, [isOpen])
 
   useEffect(() => {
-    const SECTION_IDS = ['partner-apotheken', 'ablauf'] as const
+    const SECTION_IDS = ['ablauf', 'partner-apotheken', 'faq'] as const
     const SECTION_ACTIVE_OFFSET = 110
     const getTargetSections = () =>
       SECTION_IDS
