@@ -1,10 +1,13 @@
 'use client'
-import React, { useState, useRef, useLayoutEffect, Fragment } from 'react';
+import React, { useState, useRef, useLayoutEffect, useEffect, Fragment } from 'react';
 import '@/app/main.css';
 import './how.css';
 import SectionParticlesBackground from '@/components/ui/SectionParticlesBackground';
 
 const TOTAL = 4;
+const STORY_MS = 5000;
+const MOBILE_MQ = '(max-width: 767px)';
+const STORY_CARD_BG = '/how/hoT.png';
 
 interface Step {
   num: string;
@@ -42,13 +45,57 @@ const STEPS: Step[] = [
 
 const PROG_LABELS: string[] = ['Fragebogen', 'Sortiment', 'Rezept', 'Lieferung'];
 
+type SlideDir = 1 | -1;
+
+function resolveSlideDir(from: number, to: number): SlideDir {
+  if (from === to) return 1;
+  if (from === TOTAL - 1 && to === 0) return 1;
+  if (from === 0 && to === TOTAL - 1) return -1;
+  return to > from ? 1 : -1;
+}
+
 interface HowProps {
   landingTheme: 'dark' | 'light';
   setDialogOpen: (open: boolean) => void;
 }
 
+interface HowStepCardProps {
+  step: Step;
+  active: boolean;
+  cardRef?: (el: HTMLDivElement | null) => void;
+}
+
+function HowStepCard({ step, active, cardRef }: HowStepCardProps): React.JSX.Element {
+  return (
+    <div
+      ref={cardRef}
+      className={`how-col-card ${active ? 'active' : ''}`}
+    >
+      <img
+        src={step.imageUrl}
+        alt={step.title}
+        className="how-col-image"
+        loading={active ? 'eager' : 'lazy'}
+        onError={(e) => {
+          e.currentTarget.src = '/map/map-1.png';
+        }}
+      />
+      <span className="how-col-ghost-num" aria-hidden>{step.num}</span>
+      <div className="how-col-body">
+        <span className="how-col-num">Schritt {step.num}</span>
+        <h3 className="how-col-title">{step.title}</h3>
+        <p className="how-col-desc">{step.desc}</p>
+      </div>
+    </div>
+  );
+}
+
 export default function How({ landingTheme, setDialogOpen }: HowProps): React.JSX.Element {
   const [current, setCurrent] = useState<number>(0);
+  const [slideDir, setSlideDir] = useState<SlideDir>(1);
+  const [slideTick, setSlideTick] = useState(0);
+  const [isMobile, setIsMobile] = useState(false);
+  const [reducedMotion, setReducedMotion] = useState(false);
   const sectionRef = useRef<HTMLElement | null>(null);
   const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
   const cardsContainerRef = useRef<HTMLDivElement | null>(null);
@@ -56,8 +103,64 @@ export default function How({ landingTheme, setDialogOpen }: HowProps): React.JS
   const autoScrollTargetIdxRef = useRef<number | null>(null);
   const isAutoScrollingRef = useRef(false);
 
-  /** One rAF-throttled scroll model: avoids multiple IntersectionObservers fighting over `current`. */
+  const transitionTo = (getNext: (c: number) => number, explicitDir?: SlideDir): void => {
+    setCurrent((c) => {
+      const next = getNext(c);
+      if (next === c) return c;
+      const dir = explicitDir ?? resolveSlideDir(c, next);
+      setSlideDir(dir);
+      setSlideTick((t) => t + 1);
+      return next;
+    });
+  };
+
+  const goTo = (idx: number): void => {
+    const clamped = Math.max(0, Math.min(TOTAL - 1, idx));
+    transitionTo(() => clamped);
+  };
+
+  const goNext = (): void => {
+    transitionTo((c) => (c < TOTAL - 1 ? c + 1 : 0), 1);
+  };
+
+  const goPrev = (): void => {
+    transitionTo((c) => (c > 0 ? c - 1 : TOTAL - 1), -1);
+  };
+
+  useEffect(() => {
+    if (typeof window === 'undefined' || !window.matchMedia) return;
+    const mobileMql = window.matchMedia(MOBILE_MQ);
+    const motionMql = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const syncMobile = (): void => setIsMobile(mobileMql.matches);
+    const syncMotion = (): void => setReducedMotion(motionMql.matches);
+    syncMobile();
+    syncMotion();
+    mobileMql.addEventListener('change', syncMobile);
+    motionMql.addEventListener('change', syncMotion);
+    return () => {
+      mobileMql.removeEventListener('change', syncMobile);
+      motionMql.removeEventListener('change', syncMotion);
+    };
+  }, []);
+
+  /** Auto-advance stories on mobile (respects reduced motion). */
+  useEffect(() => {
+    if (!isMobile || reducedMotion) return;
+    const id = window.setTimeout(goNext, STORY_MS);
+    return () => clearTimeout(id);
+  }, [isMobile, reducedMotion, current]);
+
+  /** Preload mobile story card background. */
+  useEffect(() => {
+    if (!isMobile) return;
+    const img = new Image();
+    img.src = STORY_CARD_BG;
+  }, [isMobile]);
+
+  /** Desktop: rAF-throttled scroll model for `current`. */
   useLayoutEffect(() => {
+    if (isMobile) return;
+
     let scheduled = false;
     let rafId: number | null = null;
 
@@ -117,9 +220,14 @@ export default function How({ landingTheme, setDialogOpen }: HowProps): React.JS
         cancelAnimationFrame(autoScrollRafRef.current);
       }
     };
-  }, []);
+  }, [isMobile]);
 
   const scrollToCard = (idx: number): void => {
+    if (isMobile) {
+      goTo(idx);
+      return;
+    }
+
     const target = cardRefs.current[idx];
     if (!target) return;
 
@@ -168,6 +276,8 @@ export default function How({ landingTheme, setDialogOpen }: HowProps): React.JS
     autoScrollRafRef.current = requestAnimationFrame(tick);
   };
 
+  const activeStep = STEPS[current];
+
   return (
     <section
       ref={sectionRef}
@@ -185,7 +295,6 @@ export default function How({ landingTheme, setDialogOpen }: HowProps): React.JS
       <div className="section how-funktioniert__shell">
         <div className="how-layout">
 
-          {/* ── Left: title + nav pills + CTA — sticky in section (desktop), below site header ── */}
           <aside className="how-sidebar" aria-label="Ablauf Navigation">
             <div className="how-sidebar-sticky">
               <div className="how-header">
@@ -228,31 +337,86 @@ export default function How({ landingTheme, setDialogOpen }: HowProps): React.JS
             </div>
           </aside>
 
-          {/* ── Right: scrollable step cards ── */}
-          <div ref={cardsContainerRef} className="how-right">
-            {STEPS.map((step, i) => (
+          <div ref={cardsContainerRef} className={`how-right ${isMobile ? 'how-right--stories' : ''}`}>
+            {isMobile ? (
               <div
-                key={`card-${i}`}
-                ref={el => { cardRefs.current[i] = el; }}
-                className={`how-col-card ${i === current ? 'active' : ''}`}
+                className="how-stories"
+                role="region"
+                aria-roledescription="Karussell"
+                aria-label={`Schritt ${current + 1} von ${TOTAL}`}
+                onKeyDown={(e: React.KeyboardEvent) => {
+                  if (e.key === 'ArrowRight') {
+                    e.preventDefault();
+                    goNext();
+                  } else if (e.key === 'ArrowLeft') {
+                    e.preventDefault();
+                    goPrev();
+                  }
+                }}
+                tabIndex={0}
               >
-                <img
-                  src={step.imageUrl}
-                  alt={step.title}
-                  className="how-col-image"
-                  loading="lazy"
-                  onError={(e) => {
-                    e.currentTarget.src = '/map/map-1.png'
-                  }}
-                />
-                <span className="how-col-ghost-num" aria-hidden>{step.num}</span>
-                <div className="how-col-body">
-                  <span className="how-col-num">Schritt {step.num}</span>
-                  <h3 className="how-col-title">{step.title}</h3>
-                  <p className="how-col-desc">{step.desc}</p>
+                <div className="how-stories-slide" aria-live="polite">
+                  <article className="how-col-card how-col-card--story active">
+                    <div className="how-stories-progress how-stories-progress--inset" aria-hidden>
+                      {STEPS.map((_, i) => (
+                        <button
+                          key={i}
+                          type="button"
+                          className="how-stories-seg"
+                          onClick={() => goTo(i)}
+                          aria-label={`Schritt ${i + 1}: ${PROG_LABELS[i]}`}
+                        >
+                          <span
+                            key={i === current ? `active-${current}` : `seg-${i}`}
+                            className={`how-stories-fill${i < current ? ' is-done' : ''}${i === current ? ' is-active' : ''}${reducedMotion && i === current ? ' is-static' : ''}`}
+                            style={
+                              reducedMotion && i === current
+                                ? { width: '100%' }
+                                : { animationDuration: `${STORY_MS}ms` }
+                            }
+                          />
+                        </button>
+                      ))}
+                    </div>
+
+                    <div
+                      key={slideTick}
+                      className={`how-stories-card-anim how-stories-card-anim--${slideDir > 0 ? 'next' : 'prev'}`}
+                    >
+                      <div className="how-story-content">
+                        <span className="how-story-num" aria-label={`Schritt ${activeStep.num}`}>
+                          {activeStep.num}
+                        </span>
+                        <h3 className="how-story-title">{activeStep.title}</h3>
+                        <p className="how-story-desc">{activeStep.desc}</p>
+                      </div>
+                    </div>
+                  </article>
                 </div>
+
+                <button
+                  type="button"
+                  className="how-stories-hit how-stories-hit--prev"
+                  aria-label="Vorheriger Schritt"
+                  onClick={goPrev}
+                />
+                <button
+                  type="button"
+                  className="how-stories-hit how-stories-hit--next"
+                  aria-label="Nächster Schritt"
+                  onClick={goNext}
+                />
               </div>
-            ))}
+            ) : (
+              STEPS.map((step, i) => (
+                <HowStepCard
+                  key={`card-${i}`}
+                  step={step}
+                  active={i === current}
+                  cardRef={(el) => { cardRefs.current[i] = el; }}
+                />
+              ))
+            )}
 
             <div className="cta-block cta-block-mobile">
               <p className="cta-note">Kostenlos starten.</p>

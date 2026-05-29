@@ -456,6 +456,12 @@
   border-color: #72906F;
 }
 
+@media (max-width: 767px) {
+  #landing-main[data-theme='dark'] .partner-apotheken-map-wrap {
+    border-color: #fff;
+  }
+}
+
 #landing-main[data-theme='light'] .partner-apotheken-section {
   --pa-bg: #f8fafc;
   --pa-accent: #0f9f6e;

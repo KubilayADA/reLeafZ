@@ -212,4 +212,20 @@
   html:has(.pharmacy-dashboard) {
     background: #0a0f0a;
   }
+  /* Marketplace — always light page chrome */
+  body:has(.marketplace-page) {
+    background: #fff;
+    color: #111827;
+  }
+  html:has(.marketplace-page) {
+    background: #fff;
+  }
+  /* Payment — light page chrome */
+  body:has(.payment-page) {
+    background: #fbfdfb;
+    color: #111827;
+  }
+  html:has(.payment-page) {
+    background: #fbfdfb;
+  }
 }

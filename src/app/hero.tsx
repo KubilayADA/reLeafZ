@@ -152,7 +152,7 @@ export function MobileHero({ setDialogOpen }: { setDialogOpen: (open: boolean) =
             type="button"
             className="mobile-hero__row-trigger"
             onClick={() => {
-              const el = document.getElementById('partner-apotheken')
+              const el = document.getElementById('ablauf')
               if (!el) return
               const top = Math.max(0, el.getBoundingClientRect().top + window.scrollY + 40)
               window.scrollTo({ top, behavior: 'smooth' })

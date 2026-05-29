@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { CheckCircle2, Package, FileText, Clock } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { API_BASE } from '@/lib/api'
+import '../payment.css'
 
 function PaymentSuccessContent() {
   const router = useRouter()
@@ -70,9 +71,9 @@ function PaymentSuccessContent() {
 
   if (sessionError) {
     return (
-      <div className="min-h-screen bg-beige inconsolata flex items-center justify-center px-4">
-        <div className="text-center max-w-md">
-          <p className="text-lg font-bold text-red-600 mb-2">Something went wrong with your session</p>
+      <div className="payment-page payment-page--centered px-4">
+        <div className="payment-shell payment-shell--narrow text-center">
+          <p className="text-lg font-bold text-red-600">Something went wrong with your session</p>
           <p className="subtitle-text text-sm">Please contact support — your payment may still have been processed.</p>
         </div>
       </div>
@@ -81,7 +82,7 @@ function PaymentSuccessContent() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-beige inconsolata flex items-center justify-center">
+      <div className="payment-page payment-page--centered">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-4 border-green-600 border-t-transparent mx-auto mb-4"></div>
           <p className="subtitle-text">Finalizing your request...</p>
@@ -92,9 +93,9 @@ function PaymentSuccessContent() {
 
   if (paymentType === 'prescription') {
     return (
-      <div className="min-h-screen bg-beige inconsolata py-12 px-4">
-        <div className="max-w-2xl mx-auto">
-          <div className="text-center mb-8">
+      <div className="payment-page">
+        <div className="payment-shell">
+          <div className="payment-shell__intro">
             <div className="inline-flex items-center justify-center w-20 h-20 bg-green-500 rounded-full mb-4 animate-bounce">
               <CheckCircle2 className="w-12 h-12 text-white" />
             </div>
@@ -106,8 +107,7 @@ function PaymentSuccessContent() {
             </p>
           </div>
 
-          <div className="bg-white rounded-2xl border-2 border-black p-8 shadow-xl mb-6">
-            <div className="space-y-6">
+          <div className="payment-section space-y-6">
               <div className="flex items-center gap-4 p-4 bg-green-50 rounded-lg border-2 border-green-500">
                 <CheckCircle2 className="w-6 h-6 text-green-600" />
                 <div>
@@ -163,25 +163,23 @@ function PaymentSuccessContent() {
                 </p>
               </div>
             </div>
-          </div>
 
-          <div className="text-center">
-            <Button 
-              onClick={() => router.push('/')}
-              className="btn-primary inconsolata px-8"
-            >
-              Return to Home
-            </Button>
-          </div>
+          <Button
+            onClick={() => router.push('/')}
+            variant="outline"
+            className="payment-btn payment-btn--nav payment-btn--block"
+          >
+            Return to Home
+          </Button>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-beige inconsolata py-12 px-4">
-      <div className="max-w-2xl mx-auto">
-        <div className="text-center mb-8">
+    <div className="payment-page">
+      <div className="payment-shell">
+        <div className="payment-shell__intro">
           <div className="inline-flex items-center justify-center w-20 h-20 bg-green-500 rounded-full mb-4 animate-bounce">
             <Package className="w-12 h-12 text-white" />
           </div>
@@ -193,8 +191,8 @@ function PaymentSuccessContent() {
           </p>
         </div>
 
-        <div className="bg-white rounded-2xl border-2 border-black p-8 shadow-xl mb-6">
-          <div className="flex items-center gap-4 p-4 bg-green-50 rounded-lg border-2 border-green-500 mb-6">
+        <div className="payment-section space-y-4">
+          <div className="flex items-center gap-4 p-4 bg-green-50 rounded-lg border-2 border-green-500">
             <CheckCircle2 className="w-6 h-6 text-green-600" />
             <div>
               <p className="font-bold text-green-900">Payment Successful</p>
@@ -225,14 +223,13 @@ function PaymentSuccessContent() {
           </div>
         </div>
 
-        <div className="text-center">
-          <Button 
-            onClick={() => router.push('/')}
-            className="btn-primary inconsolata px-8"
-          >
-            Return to Home
-          </Button>
-        </div>
+        <Button
+          onClick={() => router.push('/')}
+          variant="outline"
+          className="payment-btn payment-btn--nav payment-btn--block"
+        >
+          Return to Home
+        </Button>
       </div>
     </div>
   )
@@ -241,7 +238,7 @@ function PaymentSuccessContent() {
 export default function PaymentSuccessPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen bg-beige inconsolata flex items-center justify-center">
+      <div className="payment-page payment-page--centered">
         <div className="animate-spin rounded-full h-12 w-12 border-4 border-green-600 border-t-transparent mx-auto mb-4"></div>
       </div>
     }>
