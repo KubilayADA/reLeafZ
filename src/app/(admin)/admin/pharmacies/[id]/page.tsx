@@ -18,6 +18,11 @@ type Pharmacy = {
   inventorySource?: string
   cannaleoSubdomain?: string
   cannaleoVendorId?: string
+  cannaleoApiKey?: string
+  supportsBotendienst?: boolean
+  supportsPickup?: boolean
+  supportsMailOrder?: boolean
+  mailOrderFee?: number | null
   _count?: { treatmentRequests: number; products: number }
   recentTreatmentRequests?: Array<{
     id: number
@@ -100,6 +105,16 @@ export default function AdminPharmacyDetailPage() {
             <div className="flex justify-between"><span className="text-gray-500">City</span><span>{pharmacy.city ?? '—'}</span></div>
             <div className="flex justify-between"><span className="text-gray-500">ZIP</span><span>{pharmacy.zip}</span></div>
             <div className="flex justify-between"><span className="text-gray-500">Delivery</span><span>{pharmacy.deliveryType}</span></div>
+            <div className="flex justify-between"><span className="text-gray-500">Botendienst</span><span>{pharmacy.supportsBotendienst ? 'Enabled' : 'Disabled'}</span></div>
+            <div className="flex justify-between"><span className="text-gray-500">Pickup</span><span>{pharmacy.supportsPickup ? 'Enabled' : 'Disabled'}</span></div>
+            <div className="flex justify-between">
+              <span className="text-gray-500">Mail Order (DHL)</span>
+              <span>
+                {pharmacy.supportsMailOrder
+                  ? `Enabled — €${(pharmacy.mailOrderFee ?? 0).toFixed(2)}`
+                  : 'Disabled'}
+              </span>
+            </div>
             <div className="flex justify-between"><span className="text-gray-500">Products</span><span>{pharmacy._count?.products ?? 0}</span></div>
             <div className="flex justify-between"><span className="text-gray-500">Requests</span><span>{pharmacy._count?.treatmentRequests ?? 0}</span></div>
           </div>
@@ -111,6 +126,7 @@ export default function AdminPharmacyDetailPage() {
             <div className="space-y-2 text-sm mb-4">
               <div className="flex justify-between"><span className="text-gray-500">Subdomain</span><span className="font-mono text-xs">{pharmacy.cannaleoSubdomain ?? '—'}</span></div>
               <div className="flex justify-between"><span className="text-gray-500">Vendor ID</span><span className="font-mono text-xs">{pharmacy.cannaleoVendorId ?? '—'}</span></div>
+              <div className="flex justify-between"><span className="text-gray-500">API Key</span><span>{pharmacy.cannaleoApiKey ? '••••••• Set' : 'Not set'}</span></div>
             </div>
             <button
               onClick={handleSync}

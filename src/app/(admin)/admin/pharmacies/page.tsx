@@ -35,6 +35,11 @@ const emptyForm = {
   deliveryType: 'BOTH',
   cannaleoSubdomain: '',
   cannaleoVendorId: '',
+  cannaleoApiKey: '',
+  supportsBotendienst: false,
+  supportsPickup: true,
+  supportsMailOrder: false,
+  mailOrderFee: '',
 }
 
 export default function AdminPharmaciesPage() {
@@ -72,8 +77,24 @@ export default function AdminPharmaciesPage() {
 
   async function handleAdd(e: React.FormEvent) {
     e.preventDefault()
-    setAdding(true)
     setAddError('')
+
+    let parsedMailOrderFee: number | undefined = undefined
+    if (addForm.supportsMailOrder) {
+      const fee = Number(addForm.mailOrderFee)
+      if (!Number.isFinite(fee) || fee <= 0) {
+        setAddError('Mail-order fee must be a positive number when DHL is enabled.')
+        return
+      }
+      parsedMailOrderFee = fee
+    }
+
+    if (!addForm.supportsBotendienst && !addForm.supportsPickup && !addForm.supportsMailOrder) {
+      setAddError('Pharmacy must support at least one delivery method.')
+      return
+    }
+
+    setAdding(true)
     try {
       await createPharmacy({
         name: addForm.name,
@@ -86,6 +107,11 @@ export default function AdminPharmaciesPage() {
         deliveryType: addForm.deliveryType,
         cannaleoSubdomain: addForm.cannaleoSubdomain || undefined,
         cannaleoVendorId: addForm.cannaleoVendorId || undefined,
+        cannaleoApiKey: addForm.cannaleoApiKey || undefined,
+        supportsBotendienst: addForm.supportsBotendienst,
+        supportsPickup: addForm.supportsPickup,
+        supportsMailOrder: addForm.supportsMailOrder,
+        mailOrderFee: parsedMailOrderFee,
       })
       setShowForm(false)
       setAddForm(emptyForm)
@@ -188,6 +214,7 @@ export default function AdminPharmaciesPage() {
                       <option value="BOTH">Botendienst + Pickup</option>
                       <option value="BOTENDIENST">Botendienst only</option>
                       <option value="PICKUP_ONLY">Pickup only</option>
+                      <option value="MAIL_ORDER">Mail Order (DHL)</option>
                     </select>
                   </div>
                 </div>
@@ -207,6 +234,80 @@ export default function AdminPharmaciesPage() {
                         onChange={(e) => setAddForm(f => ({ ...f, cannaleoVendorId: e.target.value }))}
                         className="w-full rounded-lg border border-gray-200 bg-white px-3.5 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100" />
                     </div>
+                    <div>
+                      <label className="block text-xs font-semibold uppercase tracking-wide text-gray-500 mb-1.5">Cannaleo API Key</label>
+                      <input
+                        type="password"
+                        placeholder="eyJhbGciOi..."
+                        value={addForm.cannaleoApiKey}
+                        onChange={(e) => setAddForm(f => ({ ...f, cannaleoApiKey: e.target.value }))}
+                        className="w-full rounded-lg border border-blue-200 bg-white px-3.5 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                      />
+                      <p className="mt-1 text-xs text-blue-700/70">
+                        JWT-format key issued by Cannaleo per pharmacy. Treat as a password.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="rounded-lg bg-amber-50 border border-amber-200 px-4 py-3">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-amber-700 mb-3">Delivery Capabilities</p>
+                  <p className="text-xs text-amber-700/80 mb-3">
+                    Configure which delivery methods this pharmacy supports. Customers
+                    will only see methods that are enabled here.
+                  </p>
+                  <div className="space-y-3">
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={addForm.supportsBotendienst}
+                        onChange={(e) => setAddForm(f => ({ ...f, supportsBotendienst: e.target.checked }))}
+                        className="w-4 h-4 rounded border-gray-300 text-amber-600 focus:ring-amber-500"
+                      />
+                      <span className="text-sm text-gray-700">Supports Botendienst (own courier)</span>
+                    </label>
+
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={addForm.supportsPickup}
+                        onChange={(e) => setAddForm(f => ({ ...f, supportsPickup: e.target.checked }))}
+                        className="w-4 h-4 rounded border-gray-300 text-amber-600 focus:ring-amber-500"
+                      />
+                      <span className="text-sm text-gray-700">Supports Pickup (walk-in)</span>
+                    </label>
+
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={addForm.supportsMailOrder}
+                        onChange={(e) => setAddForm(f => ({
+                          ...f,
+                          supportsMailOrder: e.target.checked,
+                          mailOrderFee: e.target.checked ? f.mailOrderFee : '',
+                        }))}
+                        className="w-4 h-4 rounded border-gray-300 text-amber-600 focus:ring-amber-500"
+                      />
+                      <span className="text-sm text-gray-700">Supports Mail Order (DHL)</span>
+                    </label>
+
+                    {addForm.supportsMailOrder && (
+                      <div className="pl-6 mt-2">
+                        <label className="block text-xs font-semibold uppercase tracking-wide text-gray-500 mb-1.5">
+                          Mail-Order Fee (EUR) *
+                        </label>
+                        <input
+                          type="number"
+                          step="0.01"
+                          min="0.01"
+                          required
+                          placeholder="5.99"
+                          value={addForm.mailOrderFee}
+                          onChange={(e) => setAddForm(f => ({ ...f, mailOrderFee: e.target.value }))}
+                          className="w-full rounded-lg border border-gray-200 bg-white px-3.5 py-2.5 text-sm outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-100"
+                        />
+                      </div>
+                    )}
                   </div>
                 </div>
 

@@ -191,6 +191,11 @@ export async function createPharmacy(data: {
   deliveryType?: string
   cannaleoSubdomain?: string
   cannaleoVendorId?: string
+  cannaleoApiKey?: string
+  supportsBotendienst?: boolean
+  supportsPickup?: boolean
+  supportsMailOrder?: boolean
+  mailOrderFee?: number
 }): Promise<unknown> {
   return fetchAdmin('/api/admin/pharmacies', {
     method: 'POST',
