@@ -106,6 +106,62 @@ function StatusBadge({ status }: { status: string }) {
   )
 }
 
+type DeliveryMethodLabel = {
+  label: string
+  className: string
+  icon: string
+}
+
+function getDeliveryMethodDisplay(
+  method: string | null | undefined,
+): DeliveryMethodLabel {
+  if (!method) {
+    return {
+      label: 'Unbekannt',
+      className: 'bg-slate-500 text-slate-50',
+      icon: '—',
+    }
+  }
+  if (method === 'DHL') {
+    return {
+      label: 'DHL Versand',
+      className: 'bg-amber-500 text-amber-50',
+      icon: '📦',
+    }
+  }
+  if (method === 'BOTENDIENST_NEARBY' || method === 'BOTENDIENST_FAR') {
+    return {
+      label: 'Botendienst',
+      className: 'bg-sky-500 text-sky-50',
+      icon: '🚴',
+    }
+  }
+  if (method === 'PICKUP') {
+    return {
+      label: 'Abholung',
+      className: 'bg-emerald-500 text-emerald-50',
+      icon: '🏪',
+    }
+  }
+  return {
+    label: method,
+    className: 'bg-slate-500 text-slate-50',
+    icon: '—',
+  }
+}
+
+function DeliveryMethodBadge({ method }: { method: string | null | undefined }) {
+  const { label, className, icon } = getDeliveryMethodDisplay(method)
+  return (
+    <span
+      className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium ${className}`}
+    >
+      <span>{icon}</span>
+      <span>{label}</span>
+    </span>
+  )
+}
+
 function Skeleton({ className = '' }: { className?: string }) {
   return <div className={`animate-pulse rounded-2xl bg-white/[0.04] ${className}`} />
 }
@@ -236,7 +292,7 @@ export default function PharmacyDashboard() {
   const handleStockUpdate = async () => { if (!editingStock || !pharmacyId) return; try { setProductLoading(true); await updateProduct(editingStock.id, { stock: editingStock.value }); setEditingStock(null); await loadInventory(pharmacyId, buildInventoryFilters()) } catch (e: unknown) { setError(e instanceof Error ? e.message : 'Fehler') } finally { setProductLoading(false) } }
   const handleInventorySortToggle = (col: string) => { if (inventorySortBy === col) setInventorySortOrder(p => p === 'asc' ? 'desc' : 'asc'); else { setInventorySortBy(col); setInventorySortOrder('asc') } }
 
-  const renderNextStatusButton = (order: { id: number; status: string; deliveryMethod?: string }) => {
+  const renderNextStatusButton = (order: { id: number; status: string; deliveryMethod?: string | null }) => {
     let allowed = STATUS_TRANSITIONS[order.status] ?? [];
     if (order.status === 'READY') {
       allowed = order.deliveryMethod?.includes('BOTENDIENST')
@@ -440,13 +496,14 @@ export default function PharmacyDashboard() {
               <div className={`${G.card} overflow-hidden`}>
                 <table className="w-full">
                   <thead><tr className="border-b border-white/[0.06]">
-                    <th className={`${G.th} text-left`}>ID</th><th className={`${G.th} text-left`}>Patient</th><th className={`${G.th} text-left`}>Status</th><th className={`${G.th} text-right`}>Betrag</th><th className={`${G.th} text-right hidden md:table-cell`}>Erstellt</th><th className={`${G.th} text-right hidden lg:table-cell`}>Aktualisiert</th><th className={`${G.th} text-right`}>Aktionen</th>
+                    <th className={`${G.th} text-left`}>ID</th><th className={`${G.th} text-left`}>Patient</th><th className={`${G.th} text-left`}>Status</th><th className={`${G.th} text-left`}>Lieferung</th><th className={`${G.th} text-right`}>Betrag</th><th className={`${G.th} text-right hidden md:table-cell`}>Erstellt</th><th className={`${G.th} text-right hidden lg:table-cell`}>Aktualisiert</th><th className={`${G.th} text-right`}>Aktionen</th>
                   </tr></thead>
                   <tbody className="divide-y divide-white/[0.04]">{ordersResponse.data.map(o => (
                     <tr key={o.id} className="hover:bg-white/[0.03] transition-colors group">
                       <td className={`${G.td} text-xs font-mono text-white/30`}>#{o.id}</td>
                       <td className={G.td}><p className="text-sm font-medium text-white/80">{o.patientName}</p><p className="text-[11px] text-white/25">{o.patientEmail}</p></td>
                       <td className={G.td}><StatusBadge status={o.status} /></td>
+                      <td className={G.td}><DeliveryMethodBadge method={o.deliveryMethod} /></td>
                       <td className={`${G.td} text-sm font-semibold text-white/80 text-right`}>{o.totalPrice ? formatEUR(o.totalPrice) : '—'}</td>
                       <td className={`${G.td} text-xs text-white/25 text-right hidden md:table-cell`}>{formatShortDate(o.createdAt)}</td>
                       <td className={`${G.td} text-xs text-white/25 text-right hidden lg:table-cell`}>{formatShortDate(o.updatedAt)}</td>
@@ -470,7 +527,7 @@ export default function PharmacyDashboard() {
               {orderDetailLoading ? <div className="p-10 space-y-4"><Skeleton className="h-8 w-48" /><Skeleton className="h-16" /><Skeleton className="h-32" /><Skeleton className="h-24" /></div>
               : selectedOrderDetail ? <>
                 <div className="sticky top-0 bg-[#0a0f0a]/80 backdrop-blur-xl border-b border-white/[0.06] px-6 py-4 flex items-center justify-between rounded-t-2xl z-10">
-                  <div className="flex items-center gap-3"><div className="w-9 h-9 rounded-xl bg-white/[0.06] flex items-center justify-center"><FileText size={15} className="text-white/40" /></div><div><h2 className="text-lg font-bold text-white">Bestellung #{selectedOrderDetail.id}</h2><StatusBadge status={selectedOrderDetail.status} /></div></div>
+                  <div className="flex items-center gap-3"><div className="w-9 h-9 rounded-xl bg-white/[0.06] flex items-center justify-center"><FileText size={15} className="text-white/40" /></div><div><h2 className="text-lg font-bold text-white">Bestellung #{selectedOrderDetail.id}</h2><div className="flex flex-wrap items-center gap-2 mt-1"><StatusBadge status={selectedOrderDetail.status} /><DeliveryMethodBadge method={selectedOrderDetail.deliveryMethod} /></div></div></div>
                   <button onClick={() => { setShowOrderDetail(false); setSelectedOrderDetail(null) }} className="p-2 text-white/20 hover:text-white/60 rounded-xl hover:bg-white/[0.06] transition-all"><X size={18} /></button>
                 </div>
                 <div className="p-6 space-y-6">

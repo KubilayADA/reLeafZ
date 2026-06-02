@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
-import { ArrowLeft, Bike, Store } from 'lucide-react'
+import { ArrowLeft, Bike, Package, Store } from 'lucide-react'
 import StepProgress from '@/form/step-progress'
 import FormLogoHomeExit from '@/form/form-logo-home-exit'
 import '@/form/form.css'
@@ -14,7 +14,7 @@ interface Step2Props {
   onSelectionChange?: (selectedOption: string) => void
 }
 
-type DeliveryOption = 'BOTENDIENST' | 'PICKUP'
+type DeliveryOption = 'BOTENDIENST' | 'DHL' | 'PICKUP'
 
 export default function Step2({ onNext, onBack, initialValue = '', onSelectionChange }: Step2Props) {
   const [selectedOption, setSelectedOption] = useState<DeliveryOption | ''>(
@@ -32,6 +32,13 @@ export default function Step2({ onNext, onBack, initialValue = '', onSelectionCh
       description: 'Lieferung in 60–90 Min. durch Apotheken-Botendienst (Mo–So: 09:00–21:30 Uhr)',
       icon: Bike,
       time: '60-90 Min.'
+    },
+    {
+      id: 'DHL' as DeliveryOption,
+      title: 'DHL Versand',
+      description: 'Lieferung per DHL in 1–3 Werktagen. Bequem zu dir nach Hause oder an eine Wunschadresse.',
+      icon: Package,
+      time: '1-3 Werktage'
     },
     {
       id: 'PICKUP' as DeliveryOption,
@@ -69,7 +76,7 @@ export default function Step2({ onNext, onBack, initialValue = '', onSelectionCh
             Berlin: Wähle deine Versandart und Apotheke aus *
           </p>
 
-          <div className="form-options form-options--cols-2 form-options--center form-options--step2-fit">
+          <div className="form-options form-options--cols-3 form-options--center form-options--step2-fit">
             {options.map((option) => {
               const Icon = option.icon
               const isSelected = selectedOption === option.id

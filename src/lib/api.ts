@@ -102,7 +102,8 @@ export interface PharmacyOrder {
   patientEmail: string;
   patientPhone: string;
   status: string;
-  deliveryMethod?: string;
+  deliveryMethod?: string | null;
+  deliveryFee?: number | null;
   symptoms: string;
   createdAt: string;
   updatedAt: string;
@@ -154,7 +155,8 @@ export interface OrderDetail {
   patientEmail: string;
   patientPhone: string;
   status: string;
-  deliveryMethod?: string;
+  deliveryMethod?: string | null;
+  deliveryFee?: number | null;
   createdAt: string;
   updatedAt: string;
   selectedProducts: Array<{
