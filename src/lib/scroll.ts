@@ -84,7 +84,17 @@ export function attachLandingBinarySwitch(): () => void {
     window.requestAnimationFrame(tick)
   }
 
+  const isHeroAccordionBlockingScroll = () => {
+    if (document.documentElement.dataset.heroAccordionOpen !== 'true') return false
+    const hero = document.getElementById('hero')
+    if (!hero) return true
+    const heroBottom = hero.getBoundingClientRect().bottom + window.scrollY
+    return window.scrollY < heroBottom - HEADER_OFFSET - SWITCH_EPSILON
+  }
+
   const onWheel = (e: WheelEvent) => {
+    if (isHeroAccordionBlockingScroll()) return
+
     const mainTop = getLandingMainTop()
     const y = window.scrollY
     const crossingBridge = y > SWITCH_EPSILON && y < mainTop - SWITCH_EPSILON
@@ -116,7 +126,7 @@ export function attachLandingBinarySwitch(): () => void {
   }
 
   const onScroll = () => {
-    if (animating) return
+    if (animating || isHeroAccordionBlockingScroll()) return
     const mainTop = getLandingMainTop()
     const y = window.scrollY
     const crossingBridge = y > SWITCH_EPSILON && y < mainTop - SWITCH_EPSILON
