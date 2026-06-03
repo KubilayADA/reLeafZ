@@ -9,6 +9,8 @@ import {
   PhoneCall, Store, HeartHandshake,
 } from 'lucide-react'
 import { scrollToLandingTop } from '@/lib/scroll'
+import { heroParticlesOptions } from '@/constants/particles'
+import SectionParticlesBackground from '@/components/ui/SectionParticlesBackground'
 import { HeroImageCarousel } from './hero-carousel'
 import './header.css'
 import './hero-mobile.css'
@@ -21,6 +23,32 @@ interface HeroProps {
 }
 
 type AccordionRow = 'trust' | 'behandlung' | null
+
+type HeroZStar = {
+  left: number
+  top: number
+  size: number
+  duration: number
+  delay: number
+  rotate: number
+}
+
+function buildHeroZStars(count: number): HeroZStar[] {
+  const stars: HeroZStar[] = []
+  for (let i = 0; i < count; i++) {
+    stars.push({
+      left: ((i * 7919) % 10000) / 100,
+      top: ((i * 6151 + 17) % 10000) / 100,
+      size: [9, 10, 11, 13, 16][i % 5],
+      duration: 2 + (i % 6),
+      delay: ((i * 131) % 100) / 25,
+      rotate: ((i * 53) % 40) - 20,
+    })
+  }
+  return stars
+}
+
+const HERO_Z_STARS = buildHeroZStars(200)
 
 const HERO_NAV_LINKS = [
   { href: '#ablauf', label: 'Ablauf', scrollKey: 'ablauf' as const },
@@ -283,9 +311,37 @@ export default function Hero({
           />
           <div className="absolute inset-0 bg-black/20" /> */}
           <div
-            className={`absolute inset-0 ${landingTheme === 'dark' ? 'bg-black' : 'bg-white'}`}
+            className={`hero-section__bg-base absolute inset-0 ${landingTheme === 'dark' ? 'bg-black' : 'bg-white'}`}
             aria-hidden
           />
+          <SectionParticlesBackground
+            className="hero-section__particles"
+            options={heroParticlesOptions}
+          />
+          <div className="hero-section__z-stars" aria-hidden>
+            {HERO_Z_STARS.map((star, i) => (
+              <span
+                key={i}
+                className={`hero-section__z-star${
+                  i % 4 === 0
+                    ? ' hero-section__z-star--cyan'
+                    : i % 9 === 0
+                      ? ' hero-section__z-star--soft'
+                      : ''
+                }`}
+                style={{
+                  left: `${star.left}%`,
+                  top: `${star.top}%`,
+                  fontSize: `${star.size}px`,
+                  transform: `rotate(${star.rotate}deg)`,
+                  animationDuration: `${star.duration}s`,
+                  animationDelay: `${star.delay}s`,
+                }}
+              >
+                z
+              </span>
+            ))}
+          </div>
         </div>
 
         <button
