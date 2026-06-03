@@ -21,6 +21,11 @@
   /* Chunky “neumorphic” card/button edges — dark: light edges so they read on #0a0a0a */
   --how-chunk-border-tl: #72906F;
   --how-chunk-border-br: #72906F;
+  /* Neobrutalist frame — matches page.tsx dialogInputStyle */
+  --how-neo-border: #333;
+  --how-neo-border-width: 2.5px 2.5px 4px 2.5px;
+  --how-neo-border-round: 2.5px;
+  --how-neo-shadow: 4px 4px 0 0 #333;
   --how-mono: var(--releafz-mono);
   --how-sans: var(--releafz-sans);
   --how-ease: cubic-bezier(0.4, 0, 0.2, 1);
@@ -305,21 +310,26 @@
   transition:
     background 0.25s var(--how-ease),
     border-color 0.25s var(--how-ease),
+    border-width 0.25s var(--how-ease),
     color 0.25s var(--how-ease),
     transform 0.25s var(--how-ease),
     box-shadow 0.25s var(--how-ease);
   position: relative;
   z-index: 1;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 .how-funktioniert .prog-step.active .prog-dot {
-  background: linear-gradient(145deg, rgba(16, 185, 129, 0.95), rgba(5, 150, 105, 0.98));
-  border-color: rgba(34, 211, 238, 0.5);
-  color: #fff;
-  transform: scale(1.12);
-  box-shadow:
-    0 0 0 4px rgba(16, 185, 129, 0.25),
-    0 0 28px rgba(34, 211, 238, 0.35);
+  background: #ffffff;
+  border: var(--how-neo-border-round) solid var(--how-neo-border);
+  color: #0f172a;
+  transform: scale(1.06) translateZ(0);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  box-shadow: var(--how-neo-shadow);
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
 }
 
 .how-funktioniert .prog-step.done .prog-dot {
@@ -385,7 +395,7 @@
 
 .how-funktioniert .how-stories-slide:has(.how-col-card--story.active) {
   box-shadow:
-    0 8px 36px rgba(0, 0, 0, 0.45),
+    var(--how-neo-shadow),
     0 0 40px rgba(34, 211, 238, 0.08);
 }
 
@@ -417,18 +427,33 @@
   font-weight: 800;
   letter-spacing: 0.04em;
   color: #000000;
-  background: rgba(255, 255, 255, 0.94);
-  border-top: 2.5px solid #000;
-  border-left: 2.5px solid #000;
-  border-right: 4px solid #000;
-  border-bottom: 4px solid #000;
+  background: #ffffff;
+  border: var(--how-neo-border-round) solid var(--how-neo-border);
   border-radius: 999px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  box-shadow: var(--how-neo-shadow);
   line-height: 1;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
 }
 
-.how-funktioniert .how-story-title {
+.how-funktioniert .how-story-copy {
+  width: 100%;
+  max-width: 20rem;
   margin: 0;
+  padding: 1rem 1.15rem 1.1rem;
+  box-sizing: border-box;
+  text-align: center;
+  background: #ffffff;
+  border-style: solid;
+  border-color: var(--how-neo-border);
+  border-width: var(--how-neo-border-width);
+  border-radius: 0.875rem;
+  box-shadow: var(--how-neo-shadow);
+  background-clip: padding-box;
+}
+
+.how-funktioniert .how-story-copy .how-story-title {
+  margin: 0 0 0.65rem;
   width: 100%;
   max-width: 100%;
   font-family: var(--how-sans);
@@ -436,21 +461,17 @@
   font-weight: 800;
   line-height: 1.2;
   letter-spacing: -0.03em;
-  color: #ffffff;
-  text-shadow:
-    0 0 28px rgba(34, 211, 238, 0.45),
-    0 2px 18px rgba(15, 23, 42, 0.35);
+  color: #0f172a;
 }
 
-.how-funktioniert .how-story-desc {
+.how-funktioniert .how-story-copy .how-story-desc {
   margin: 0;
-  max-width: 18rem;
+  max-width: none;
   font-family: var(--how-sans);
   font-size: clamp(0.88rem, 3.6vw, 0.98rem);
-  font-weight: 400;
+  font-weight: 500;
   line-height: 1.55;
-  color: rgba(255, 255, 255, 0.88);
-  text-shadow: 0 1px 10px rgba(15, 23, 42, 0.25);
+  color: rgba(15, 23, 42, 0.78);
 }
 
 /* Instagram-style stories viewer (all breakpoints) */
@@ -464,15 +485,16 @@
     --how-stories-card-h: 30rem;
   }
 
-  .how-funktioniert .how-story-title {
+  .how-funktioniert .how-story-copy {
+    max-width: 26rem;
+    padding: 1.1rem 1.35rem 1.15rem;
+  }
+
+  .how-funktioniert .how-story-copy .how-story-title {
     font-size: clamp(1.15rem, 2.2vw, 1.5rem);
     white-space: normal;
     overflow: visible;
     text-overflow: unset;
-  }
-
-  .how-funktioniert .how-story-desc {
-    max-width: 28rem;
   }
 }
 
@@ -561,13 +583,13 @@
   height: var(--how-stories-card-h);
   min-height: var(--how-stories-card-h);
   border-radius: var(--how-radius-lg);
-  border-top: 2.5px solid #000;
-  border-left: 2.5px solid #000;
-  border-right: 4px solid #000;
-  border-bottom: 4px solid #000;
+  border-style: solid;
+  border-color: var(--how-neo-border);
+  border-width: var(--how-neo-border-width);
   box-sizing: border-box;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  box-shadow: var(--how-neo-shadow);
   background: #0a0a0a;
+  background-clip: padding-box;
 }
 
 .how-funktioniert .how-stories-card-anim {
@@ -773,13 +795,13 @@
     --how-chunk-border-br: #333;
   }
 
-  .how-funktioniert .how-stories-slide .how-story-title {
+  .how-funktioniert .how-stories-slide .how-story-copy .how-story-title {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
   }
 
-  .how-funktioniert .how-stories-slide .how-story-desc {
+  .how-funktioniert .how-stories-slide .how-story-copy .how-story-desc {
     overflow: hidden;
     display: -webkit-box;
     -webkit-box-orient: vertical;
@@ -910,17 +932,22 @@
 
 #landing-main[data-theme='light'] .how-funktioniert .how-stories-slide,
 .how-funktioniert.theme-light .how-stories-slide {
-  border-top-color: #000;
-  border-left-color: #000;
-  border-right-color: #000;
-  border-bottom-color: #000;
-  box-shadow: 0 10px 36px rgba(2, 6, 23, 0.08);
+  border-color: var(--how-neo-border);
+  box-shadow: var(--how-neo-shadow);
 }
 
 #landing-main[data-theme='light'] .how-funktioniert .prog-dot,
 .how-funktioniert.theme-light .prog-dot {
   background: rgba(255, 255, 255, 0.9);
   color: #334155;
+}
+
+#landing-main[data-theme='light'] .how-funktioniert .prog-step.active .prog-dot,
+.how-funktioniert.theme-light .prog-step.active .prog-dot {
+  background: #ffffff;
+  border: var(--how-neo-border-round) solid var(--how-neo-border);
+  color: #0f172a;
+  box-shadow: var(--how-neo-shadow);
 }
 
 #landing-main[data-theme='light'] .how-funktioniert .btn-cta,
@@ -932,19 +959,24 @@
 #landing-main[data-theme='light'] .how-funktioniert .how-story-num,
 .how-funktioniert.theme-light .how-story-num {
   color: #000000;
-  background: rgba(255, 255, 255, 0.94);
-  border-top-color: #000;
-  border-left-color: #000;
-  border-right-color: #000;
-  border-bottom-color: #000;
+  background: #ffffff;
+  border-color: var(--how-neo-border);
+  box-shadow: var(--how-neo-shadow);
 }
 
-#landing-main[data-theme='light'] .how-funktioniert .how-story-title,
-.how-funktioniert.theme-light .how-story-title {
-  color: #ffffff;
+#landing-main[data-theme='light'] .how-funktioniert .how-story-copy,
+.how-funktioniert.theme-light .how-story-copy {
+  background: #ffffff;
+  border-color: var(--how-neo-border);
+  box-shadow: var(--how-neo-shadow);
 }
 
-#landing-main[data-theme='light'] .how-funktioniert .how-story-desc,
-.how-funktioniert.theme-light .how-story-desc {
-  color: rgba(255, 255, 255, 0.88);
+#landing-main[data-theme='light'] .how-funktioniert .how-story-copy .how-story-title,
+.how-funktioniert.theme-light .how-story-copy .how-story-title {
+  color: #0f172a;
+}
+
+#landing-main[data-theme='light'] .how-funktioniert .how-story-copy .how-story-desc,
+.how-funktioniert.theme-light .how-story-copy .how-story-desc {
+  color: rgba(15, 23, 42, 0.78);
 }
