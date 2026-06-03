@@ -16,6 +16,16 @@
   .mobile-hero {
     display: flex;
   }
+
+  .mobile-hero:has(.mobile-hero__row:first-child.is-open) {
+    min-height: 100dvh;
+    height: auto;
+  }
+
+  .mobile-hero:has(.mobile-hero__row.is-open) .mobile-hero__rows {
+    flex: none;
+    justify-content: flex-start;
+  }
 }
 
 @media (min-width: 768px) {
@@ -198,7 +208,7 @@
   font-weight: 300;
   line-height: 1;
   flex-shrink: 0;
-  transition: transform 420ms cubic-bezier(0.22, 0.61, 0.36, 1);
+  transition: transform 620ms cubic-bezier(0.33, 1, 0.68, 1);
   width: 32px;
   text-align: center;
   color: rgba(15, 23, 42, 0.5);
@@ -219,7 +229,7 @@
 .mobile-hero__panel {
   display: grid;
   grid-template-rows: 0fr;
-  transition: grid-template-rows 460ms cubic-bezier(0.22, 0.61, 0.36, 1);
+  transition: grid-template-rows 620ms cubic-bezier(0.33, 1, 0.68, 1);
 }
 
 .mobile-hero__row.is-open .mobile-hero__panel {
@@ -228,13 +238,34 @@
 
 .mobile-hero__panel-inner {
   overflow: hidden;
+  min-height: 0;
   opacity: 0;
-  transition: opacity 260ms ease;
+  transform: translateY(-6px);
+  transition:
+    opacity 420ms cubic-bezier(0.33, 1, 0.68, 1) 100ms,
+    transform 620ms cubic-bezier(0.33, 1, 0.68, 1) 100ms;
 }
 
 .mobile-hero__row.is-open .mobile-hero__panel-inner {
   opacity: 1;
-  transition-delay: 80ms;
+  transform: translateY(0);
+}
+
+.hero-section--expanded .mobile-hero__row.is-open .mobile-hero__panel-inner {
+  overflow: visible;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mobile-hero__panel,
+  .mobile-hero__panel-inner,
+  .mobile-hero__row-indicator {
+    transition-duration: 0.01ms !important;
+    transition-delay: 0ms !important;
+  }
+
+  .mobile-hero__panel-inner {
+    transform: none;
+  }
 }
 
 .mobile-hero__panel-inner > :first-child {
@@ -380,10 +411,23 @@
 
 .mobile-hero__payment-methods {
   display: block;
-  width: min(100%, 260px);
+  width: min(100%, 320px);
   height: auto;
-  margin: 12px auto 0;
+  margin: 14px auto 0;
   opacity: 0.96;
+}
+
+@media (min-width: 768px) {
+  .hero-accordion .mobile-hero__payment-methods {
+    width: min(100%, 400px);
+    margin-top: 16px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .hero-accordion .mobile-hero__payment-methods {
+    width: min(100%, 440px);
+  }
 }
 
 /* ── Dark mode (landing theme toggle; matches how-funktioniert / partner-apotheken) ── */
@@ -486,5 +530,128 @@
 
 #landing-main[data-theme='dark'] .mobile-hero__cta-btn:focus-visible {
   outline-color: #22d3ee;
+}
+
+/* ── Desktop hero: same accordion rows in left column (≥768px) ── */
+
+.hero-section:has(.mobile-hero__row.is-open) .hero-scroll-overlay {
+  pointer-events: none;
+}
+
+@media (min-width: 768px) {
+  .hero-accordion {
+    width: 100%;
+    align-self: stretch;
+  }
+
+  .hero-accordion .mobile-hero__rows {
+    flex: none;
+    justify-content: flex-start;
+    padding: 0;
+    max-width: 100%;
+  }
+
+  .hero-accordion .mobile-hero__row-label {
+    font-size: clamp(1.5rem, 2.2vw, 2.25rem);
+  }
+
+  .hero-accordion .mobile-hero__row-indicator {
+    font-size: clamp(1.5rem, 2vw, 2rem);
+  }
+
+  .hero-accordion .mobile-hero__row-trigger {
+    padding: 1.125rem 0;
+  }
+}
+
+@media (min-width: 1024px) {
+  .hero-accordion .mobile-hero__cta-btn {
+    width: fit-content;
+    min-width: 15rem;
+    max-width: 20rem;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 0.8rem 2.35rem;
+    font-size: 1.075rem;
+  }
+}
+
+.hero-section--light .hero-accordion .mobile-hero__row-trigger {
+  color: #0f172a;
+}
+
+.hero-section--light .hero-accordion .mobile-hero__row {
+  border-top-color: rgba(15, 23, 42, 0.12);
+}
+
+.hero-section--light .hero-accordion .mobile-hero__row:last-child {
+  border-bottom-color: rgba(15, 23, 42, 0.12);
+}
+
+.hero-section--light .hero-accordion .mobile-hero__row-indicator {
+  color: rgba(15, 23, 42, 0.5);
+}
+
+.hero-section--light .hero-accordion .mobile-hero__row-hint {
+  color: rgba(15, 23, 42, 0.45);
+}
+
+.hero-section--dark .hero-accordion .mobile-hero__row {
+  border-top-color: rgba(255, 255, 255, 0.14);
+}
+
+.hero-section--dark .hero-accordion .mobile-hero__row:last-child {
+  border-bottom-color: rgba(255, 255, 255, 0.14);
+}
+
+.hero-section--dark .hero-accordion .mobile-hero__row-trigger {
+  color: #ffffff;
+}
+
+.hero-section--dark .hero-accordion .mobile-hero__row-indicator {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.hero-section--dark .hero-accordion .mobile-hero__row-hint {
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.hero-section--dark .hero-accordion .mobile-hero__trust-group-label {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.hero-section--dark .hero-accordion .mobile-hero__trust-card {
+  background: rgba(26, 26, 26, 0.75);
+  border-color: rgba(255, 255, 255, 0.14);
+}
+
+.hero-section--dark .hero-accordion .mobile-hero__trust-icon {
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.hero-section--dark .hero-accordion .mobile-hero__trust-title {
+  color: #ffffff;
+}
+
+.hero-section--dark .hero-accordion .mobile-hero__trust-sub {
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.hero-section--dark .hero-accordion .mobile-hero__trust-check {
+  border-color: rgba(255, 255, 255, 0.2);
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.hero-section--dark .hero-accordion .mobile-hero__cta-copy {
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.hero-section--dark .hero-accordion .mobile-hero__cta-btn {
+  background: #141414;
+  border-top-color: #fff;
+  border-left-color: #fff;
+  border-right-color: #fff;
+  border-bottom-color: #fff;
+  color: #f8fafc;
 }
 
