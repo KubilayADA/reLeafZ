@@ -127,8 +127,10 @@ function HowStoriesPanel({
               <span className="how-story-num" aria-label={`Schritt ${activeStep.num}`}>
                 {activeStep.num}
               </span>
-              <h3 className="how-story-title">{activeStep.title}</h3>
-              <p className="how-story-desc">{activeStep.desc}</p>
+              <div className="how-story-copy">
+                <h3 className="how-story-title">{activeStep.title}</h3>
+                <p className="how-story-desc">{activeStep.desc}</p>
+              </div>
             </div>
           </div>
         </article>
