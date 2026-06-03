@@ -360,125 +360,296 @@
   opacity: 0.85;
 }
 
-/* Column cards — glass panels */
+/* Step cards — text-only story panels */
 .how-funktioniert .how-col-card {
   position: relative;
-  display: flex;
-  flex-direction: row;
-  align-items: flex-start;
-  gap: var(--how-space-md);
-  padding: var(--how-space-lg);
-  border-top: 2.5px solid var(--how-chunk-border-tl);
-  border-left: 2.5px solid var(--how-chunk-border-tl);
-  border-right: 4px solid var(--how-chunk-border-br);
-  border-bottom: 4px solid var(--how-chunk-border-br);
-  border-radius: var(--how-radius-lg);
-  background: var(--how-card);
-  backdrop-filter: blur(14px) saturate(140%);
-  -webkit-backdrop-filter: blur(14px) saturate(140%);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
-  scroll-margin-top: calc(var(--how-sticky-top) + 0.75rem);
-  transition:
-    background 280ms ease,
-    border-color 280ms ease,
-    box-shadow 280ms ease,
-    color 280ms ease;
+  transition: box-shadow 280ms ease;
 }
 
-.how-funktioniert .how-col-card.active {
+.how-funktioniert .how-col-card--story {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  box-sizing: border-box;
+  overflow: hidden;
+  padding: 0;
+  border: none;
+  border-radius: inherit;
+  background: url('/how/hoT.png') center top / cover no-repeat;
+  background-clip: padding-box;
+  box-shadow: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  isolation: isolate;
+}
+
+.how-funktioniert .how-stories-slide:has(.how-col-card--story.active) {
   box-shadow:
     0 8px 36px rgba(0, 0, 0, 0.45),
     0 0 40px rgba(34, 211, 238, 0.08);
 }
 
-.how-funktioniert .how-col-image {
-  flex-shrink: 0;
-  width: 300px;
-  height: 300px;
-  object-fit: cover;
-  border-radius: var(--how-radius-md);
-  display: block;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.how-funktioniert .how-col-body {
-  flex: 1;
-  position: relative;
-  padding: var(--how-space-xs) 0;
+.how-funktioniert .how-story-content {
   display: flex;
   flex-direction: column;
-  gap: var(--how-space-sm);
-  overflow: hidden;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 1rem;
+  width: 100%;
+  min-height: inherit;
+  padding: 2rem 1.35rem 1.5rem;
+  box-sizing: border-box;
+  position: relative;
+  z-index: 1;
 }
 
-.how-funktioniert .how-col-ghost-num {
-  position: absolute;
-  bottom: clamp(0.55rem, 2vw, 0.9rem);
-  right: clamp(0.55rem, 2vw, 0.9rem);
-  width: clamp(2rem, 4.5vw, 2.35rem);
-  height: clamp(2rem, 4.5vw, 2.35rem);
+.how-funktioniert .how-story-num {
+  flex-shrink: 0;
+  min-width: 2.65rem;
+  height: 2.65rem;
+  padding: 0 0.55rem;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   font-family: var(--how-mono);
-  font-size: clamp(0.72rem, 1.4vw, 0.84rem);
+  font-size: 0.92rem;
   font-weight: 800;
-  letter-spacing: 0.02em;
-  color: var(--how-text);
-  border-top: 2.5px solid var(--how-chunk-border-tl);
-  border-left: 2.5px solid var(--how-chunk-border-tl);
-  border-right: 4px solid var(--how-chunk-border-br);
-  border-bottom: 4px solid var(--how-chunk-border-br);
+  letter-spacing: 0.04em;
+  color: #000000;
+  background: rgba(255, 255, 255, 0.94);
+  border-top: 2.5px solid #000;
+  border-left: 2.5px solid #000;
+  border-right: 4px solid #000;
+  border-bottom: 4px solid #000;
   border-radius: 999px;
-  background: color-mix(in srgb, var(--how-card) 88%, transparent);
-  opacity: 0.92;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
   line-height: 1;
-  pointer-events: none;
-  user-select: none;
-  z-index: 2;
 }
 
-.how-funktioniert .how-col-num {
-  font-family: var(--how-mono);
-  font-size: 0.8rem;
-  font-weight: 700;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--how-accent-cyan);
-  padding-bottom: 2px;
-  border-bottom: 1px solid rgba(34, 211, 238, 0.45);
-  display: inline-block;
-  width: fit-content;
-}
-
-.how-funktioniert .how-col-title {
-  font-family: var(--how-sans);
-  font-size: clamp(1.1rem, 2vw, 1.35rem);
-  font-weight: 700;
-  color: var(--how-text);
-  line-height: 1.25;
-  letter-spacing: -0.02em;
+.how-funktioniert .how-story-title {
   margin: 0;
+  width: 100%;
+  max-width: 100%;
+  font-family: var(--how-sans);
+  font-size: clamp(1.05rem, 4.5vw, 1.45rem);
+  font-weight: 800;
+  line-height: 1.2;
+  letter-spacing: -0.03em;
+  color: #ffffff;
+  text-shadow:
+    0 0 28px rgba(34, 211, 238, 0.45),
+    0 2px 18px rgba(15, 23, 42, 0.35);
 }
 
-.how-funktioniert .how-col-desc {
+.how-funktioniert .how-story-desc {
+  margin: 0;
+  max-width: 18rem;
   font-family: var(--how-sans);
-  font-size: 0.9375rem;
-  color: var(--how-muted);
+  font-size: clamp(0.88rem, 3.6vw, 0.98rem);
   font-weight: 400;
-  line-height: 1.65;
+  line-height: 1.55;
+  color: rgba(255, 255, 255, 0.88);
+  text-shadow: 0 1px 10px rgba(15, 23, 42, 0.25);
+}
+
+/* Instagram-style stories viewer (all breakpoints) */
+.how-funktioniert .how-right--stories {
+  gap: var(--how-space-lg);
+  --how-stories-card-h: 28.5rem;
+}
+
+@media (min-width: 768px) {
+  .how-funktioniert .how-right--stories {
+    --how-stories-card-h: 30rem;
+  }
+
+  .how-funktioniert .how-story-title {
+    font-size: clamp(1.15rem, 2.2vw, 1.5rem);
+    white-space: normal;
+    overflow: visible;
+    text-overflow: unset;
+  }
+
+  .how-funktioniert .how-story-desc {
+    max-width: 28rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .how-funktioniert .how-right--stories {
+    --how-stories-card-h: 32rem;
+  }
+}
+
+.how-funktioniert .how-stories {
+  position: relative;
+  outline: none;
+  border-radius: var(--how-radius-lg);
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.how-funktioniert .how-stories:focus-visible {
+  box-shadow: 0 0 0 2px rgba(34, 211, 238, 0.45);
+}
+
+.how-funktioniert .how-stories-progress {
+  display: flex;
+  gap: 0.35rem;
+  padding: 0 0.1rem;
+}
+
+.how-funktioniert .how-stories-progress--inset {
+  position: absolute;
+  top: 0.85rem;
+  left: 0.85rem;
+  right: 0.85rem;
+  z-index: 5;
   margin: 0;
 }
 
-@media (max-width: 640px) {
-  .how-funktioniert .how-col-card {
-    flex-direction: column;
-  }
+.how-funktioniert .how-stories-seg {
+  flex: 1;
+  height: 3px;
+  padding: 0;
+  border: none;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.38);
+  cursor: pointer;
+  overflow: hidden;
+  position: relative;
+}
 
-  .how-funktioniert .how-col-image {
-    width: 100%;
-    height: 220px;
+.how-funktioniert .how-stories-fill {
+  display: block;
+  height: 100%;
+  width: 0;
+  border-radius: inherit;
+  background: #ffffff;
+  pointer-events: none;
+}
+
+.how-funktioniert .how-stories-fill.is-done {
+  width: 100%;
+  animation: none;
+}
+
+.how-funktioniert .how-stories-fill.is-active {
+  width: 0;
+  animation: howStoryFill linear forwards;
+}
+
+.how-funktioniert .how-stories-fill.is-active.is-static {
+  width: 100%;
+  animation: none;
+}
+
+@keyframes howStoryFill {
+  from {
+    width: 0;
   }
+  to {
+    width: 100%;
+  }
+}
+
+.how-funktioniert .how-stories-slide {
+  position: relative;
+  z-index: 1;
+  overflow: hidden;
+  height: var(--how-stories-card-h);
+  min-height: var(--how-stories-card-h);
+  border-radius: var(--how-radius-lg);
+  border-top: 2.5px solid #000;
+  border-left: 2.5px solid #000;
+  border-right: 4px solid #000;
+  border-bottom: 4px solid #000;
+  box-sizing: border-box;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  background: #0a0a0a;
+}
+
+.how-funktioniert .how-stories-card-anim {
+  position: relative;
+  z-index: 3;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 0;
+  will-change: transform, opacity;
+  animation: howStoryEnterNext 0.42s var(--how-ease) both;
+}
+
+.how-funktioniert .how-stories-card-anim--prev {
+  animation-name: howStoryEnterPrev;
+}
+
+@keyframes howStoryEnterNext {
+  from {
+    opacity: 0;
+    transform: translate3d(14%, 0, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes howStoryEnterPrev {
+  from {
+    opacity: 0;
+    transform: translate3d(-14%, 0, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+.how-funktioniert .how-stories-slide .how-col-card--story {
+  height: 100%;
+  min-height: 100%;
+  border-radius: 0;
+}
+
+.how-funktioniert .how-stories-slide .how-story-content {
+  padding: 3.25rem 1.35rem 1.5rem;
+}
+
+.how-funktioniert .how-stories-hit {
+  position: absolute;
+  top: 0;
+  height: var(--how-stories-card-h);
+  z-index: 5;
+  padding: 0;
+  margin: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.how-funktioniert .how-stories-hit--prev {
+  left: 0;
+  width: 32%;
+}
+
+.how-funktioniert .how-stories-hit--pause {
+  left: 32%;
+  width: 36%;
+  cursor: pointer;
+}
+
+.how-funktioniert .how-stories-hit--next {
+  right: 0;
+  width: 32%;
+}
+
+.how-funktioniert .how-stories--paused .how-stories-fill.is-active {
+  animation-play-state: paused;
 }
 
 /* CTA */
@@ -598,252 +769,23 @@
   }
 
   .how-funktioniert .how-right--stories {
-    gap: var(--how-space-lg);
-    --how-stories-card-h: 28.5rem;
     --how-chunk-border-tl: #333;
     --how-chunk-border-br: #333;
   }
 
-  /* ── Mobile: Instagram-style stories viewer ── */
-  .how-funktioniert .how-stories {
-    position: relative;
-    outline: none;
-    border-radius: var(--how-radius-lg);
-  }
-
-  .how-funktioniert .how-stories:focus-visible {
-    box-shadow: 0 0 0 2px rgba(34, 211, 238, 0.45);
-  }
-
-  .how-funktioniert .how-stories-progress {
-    display: flex;
-    gap: 0.35rem;
-    padding: 0 0.1rem;
-  }
-
-  .how-funktioniert .how-stories-progress--inset {
-    position: absolute;
-    top: 0.85rem;
-    left: 0.85rem;
-    right: 0.85rem;
-    z-index: 5;
-    margin: 0;
-  }
-
-  .how-funktioniert .how-stories-seg {
-    flex: 1;
-    height: 3px;
-    padding: 0;
-    border: none;
-    border-radius: 999px;
-    background: rgba(255, 255, 255, 0.38);
-    cursor: pointer;
-    overflow: hidden;
-    position: relative;
-  }
-
-  .how-funktioniert .how-stories-fill {
-    display: block;
-    height: 100%;
-    width: 0;
-    border-radius: inherit;
-    background: #ffffff;
-    pointer-events: none;
-  }
-
-  .how-funktioniert .how-stories-fill.is-done {
-    width: 100%;
-    animation: none;
-  }
-
-  .how-funktioniert .how-stories-fill.is-active {
-    width: 0;
-    animation: howStoryFill linear forwards;
-  }
-
-  .how-funktioniert .how-stories-fill.is-active.is-static {
-    width: 100%;
-    animation: none;
-  }
-
-  @keyframes howStoryFill {
-    from {
-      width: 0;
-    }
-    to {
-      width: 100%;
-    }
-  }
-
-  .how-funktioniert .how-stories-slide {
-    position: relative;
-    z-index: 1;
-    overflow: hidden;
-    height: var(--how-stories-card-h);
-    min-height: var(--how-stories-card-h);
-    border-radius: var(--how-radius-lg);
-  }
-
-  .how-funktioniert .how-stories-card-anim {
-    position: relative;
-    z-index: 3;
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    min-height: 0;
-    will-change: transform, opacity;
-    animation: howStoryEnterNext 0.42s var(--how-ease) both;
-  }
-
-  .how-funktioniert .how-stories-card-anim--prev {
-    animation-name: howStoryEnterPrev;
-  }
-
-  @keyframes howStoryEnterNext {
-    from {
-      opacity: 0;
-      transform: translate3d(14%, 0, 0);
-    }
-    to {
-      opacity: 1;
-      transform: translate3d(0, 0, 0);
-    }
-  }
-
-  @keyframes howStoryEnterPrev {
-    from {
-      opacity: 0;
-      transform: translate3d(-14%, 0, 0);
-    }
-    to {
-      opacity: 1;
-      transform: translate3d(0, 0, 0);
-    }
-  }
-
-  .how-funktioniert .how-stories-slide .how-col-card--story {
-    display: flex;
-    flex-direction: column;
-    margin: 0;
-    height: 100%;
-    min-height: 100%;
-    box-sizing: border-box;
-    position: relative;
-    overflow: hidden;
-    padding: 0;
-    border: none;
-    border-radius: var(--how-radius-md);
-    background: url('/how/hoT.png') center top / cover no-repeat;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
-    backdrop-filter: none;
-    -webkit-backdrop-filter: none;
-    isolation: isolate;
-  }
-
-  .how-funktioniert .how-stories-slide .how-col-card--story::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    z-index: 2;
-    border-radius: inherit;
-    border-top: 2.5px solid #fff;
-    border-left: 2.5px solid #fff;
-    border-right: 4px solid #fff;
-    border-bottom: 4px solid #fff;
-    pointer-events: none;
-  }
-
-  .how-funktioniert .how-story-content {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    gap: 1rem;
-    width: 100%;
-    padding: 3.25rem 1.35rem 1.5rem;
-    box-sizing: border-box;
-  }
-
-  .how-funktioniert .how-story-num {
-    flex-shrink: 0;
-    min-width: 2.65rem;
-    height: 2.65rem;
-    padding: 0 0.55rem;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    font-family: var(--how-mono);
-    font-size: 0.92rem;
-    font-weight: 800;
-    letter-spacing: 0.04em;
-    color: #0f172a;
-    background: rgba(255, 255, 255, 0.94);
-    border-top: 2.5px solid #fff;
-    border-left: 2.5px solid #fff;
-    border-right: 4px solid #fff;
-    border-bottom: 4px solid #fff;
-    border-radius: 999px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-    line-height: 1;
-  }
-
-  .how-funktioniert .how-story-title {
-    margin: 0;
-    width: 100%;
-    max-width: 100%;
-    font-family: var(--how-sans);
-    font-size: clamp(0.95rem, 4.2vw, 1.35rem);
-    font-weight: 700;
-    line-height: 1.25;
-    letter-spacing: -0.02em;
-    color: #ffffff;
-    text-shadow: 0 2px 14px rgba(15, 23, 42, 0.28);
+  .how-funktioniert .how-stories-slide .how-story-title {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
   }
 
-  .how-funktioniert .how-story-desc {
-    margin: 0;
-    max-width: 18rem;
-    font-family: var(--how-sans);
-    font-size: clamp(0.88rem, 3.6vw, 0.98rem);
-    font-weight: 400;
-    line-height: 1.55;
-    color: #0f172a;
+  .how-funktioniert .how-stories-slide .how-story-desc {
     overflow: hidden;
     display: -webkit-box;
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 6;
     line-clamp: 6;
   }
-
-  .how-funktioniert .how-stories-hit {
-    position: absolute;
-    top: 0;
-    height: var(--how-stories-card-h);
-    z-index: 5;
-    padding: 0;
-    margin: 0;
-    border: none;
-    background: transparent;
-    cursor: pointer;
-    -webkit-tap-highlight-color: transparent;
-  }
-
-  .how-funktioniert .how-stories-hit--prev {
-    left: 0;
-    width: 32%;
-  }
-
-  .how-funktioniert .how-stories-hit--next {
-    right: 0;
-    width: 68%;
-  }
-
 }
 
 @media (max-width: 440px) {
@@ -961,16 +903,18 @@
     linear-gradient(90deg, rgba(15, 23, 42, 0.08) 1px, transparent 1px);
 }
 
-#landing-main[data-theme='light'] .how-funktioniert .how-col-card,
-.how-funktioniert.theme-light .how-col-card {
+#landing-main[data-theme='light'] .how-funktioniert .how-col-card--story,
+.how-funktioniert.theme-light .how-col-card--story {
   box-shadow: 0 10px 36px rgba(2, 6, 23, 0.08);
 }
 
-#landing-main[data-theme='light'] .how-funktioniert .how-col-ghost-num,
-.how-funktioniert.theme-light .how-col-ghost-num {
-  background: rgba(255, 255, 255, 0.94);
-  color: #0f172a;
-  opacity: 1;
+#landing-main[data-theme='light'] .how-funktioniert .how-stories-slide,
+.how-funktioniert.theme-light .how-stories-slide {
+  border-top-color: #000;
+  border-left-color: #000;
+  border-right-color: #000;
+  border-bottom-color: #000;
+  box-shadow: 0 10px 36px rgba(2, 6, 23, 0.08);
 }
 
 #landing-main[data-theme='light'] .how-funktioniert .prog-dot,
@@ -985,18 +929,22 @@
   background: rgba(255, 255, 255, 0.84);
 }
 
-#landing-main[data-theme='light'] .how-funktioniert .how-stories-slide .how-col-card--story::after,
-.how-funktioniert.theme-light .how-stories-slide .how-col-card--story::after {
+#landing-main[data-theme='light'] .how-funktioniert .how-story-num,
+.how-funktioniert.theme-light .how-story-num {
+  color: #000000;
+  background: rgba(255, 255, 255, 0.94);
   border-top-color: #000;
   border-left-color: #000;
   border-right-color: #000;
   border-bottom-color: #000;
 }
 
-#landing-main[data-theme='light'] .how-funktioniert .how-story-num,
-.how-funktioniert.theme-light .how-story-num {
-  border-top-color: #000;
-  border-left-color: #000;
-  border-right-color: #000;
-  border-bottom-color: #000;
+#landing-main[data-theme='light'] .how-funktioniert .how-story-title,
+.how-funktioniert.theme-light .how-story-title {
+  color: #ffffff;
+}
+
+#landing-main[data-theme='light'] .how-funktioniert .how-story-desc,
+.how-funktioniert.theme-light .how-story-desc {
+  color: rgba(255, 255, 255, 0.88);
 }

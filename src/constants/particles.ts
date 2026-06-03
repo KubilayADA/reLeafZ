@@ -61,3 +61,47 @@ export const sectionParticlesOptions: ISourceOptions = {
     },
   },
 }
+
+/** Blue drift for landing hero — dense, full-viewport (mirrors Coming Soon motion). */
+export const heroParticlesOptions: ISourceOptions = {
+  fullScreen: { enable: false },
+  background: {
+    color: { value: 'transparent' },
+  },
+  fpsLimit: 60,
+  detectRetina: true,
+  particles: {
+    number: {
+      value: 240,
+      density: { enable: false },
+    },
+    color: {
+      value: ['#22d3ee', '#38bdf8', '#60a5fa', '#3b82f6', '#0ea5e9', '#7dd3fc'],
+    },
+    shape: { type: 'circle' },
+    opacity: {
+      value: { min: 0.2, max: 0.62 },
+      animation: { enable: true, speed: 0.6, sync: false },
+    },
+    size: {
+      value: { min: 0.3, max: 3.4 },
+      animation: { enable: true, speed: 2, sync: false, startValue: 'random' },
+    },
+    links: { enable: false },
+    move: {
+      enable: true,
+      random: true,
+      speed: 0.9,
+      direction: 'top',
+      straight: false,
+      outModes: { default: 'out' },
+    },
+  },
+  interactivity: {
+    detectsOn: 'window',
+    events: {
+      onHover: { enable: false },
+      onClick: { enable: false },
+    },
+  },
+}

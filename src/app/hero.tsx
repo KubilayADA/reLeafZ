@@ -2,15 +2,17 @@
 
 import React from 'react'
 import {
-  Check, Shield, Clock, MapPin,
+  Check,
   FileText, Scale, CircleDot,
   UserCheck, Stethoscope,
   Lock, Wifi,
   PhoneCall, Store, HeartHandshake,
 } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import words from '@/constants/index'
 import { scrollToLandingTop } from '@/lib/scroll'
+import { heroParticlesOptions } from '@/constants/particles'
+import SectionParticlesBackground from '@/components/ui/SectionParticlesBackground'
+import { HeroImageCarousel } from './hero-carousel'
+import './header.css'
 import './hero-mobile.css'
 
 interface HeroProps {
@@ -22,17 +24,209 @@ interface HeroProps {
 
 type AccordionRow = 'trust' | 'behandlung' | null
 
-export function MobileHero({ setDialogOpen }: { setDialogOpen: (open: boolean) => void }) {
+type HeroZStar = {
+  left: number
+  top: number
+  size: number
+  duration: number
+  delay: number
+  rotate: number
+}
+
+function buildHeroZStars(count: number): HeroZStar[] {
+  const stars: HeroZStar[] = []
+  for (let i = 0; i < count; i++) {
+    stars.push({
+      left: ((i * 7919) % 10000) / 100,
+      top: ((i * 6151 + 17) % 10000) / 100,
+      size: [9, 10, 11, 13, 16][i % 5],
+      duration: 2 + (i % 6),
+      delay: ((i * 131) % 100) / 25,
+      rotate: ((i * 53) % 40) - 20,
+    })
+  }
+  return stars
+}
+
+const HERO_Z_STARS = buildHeroZStars(200)
+
+const HERO_NAV_LINKS = [
+  { href: '#ablauf', label: 'Ablauf', scrollKey: 'ablauf' as const },
+  { href: '#partner-apotheken', label: 'Apotheke in Ihrer Nähe' },
+  { href: '#faq', label: 'FAQ' },
+  { href: '#chat', label: 'Chat with us!' },
+]
+
+function HeroTopNav({ onScrollToAblauf }: { onScrollToAblauf: () => void }) {
+  return (
+    <nav className="hero-logo-bar__nav header-desktop-nav header-text" aria-label="Hauptnavigation">
+      {HERO_NAV_LINKS.map((link) => (
+        <a
+          key={link.href}
+          href={link.href}
+          className="header-nav-link"
+          onClick={(e) => {
+            if (link.scrollKey === 'ablauf') {
+              e.preventDefault()
+              onScrollToAblauf()
+            }
+          }}
+        >
+          {link.label}
+        </a>
+      ))}
+    </nav>
+  )
+}
+
+function HeroAccordionRows({
+  setDialogOpen,
+  onDiscover,
+  scrollAnchorRef,
+  onOpenRowChange,
+}: {
+  setDialogOpen: (open: boolean) => void
+  onDiscover?: () => void
+  scrollAnchorRef?: React.RefObject<HTMLElement | null>
+  onOpenRowChange?: (row: AccordionRow) => void
+}) {
   const [openRow, setOpenRow] = React.useState<AccordionRow>(null)
-  const heroRef = React.useRef<HTMLElement>(null)
+
+  React.useEffect(() => {
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    const delayMs = prefersReducedMotion ? 0 : 3000
+
+    const timerId = window.setTimeout(() => {
+      requestAnimationFrame(() => {
+        setOpenRow((prev) => (prev === null ? 'behandlung' : prev))
+      })
+    }, delayMs)
+
+    return () => window.clearTimeout(timerId)
+  }, [])
+
+  React.useEffect(() => {
+    onOpenRowChange?.(openRow)
+  }, [openRow, onOpenRowChange])
+
+  React.useEffect(() => {
+    if (openRow !== null) {
+      document.documentElement.dataset.heroAccordionOpen = 'true'
+    } else {
+      delete document.documentElement.dataset.heroAccordionOpen
+    }
+    return () => {
+      delete document.documentElement.dataset.heroAccordionOpen
+    }
+  }, [openRow])
 
   const toggleRow = (row: AccordionRow) => {
     const hadOpenPanel = openRow !== null
     setOpenRow((prev) => (prev === row ? null : row))
     if (hadOpenPanel) {
-      heroRef.current?.scrollIntoView({ block: 'start', behavior: 'instant' as ScrollBehavior })
+      scrollAnchorRef?.current?.scrollIntoView({ block: 'start', behavior: 'instant' as ScrollBehavior })
     }
   }
+
+  const handleDiscover = () => {
+    if (onDiscover) {
+      onDiscover()
+      return
+    }
+    const el = document.getElementById('ablauf')
+    if (!el) return
+    const top = Math.max(0, el.getBoundingClientRect().top + window.scrollY + 40)
+    window.scrollTo({ top, behavior: 'smooth' })
+  }
+
+  return (
+    <div className="mobile-hero__rows">
+      <div className={`mobile-hero__row ${openRow === 'trust' ? 'is-open' : ''}`}>
+        <button
+          type="button"
+          className="mobile-hero__row-trigger"
+          onClick={() => toggleRow('trust')}
+          aria-expanded={openRow === 'trust'}
+        >
+          <span className="mobile-hero__row-label">ÜBER UNS</span>
+          <span className="mobile-hero__row-indicator">+</span>
+        </button>
+        <div className="mobile-hero__panel">
+          <div className="mobile-hero__panel-inner">
+            <div className="mobile-hero__trust-group">
+              <div className="mobile-hero__trust-group-label">Rechtlich &amp; Regulatorisch</div>
+              <TrustCard icon={<FileText />} title="Verschreibung nach §10 BtMG" sub="Rechtssichere Betäubungsmittelverordnung" />
+              <TrustCard icon={<Scale />} title="CanG-konform (Cannabis Act 2024)" sub="Vollständig nach aktuellem Recht" />
+              <TrustCard icon={<CircleDot />} title="Registriert beim BfArM" sub="Bundesbehörde für Arzneimittel" />
+            </div>
+            <div className="mobile-hero__trust-group">
+              <div className="mobile-hero__trust-group-label">Medizinische Qualität</div>
+              <TrustCard icon={<UserCheck />} title="Ausschließlich deutsche Ärzte" sub="Approbiert & in Deutschland lizenziert" />
+              <TrustCard icon={<Stethoscope />} title="Medizinisch geprüfte Behandlungen" sub="Kein Rezept ohne medizinische Grundlage" />
+            </div>
+            <div className="mobile-hero__trust-group">
+              <div className="mobile-hero__trust-group-label">Datenschutz</div>
+              <TrustCard icon={<Lock />} title="DSGVO-konform & verschlüsselt" sub="Server ausschließlich in Deutschland" />
+              <TrustCard icon={<Wifi />} title="Keine Datenweitergabe an Kassen" sub="Strikte ärztliche Schweigepflicht" />
+            </div>
+            <div className="mobile-hero__trust-group">
+              <div className="mobile-hero__trust-group-label">Ablauf &amp; Service</div>
+              <TrustCard icon={<PhoneCall />} title="Antwort innerhalb von 24 Stunden" sub="Schnelle ärztliche Erstberatung" />
+              <TrustCard icon={<Store />} title="Berliner Partnerapotheken" sub="Direkte Lieferung & Apothekerberatung" />
+              <TrustCard icon={<HeartHandshake />} title="Kostenlose Folgeberatungen" sub="Betreuung über die gesamte Behandlung" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className={`mobile-hero__row ${openRow === 'behandlung' ? 'is-open' : ''}`}>
+        <button
+          type="button"
+          className="mobile-hero__row-trigger"
+          onClick={() => toggleRow('behandlung')}
+          aria-expanded={openRow === 'behandlung'}
+        >
+          <span className="mobile-hero__row-label">BEHANDLUNG ANFRAGEN</span>
+          <span className="mobile-hero__row-indicator">+</span>
+        </button>
+        <div className="mobile-hero__panel">
+          <div className="mobile-hero__panel-inner">
+            <p className="mobile-hero__cta-copy">
+              Starte jetzt deine Cannabis-Therapie — unkompliziert, legal und von zuhause.
+            </p>
+            <button
+              type="button"
+              className="mobile-hero__cta-btn"
+              onClick={() => setDialogOpen(true)}
+            >
+              Jetzt anfragen &rarr;
+            </button>
+            <img
+              src="/payment_badges.svg"
+              alt="Zahlungsmethoden"
+              className="mobile-hero__payment-methods"
+              loading="lazy"
+            />
+          </div>
+        </div>
+      </div>
+
+      <div className="mobile-hero__row">
+        <button
+          type="button"
+          className="mobile-hero__row-trigger"
+          onClick={handleDiscover}
+        >
+          <span className="mobile-hero__row-label">ENTDECKEN</span>
+          <span className="mobile-hero__row-hint">↓ Mehr erfahren</span>
+        </button>
+      </div>
+    </div>
+  )
+}
+
+export function MobileHero({ setDialogOpen }: { setDialogOpen: (open: boolean) => void }) {
+  const heroRef = React.useRef<HTMLElement>(null)
 
   const mobileParticles = React.useMemo(() =>
     Array.from({ length: 6 }, (_, i) => ({
@@ -76,93 +270,7 @@ export function MobileHero({ setDialogOpen }: { setDialogOpen: (open: boolean) =
         </div>
       </header>
 
-      <div className="mobile-hero__rows">
-        <div className={`mobile-hero__row ${openRow === 'trust' ? 'is-open' : ''}`}>
-          <button
-            type="button"
-            className="mobile-hero__row-trigger"
-            onClick={() => toggleRow('trust')}
-            aria-expanded={openRow === 'trust'}
-          >
-            <span className="mobile-hero__row-label">ÜBER UNS</span>
-            <span className="mobile-hero__row-indicator">+</span>
-          </button>
-          <div className="mobile-hero__panel">
-            <div className="mobile-hero__panel-inner">
-              <div className="mobile-hero__trust-group">
-                <div className="mobile-hero__trust-group-label">Rechtlich &amp; Regulatorisch</div>
-                <TrustCard icon={<FileText />} title="Verschreibung nach §10 BtMG" sub="Rechtssichere Betäubungsmittelverordnung" />
-                <TrustCard icon={<Scale />} title="CanG-konform (Cannabis Act 2024)" sub="Vollständig nach aktuellem Recht" />
-                <TrustCard icon={<CircleDot />} title="Registriert beim BfArM" sub="Bundesbehörde für Arzneimittel" />
-              </div>
-              <div className="mobile-hero__trust-group">
-                <div className="mobile-hero__trust-group-label">Medizinische Qualität</div>
-                <TrustCard icon={<UserCheck />} title="Ausschließlich deutsche Ärzte" sub="Approbiert & in Deutschland lizenziert" />
-                <TrustCard icon={<Stethoscope />} title="Medizinisch geprüfte Behandlungen" sub="Kein Rezept ohne medizinische Grundlage" />
-              </div>
-              <div className="mobile-hero__trust-group">
-                <div className="mobile-hero__trust-group-label">Datenschutz</div>
-                <TrustCard icon={<Lock />} title="DSGVO-konform & verschlüsselt" sub="Server ausschließlich in Deutschland" />
-                <TrustCard icon={<Wifi />} title="Keine Datenweitergabe an Kassen" sub="Strikte ärztliche Schweigepflicht" />
-              </div>
-              <div className="mobile-hero__trust-group">
-                <div className="mobile-hero__trust-group-label">Ablauf &amp; Service</div>
-                <TrustCard icon={<PhoneCall />} title="Antwort innerhalb von 24 Stunden" sub="Schnelle ärztliche Erstberatung" />
-                <TrustCard icon={<Store />} title="Berliner Partnerapotheken" sub="Direkte Lieferung & Apothekerberatung" />
-                <TrustCard icon={<HeartHandshake />} title="Kostenlose Folgeberatungen" sub="Betreuung über die gesamte Behandlung" />
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div className={`mobile-hero__row ${openRow === 'behandlung' ? 'is-open' : ''}`}>
-          <button
-            type="button"
-            className="mobile-hero__row-trigger"
-            onClick={() => toggleRow('behandlung')}
-            aria-expanded={openRow === 'behandlung'}
-          >
-            <span className="mobile-hero__row-label">BEHANDLUNG ANFRAGEN</span>
-            <span className="mobile-hero__row-indicator">+</span>
-          </button>
-          <div className="mobile-hero__panel">
-            <div className="mobile-hero__panel-inner">
-              <p className="mobile-hero__cta-copy">
-                Starte jetzt deine Cannabis-Therapie — unkompliziert, legal und von zuhause.
-              </p>
-              <button
-                type="button"
-                className="mobile-hero__cta-btn"
-                onClick={() => setDialogOpen(true)}
-              >
-                Jetzt anfragen &rarr;
-              </button>
-              <img
-                src="/payy.png"
-                alt="Zahlungsmethoden"
-                className="mobile-hero__payment-methods"
-                loading="lazy"
-              />
-            </div>
-          </div>
-        </div>
-
-        <div className="mobile-hero__row">
-          <button
-            type="button"
-            className="mobile-hero__row-trigger"
-            onClick={() => {
-              const el = document.getElementById('ablauf')
-              if (!el) return
-              const top = Math.max(0, el.getBoundingClientRect().top + window.scrollY + 40)
-              window.scrollTo({ top, behavior: 'smooth' })
-            }}
-          >
-            <span className="mobile-hero__row-label">ENTDECKEN</span>
-            <span className="mobile-hero__row-hint">↓ Mehr erfahren</span>
-          </button>
-        </div>
-      </div>
+      <HeroAccordionRows setDialogOpen={setDialogOpen} scrollAnchorRef={heroRef} />
     </section>
   )
 }
@@ -172,24 +280,27 @@ export default function Hero({
   onScrollToAblauf,
   landingTheme,
 }: HeroProps) {
-  const heroVideoSrc = landingTheme === 'dark'
-    ? '/hero-night.mp4'
-    : '/bubble-explose.mp4'
-
-  const heroChecklistItems = [
-    'Lieferung in 30-90 Minuten in Berlin',
-    'Rezept direkt vom Arzt online',
-    'Ärztlich geprüft & empfohlen',
-    'Verschlüsselte Arzt-Patienten-Kommunikation',
-  ]
+  const [openAccordionRow, setOpenAccordionRow] = React.useState<AccordionRow>(null)
+  const isHeroExpanded = openAccordionRow === 'trust'
 
   return (
     <section
       id="hero"
-      className="hero-section hero-section--fixed pointer-events-none fixed inset-0 z-0 flex w-full min-h-[100dvh] flex-col overflow-hidden pt-16 pb-28 sm:pt-20 sm:pb-32"
+      className={`hero-section hero-section--${landingTheme} pointer-events-none z-0 flex w-full min-h-[100dvh] flex-col pt-16 pb-28 sm:pt-20 sm:pb-32 ${
+        isHeroExpanded
+          ? 'hero-section--expanded relative overflow-visible'
+          : 'hero-section--fixed fixed inset-0 overflow-hidden'
+      }`}
+      style={
+        {
+          '--header-nav-color': landingTheme === 'light' ? '#0f172a' : '#ffffff',
+          '--header-nav-hover-color':
+            landingTheme === 'light' ? 'rgba(15, 23, 42, 0.82)' : 'rgba(255, 255, 255, 0.92)',
+        } as React.CSSProperties
+      }
     >
-        <div className="pointer-events-none absolute inset-0 w-full overflow-hidden">
-          <video
+        <div className="hero-section__backdrop pointer-events-none absolute inset-0 min-h-full w-full overflow-hidden">
+          {/* <video
             className="absolute inset-0 w-full h-full object-cover"
             src={heroVideoSrc}
             preload="auto"
@@ -198,26 +309,64 @@ export default function Hero({
             loop
             playsInline
           />
-          <div className="absolute inset-0 bg-black/20" />
+          <div className="absolute inset-0 bg-black/20" /> */}
+          <div
+            className={`hero-section__bg-base absolute inset-0 ${landingTheme === 'dark' ? 'bg-black' : 'bg-white'}`}
+            aria-hidden
+          />
+          <SectionParticlesBackground
+            className="hero-section__particles"
+            options={heroParticlesOptions}
+          />
+          <div className="hero-section__z-stars" aria-hidden>
+            {HERO_Z_STARS.map((star, i) => (
+              <span
+                key={i}
+                className={`hero-section__z-star${
+                  i % 4 === 0
+                    ? ' hero-section__z-star--cyan'
+                    : i % 9 === 0
+                      ? ' hero-section__z-star--soft'
+                      : ''
+                }`}
+                style={{
+                  left: `${star.left}%`,
+                  top: `${star.top}%`,
+                  fontSize: `${star.size}px`,
+                  transform: `rotate(${star.rotate}deg)`,
+                  animationDuration: `${star.duration}s`,
+                  animationDelay: `${star.delay}s`,
+                }}
+              >
+                z
+              </span>
+            ))}
+          </div>
         </div>
 
         <button
           type="button"
           aria-label="Go to next section"
-          className="pointer-events-auto absolute inset-0 z-[1] bg-transparent"
+          className="hero-scroll-overlay pointer-events-auto absolute inset-0 z-[1] bg-transparent"
           onClick={onScrollToAblauf}
         />
 
-        <a
-          href="#hero"
-          className="pointer-events-auto absolute top-5 left-1/2 -translate-x-1/2 sm:left-8 sm:translate-x-0 sm:top-8 md:top-12 md:left-14 md:scale-150 z-10 flex items-center gap-2 no-underline text-inherit hover:opacity-100 transition-opacity"
-          onClick={(e) => {
-            e.preventDefault()
-            scrollToLandingTop()
-          }}
-        >
-          {/* <img src="/logo2.png" alt="reLeafZ Logo" className="logo-hero" /> */}
-        </a>
+        <div className="hero-logo-bar pointer-events-none absolute top-5 right-0 left-0 z-20 sm:top-8">
+          <div className="hero-logo-bar__row">
+            <a
+              href="#hero"
+              className="hero-logo-link pointer-events-auto flex shrink-0 items-center no-underline text-inherit hover:opacity-90 transition-opacity"
+              onClick={(e) => {
+                e.preventDefault()
+                scrollToLandingTop()
+              }}
+            >
+              <img src="/logo1.png" alt="reLeafZ Logo" className="logo-hero" />
+            </a>
+            <HeroTopNav onScrollToAblauf={onScrollToAblauf} />
+          </div>
+          <div className="hero-logo-divider" aria-hidden />
+        </div>
 
         <a
           href="#ablauf"
@@ -229,79 +378,20 @@ export default function Hero({
         >
         </a>
 
-        <div className="pointer-events-none relative max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 overflow-visible w-full">
-          <div className="text-center overflow-visible w-full max-w-full">
-            <div className="lg:-ml-[94px] lg:mr-auto lg:w-full lg:max-w-[980px]">
-              <img
-                src="/payy.png"
-                alt="payy"
-                className="w-88 h-10 object-contain mx-auto lg:mx-0 mt-8 lg:mt-12 mb-0"
-              />
-              <h1 className="title-gradient-hero mt-0 !mb-0 lg:!-mb-6 lg:w-full lg:text-left">
-                MEDIZINAL CANNABIS
-              </h1>
-              <div className="animated-words-container -mt-5 lg:-mt-12 lg:!-ml-[33px] lg:!w-full lg:!items-start lg:!justify-start">
-                <div className="words-wrapper lg:!w-full lg:!items-start">
-                  {words.map((word, index) => (
-                    <div
-                      key={index}
-                      className="word-item font-bold title-gradient-hero leading-tight italic mb-0 lg:!w-full lg:!justify-start lg:!text-left"
-                    >
-                      {word}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
+        <div className="hero-layout">
+          <div
+            className="hero-layout__content hero-accordion pointer-events-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <HeroAccordionRows
+              setDialogOpen={setDialogOpen}
+              onDiscover={onScrollToAblauf}
+              onOpenRowChange={setOpenAccordionRow}
+            />
+          </div>
 
-            <div className="mx-auto mt-6 mb-4 flex w-fit flex-col gap-6 text-left lg:mt-15 lg:mb-6 lg:ml-[-100px] lg:mr-auto scale-100">
-              {heroChecklistItems.map((text, index) => (
-                <div key={`hero-check-${index}`} className="flex items-center gap-3 text-white">
-                  <span className="flex h-7 w-7 items-center justify-center rounded-full bg-emerald-500/90 shadow-[0_0_0_4px_rgba(16,185,129,0.22)]">
-                    <Check className="h-4 w-4 text-white" />
-                  </span>
-                  <span className="text-lg font-bold leading-none">{text}</span>
-                </div>
-              ))}
-            </div>
-
-            <div className="hero-cta-wrap -mt-4 lg:-mt-10 lg:mr-auto lg:ml-[-380px]">
-              <div className="hero-cta-center pointer-events-auto">
-                <Button
-                  className="behandlung-button relative z-20 md:scale-125 lg:scale-150 min-w-44 sm:min-w-56 md:min-w-64 w-auto"
-                  style={{
-                    background: '#ffffff',
-                    color: '#0f172a',
-                    borderTop: '2.5px solid #333',
-                    borderLeft: '2.5px solid #333',
-                    borderRight: '4px solid #333',
-                    borderBottom: '4px solid #333',
-                    borderRadius: '12px',
-                  }}
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    setDialogOpen(true)
-                  }}
-                >
-                  BEHANDLUNG ANFRAGEN →
-                </Button>
-              </div>
-
-              <div className="trust-badges -mt-2">
-                <div className="trust-badge-item">
-                  <Shield className="w-5 h-5 text-black-700 mr-2" />
-                  GDPR Compliant
-                </div>
-                <div className="trust-badge-item">
-                  <Clock className="w-5 h-5 text-black-700 mr-2" />
-                  Licensed Doctors
-                </div>
-                <div className="trust-badge-item">
-                  <MapPin className="w-5 h-5 text-black-700 mr-2" />
-                  Berlin Pharmacies
-                </div>
-              </div>
-            </div>
+          <div className="hero-layout__media">
+            <HeroImageCarousel />
           </div>
         </div>
     </section>
