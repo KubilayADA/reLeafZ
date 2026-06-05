@@ -32,6 +32,26 @@ type Pharmacy = {
   }>
 }
 
+function statusPillClasses(status: string) {
+  switch (status) {
+    case 'APPROVED':
+      return 'bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200'
+    case 'DECLINED':
+    case 'CANCELLED':
+      return 'bg-rose-50 text-rose-700 ring-1 ring-rose-200'
+    case 'PENDING_DOCTOR_APPROVAL':
+    case 'PENDING_STRAIN_SELECTION':
+      return 'bg-amber-50 text-amber-700 ring-1 ring-amber-200'
+    case 'DELIVERED':
+      return 'bg-sky-50 text-sky-700 ring-1 ring-sky-200'
+    default:
+      return 'bg-gray-100 text-gray-600 ring-1 ring-gray-200'
+  }
+}
+
+const cardCls = 'rounded-2xl bg-white border border-black/[0.06] p-6'
+const cardShadow = { boxShadow: '0 2px 16px rgba(0,0,0,0.05)' }
+
 export default function AdminPharmacyDetailPage() {
   const params = useParams()
   const router = useRouter()
@@ -69,109 +89,193 @@ export default function AdminPharmacyDetailPage() {
     }
   }
 
-  if (loading) return (
-    <div className={`${dmSans.className} text-black`}>
-      <div className="h-8 w-48 bg-gray-200 rounded animate-pulse mb-4" />
-      <div className="h-64 bg-gray-100 rounded-2xl animate-pulse" />
-    </div>
-  )
+  if (loading) {
+    return (
+      <div className={dmSans.className}>
+        <div className="h-8 w-48 bg-gray-200 rounded-xl animate-pulse mb-6" />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="h-64 bg-gray-100 rounded-2xl animate-pulse" />
+          <div className="h-64 bg-gray-100 rounded-2xl animate-pulse" />
+        </div>
+      </div>
+    )
+  }
 
-  if (error) return (
-    <div className={`${dmSans.className} text-black`}>
-      <div className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">{error}</div>
-    </div>
-  )
+  if (error) {
+    return (
+      <div className={dmSans.className}>
+        <div className="rounded-2xl border border-red-200 bg-red-50 px-5 py-4 text-sm text-red-700">
+          {error}
+        </div>
+      </div>
+    )
+  }
 
   if (!pharmacy) return null
 
+  const detailRows: Array<{ label: string; value: string | number | boolean | undefined | null }> =
+    [
+      { label: 'Email', value: pharmacy.email },
+      { label: 'Contact', value: pharmacy.contact },
+      { label: 'City', value: pharmacy.city ?? '—' },
+      { label: 'ZIP', value: pharmacy.zip },
+      { label: 'Delivery type', value: pharmacy.deliveryType },
+      {
+        label: 'Botendienst',
+        value: pharmacy.supportsBotendienst ? 'Enabled' : 'Disabled',
+      },
+      { label: 'Pickup', value: pharmacy.supportsPickup ? 'Enabled' : 'Disabled' },
+      {
+        label: 'Mail Order (DHL)',
+        value: pharmacy.supportsMailOrder
+          ? `Enabled — €${(pharmacy.mailOrderFee ?? 0).toFixed(2)}`
+          : 'Disabled',
+      },
+      { label: 'Products', value: pharmacy._count?.products ?? 0 },
+      { label: 'Requests', value: pharmacy._count?.treatmentRequests ?? 0 },
+    ]
+
   return (
-    <div className={`${dmSans.className} text-black`}>
-      <div className="mb-6 flex items-center gap-4">
-        <button onClick={() => router.back()} className="text-sm text-gray-500 hover:text-black">← Back</button>
-        <h1 className="text-2xl font-bold">{pharmacy.name}</h1>
-        {pharmacy.inventorySource === 'CANNALEO' && (
-          <span className="rounded-full bg-blue-100 text-blue-700 border border-blue-300 px-3 py-1 text-xs font-semibold">
-            Cannaleo
-          </span>
-        )}
+    <div className={dmSans.className}>
+      {/* Page header */}
+      <div className="mb-8 flex items-center gap-4">
+        <button
+          onClick={() => router.back()}
+          className="text-sm text-gray-400 hover:text-gray-700 transition-colors"
+        >
+          ←
+        </button>
+        <div className="flex items-center gap-3">
+          <h1 className="text-[28px] font-bold tracking-tight text-gray-900">{pharmacy.name}</h1>
+          {pharmacy.inventorySource === 'CANNALEO' && (
+            <span className="rounded-full bg-sky-50 text-sky-700 ring-1 ring-sky-200 px-3 py-1 text-xs font-semibold">
+              Cannaleo
+            </span>
+          )}
+        </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-        <div className="rounded-2xl border border-black/10 bg-white p-6 shadow-sm">
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-gray-500 mb-4">Details</h2>
-          <div className="space-y-2 text-sm">
-            <div className="flex justify-between"><span className="text-gray-500">Email</span><span>{pharmacy.email}</span></div>
-            <div className="flex justify-between"><span className="text-gray-500">Contact</span><span>{pharmacy.contact}</span></div>
-            <div className="flex justify-between"><span className="text-gray-500">City</span><span>{pharmacy.city ?? '—'}</span></div>
-            <div className="flex justify-between"><span className="text-gray-500">ZIP</span><span>{pharmacy.zip}</span></div>
-            <div className="flex justify-between"><span className="text-gray-500">Delivery</span><span>{pharmacy.deliveryType}</span></div>
-            <div className="flex justify-between"><span className="text-gray-500">Botendienst</span><span>{pharmacy.supportsBotendienst ? 'Enabled' : 'Disabled'}</span></div>
-            <div className="flex justify-between"><span className="text-gray-500">Pickup</span><span>{pharmacy.supportsPickup ? 'Enabled' : 'Disabled'}</span></div>
-            <div className="flex justify-between">
-              <span className="text-gray-500">Mail Order (DHL)</span>
-              <span>
-                {pharmacy.supportsMailOrder
-                  ? `Enabled — €${(pharmacy.mailOrderFee ?? 0).toFixed(2)}`
-                  : 'Disabled'}
-              </span>
-            </div>
-            <div className="flex justify-between"><span className="text-gray-500">Products</span><span>{pharmacy._count?.products ?? 0}</span></div>
-            <div className="flex justify-between"><span className="text-gray-500">Requests</span><span>{pharmacy._count?.treatmentRequests ?? 0}</span></div>
+        {/* Details card */}
+        <div className={cardCls} style={cardShadow}>
+          <h2 className="text-[10px] uppercase tracking-widest font-semibold text-gray-400 mb-4">
+            Details
+          </h2>
+          <div className="space-y-2.5">
+            {detailRows.map((row) => (
+              <div key={row.label} className="flex justify-between items-center text-sm">
+                <span className="text-gray-400">{row.label}</span>
+                <span className="font-medium text-gray-800 text-right ml-4">
+                  {String(row.value ?? '—')}
+                </span>
+              </div>
+            ))}
           </div>
         </div>
 
+        {/* Cannaleo sync card */}
         {pharmacy.inventorySource === 'CANNALEO' && (
-          <div className="rounded-2xl border border-blue-200 bg-blue-50 p-6 shadow-sm">
-            <h2 className="text-sm font-semibold uppercase tracking-wide text-blue-600 mb-4">Cannaleo Sync</h2>
-            <div className="space-y-2 text-sm mb-4">
-              <div className="flex justify-between"><span className="text-gray-500">Subdomain</span><span className="font-mono text-xs">{pharmacy.cannaleoSubdomain ?? '—'}</span></div>
-              <div className="flex justify-between"><span className="text-gray-500">Vendor ID</span><span className="font-mono text-xs">{pharmacy.cannaleoVendorId ?? '—'}</span></div>
-              <div className="flex justify-between"><span className="text-gray-500">API Key</span><span>{pharmacy.cannaleoApiKey ? '••••••• Set' : 'Not set'}</span></div>
+          <div
+            className="rounded-2xl border border-sky-100 bg-sky-50/40 p-6"
+            style={cardShadow}
+          >
+            <h2 className="text-[10px] uppercase tracking-widest font-semibold text-sky-600 mb-4">
+              Cannaleo Sync
+            </h2>
+            <div className="space-y-2.5 mb-5">
+              {[
+                { label: 'Subdomain', value: pharmacy.cannaleoSubdomain ?? '—', mono: true },
+                { label: 'Vendor ID', value: pharmacy.cannaleoVendorId ?? '—', mono: true },
+                {
+                  label: 'API Key',
+                  value: pharmacy.cannaleoApiKey ? '•••••• Set' : 'Not set',
+                  mono: false,
+                },
+              ].map((row) => (
+                <div key={row.label} className="flex justify-between items-center text-sm">
+                  <span className="text-gray-500">{row.label}</span>
+                  <span
+                    className={`text-gray-800 ml-4 ${row.mono ? 'font-mono text-xs' : 'font-medium'}`}
+                  >
+                    {row.value}
+                  </span>
+                </div>
+              ))}
             </div>
             <button
               onClick={handleSync}
               disabled={syncing}
-              className="w-full rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-blue-700 disabled:opacity-50 transition"
+              className="w-full rounded-xl bg-sky-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-sky-700 disabled:opacity-50 transition"
             >
-              {syncing ? 'Syncing...' : '🔄 Sync Cannaleo Inventory'}
+              {syncing ? 'Syncing…' : 'Sync Cannaleo Inventory'}
             </button>
             {syncResult && (
-              <div className={`mt-3 rounded-lg px-4 py-3 text-sm ${syncResult.errors.length > 0 ? 'bg-red-50 border border-red-200 text-red-700' : 'bg-green-50 border border-green-200 text-green-700'}`}>
+              <div
+                className={`mt-3 rounded-xl px-4 py-3 text-sm ${
+                  syncResult.errors.length > 0
+                    ? 'border border-red-200 bg-red-50 text-red-700'
+                    : 'border border-emerald-200 bg-emerald-50 text-emerald-700'
+                }`}
+              >
                 {syncResult.errors.length === 0
-                  ? `✅ Synced ${syncResult.synced} products successfully`
-                  : `⚠️ Synced ${syncResult.synced} products with ${syncResult.errors.length} errors`
-                }
+                  ? `Synced ${syncResult.synced} products successfully`
+                  : `Synced ${syncResult.synced} products with ${syncResult.errors.length} errors`}
               </div>
             )}
           </div>
         )}
       </div>
 
+      {/* Recent requests */}
       {pharmacy.recentTreatmentRequests && pharmacy.recentTreatmentRequests.length > 0 && (
-        <div className="rounded-2xl border border-black/10 bg-white shadow-sm overflow-hidden">
-          <div className="px-6 py-4 border-b border-black/10">
-            <h2 className="text-sm font-semibold uppercase tracking-wide text-gray-500">Recent Requests</h2>
+        <div
+          className="rounded-2xl bg-white border border-black/[0.06] overflow-hidden"
+          style={cardShadow}
+        >
+          <div className="px-6 py-4 border-b border-gray-100">
+            <h2 className="text-[10px] uppercase tracking-widest font-semibold text-gray-400">
+              Recent Requests
+            </h2>
           </div>
-          <table className="min-w-full text-sm">
-            <thead>
-              <tr className="bg-gray-50 border-b border-black/10">
-                <th className="px-6 py-3 text-left font-medium text-gray-600">ID</th>
-                <th className="px-6 py-3 text-left font-medium text-gray-600">Patient</th>
-                <th className="px-6 py-3 text-left font-medium text-gray-600">Status</th>
-                <th className="px-6 py-3 text-left font-medium text-gray-600">Date</th>
-              </tr>
-            </thead>
-            <tbody>
-              {pharmacy.recentTreatmentRequests.map((r) => (
-                <tr key={r.id} className="border-b border-black/5 last:border-b-0 hover:bg-black/[0.02]">
-                  <td className="px-6 py-3 text-gray-700">{r.id}</td>
-                  <td className="px-6 py-3 text-gray-700">{r.patient.fullName}</td>
-                  <td className="px-6 py-3 text-gray-700">{r.status}</td>
-                  <td className="px-6 py-3 text-gray-700">{new Date(r.createdAt).toLocaleDateString()}</td>
+          <div className="overflow-x-auto">
+            <table className="min-w-full text-sm">
+              <thead>
+                <tr className="bg-gray-50/80 border-b border-gray-100">
+                  {['ID', 'Patient', 'Status', 'Date'].map((h) => (
+                    <th
+                      key={h}
+                      className="px-5 py-3 text-left text-[11px] uppercase tracking-wider font-semibold text-gray-400"
+                    >
+                      {h}
+                    </th>
+                  ))}
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {pharmacy.recentTreatmentRequests.map((r) => (
+                  <tr
+                    key={r.id}
+                    className="border-b border-gray-50 last:border-b-0 hover:bg-emerald-50/30 transition-colors"
+                  >
+                    <td className="px-5 py-3.5 text-xs font-mono text-gray-400">#{r.id}</td>
+                    <td className="px-5 py-3.5 font-medium text-gray-800">
+                      {r.patient.fullName}
+                    </td>
+                    <td className="px-5 py-3.5">
+                      <span
+                        className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-[11px] font-semibold ${statusPillClasses(r.status)}`}
+                      >
+                        {r.status.replace(/_/g, ' ')}
+                      </span>
+                    </td>
+                    <td className="px-5 py-3.5 text-gray-400 text-xs">
+                      {new Date(r.createdAt).toLocaleDateString('de-DE')}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
     </div>
