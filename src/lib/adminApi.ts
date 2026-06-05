@@ -1,5 +1,11 @@
 const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? ''
 
+export function apiUrl(path: string | null | undefined): string {
+  if (!path) return ''
+  if (path.startsWith('http://') || path.startsWith('https://')) return path
+  return `${API_BASE}${path}`
+}
+
 type FetchAdminOptions = RequestInit & {
   query?: Record<string, string | number | boolean | undefined>
 }
