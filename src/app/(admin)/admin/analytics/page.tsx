@@ -8,6 +8,7 @@ import {
   BarChart,
   Cell,
   ComposedChart,
+  Legend,
   Pie,
   PieChart,
   ResponsiveContainer,
@@ -281,6 +282,18 @@ export default function AdminAnalyticsPage() {
                 <Tooltip
                   formatter={(value) => [value, 'Count']}
                   contentStyle={{ borderRadius: 12, border: '1px solid #f3f4f6' }}
+                />
+                <Legend
+                  verticalAlign="bottom"
+                  height={48}
+                  iconType="circle"
+                  formatter={(value: string) =>
+                    value
+                      .replace(/_/g, ' ')
+                      .toLowerCase()
+                      .replace(/\b\w/g, (c) => c.toUpperCase())
+                  }
+                  wrapperStyle={{ fontSize: 12, paddingTop: 12 }}
                 />
               </PieChart>
             </ResponsiveContainer>
