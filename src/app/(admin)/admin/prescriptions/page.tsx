@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { DM_Sans } from 'next/font/google'
-import { getAdminPrescriptions, type PrescriptionListRow } from '@/lib/adminApi'
+import { apiUrl, getAdminPrescriptions, type PrescriptionListRow } from '@/lib/adminApi'
 
 const dmSans = DM_Sans({
   subsets: ['latin'],
@@ -145,7 +145,7 @@ function PrescriptionDetailModal({
 
           {row.pdfUrl ? (
             <a
-              href={row.pdfUrl}
+              href={apiUrl(row.pdfUrl)}
               target="_blank"
               rel="noopener noreferrer"
               className="block w-full rounded-xl bg-[#10b981] px-4 py-2.5 text-sm font-semibold text-white text-center hover:bg-emerald-600 transition"
