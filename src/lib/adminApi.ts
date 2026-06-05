@@ -4,6 +4,38 @@ type FetchAdminOptions = RequestInit & {
   query?: Record<string, string | number | boolean | undefined>
 }
 
+export class AdminApiError extends Error {
+  fieldErrors: Record<string, string>
+
+  constructor(message: string, fieldErrors: Record<string, string> = {}) {
+    super(message)
+    this.name = 'AdminApiError'
+    this.fieldErrors = fieldErrors
+  }
+}
+
+function parseFieldErrors(data: unknown): Record<string, string> {
+  if (!data || typeof data !== 'object') return {}
+  const obj = data as Record<string, unknown>
+  const raw =
+    obj.fieldErrors ??
+    obj.errors ??
+    obj.validationErrors ??
+    (typeof obj.details === 'object' ? obj.details : undefined)
+
+  if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return {}
+
+  const result: Record<string, string> = {}
+  for (const [key, value] of Object.entries(raw as Record<string, unknown>)) {
+    if (typeof value === 'string') {
+      result[key] = value
+    } else if (Array.isArray(value) && typeof value[0] === 'string') {
+      result[key] = value[0]
+    }
+  }
+  return result
+}
+
 function withQuery(
   path: string,
   query?: Record<string, string | number | boolean | undefined>,
@@ -40,10 +72,153 @@ async function fetchAdmin(path: string, options: FetchAdminOptions = {}) {
       data?.message ||
       data?.error ||
       (response.status ? `Request failed with status ${response.status}` : 'Request failed')
-    throw new Error(message)
+    throw new AdminApiError(message, parseFieldErrors(data))
   }
 
   return data
+}
+
+// TYPES
+
+export type DoctorOnboardingStatus =
+  | 'INVITED'
+  | 'DOCUMENTS_PENDING'
+  | 'VERIFIED'
+  | 'ACTIVE'
+  | 'SUSPENDED'
+
+export type Doctor = {
+  id: number
+  userId?: number
+  name: string
+  email: string
+  specialty: string | null
+  licenseNumber: string | null
+  phone: string | null
+  isActive: boolean
+  _count?: { treatmentRequests?: number }
+  title: string | null
+  bsnrNumber: string | null
+  lanrNumber: string | null
+  medicalChamber: string | null
+  languages: string[]
+  onboardingStatus: DoctorOnboardingStatus
+  consultationFee: number | null
+  bio: string | null
+  profilePictureUrl: string | null
+  yearsOfExperience: number | null
+  availableForCannabis: boolean
+  createdAt?: string
+  treatmentRequests?: Array<{
+    id: number
+    status: string
+    createdAt: string
+    patient: { id: number; email: string; fullName: string }
+    pharmacy: { id: number; name: string } | null
+  }>
+}
+
+export type PatientListRow = {
+  id: number
+  fullName: string
+  email: string
+  phone?: string | null
+  createdAt: string
+  _count?: { treatmentRequests?: number }
+}
+
+export type PatientOrderSummary = {
+  id: number
+  status: string
+  createdAt: string
+  deliveryMethod: string | null
+  deliveryAddress: string | null
+  total: number
+  pharmacyName: string | null
+  productCount: number
+}
+
+export type PatientDetail = {
+  id: number
+  email: string
+  name: string | null
+  fullName?: string | null
+  phone: string | null
+  address: string | null
+  treatmentRequests: Array<{
+    id: number
+    status: string
+    createdAt: string
+    doctor: { name: string | null }
+    pharmacy: { name: string | null }
+  }>
+  orders?: PatientOrderSummary[]
+}
+
+export type PharmacyStats = {
+  totalOrders: number
+  totalRevenue: number
+  avgFulfillmentMinutes: number | null
+  ordersThisMonth: number
+  activeOrders: number
+}
+
+export type PharmacyDetail = {
+  id: number
+  name: string
+  email: string
+  contact: string
+  zip: string
+  city?: string
+  deliveryType: string
+  inventorySource?: string
+  cannaleoSubdomain?: string
+  cannaleoVendorId?: string
+  cannaleoApiKey?: string
+  supportsBotendienst?: boolean
+  supportsPickup?: boolean
+  supportsMailOrder?: boolean
+  mailOrderFee?: number | null
+  _count?: { treatmentRequests: number; products: number }
+  recentTreatmentRequests?: Array<{
+    id: number
+    status: string
+    createdAt: string
+    patient: { id: number; email: string; fullName: string }
+  }>
+  stats?: PharmacyStats
+}
+
+export type PrescriptionListRow = {
+  id: number
+  createdAt: string
+  status: string
+  patientName: string | null
+  patientId: number | null
+  doctorName: string | null
+  pharmacyName: string | null
+  pdfUrl: string | null
+  email?: string | null
+  totalPrice?: number | null
+}
+
+export type CreateDoctorPayload = {
+  name: string
+  email: string
+  licenseNumber?: string
+  specialty?: string
+  title?: string | null
+  phone?: string | null
+  profilePictureUrl?: string | null
+  bsnrNumber?: string | null
+  lanrNumber?: string | null
+  medicalChamber?: string | null
+  languages?: string[]
+  yearsOfExperience?: number | null
+  consultationFee?: number | null
+  availableForCannabis?: boolean
+  bio?: string | null
+  onboardingStatus?: DoctorOnboardingStatus
 }
 
 // AUTH
@@ -89,7 +264,7 @@ export async function getAdminPatients(params?: {
   limit?: number
   search?: string
 }): Promise<{
-  patients: unknown[]
+  patients: PatientListRow[]
   total: number
   page: number
   limit: number
@@ -100,7 +275,7 @@ export async function getAdminPatients(params?: {
   })
 }
 
-export async function getAdminPatient(id: number): Promise<unknown> {
+export async function getAdminPatient(id: number): Promise<PatientDetail> {
   return fetchAdmin(`/api/admin/patients/${id}`)
 }
 
@@ -110,7 +285,7 @@ export async function getAdminDoctors(params?: {
   limit?: number
   search?: string
 }): Promise<{
-  doctors: unknown[]
+  doctors: Doctor[]
   total: number
   page: number
   limit: number
@@ -121,26 +296,28 @@ export async function getAdminDoctors(params?: {
   })
 }
 
-export async function getAdminDoctor(id: number): Promise<unknown> {
+export async function getAdminDoctor(id: number): Promise<Doctor> {
   return fetchAdmin(`/api/admin/doctors/${id}`)
 }
 
-export async function toggleDoctorActive(id: number, isActive: boolean): Promise<unknown> {
+export async function toggleDoctorActive(id: number, isActive: boolean): Promise<Doctor> {
   return fetchAdmin(`/api/admin/doctors/${id}/active`, {
     method: 'PATCH',
     body: JSON.stringify({ isActive }),
   })
 }
 
-export async function createDoctor(data: {
-  name: string
-  email: string
-  licenseNumber?: string
-  specialty?: string
-}): Promise<unknown> {
+export async function createDoctor(data: CreateDoctorPayload): Promise<Doctor> {
   return fetchAdmin('/api/admin/doctors', {
     method: 'POST',
     body: JSON.stringify(data),
+  })
+}
+
+export async function updateDoctor(id: number, payload: Partial<Doctor>): Promise<Doctor> {
+  return fetchAdmin(`/api/admin/doctors/${id}`, {
+    method: 'PATCH',
+    body: JSON.stringify(payload),
   })
 }
 
@@ -161,7 +338,7 @@ export async function getAdminPharmacies(params?: {
   })
 }
 
-export async function getAdminPharmacy(id: number): Promise<unknown> {
+export async function getAdminPharmacy(id: number): Promise<PharmacyDetail> {
   return fetchAdmin(`/api/admin/pharmacies/${id}`)
 }
 
@@ -220,7 +397,7 @@ export async function getAdminPrescriptions(params?: {
   search?: string
   status?: string
 }): Promise<{
-  prescriptions: unknown[]
+  prescriptions: PrescriptionListRow[]
   total: number
   page: number
   limit: number
@@ -290,14 +467,70 @@ export async function deactivateAdminMember(id: number): Promise<unknown> {
 }
 
 // ANALYTICS
-export async function getAnalyticsOverview(): Promise<unknown> {
-  return fetchAdmin('/api/admin/analytics/overview')
+export type AnalyticsOverview = {
+  totalPatients?: number
+  totalDoctors?: number
+  totalPharmacies?: number
+  totalTreatmentRequests?: number
+  totalPrescriptions?: number
+  pendingApproval?: number
+  todayRequests?: number
+  totalRevenue?: number
+  activeDoctors?: number
 }
 
-export async function getRequestsByStatus(): Promise<unknown> {
-  return fetchAdmin('/api/admin/analytics/requests-by-status')
+export type RecentActivityItem = {
+  id?: number | string
+  treatmentRequestId?: number | string
+  fullName?: string
+  patientName?: string
+  patient?: { name?: string; fullName?: string }
+  status?: string
+  doctorName?: string
+  doctor?: { name?: string }
+  pharmacyName?: string
+  pharmacy?: { name?: string }
+  createdAt?: string
+  date?: string
+  amount?: number
+  total?: number
+  paymentAmount?: number
 }
 
-export async function getRecentActivity(): Promise<unknown> {
-  return fetchAdmin('/api/admin/analytics/recent-activity')
+export async function getAnalyticsOverview(): Promise<AnalyticsOverview> {
+  const res = await fetchAdmin('/api/admin/analytics/overview')
+  const cast = res as Record<string, unknown>
+  return (cast?.data ?? cast ?? {}) as AnalyticsOverview
+}
+
+export async function getRequestsByStatus(): Promise<
+  Array<{ status: string; count: number }>
+> {
+  const res = await fetchAdmin('/api/admin/analytics/requests-by-status')
+  const cast = res as Record<string, unknown>
+  const inner = cast?.data ?? cast?.rows ?? cast?.byStatus ?? cast
+
+  if (Array.isArray(inner)) {
+    return inner as Array<{ status: string; count: number }>
+  }
+  if (inner && typeof inner === 'object' && !Array.isArray(inner)) {
+    return Object.entries(inner as Record<string, number>).map(([status, count]) => ({
+      status,
+      count: typeof count === 'number' ? count : Number(count),
+    }))
+  }
+  return []
+}
+
+export async function getRecentActivity(): Promise<RecentActivityItem[]> {
+  const res = await fetchAdmin('/api/admin/analytics/recent-activity')
+  const cast = res as Record<string, unknown>
+  const raw =
+    cast?.activity ??
+    cast?.data ??
+    cast?.activities ??
+    cast?.requests ??
+    (Array.isArray(cast) ? cast : [])
+
+  return Array.isArray(raw) ? (raw as RecentActivityItem[]) : []
 }
