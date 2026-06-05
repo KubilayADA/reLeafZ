@@ -3,7 +3,14 @@
 import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { DM_Sans } from 'next/font/google'
-import { getAdminPatient, type PatientDetail, type PatientOrderSummary } from '@/lib/adminApi'
+import {
+  AdminApiError,
+  getAdminPatient,
+  updatePatient,
+  type PatientDetail,
+  type PatientOrderSummary,
+  type PatientUpdatePayload,
+} from '@/lib/adminApi'
 
 const dmSans = DM_Sans({ subsets: ['latin'], weight: ['400', '500', '700'] })
 
@@ -24,6 +31,19 @@ const cardCls = 'rounded-2xl bg-white border border-black/[0.06] p-6'
 const cardShadow = { boxShadow: '0 2px 16px rgba(0,0,0,0.05)' }
 const modalShadow = { boxShadow: '0 20px 60px rgba(0,0,0,0.18)' }
 
+const inputCls =
+  'w-full rounded-xl border border-gray-200 bg-gray-50 px-3.5 py-2.5 text-sm text-gray-900 outline-none transition focus:border-emerald-500 focus:bg-white focus:ring-2 focus:ring-emerald-100'
+
+type PatientFormValues = {
+  fullName: string
+  email: string
+  phone: string
+  dateOfBirth: string
+  street: string
+  city: string
+  zip: string
+}
+
 function formatCurrency(value: number | undefined) {
   return new Intl.NumberFormat('de-DE', {
     style: 'currency',
@@ -33,6 +53,263 @@ function formatCurrency(value: number | undefined) {
   }).format(value ?? 0)
 }
 
+function toDateInputValue(iso: string | null | undefined) {
+  if (!iso) return ''
+  const d = new Date(iso)
+  if (Number.isNaN(d.getTime())) return iso.slice(0, 10)
+  return d.toISOString().slice(0, 10)
+}
+
+function patientToFormValues(patient: PatientDetail): PatientFormValues {
+  return {
+    fullName: patient.fullName ?? patient.name ?? '',
+    email: patient.email ?? '',
+    phone: patient.phone ?? '',
+    dateOfBirth: toDateInputValue(patient.dateOfBirth),
+    street: patient.street ?? '',
+    city: patient.city ?? '',
+    zip: patient.zip ?? '',
+  }
+}
+
+function buildPatientUpdatePayload(
+  form: PatientFormValues,
+  initial: PatientFormValues,
+): PatientUpdatePayload {
+  const payload: PatientUpdatePayload = {}
+  if (form.fullName !== initial.fullName) payload.fullName = form.fullName.trim()
+  if (form.email !== initial.email) payload.email = form.email.trim()
+  if (form.phone !== initial.phone) payload.phone = form.phone.trim() || undefined
+  if (form.dateOfBirth !== initial.dateOfBirth) {
+    payload.dateOfBirth = form.dateOfBirth.trim() ? form.dateOfBirth : null
+  }
+  if (form.street !== initial.street) payload.street = form.street.trim() || undefined
+  if (form.city !== initial.city) payload.city = form.city.trim() || undefined
+  if (form.zip !== initial.zip) payload.zip = form.zip.trim() || undefined
+  return payload
+}
+
+function SectionTitle({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="flex items-center gap-2 mb-4">
+      <div className="w-1 h-5 rounded-full bg-[#10b981]" />
+      <h3 className="text-[10px] uppercase tracking-wider font-semibold text-gray-500">
+        {children}
+      </h3>
+    </div>
+  )
+}
+
+function FieldError({ message }: { message?: string }) {
+  if (!message) return null
+  return <p className="mt-1 text-xs text-red-600">{message}</p>
+}
+
+function PatientEditModal({
+  patient,
+  open,
+  onClose,
+  onSuccess,
+}: {
+  patient: PatientDetail
+  open: boolean
+  onClose: () => void
+  onSuccess: (patient: PatientDetail) => void
+}) {
+  const initialValues = patientToFormValues(patient)
+  const [form, setForm] = useState<PatientFormValues>(initialValues)
+  const [submitting, setSubmitting] = useState(false)
+  const [generalError, setGeneralError] = useState('')
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({})
+
+  useEffect(() => {
+    if (open) {
+      setForm(patientToFormValues(patient))
+      setGeneralError('')
+      setFieldErrors({})
+    }
+  }, [open, patient])
+
+  if (!open) return null
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault()
+    setSubmitting(true)
+    setGeneralError('')
+    setFieldErrors({})
+
+    const payload = buildPatientUpdatePayload(form, initialValues)
+    if (Object.keys(payload).length === 0) {
+      onClose()
+      setSubmitting(false)
+      return
+    }
+
+    try {
+      const updated = await updatePatient(patient.id, payload)
+      onSuccess(updated)
+      onClose()
+    } catch (err) {
+      if (err instanceof AdminApiError) {
+        setGeneralError(err.message)
+        setFieldErrors(err.fieldErrors)
+      } else {
+        setGeneralError(err instanceof Error ? err.message : 'Failed to update patient.')
+      }
+    } finally {
+      setSubmitting(false)
+    }
+  }
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm px-4 py-8 overflow-y-auto"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose()
+      }}
+    >
+      <div
+        className="w-full max-w-lg rounded-2xl bg-white overflow-hidden my-auto"
+        style={modalShadow}
+      >
+        <div className="px-6 py-5 border-b border-gray-100 flex items-start justify-between">
+          <div>
+            <h2 className="text-base font-bold text-gray-900">Edit Patient</h2>
+            <p className="text-xs text-gray-500 mt-0.5">Update identity and address details.</p>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            className="text-gray-400 hover:text-gray-700 text-xl leading-none p-1"
+            aria-label="Close"
+          >
+            ×
+          </button>
+        </div>
+
+        <div className="px-6 py-6 max-h-[70vh] overflow-y-auto">
+          {generalError && (
+            <div className="mb-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+              {generalError}
+            </div>
+          )}
+
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div>
+              <SectionTitle>Identity</SectionTitle>
+              <div className="space-y-3">
+                <div>
+                  <label className="block text-xs font-semibold text-gray-600 mb-1.5">
+                    Full Name
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={form.fullName}
+                    onChange={(e) => setForm((f) => ({ ...f, fullName: e.target.value }))}
+                    className={inputCls}
+                  />
+                  <FieldError message={fieldErrors.fullName} />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-gray-600 mb-1.5">Email</label>
+                  <input
+                    type="email"
+                    required
+                    value={form.email}
+                    onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
+                    className={inputCls}
+                  />
+                  <FieldError message={fieldErrors.email} />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-gray-600 mb-1.5">Phone</label>
+                  <input
+                    type="tel"
+                    value={form.phone}
+                    onChange={(e) => setForm((f) => ({ ...f, phone: e.target.value }))}
+                    className={inputCls}
+                  />
+                  <FieldError message={fieldErrors.phone} />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-gray-600 mb-1.5">
+                    Date of Birth
+                  </label>
+                  <input
+                    type="date"
+                    value={form.dateOfBirth}
+                    onChange={(e) => setForm((f) => ({ ...f, dateOfBirth: e.target.value }))}
+                    className={inputCls}
+                  />
+                  <FieldError message={fieldErrors.dateOfBirth} />
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <SectionTitle>Address</SectionTitle>
+              <div className="space-y-3">
+                <div>
+                  <label className="block text-xs font-semibold text-gray-600 mb-1.5">Street</label>
+                  <input
+                    type="text"
+                    value={form.street}
+                    onChange={(e) => setForm((f) => ({ ...f, street: e.target.value }))}
+                    className={inputCls}
+                  />
+                  <FieldError message={fieldErrors.street} />
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-600 mb-1.5">City</label>
+                    <input
+                      type="text"
+                      value={form.city}
+                      onChange={(e) => setForm((f) => ({ ...f, city: e.target.value }))}
+                      className={inputCls}
+                    />
+                    <FieldError message={fieldErrors.city} />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-600 mb-1.5">
+                      Postal Code
+                    </label>
+                    <input
+                      type="text"
+                      value={form.zip}
+                      onChange={(e) => setForm((f) => ({ ...f, zip: e.target.value }))}
+                      className={inputCls}
+                    />
+                    <FieldError message={fieldErrors.zip} />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex gap-3 pt-2">
+              <button
+                type="button"
+                onClick={onClose}
+                className="flex-1 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 transition"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                disabled={submitting}
+                className="flex-1 rounded-xl bg-[#10b981] px-4 py-2.5 text-sm font-semibold text-white hover:bg-emerald-600 disabled:opacity-50 transition"
+              >
+                {submitting ? 'Saving…' : 'Save Changes'}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 function OrderDetailModal({
   order,
   onClose,
@@ -40,6 +317,8 @@ function OrderDetailModal({
   order: PatientOrderSummary
   onClose: () => void
 }) {
+  const items = order.items ?? []
+
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm px-4"
@@ -99,12 +378,33 @@ function OrderDetailModal({
             <span className="text-gray-400">Pharmacy</span>
             <span className="font-medium text-gray-800">{order.pharmacyName ?? '—'}</span>
           </div>
-          <div className="flex justify-between items-center text-sm">
-            <span className="text-gray-400">Products</span>
-            <span className="font-medium text-gray-800 tabular-nums">
-              {order.productCount ?? 0} item{(order.productCount ?? 0) !== 1 ? 's' : ''}
-            </span>
-          </div>
+
+          {items.length > 0 ? (
+            <div className="pt-2 border-t border-gray-100">
+              <p className="text-sm font-semibold text-gray-800 mb-3">Products</p>
+              <div className="space-y-2.5">
+                {items.map((item) => (
+                  <div
+                    key={`${item.productId}-${item.productName}`}
+                    className="flex justify-between items-baseline gap-4"
+                  >
+                    <span className="text-sm font-medium text-gray-800">{item.productName}</span>
+                    <span className="text-xs text-gray-500 tabular-nums shrink-0">
+                      {item.quantity} × {formatCurrency(item.pricePerUnit)}/g
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ) : (
+            <div className="flex justify-between items-center text-sm">
+              <span className="text-gray-400">Products</span>
+              <span className="font-medium text-gray-800 tabular-nums">
+                {order.productCount ?? 0} item{(order.productCount ?? 0) !== 1 ? 's' : ''}
+              </span>
+            </div>
+          )}
+
           <div className="flex justify-between items-center text-sm pt-2 border-t border-gray-100">
             <span className="text-gray-400">Total</span>
             <span className="font-bold text-gray-900">{formatCurrency(order.total)}</span>
@@ -133,18 +433,22 @@ export default function AdminPatientDetailPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [selectedOrder, setSelectedOrder] = useState<PatientOrderSummary | null>(null)
+  const [showEditModal, setShowEditModal] = useState(false)
+
+  async function loadPatient() {
+    try {
+      const data = await getAdminPatient(id)
+      setPatient(data)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to load patient.')
+    } finally {
+      setLoading(false)
+    }
+  }
 
   useEffect(() => {
-    ;(async () => {
-      try {
-        const data = await getAdminPatient(id)
-        setPatient(data)
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to load patient.')
-      } finally {
-        setLoading(false)
-      }
-    })()
+    void loadPatient()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id])
 
   if (loading) {
@@ -159,7 +463,7 @@ export default function AdminPatientDetailPage() {
     )
   }
 
-  if (error) {
+  if (error && !patient) {
     return (
       <div className={dmSans.className}>
         <div className="rounded-2xl border border-red-200 bg-red-50 px-5 py-4 text-sm text-red-700">
@@ -190,6 +494,18 @@ export default function AdminPatientDetailPage() {
         <OrderDetailModal order={selectedOrder} onClose={() => setSelectedOrder(null)} />
       )}
 
+      {showEditModal && (
+        <PatientEditModal
+          patient={patient}
+          open={showEditModal}
+          onClose={() => setShowEditModal(false)}
+          onSuccess={(updated) => {
+            setPatient(updated)
+            setShowEditModal(false)
+          }}
+        />
+      )}
+
       <div className="mb-8 flex items-center gap-4">
         <button
           onClick={() => router.back()}
@@ -197,8 +513,23 @@ export default function AdminPatientDetailPage() {
         >
           ←
         </button>
-        <h1 className="text-[28px] font-bold tracking-tight text-gray-900">{displayName}</h1>
+        <h1 className="text-[28px] font-bold tracking-tight text-gray-900 flex-1">
+          {displayName}
+        </h1>
+        <button
+          type="button"
+          onClick={() => setShowEditModal(true)}
+          className="rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 transition"
+        >
+          Edit
+        </button>
       </div>
+
+      {error && (
+        <div className="mb-6 rounded-2xl border border-red-200 bg-red-50 px-5 py-4 text-sm text-red-700">
+          {error}
+        </div>
+      )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
         <div className={cardCls} style={cardShadow}>
@@ -208,14 +539,26 @@ export default function AdminPatientDetailPage() {
           <div className="space-y-2.5">
             {[
               { label: 'Email', value: patient.email },
-              { label: 'Name', value: patient.name ?? patient.fullName ?? '—' },
+              { label: 'Name', value: patient.fullName ?? patient.name ?? '—' },
               { label: 'Phone', value: patient.phone ?? '—' },
-              { label: 'City / Address', value: patient.address ?? '—' },
+              {
+                label: 'Date of Birth',
+                value: patient.dateOfBirth
+                  ? new Date(patient.dateOfBirth).toLocaleDateString('de-DE')
+                  : '—',
+              },
+              {
+                label: 'Address',
+                value:
+                  [patient.street, patient.zip, patient.city].filter(Boolean).join(', ') ||
+                  patient.address ||
+                  '—',
+              },
               { label: 'Total Requests', value: treatmentRequests.length },
             ].map((row) => (
               <div key={row.label} className="flex justify-between items-center text-sm">
                 <span className="text-gray-400">{row.label}</span>
-                <span className="font-medium text-gray-800">{row.value}</span>
+                <span className="font-medium text-gray-800 text-right ml-4">{row.value}</span>
               </div>
             ))}
           </div>
@@ -248,7 +591,6 @@ export default function AdminPatientDetailPage() {
         </div>
       </div>
 
-      {/* Order history */}
       <div
         className="rounded-2xl bg-white border border-black/[0.06] overflow-hidden mb-6"
         style={cardShadow}
@@ -314,7 +656,6 @@ export default function AdminPatientDetailPage() {
         )}
       </div>
 
-      {/* Treatment requests table */}
       {treatmentRequests.length > 0 ? (
         <div
           className="rounded-2xl bg-white border border-black/[0.06] overflow-hidden"
