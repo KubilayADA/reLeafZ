@@ -23,6 +23,7 @@ type OverviewData = {
 type ActivityItem = {
   id?: number | string
   treatmentRequestId?: number | string
+  fullName?: string
   patientName?: string
   patient?: { name?: string; fullName?: string }
   status?: string
@@ -102,26 +103,12 @@ export default function AdminDashboardPage() {
 
         if (!mounted) return
 
-        const overviewCast = overviewRes as Record<string, unknown>
-        const normalizedOverview: OverviewData = (overviewCast?.data ??
-          overviewCast ??
-          {}) as OverviewData
+        const normalizedOverview: OverviewData = overviewRes
 
-        const activityCast = activityRes as Record<string, unknown>
-        const rawActivity: unknown =
-          activityCast?.activity ??
-          activityCast?.data ??
-          activityCast?.activities ??
-          activityCast?.requests ??
-          activityCast ??
-          []
-
-        const normalizedActivity = Array.isArray(rawActivity)
-          ? (rawActivity as ActivityItem[])
-          : []
+        const normalizedActivity = activityRes.slice(0, 10)
 
         setOverview(normalizedOverview)
-        setActivity(normalizedActivity.slice(0, 10))
+        setActivity(normalizedActivity)
       } catch (err) {
         if (!mounted) return
         setError(err instanceof Error ? err.message : 'Failed to load dashboard data.')
@@ -355,9 +342,10 @@ export default function AdminDashboardPage() {
                           #{item.id ?? item.treatmentRequestId ?? '—'}
                         </td>
                         <td className="px-5 py-3.5 font-medium text-gray-800">
-                          {item.patientName ??
-                            item.patient?.name ??
+                          {item.fullName ??
+                            item.patientName ??
                             item.patient?.fullName ??
+                            item.patient?.name ??
                             '—'}
                         </td>
                         <td className="px-5 py-3.5">
