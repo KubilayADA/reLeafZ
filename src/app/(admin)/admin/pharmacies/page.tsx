@@ -18,10 +18,7 @@ type Pharmacy = {
   zip?: string
   postcode?: string
   deliveryType?: string
-  treatmentRequestsCount?: number
-  treatmentRequestCount?: number
-  productsCount?: number
-  productCount?: number
+  _count?: { products?: number; treatmentRequests?: number }
 }
 
 const emptyForm = {
@@ -513,10 +510,10 @@ export default function AdminPharmaciesPage() {
                         </span>
                       </td>
                       <td className="px-5 py-3.5 text-gray-600 tabular-nums">
-                        {p.treatmentRequestsCount ?? p.treatmentRequestCount ?? 0}
+                        {p._count?.treatmentRequests ?? 0}
                       </td>
                       <td className="px-5 py-3.5 text-gray-600 tabular-nums">
-                        {p.productsCount ?? p.productCount ?? 0}
+                        {p._count?.products ?? 0}
                       </td>
                     </tr>
                   ))}
