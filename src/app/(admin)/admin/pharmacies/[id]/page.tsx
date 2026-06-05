@@ -3,33 +3,20 @@
 import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { DM_Sans } from 'next/font/google'
-import { getAdminPharmacy, syncCannaleoPharmacy } from '@/lib/adminApi'
+import { Clock } from 'lucide-react'
+import { getAdminPharmacy, syncCannaleoPharmacy, type PharmacyDetail } from '@/lib/adminApi'
 
 const dmSans = DM_Sans({ subsets: ['latin'], weight: ['400', '500', '700'] })
 
-type Pharmacy = {
-  id: number
-  name: string
-  email: string
-  contact: string
-  zip: string
-  city?: string
-  deliveryType: string
-  inventorySource?: string
-  cannaleoSubdomain?: string
-  cannaleoVendorId?: string
-  cannaleoApiKey?: string
-  supportsBotendienst?: boolean
-  supportsPickup?: boolean
-  supportsMailOrder?: boolean
-  mailOrderFee?: number | null
-  _count?: { treatmentRequests: number; products: number }
-  recentTreatmentRequests?: Array<{
-    id: number
-    status: string
-    createdAt: string
-    patient: { id: number; email: string; fullName: string }
-  }>
+type Pharmacy = PharmacyDetail
+
+function formatCurrency(value: number | undefined) {
+  return new Intl.NumberFormat('de-DE', {
+    style: 'currency',
+    currency: 'EUR',
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(value ?? 0)
 }
 
 function statusPillClasses(status: string) {
@@ -225,6 +212,73 @@ export default function AdminPharmacyDetailPage() {
           </div>
         )}
       </div>
+
+      {/* Analytics panel */}
+      {pharmacy.stats && (
+        <div className="mb-6">
+          <h2 className="text-[10px] uppercase tracking-widest font-semibold text-gray-400 mb-4">
+            Analytics
+          </h2>
+          <div className="grid grid-cols-2 xl:grid-cols-4 gap-4 mb-4">
+            {[
+              {
+                label: 'Total Orders',
+                value: pharmacy.stats.totalOrders ?? 0,
+                color: 'text-gray-900',
+              },
+              {
+                label: 'Total Revenue',
+                value: formatCurrency(pharmacy.stats.totalRevenue),
+                color: 'text-emerald-600',
+              },
+              {
+                label: 'Active Orders',
+                value: pharmacy.stats.activeOrders ?? 0,
+                color: 'text-sky-600',
+              },
+              {
+                label: 'Orders This Month',
+                value: pharmacy.stats.ordersThisMonth ?? 0,
+                color: 'text-violet-600',
+              },
+            ].map((stat) => (
+              <div
+                key={stat.label}
+                className="rounded-2xl bg-white border border-black/[0.06] p-5"
+                style={cardShadow}
+              >
+                <p className="text-[10px] uppercase tracking-widest font-semibold text-gray-400 mb-3">
+                  {stat.label}
+                </p>
+                <p className={`text-[36px] font-bold leading-none tracking-tight ${stat.color}`}>
+                  {stat.value}
+                </p>
+              </div>
+            ))}
+          </div>
+          <div
+            className="rounded-2xl px-6 py-4 flex items-center gap-3"
+            style={{
+              background: 'linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%)',
+              boxShadow: '0 2px 16px rgba(0,0,0,0.04)',
+            }}
+          >
+            <Clock className="h-5 w-5 text-gray-400 shrink-0" />
+            <p className="text-sm text-gray-600">
+              {pharmacy.stats.avgFulfillmentMinutes != null ? (
+                <>
+                  Avg fulfillment time:{' '}
+                  <span className="font-semibold text-gray-800">
+                    {pharmacy.stats.avgFulfillmentMinutes} min
+                  </span>
+                </>
+              ) : (
+                'No completed orders yet'
+              )}
+            </p>
+          </div>
+        </div>
+      )}
 
       {/* Recent requests */}
       {pharmacy.recentTreatmentRequests && pharmacy.recentTreatmentRequests.length > 0 && (
