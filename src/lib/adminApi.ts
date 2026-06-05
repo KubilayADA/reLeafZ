@@ -127,6 +127,13 @@ export type PatientListRow = {
   _count?: { treatmentRequests?: number }
 }
 
+export type PatientOrderItem = {
+  productId: number
+  productName: string
+  quantity: number
+  pricePerUnit: number
+}
+
 export type PatientOrderSummary = {
   id: number
   status: string
@@ -136,6 +143,17 @@ export type PatientOrderSummary = {
   total: number
   pharmacyName: string | null
   productCount: number
+  items?: PatientOrderItem[]
+}
+
+export type PatientUpdatePayload = {
+  fullName?: string
+  email?: string
+  phone?: string
+  city?: string
+  street?: string
+  zip?: string
+  dateOfBirth?: string | null
 }
 
 export type PatientDetail = {
@@ -145,6 +163,10 @@ export type PatientDetail = {
   fullName?: string | null
   phone: string | null
   address: string | null
+  city?: string | null
+  street?: string | null
+  zip?: string | null
+  dateOfBirth?: string | null
   treatmentRequests: Array<{
     id: number
     status: string
@@ -163,18 +185,48 @@ export type PharmacyStats = {
   activeOrders: number
 }
 
+export type PharmacyProduct = {
+  id: number
+  name: string
+  strain: string | null
+  thcContent: number | null
+  cbdContent: number | null
+  pricePerGram: number
+  stockGrams: number
+  isActive: boolean
+  cannaleoExternalId: string | null
+}
+
+export type PharmacyUpdatePayload = {
+  name?: string
+  email?: string
+  contact?: string
+  phone?: string
+  zip?: string
+  city?: string
+  cannaleoSubdomain?: string | null
+  cannaleoVendorId?: string | null
+  cannaleoApiKey?: string | null
+  inventorySource?: 'MANUAL' | 'CANNALEO'
+  supportsBotendienst?: boolean
+  supportsPickup?: boolean
+  supportsMailOrder?: boolean
+  mailOrderFee?: number | null
+}
+
 export type PharmacyDetail = {
   id: number
   name: string
   email: string
   contact: string
+  phone?: string | null
   zip: string
   city?: string
   deliveryType: string
-  inventorySource?: string
-  cannaleoSubdomain?: string
-  cannaleoVendorId?: string
-  cannaleoApiKey?: string
+  inventorySource?: 'MANUAL' | 'CANNALEO' | string
+  cannaleoSubdomain?: string | null
+  cannaleoVendorId?: string | null
+  cannaleoApiKey?: string | null
   supportsBotendienst?: boolean
   supportsPickup?: boolean
   supportsMailOrder?: boolean
@@ -187,6 +239,7 @@ export type PharmacyDetail = {
     patient: { id: number; email: string; fullName: string }
   }>
   stats?: PharmacyStats
+  products?: PharmacyProduct[]
 }
 
 export type PrescriptionListRow = {
@@ -279,6 +332,16 @@ export async function getAdminPatient(id: number): Promise<PatientDetail> {
   return fetchAdmin(`/api/admin/patients/${id}`)
 }
 
+export async function updatePatient(
+  id: number,
+  payload: PatientUpdatePayload,
+): Promise<PatientDetail> {
+  return fetchAdmin(`/api/admin/patients/${id}`, {
+    method: 'PATCH',
+    body: JSON.stringify(payload),
+  })
+}
+
 // DOCTORS
 export async function getAdminDoctors(params?: {
   page?: number
@@ -340,6 +403,16 @@ export async function getAdminPharmacies(params?: {
 
 export async function getAdminPharmacy(id: number): Promise<PharmacyDetail> {
   return fetchAdmin(`/api/admin/pharmacies/${id}`)
+}
+
+export async function updatePharmacy(
+  id: number,
+  payload: PharmacyUpdatePayload,
+): Promise<PharmacyDetail> {
+  return fetchAdmin(`/api/admin/pharmacies/${id}`, {
+    method: 'PATCH',
+    body: JSON.stringify(payload),
+  })
 }
 
 export async function updatePharmacyDelivery(
