@@ -4,11 +4,15 @@ import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { DM_Sans } from 'next/font/google'
 import { Clock } from 'lucide-react'
-import { getAdminPharmacy, syncCannaleoPharmacy, type PharmacyDetail } from '@/lib/adminApi'
+import {
+  getAdminPharmacy,
+  syncCannaleoPharmacy,
+  type PharmacyDetail,
+  type PharmacyProduct,
+} from '@/lib/adminApi'
+import { PharmacyEditModal } from '../PharmacyEditModal'
 
 const dmSans = DM_Sans({ subsets: ['latin'], weight: ['400', '500', '700'] })
-
-type Pharmacy = PharmacyDetail
 
 function formatCurrency(value: number | undefined) {
   return new Intl.NumberFormat('de-DE', {
@@ -17,6 +21,11 @@ function formatCurrency(value: number | undefined) {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   }).format(value ?? 0)
+}
+
+function formatPercent(value: number | null | undefined) {
+  if (value == null) return '—'
+  return `${value}%`
 }
 
 function statusPillClasses(status: string) {
@@ -44,23 +53,27 @@ export default function AdminPharmacyDetailPage() {
   const router = useRouter()
   const id = Number(params.id)
 
-  const [pharmacy, setPharmacy] = useState<Pharmacy | null>(null)
+  const [pharmacy, setPharmacy] = useState<PharmacyDetail | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [syncing, setSyncing] = useState(false)
   const [syncResult, setSyncResult] = useState<{ synced: number; errors: string[] } | null>(null)
+  const [showEditModal, setShowEditModal] = useState(false)
+
+  async function loadPharmacy() {
+    try {
+      const data = await getAdminPharmacy(id)
+      setPharmacy(data)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to load pharmacy.')
+    } finally {
+      setLoading(false)
+    }
+  }
 
   useEffect(() => {
-    ;(async () => {
-      try {
-        const data = await getAdminPharmacy(id)
-        setPharmacy(data as Pharmacy)
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to load pharmacy.')
-      } finally {
-        setLoading(false)
-      }
-    })()
+    void loadPharmacy()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id])
 
   async function handleSync() {
@@ -69,6 +82,7 @@ export default function AdminPharmacyDetailPage() {
     try {
       const result = await syncCannaleoPharmacy(id)
       setSyncResult({ synced: result.synced, errors: result.errors })
+      await loadPharmacy()
     } catch (err) {
       setSyncResult({ synced: 0, errors: [err instanceof Error ? err.message : 'Sync failed'] })
     } finally {
@@ -88,7 +102,7 @@ export default function AdminPharmacyDetailPage() {
     )
   }
 
-  if (error) {
+  if (error && !pharmacy) {
     return (
       <div className={dmSans.className}>
         <div className="rounded-2xl border border-red-200 bg-red-50 px-5 py-4 text-sm text-red-700">
@@ -100,10 +114,13 @@ export default function AdminPharmacyDetailPage() {
 
   if (!pharmacy) return null
 
+  const products = pharmacy.products ?? []
+
   const detailRows: Array<{ label: string; value: string | number | boolean | undefined | null }> =
     [
       { label: 'Email', value: pharmacy.email },
       { label: 'Contact', value: pharmacy.contact },
+      { label: 'Phone', value: pharmacy.phone ?? '—' },
       { label: 'City', value: pharmacy.city ?? '—' },
       { label: 'ZIP', value: pharmacy.zip },
       { label: 'Delivery type', value: pharmacy.deliveryType },
@@ -118,13 +135,25 @@ export default function AdminPharmacyDetailPage() {
           ? `Enabled — €${(pharmacy.mailOrderFee ?? 0).toFixed(2)}`
           : 'Disabled',
       },
-      { label: 'Products', value: pharmacy._count?.products ?? 0 },
+      { label: 'Inventory Source', value: pharmacy.inventorySource ?? '—' },
+      { label: 'Products', value: pharmacy._count?.products ?? products.length },
       { label: 'Requests', value: pharmacy._count?.treatmentRequests ?? 0 },
     ]
 
   return (
     <div className={dmSans.className}>
-      {/* Page header */}
+      {showEditModal && (
+        <PharmacyEditModal
+          open={showEditModal}
+          pharmacy={pharmacy}
+          onClose={() => setShowEditModal(false)}
+          onSuccess={(updated) => {
+            setPharmacy(updated)
+            setShowEditModal(false)
+          }}
+        />
+      )}
+
       <div className="mb-8 flex items-center gap-4">
         <button
           onClick={() => router.back()}
@@ -132,7 +161,7 @@ export default function AdminPharmacyDetailPage() {
         >
           ←
         </button>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 flex-1">
           <h1 className="text-[28px] font-bold tracking-tight text-gray-900">{pharmacy.name}</h1>
           {pharmacy.inventorySource === 'CANNALEO' && (
             <span className="rounded-full bg-sky-50 text-sky-700 ring-1 ring-sky-200 px-3 py-1 text-xs font-semibold">
@@ -140,10 +169,22 @@ export default function AdminPharmacyDetailPage() {
             </span>
           )}
         </div>
+        <button
+          type="button"
+          onClick={() => setShowEditModal(true)}
+          className="rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 transition"
+        >
+          Edit
+        </button>
       </div>
 
+      {error && (
+        <div className="mb-6 rounded-2xl border border-red-200 bg-red-50 px-5 py-4 text-sm text-red-700">
+          {error}
+        </div>
+      )}
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-        {/* Details card */}
         <div className={cardCls} style={cardShadow}>
           <h2 className="text-[10px] uppercase tracking-widest font-semibold text-gray-400 mb-4">
             Details
@@ -160,7 +201,6 @@ export default function AdminPharmacyDetailPage() {
           </div>
         </div>
 
-        {/* Cannaleo sync card */}
         {pharmacy.inventorySource === 'CANNALEO' && (
           <div
             className="rounded-2xl border border-sky-100 bg-sky-50/40 p-6"
@@ -213,7 +253,6 @@ export default function AdminPharmacyDetailPage() {
         )}
       </div>
 
-      {/* Analytics panel */}
       {pharmacy.stats && (
         <div className="mb-6">
           <h2 className="text-[10px] uppercase tracking-widest font-semibold text-gray-400 mb-4">
@@ -280,7 +319,95 @@ export default function AdminPharmacyDetailPage() {
         </div>
       )}
 
-      {/* Recent requests */}
+      {/* Products */}
+      <div
+        className="rounded-2xl bg-white border border-black/[0.06] overflow-hidden mb-6"
+        style={cardShadow}
+      >
+        <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between gap-3">
+          <h2 className="text-[10px] uppercase tracking-widest font-semibold text-gray-400">
+            Products ({products.length})
+          </h2>
+          {pharmacy.inventorySource === 'CANNALEO' && (
+            <span className="rounded-full bg-sky-50 text-sky-700 ring-1 ring-sky-200 px-2.5 py-0.5 text-[10px] font-semibold">
+              Synced from Cannaleo
+            </span>
+          )}
+        </div>
+        {products.length > 0 ? (
+          <div className="overflow-x-auto">
+            <table className="min-w-full text-sm">
+              <thead>
+                <tr className="bg-gray-50/80 border-b border-gray-100">
+                  {[
+                    'Name',
+                    'Strain',
+                    'THC %',
+                    'CBD %',
+                    'Price / g',
+                    'Stock (g)',
+                    'Status',
+                    'Cannaleo ID',
+                  ].map((h) => (
+                    <th
+                      key={h}
+                      className="px-5 py-3 text-left text-[11px] uppercase tracking-wider font-semibold text-gray-400"
+                    >
+                      {h}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {products.map((product: PharmacyProduct) => (
+                  <tr
+                    key={product.id}
+                    className="border-b border-gray-50 last:border-b-0 hover:bg-emerald-50/20 transition-colors"
+                  >
+                    <td className="px-5 py-3.5 font-medium text-gray-800">{product.name}</td>
+                    <td className="px-5 py-3.5 text-gray-600">{product.strain ?? '—'}</td>
+                    <td className="px-5 py-3.5 text-gray-600 tabular-nums">
+                      {formatPercent(product.thcContent)}
+                    </td>
+                    <td className="px-5 py-3.5 text-gray-600 tabular-nums">
+                      {formatPercent(product.cbdContent)}
+                    </td>
+                    <td className="px-5 py-3.5 text-gray-800 tabular-nums">
+                      {formatCurrency(product.pricePerGram)}
+                    </td>
+                    <td className="px-5 py-3.5 text-gray-600 tabular-nums">
+                      {product.stockGrams ?? 0}
+                    </td>
+                    <td className="px-5 py-3.5">
+                      <span
+                        className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-[11px] font-semibold ${
+                          product.isActive
+                            ? 'bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200'
+                            : 'bg-gray-100 text-gray-500 ring-1 ring-gray-200'
+                        }`}
+                      >
+                        {product.isActive ? 'Active' : 'Inactive'}
+                      </span>
+                    </td>
+                    <td className="px-5 py-3.5 text-xs font-mono text-gray-400">
+                      {product.cannaleoExternalId ?? '—'}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          <div className="px-6 py-16 text-center">
+            <div className="text-gray-300 text-4xl mb-3">◌</div>
+            <p className="text-sm text-gray-400">No products yet</p>
+            <p className="text-xs text-gray-400 mt-1">
+              Products appear here once the pharmacy uploads inventory or after a Cannaleo sync.
+            </p>
+          </div>
+        )}
+      </div>
+
       {pharmacy.recentTreatmentRequests && pharmacy.recentTreatmentRequests.length > 0 && (
         <div
           className="rounded-2xl bg-white border border-black/[0.06] overflow-hidden"
