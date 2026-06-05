@@ -97,10 +97,13 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       {/* ── Sidebar ── */}
       <aside className="fixed left-0 top-0 h-screen w-[260px] bg-[#111] flex flex-col z-30">
         <div className="px-6 py-6 border-b border-white/[0.07]">
-          <p className="text-xl font-bold tracking-tight text-white">
-            releaf<span className="text-emerald-400">Z</span>
-          </p>
-          <p className="mt-1 text-[10px] tracking-widest uppercase text-gray-500 font-semibold">
+          <img
+            src="/logo1.png"
+            alt="reLeafZ"
+            className="h-8 w-auto"
+            style={{ filter: 'brightness(1.3)' }}
+          />
+          <p className="mt-3 text-[10px] tracking-widest uppercase text-gray-500 font-semibold">
             Admin Control Panel
           </p>
         </div>
