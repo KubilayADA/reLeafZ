@@ -13,6 +13,7 @@ import {
   UserCog,
   BarChart3,
   LogOut,
+  ChevronRight,
 } from 'lucide-react'
 import { adminLogout, adminMe } from '@/lib/adminApi'
 
@@ -45,6 +46,17 @@ function navItemIsActive(pathname: string, href: string) {
   return pathname === href || pathname.startsWith(`${href}/`)
 }
 
+function roleChipClass(role: string) {
+  switch (role.toUpperCase()) {
+    case 'ADMIN':
+      return 'bg-emerald-500/20 text-emerald-400'
+    case 'OPERATOR':
+      return 'bg-cyan-500/20 text-cyan-400'
+    default:
+      return 'bg-gray-500/20 text-gray-400'
+  }
+}
+
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
   const router = useRouter()
@@ -57,9 +69,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         const me = await adminMe()
         if (mounted) setAdmin(me)
       } catch {
-        if (mounted) {
-          setAdmin(null)
-        }
+        if (mounted) setAdmin(null)
       }
     })()
     return () => {
@@ -75,66 +85,90 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     }
   }
 
+  const activeNav = navItems.find((item) => navItemIsActive(pathname, item.href))
+  const pageTitle = activeNav?.label ?? 'Admin'
+
   if (pathname.startsWith(`${ADMIN_BASE}/login`)) {
-    return (
-      <div className={`${dmSans.className} min-h-screen bg-beige text-black`}>{children}</div>
-    )
+    return <div className={`${dmSans.className} min-h-screen`}>{children}</div>
   }
 
   return (
-    <div className={`${dmSans.className} min-h-screen bg-beige text-black`}>
-      <aside className="fixed left-0 top-0 h-screen w-[240px] border-r border-black/10 bg-white/90 backdrop-blur-sm">
-        <div className="h-full flex flex-col">
-          <div className="px-6 py-7 border-b border-black/10">
-            <p className="text-xl font-bold tracking-tight">
-              releaf<span className="text-green-600">Z</span>
-            </p>
-            <p className="mt-3 text-xs text-gray-500">Admin Control Panel</p>
-          </div>
+    <div className={`${dmSans.className} min-h-screen bg-[#fbfdfb] text-gray-900`}>
+      {/* ── Sidebar ── */}
+      <aside className="fixed left-0 top-0 h-screen w-[260px] bg-[#111] flex flex-col z-30">
+        <div className="px-6 py-6 border-b border-white/[0.07]">
+          <p className="text-xl font-bold tracking-tight text-white">
+            releaf<span className="text-emerald-400">Z</span>
+          </p>
+          <p className="mt-1 text-[10px] tracking-widest uppercase text-gray-500 font-semibold">
+            Admin Control Panel
+          </p>
+        </div>
 
-          <nav className="flex-1 px-3 py-4 space-y-1">
-            {navItems.map((item) => {
-              const isActive = navItemIsActive(pathname, item.href)
-              const Icon = item.icon
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className={`flex items-center gap-3 px-3 py-2.5 text-sm rounded-md transition-colors border-l-2 ${
-                    isActive
-                      ? 'border-l-green-600 text-green-700 bg-green-50/70 font-medium'
-                      : 'border-l-transparent text-gray-700 hover:text-black hover:bg-black/5'
-                  }`}
-                >
-                  <Icon size={17} />
-                  <span>{item.label}</span>
-                </Link>
-              )
-            })}
-          </nav>
+        <nav className="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto">
+          {navItems.map((item) => {
+            const isActive = navItemIsActive(pathname, item.href)
+            const Icon = item.icon
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={`flex items-center gap-3 px-3 py-2.5 text-sm rounded-xl transition-all duration-150 border-l-2 ${
+                  isActive
+                    ? 'border-l-emerald-500 bg-emerald-500/[0.12] text-emerald-400 font-medium'
+                    : 'border-l-transparent text-gray-400 hover:text-white hover:bg-white/[0.06]'
+                }`}
+              >
+                <Icon
+                  size={16}
+                  className={isActive ? 'text-emerald-400' : 'text-gray-500 group-hover:text-white'}
+                />
+                <span>{item.label}</span>
+              </Link>
+            )
+          })}
+        </nav>
 
-          <div className="px-4 py-4 border-t border-black/10">
-            <div className="mb-3 px-2">
-              <p className="text-sm font-medium text-gray-900 truncate">
-                {admin?.name ?? 'Admin'}
-              </p>
-              <p className="text-xs text-gray-500 truncate">
-                {admin?.role ?? 'Loading role...'}
-              </p>
+        <div className="px-3 py-4 border-t border-white/[0.07]">
+          <div className="mb-3 px-2 flex items-center gap-3">
+            <div className="w-8 h-8 rounded-full bg-emerald-500/20 flex items-center justify-center text-emerald-400 font-bold text-sm flex-shrink-0">
+              {(admin?.name ?? 'A').charAt(0).toUpperCase()}
             </div>
-            <button
-              type="button"
-              onClick={handleLogout}
-              className="w-full flex items-center justify-center gap-2 px-3 py-2.5 text-sm border border-black/15 rounded-md bg-white hover:bg-black/5 transition-colors"
-            >
-              <LogOut size={16} />
-              Logout
-            </button>
+            <div className="min-w-0">
+              <p className="text-sm font-medium text-white truncate">{admin?.name ?? 'Admin'}</p>
+              {admin?.role && (
+                <span
+                  className={`mt-0.5 inline-block text-[10px] px-1.5 py-0.5 rounded font-semibold uppercase tracking-wide ${roleChipClass(admin.role)}`}
+                >
+                  {admin.role}
+                </span>
+              )}
+            </div>
           </div>
+          <button
+            type="button"
+            onClick={handleLogout}
+            className="w-full flex items-center justify-center gap-2 px-3 py-2 text-sm text-gray-400 border border-white/[0.1] rounded-xl hover:bg-white/[0.06] hover:text-white transition-colors"
+          >
+            <LogOut size={15} />
+            Sign out
+          </button>
         </div>
       </aside>
 
-      <main className="ml-[240px] min-h-screen p-6 md:p-8">{children}</main>
+      {/* ── Topbar ── */}
+      <div className="fixed top-0 right-0 left-[260px] h-[58px] bg-[#fbfdfb]/95 backdrop-blur-sm border-b border-black/[0.06] z-20 flex items-center px-8">
+        <div className="flex items-center gap-2 text-sm">
+          <span className="text-gray-400">Admin</span>
+          <ChevronRight size={13} className="text-gray-300" />
+          <span className="font-semibold text-gray-700">{pageTitle}</span>
+        </div>
+      </div>
+
+      {/* ── Main content ── */}
+      <main className="ml-[260px] min-h-screen pt-[58px]">
+        <div className="p-8">{children}</div>
+      </main>
     </div>
   )
 }
