@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { DM_Sans } from 'next/font/google'
-import { getAdminPrescriptions } from '@/lib/adminApi'
+import { getAdminPrescriptions, type PrescriptionListRow } from '@/lib/adminApi'
 
 const dmSans = DM_Sans({
   subsets: ['latin'],
@@ -24,19 +24,7 @@ const STATUS_OPTIONS = [
   'CANCELLED',
 ] as const
 
-type Prescription = {
-  id?: number
-  patientName?: string
-  email?: string
-  patient?: { name?: string; fullName?: string; email?: string }
-  status?: string
-  doctorName?: string
-  doctor?: { name?: string }
-  pharmacyName?: string
-  pharmacy?: { name?: string }
-  totalPrice?: number
-  createdAt?: string
-}
+const modalShadow = { boxShadow: '0 20px 60px rgba(0,0,0,0.18)' }
 
 function statusPillClasses(status: string | undefined) {
   switch (status) {
@@ -62,7 +50,7 @@ function statusPillClasses(status: string | undefined) {
   }
 }
 
-function formatCurrency(value: number | undefined) {
+function formatCurrency(value: number | undefined | null) {
   return new Intl.NumberFormat('de-DE', {
     style: 'currency',
     currency: 'EUR',
@@ -82,8 +70,106 @@ function formatDate(dateLike: string | undefined) {
   }).format(date)
 }
 
+function PrescriptionDetailModal({
+  row,
+  onClose,
+}: {
+  row: PrescriptionListRow
+  onClose: () => void
+}) {
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm px-4"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose()
+      }}
+    >
+      <div
+        className="w-full max-w-md rounded-2xl bg-white overflow-hidden"
+        style={modalShadow}
+      >
+        <div className="px-6 py-5 border-b border-gray-100 flex items-start justify-between">
+          <div>
+            <h2 className="text-base font-bold text-gray-900">
+              Prescription #{row.id}
+            </h2>
+            <p className="text-xs text-gray-500 mt-0.5">{formatDate(row.createdAt)}</p>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            className="text-gray-400 hover:text-gray-700 text-xl leading-none p-1"
+            aria-label="Close"
+          >
+            ×
+          </button>
+        </div>
+
+        <div className="px-6 py-6 space-y-4">
+          <div className="flex justify-between items-center">
+            <span className="text-sm text-gray-400">Status</span>
+            <span
+              className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-[11px] font-semibold ${statusPillClasses(row.status)}`}
+            >
+              {(row.status ?? 'UNKNOWN').replace(/_/g, ' ')}
+            </span>
+          </div>
+          <div className="flex justify-between items-center text-sm gap-4">
+            <span className="text-gray-400 shrink-0">Patient</span>
+            {row.patientId ? (
+              <Link
+                href={`/admin/patients/${row.patientId}`}
+                className="font-medium text-emerald-600 hover:text-emerald-700 text-right"
+                onClick={(e) => e.stopPropagation()}
+              >
+                {row.patientName ?? 'View patient'}
+              </Link>
+            ) : (
+              <span className="font-medium text-gray-800">{row.patientName ?? '—'}</span>
+            )}
+          </div>
+          <div className="flex justify-between items-center text-sm">
+            <span className="text-gray-400">Doctor</span>
+            <span className="font-medium text-gray-800">{row.doctorName ?? '—'}</span>
+          </div>
+          <div className="flex justify-between items-center text-sm">
+            <span className="text-gray-400">Pharmacy</span>
+            <span className="font-medium text-gray-800">{row.pharmacyName ?? '—'}</span>
+          </div>
+          {row.totalPrice != null && (
+            <div className="flex justify-between items-center text-sm pt-2 border-t border-gray-100">
+              <span className="text-gray-400">Total</span>
+              <span className="font-bold text-gray-900">{formatCurrency(row.totalPrice)}</span>
+            </div>
+          )}
+
+          {row.pdfUrl ? (
+            <a
+              href={row.pdfUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block w-full rounded-xl bg-[#10b981] px-4 py-2.5 text-sm font-semibold text-white text-center hover:bg-emerald-600 transition"
+            >
+              Download PDF
+            </a>
+          ) : (
+            <button
+              type="button"
+              disabled
+              title="PDF not yet generated"
+              className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm font-medium text-gray-400 cursor-not-allowed"
+            >
+              Download PDF
+            </button>
+          )}
+        </div>
+      </div>
+    </div>
+  )
+}
+
 export default function AdminPrescriptionsPage() {
-  const [rows, setRows] = useState<Prescription[]>([])
+  const [rows, setRows] = useState<PrescriptionListRow[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [search, setSearch] = useState('')
@@ -91,6 +177,7 @@ export default function AdminPrescriptionsPage() {
   const [page, setPage] = useState(1)
   const [limit] = useState(10)
   const [totalPages, setTotalPages] = useState(1)
+  const [selectedRow, setSelectedRow] = useState<PrescriptionListRow | null>(null)
 
   useEffect(() => {
     let mounted = true
@@ -105,7 +192,7 @@ export default function AdminPrescriptionsPage() {
           status: status === 'All' ? undefined : status,
         })
         if (!mounted) return
-        setRows((res?.prescriptions ?? []) as Prescription[])
+        setRows(res?.prescriptions ?? [])
         setTotalPages(Math.max(1, res?.totalPages ?? 1))
       } catch (err) {
         if (!mounted) return
@@ -121,7 +208,10 @@ export default function AdminPrescriptionsPage() {
 
   return (
     <div className={dmSans.className}>
-      {/* Header */}
+      {selectedRow && (
+        <PrescriptionDetailModal row={selectedRow} onClose={() => setSelectedRow(null)} />
+      )}
+
       <div className="mb-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
           <h1 className="text-[28px] font-bold tracking-tight text-gray-900">Prescriptions</h1>
@@ -169,23 +259,21 @@ export default function AdminPrescriptionsPage() {
           <table className="min-w-full text-sm">
             <thead>
               <tr className="bg-gray-50/80 border-b border-gray-100">
-                {['ID', 'Patient', 'Email', 'Status', 'Doctor', 'Pharmacy', 'Price', 'Date'].map(
-                  (h) => (
-                    <th
-                      key={h}
-                      className="px-5 py-3 text-left text-[11px] uppercase tracking-wider font-semibold text-gray-400"
-                    >
-                      {h}
-                    </th>
-                  ),
-                )}
+                {['ID', 'Patient', 'Doctor', 'Pharmacy', 'Status', 'Date'].map((h) => (
+                  <th
+                    key={h}
+                    className="px-5 py-3 text-left text-[11px] uppercase tracking-wider font-semibold text-gray-400"
+                  >
+                    {h}
+                  </th>
+                ))}
               </tr>
             </thead>
             <tbody>
               {loading
                 ? Array.from({ length: 10 }).map((_, idx) => (
                     <tr key={idx} className="border-b border-gray-50">
-                      {Array.from({ length: 8 }).map((__, cidx) => (
+                      {Array.from({ length: 6 }).map((__, cidx) => (
                         <td key={cidx} className="px-5 py-3.5">
                           <div className="h-3 w-20 bg-gray-200 rounded animate-pulse" />
                         </td>
@@ -195,42 +283,21 @@ export default function AdminPrescriptionsPage() {
                 : rows.map((r, idx) => (
                     <tr
                       key={r.id ?? idx}
-                      className="border-b border-gray-50 last:border-b-0 hover:bg-emerald-50/30 transition-colors"
+                      onClick={() => setSelectedRow(r)}
+                      className="border-b border-gray-50 last:border-b-0 hover:bg-emerald-50/30 transition-colors cursor-pointer"
                     >
-                      <td className="px-5 py-3.5 text-xs font-mono text-gray-400">
-                        <Link
-                          href={`/admin/prescriptions/${r.id}`}
-                          className="hover:text-emerald-600 transition-colors"
-                        >
-                          #{r.id ?? '—'}
-                        </Link>
-                      </td>
+                      <td className="px-5 py-3.5 text-xs font-mono text-gray-400">#{r.id ?? '—'}</td>
                       <td className="px-5 py-3.5 font-medium text-gray-800">
-                        <Link
-                          href={`/admin/prescriptions/${r.id}`}
-                          className="hover:text-emerald-600 transition-colors"
-                        >
-                          {r.patientName ?? r.patient?.name ?? r.patient?.fullName ?? '—'}
-                        </Link>
+                        {r.patientName ?? '—'}
                       </td>
-                      <td className="px-5 py-3.5 text-gray-500">
-                        {r.email ?? r.patient?.email ?? '—'}
-                      </td>
+                      <td className="px-5 py-3.5 text-gray-600">{r.doctorName ?? '—'}</td>
+                      <td className="px-5 py-3.5 text-gray-600">{r.pharmacyName ?? '—'}</td>
                       <td className="px-5 py-3.5">
                         <span
                           className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-[11px] font-semibold ${statusPillClasses(r.status)}`}
                         >
                           {(r.status ?? 'UNKNOWN').replace(/_/g, ' ')}
                         </span>
-                      </td>
-                      <td className="px-5 py-3.5 text-gray-600">
-                        {r.doctorName ?? r.doctor?.name ?? '—'}
-                      </td>
-                      <td className="px-5 py-3.5 text-gray-600">
-                        {r.pharmacyName ?? r.pharmacy?.name ?? '—'}
-                      </td>
-                      <td className="px-5 py-3.5 text-gray-700 tabular-nums font-medium">
-                        {formatCurrency(r.totalPrice)}
                       </td>
                       <td className="px-5 py-3.5 text-gray-400 text-xs">
                         {formatDate(r.createdAt)}
@@ -239,7 +306,7 @@ export default function AdminPrescriptionsPage() {
                   ))}
               {!loading && rows.length === 0 && (
                 <tr>
-                  <td colSpan={8} className="px-5 py-16 text-center">
+                  <td colSpan={6} className="px-5 py-16 text-center">
                     <div className="text-gray-300 text-4xl mb-3">◌</div>
                     <p className="text-sm text-gray-400">No treatment requests found</p>
                   </td>

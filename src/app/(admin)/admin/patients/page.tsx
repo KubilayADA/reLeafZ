@@ -1,25 +1,14 @@
 'use client'
 
-import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { DM_Sans } from 'next/font/google'
-import { getAdminPatients } from '@/lib/adminApi'
+import { getAdminPatients, type PatientListRow } from '@/lib/adminApi'
 
 const dmSans = DM_Sans({
   subsets: ['latin'],
   weight: ['400', '500', '700'],
 })
-
-type Patient = {
-  id?: number
-  name?: string
-  fullName?: string
-  email?: string
-  phone?: string
-  treatmentRequestsCount?: number
-  treatmentRequestCount?: number
-  createdAt?: string | null
-}
 
 function formatDate(dateLike: string | null | undefined) {
   if (!dateLike) return '—'
@@ -33,7 +22,8 @@ function formatDate(dateLike: string | null | undefined) {
 }
 
 export default function AdminPatientsPage() {
-  const [patients, setPatients] = useState<Patient[]>([])
+  const router = useRouter()
+  const [patients, setPatients] = useState<PatientListRow[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [searchInput, setSearchInput] = useState('')
@@ -62,7 +52,7 @@ export default function AdminPatientsPage() {
           search: search || undefined,
         })
         if (!mounted) return
-        setPatients((res?.patients ?? []) as Patient[])
+        setPatients(res?.patients ?? [])
         setTotalPages(Math.max(1, res?.totalPages ?? 1))
       } catch (err) {
         if (!mounted) return
@@ -79,7 +69,6 @@ export default function AdminPatientsPage() {
 
   return (
     <div className={dmSans.className}>
-      {/* Header */}
       <div className="mb-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
           <h1 className="text-[28px] font-bold tracking-tight text-gray-900">Patients</h1>
@@ -131,29 +120,16 @@ export default function AdminPatientsPage() {
                   ))
                 : patients.map((p) => (
                     <tr
-                      key={p.id ?? Math.random()}
-                      className="border-b border-gray-50 last:border-b-0 hover:bg-emerald-50/30 transition-colors"
+                      key={p.id}
+                      onClick={() => router.push(`/admin/patients/${p.id}`)}
+                      className="border-b border-gray-50 last:border-b-0 hover:bg-emerald-50/30 transition-colors cursor-pointer"
                     >
-                      <td className="px-5 py-3.5 text-xs font-mono text-gray-400">
-                        <Link
-                          href={`/admin/patients/${p.id}`}
-                          className="hover:text-emerald-600 transition-colors"
-                        >
-                          #{p.id ?? '—'}
-                        </Link>
-                      </td>
-                      <td className="px-5 py-3.5 font-medium text-gray-800">
-                        <Link
-                          href={`/admin/patients/${p.id}`}
-                          className="hover:text-emerald-600 transition-colors"
-                        >
-                          {p.name ?? p.fullName ?? '—'}
-                        </Link>
-                      </td>
+                      <td className="px-5 py-3.5 text-xs font-mono text-gray-400">#{p.id}</td>
+                      <td className="px-5 py-3.5 font-medium text-gray-800">{p.fullName ?? '—'}</td>
                       <td className="px-5 py-3.5 text-gray-500">{p.email ?? '—'}</td>
                       <td className="px-5 py-3.5 text-gray-500">{p.phone ?? '—'}</td>
                       <td className="px-5 py-3.5 text-gray-600 tabular-nums">
-                        {p.treatmentRequestsCount ?? p.treatmentRequestCount ?? 0}
+                        {p._count?.treatmentRequests ?? 0}
                       </td>
                       <td className="px-5 py-3.5 text-gray-400 text-xs">
                         {formatDate(p.createdAt)}
