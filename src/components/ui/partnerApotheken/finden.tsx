@@ -39,36 +39,104 @@ const PHARMACY: Pharmacy = {
 
 const MAP_ID = process.env.NEXT_PUBLIC_GOOGLE_MAPS_MAP_ID ?? 'DEMO_MAP_ID'
 const MAPS_API_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY ?? ''
-const MAP_ZOOM_START = 11
 const PHARMACY_ZOOM = 15
+const MAP_REVEAL_DELAY_MS = 1000
 
-function getMapZoomProgress(mapEl: HTMLElement) {
-  const rect = mapEl.getBoundingClientRect()
-  const vh = window.innerHeight
-  const startY = vh * 0.9
-  const endY = vh * 0.35
-  return Math.min(1, Math.max(0, (startY - rect.top) / (startY - endY)))
-}
-
-function MapScrollZoom({ progress }: { progress: number }) {
+function MapContainerFit({
+  containerRef,
+  isReady,
+}: {
+  containerRef: React.RefObject<HTMLDivElement | null>
+  isReady: boolean
+}) {
   const map = useMap()
 
   useEffect(() => {
-    if (!map) return
+    const container = containerRef.current
+    if (!map || !container || !isReady) return
 
-    const zoom = MAP_ZOOM_START + (PHARMACY_ZOOM - MAP_ZOOM_START) * progress
-    map.setCenter({ lat: PHARMACY.lat, lng: PHARMACY.lng })
-    map.setZoom(zoom)
-  }, [map, progress])
+    const fitMap = () => {
+      window.google?.maps.event.trigger(map, 'resize')
+      map.setCenter({ lat: PHARMACY.lat, lng: PHARMACY.lng })
+      map.setZoom(PHARMACY_ZOOM)
+    }
+
+    fitMap()
+
+    const observer = new ResizeObserver(() => {
+      window.requestAnimationFrame(fitMap)
+    })
+    observer.observe(container)
+
+    const delayedFit = window.setTimeout(fitMap, 400)
+    const delayedFitLate = window.setTimeout(fitMap, 1100)
+
+    return () => {
+      observer.disconnect()
+      window.clearTimeout(delayedFit)
+      window.clearTimeout(delayedFitLate)
+    }
+  }, [map, containerRef, isReady])
 
   return null
+}
+
+function StoryNavButton({
+  direction,
+  label,
+  disabled = true,
+  onClick,
+}: {
+  direction: 'prev' | 'next'
+  label: string
+  disabled?: boolean
+  onClick?: () => void
+}) {
+  return (
+    <button
+      type="button"
+      className="partner-apotheken-story-nav-btn"
+      aria-label={label}
+      disabled={disabled}
+      onClick={onClick}
+    >
+      <svg
+        className="partner-apotheken-story-nav-icon"
+        viewBox="0 0 16 16"
+        fill="none"
+        aria-hidden
+      >
+        {direction === 'prev' ? (
+          <path
+            d="M10 3L5 8l5 5"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        ) : (
+          <path
+            d="M6 3l5 5-5 5"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        )}
+      </svg>
+    </button>
+  )
 }
 
 function AsavitaStory({ pharmacy }: { pharmacy: Pharmacy }) {
   return (
     <article className="partner-apotheken-story">
+      <div className="partner-apotheken-story-nav" aria-label="Apotheke wechseln">
+        <StoryNavButton direction="prev" label="Vorherige Apotheke" />
+        <StoryNavButton direction="next" label="Nächste Apotheke" />
+      </div>
+
       <header className="partner-apotheken-story-header">
-        <p className="partner-apotheken-story-kicker">Unsere Partnerapotheke</p>
         <h3 className="partner-apotheken-story-title">{pharmacy.name}</h3>
       </header>
 
@@ -80,14 +148,17 @@ function AsavitaStory({ pharmacy }: { pharmacy: Pharmacy }) {
       <div className="partner-apotheken-story-points">
         <p>
           <span className="partner-apotheken-story-term">Berlin, 90 Min.</span>
+          {' — '}
           Lieferung innerhalb von 90 Minuten direkt nach Hause.
         </p>
         <p>
           <span className="partner-apotheken-story-term">Abholung</span>
+          {' — '}
           Persönlich in der Apotheke, Mo–Fr 10–18 Uhr.
         </p>
         <p>
           <span className="partner-apotheken-story-term">Deutschlandweit</span>
+          {' — '}
           Versand per DHL, sicher und diskret in 1–3 Werktagen.
         </p>
       </div>
@@ -102,12 +173,11 @@ function AsavitaStory({ pharmacy }: { pharmacy: Pharmacy }) {
           <span aria-hidden> · </span>
           {pharmacy.hours}
         </p>
-        <p>
+        <p className="partner-apotheken-story-meta-line">
           <a href={`tel:${pharmacy.phone.replace(/\s/g, '')}`}>{pharmacy.phone}</a>
           <span aria-hidden> · </span>
           <a href={`mailto:${pharmacy.email}`}>{pharmacy.email}</a>
-        </p>
-        <p className="partner-apotheken-story-links">
+          <span aria-hidden> · </span>
           <a href={pharmacy.website} target="_blank" rel="noreferrer">
             asavita.de
           </a>
@@ -123,39 +193,47 @@ function AsavitaStory({ pharmacy }: { pharmacy: Pharmacy }) {
 
 function PartnerApothekenMap({
   landingTheme,
-  zoomProgress,
+  containerRef,
+  isReady,
+  showMarker,
 }: {
   landingTheme: LandingTheme
-  zoomProgress: number
+  containerRef: React.RefObject<HTMLDivElement | null>
+  isReady: boolean
+  showMarker: boolean
 }) {
   const colorScheme = landingTheme === 'dark' ? ColorScheme.DARK : ColorScheme.LIGHT
 
   return (
-    <APIProvider apiKey={MAPS_API_KEY} libraries={['marker']}>
-      <Map
-        mapId={MAP_ID}
-        defaultCenter={{ lat: PHARMACY.lat, lng: PHARMACY.lng }}
-        defaultZoom={MAP_ZOOM_START}
-        colorScheme={colorScheme}
-        disableDefaultUI
-        clickableIcons={false}
-        gestureHandling="cooperative"
-        className="partner-apotheken-map"
-        style={{ width: '100%', height: '100%' }}
-      >
-        <MapScrollZoom progress={zoomProgress} />
+    <Map
+      mapId={MAP_ID}
+      defaultCenter={{ lat: PHARMACY.lat, lng: PHARMACY.lng }}
+      defaultZoom={PHARMACY_ZOOM}
+      colorScheme={colorScheme}
+      disableDefaultUI
+      clickableIcons={false}
+      gestureHandling="cooperative"
+      className="partner-apotheken-map"
+      style={{ width: '100%', height: '100%' }}
+    >
+      <MapContainerFit containerRef={containerRef} isReady={isReady} />
+      {showMarker ? (
         <AdvancedMarker position={{ lat: PHARMACY.lat, lng: PHARMACY.lng }} title={PHARMACY.name} />
-      </Map>
-    </APIProvider>
+      ) : null}
+    </Map>
   )
 }
 
 function PartnerApothekenMapMount({
   landingTheme,
-  zoomProgress,
+  containerRef,
+  isReady,
+  showMarker,
 }: {
   landingTheme: LandingTheme
-  zoomProgress: number
+  containerRef: React.RefObject<HTMLDivElement | null>
+  isReady: boolean
+  showMarker: boolean
 }) {
   const [isMounted, setIsMounted] = React.useState(false)
 
@@ -167,14 +245,25 @@ function PartnerApothekenMapMount({
     return <div className="partner-apotheken-map-placeholder" aria-hidden />
   }
 
-  return <PartnerApothekenMap landingTheme={landingTheme} zoomProgress={zoomProgress} />
+  return (
+    <div className="partner-apotheken-map-slot">
+      <APIProvider apiKey={MAPS_API_KEY} libraries={['marker']}>
+        <PartnerApothekenMap
+          landingTheme={landingTheme}
+          containerRef={containerRef}
+          isReady={isReady}
+          showMarker={showMarker}
+        />
+      </APIProvider>
+    </div>
+  )
 }
 
 const PartnerApotheken = () => {
   const sectionRef = useRef<HTMLElement | null>(null)
-  const mapWrapRef = useRef<HTMLDivElement | null>(null)
+  const mapContainerRef = useRef<HTMLDivElement | null>(null)
   const [isInView, setIsInView] = useState(false)
-  const [zoomProgress, setZoomProgress] = useState(0)
+  const [mapRevealed, setMapRevealed] = useState(false)
   const landingTheme = useSyncExternalStore(
     subscribeLandingTheme,
     getLandingThemeClientSnapshot,
@@ -209,35 +298,12 @@ const PartnerApotheken = () => {
 
     const motionMedia = window.matchMedia('(prefers-reduced-motion: reduce)')
     if (motionMedia.matches) {
-      setZoomProgress(1)
+      setMapRevealed(true)
       return
     }
 
-    let rafId = 0
-
-    const updateZoomProgress = () => {
-      const mapEl = mapWrapRef.current
-      if (!mapEl) return
-      setZoomProgress(getMapZoomProgress(mapEl))
-    }
-
-    const onScrollOrResize = () => {
-      if (rafId) return
-      rafId = window.requestAnimationFrame(() => {
-        rafId = 0
-        updateZoomProgress()
-      })
-    }
-
-    updateZoomProgress()
-    window.addEventListener('scroll', onScrollOrResize, { passive: true })
-    window.addEventListener('resize', onScrollOrResize, { passive: true })
-
-    return () => {
-      window.removeEventListener('scroll', onScrollOrResize)
-      window.removeEventListener('resize', onScrollOrResize)
-      if (rafId) window.cancelAnimationFrame(rafId)
-    }
+    const revealTimer = window.setTimeout(() => setMapRevealed(true), MAP_REVEAL_DELAY_MS)
+    return () => window.clearTimeout(revealTimer)
   }, [isInView])
 
   return (
@@ -255,22 +321,32 @@ const PartnerApotheken = () => {
       </div>
 
       <div className="partner-apotheken-inner partner-apotheken__shell">
-        <div className="partner-apotheken-heading">
-          <p className="partner-apotheken-kicker partner-apotheken-reveal">Partner-Apotheken</p>
-          <h2 className="partner-apotheken-reveal">Finde deine Apotheke in der Nähe</h2>
-          <p className="partner-apotheken-subtitle partner-apotheken-reveal">
-            Standort auf der Karte — Lieferung, Abholung und Kontakt zu unserer Partnerapotheke in Berlin.
-          </p>
+        <div className="partner-apotheken-intro-row">
+          <span className="partner-apotheken-story-pill partner-apotheken-reveal">
+            Unsere Partnerapotheke
+          </span>
+          <h2 className="partner-apotheken-title partner-apotheken-reveal">
+            <span className="partner-apotheken-title-line">Deine Apotheke.</span>
+            <span className="partner-apotheken-title-line">Überall in Deutschland.</span>
+          </h2>
         </div>
 
         <div className="partner-apotheken-layout">
           <div
-            ref={mapWrapRef}
-            className="partner-apotheken-map-wrap partner-apotheken-reveal partner-apotheken-reveal--from-left"
+            className={`partner-apotheken-map-wrap partner-apotheken-reveal partner-apotheken-reveal--from-left${mapRevealed ? ' is-map-revealed' : ''}`}
           >
-            <div className="partner-apotheken-google-map" aria-label="Berlin Karte mit Partner-Apotheken">
+            <div
+              ref={mapContainerRef}
+              className="partner-apotheken-google-map"
+              aria-label="Berlin Karte mit Partner-Apotheken"
+            >
               {isInView ? (
-                <PartnerApothekenMapMount landingTheme={landingTheme} zoomProgress={zoomProgress} />
+                <PartnerApothekenMapMount
+                  landingTheme={landingTheme}
+                  containerRef={mapContainerRef}
+                  isReady={isInView}
+                  showMarker={mapRevealed}
+                />
               ) : (
                 <div className="partner-apotheken-map-placeholder" aria-hidden />
               )}
