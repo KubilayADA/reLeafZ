@@ -218,6 +218,14 @@ export type PharmacyUpdatePayload = {
   supportsPickup?: boolean
   supportsMailOrder?: boolean
   mailOrderFee?: number | null
+  // Profile fields editable by admin
+  description?: string | null
+  logoUrl?: string | null
+  operatingHours?: string | null
+  contactPersonName?: string | null
+  contactEmail?: string | null
+  apothekenLizenz?: string | null
+  btmErlaubnis?: string | null
 }
 
 export type PharmacyDetail = {
@@ -228,6 +236,9 @@ export type PharmacyDetail = {
   phone?: string | null
   zip: string
   city?: string
+  street?: string | null
+  latitude?: number | null
+  longitude?: number | null
   deliveryType: string
   inventorySource?: 'MANUAL' | 'CANNALEO' | string
   cannaleoSubdomain?: string | null
@@ -237,6 +248,19 @@ export type PharmacyDetail = {
   supportsPickup?: boolean
   supportsMailOrder?: boolean
   mailOrderFee?: number | null
+  baseDeliveryFee?: number | null
+  extendedDeliveryFee?: number | null
+  deliveryRadius?: number | null
+  maxDeliveryRadius?: number | null
+  // Profile fields
+  description?: string | null
+  logoUrl?: string | null
+  operatingHours?: string | null
+  contactPersonName?: string | null
+  contactEmail?: string | null
+  apothekenLizenz?: string | null
+  btmErlaubnis?: string | null
+  apiKey?: string | null
   _count?: { treatmentRequests: number; products: number }
   recentTreatmentRequests?: Array<{
     id: number

@@ -24,7 +24,52 @@ export interface Pharmacy {
   zip: string;
   contact: string;
   zipRange?: string;
+  // Address
+  street?: string | null;
+  city?: string | null;
+  latitude?: number | null;
+  longitude?: number | null;
+  // Editable by pharmacist
+  description?: string | null;
+  logoUrl?: string | null;
+  operatingHours?: string | null;
+  contactPersonName?: string | null;
+  contactEmail?: string | null;
+  phone?: string | null;
+  mailOrderFee?: number | null;
+  baseDeliveryFee?: number;
+  extendedDeliveryFee?: number;
+  deliveryRadius?: number;
+  maxDeliveryRadius?: number;
+  // Locked (admin-managed)
+  deliveryType?: string;
+  supportsBotendienst?: boolean;
+  supportsPickup?: boolean;
+  supportsMailOrder?: boolean;
+  inventorySource?: 'MANUAL' | 'CANNALEO' | string;
+  cannaleoSubdomain?: string | null;
+  cannaleoVendorId?: string | null;
+  cannaleoApiKey?: string | null;
+  apothekenLizenz?: string | null;
+  btmErlaubnis?: string | null;
+  apiKey?: string | null;
+  // Derived from inventorySource
+  isSyncMode?: boolean;
 }
+
+export type EditableProfileFields = {
+  description: string | null;
+  logoUrl: string | null;
+  operatingHours: string | null;
+  contactPersonName: string | null;
+  contactEmail: string | null;
+  phone: string | null;
+  mailOrderFee: number | null;
+  baseDeliveryFee: number;
+  extendedDeliveryFee: number;
+  deliveryRadius: number;
+  maxDeliveryRadius: number;
+};
 
 export interface OrderItem {
   productId: number;
@@ -911,4 +956,26 @@ export async function updateProductStock(
   stock: number
 ): Promise<Product> {
   return updateProduct(productId, { stock });
+}
+
+// ============================================
+// PHARMACY PROFILE (self-update by pharmacist)
+// ============================================
+
+export async function updatePharmacyProfile(
+  pharmacyId: number,
+  patch: Partial<EditableProfileFields>
+): Promise<Pharmacy> {
+  const response = await fetch(`${API_BASE}/api/pharmacy/${pharmacyId}/profile`, {
+    method: 'PATCH',
+    credentials: 'include',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(patch),
+  });
+  if (!response.ok) {
+    const body = await response.json().catch(() => ({})) as { message?: string };
+    throw new Error(body.message ?? 'Profil-Update fehlgeschlagen');
+  }
+  const json = await response.json() as { data: Pharmacy };
+  return json.data;
 }
