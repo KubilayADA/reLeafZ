@@ -40,6 +40,44 @@ const preExistingConditionOptions = [
   { id: 'Keine', title: 'Keine Vorerkrankungen' },
 ]
 
+const DISQUALIFYING_CONDITIONS = [
+  'Psychose',
+  'Persoenlichkeitsstoerung',
+  'THCAllergie',
+  'Sucht',
+  'Herzkrankheit',
+  'LeberNierenkrankheit',
+] as const
+
+function getDisqualificationReasons(state: {
+  isPregnantOrBreastfeeding: boolean | null
+  exceededMonthlyLimit: boolean | null
+  preExistingConditions: string[]
+}): string[] {
+  const reasons: string[] = []
+  if (state.isPregnantOrBreastfeeding === true) {
+    reasons.push('Schwangerschaft oder Stillzeit')
+  }
+  if (state.exceededMonthlyLimit === true) {
+    reasons.push('Überschreitung des monatlichen Höchstkonsums')
+  }
+  const hitConditions = state.preExistingConditions.filter((c) =>
+    DISQUALIFYING_CONDITIONS.includes(c as (typeof DISQUALIFYING_CONDITIONS)[number])
+  )
+  if (hitConditions.length > 0) {
+    const conditionLabels: Record<string, string> = {
+      Psychose: 'Psychose',
+      Persoenlichkeitsstoerung: 'Persönlichkeitsstörung',
+      THCAllergie: 'THC-Allergie',
+      Sucht: 'Suchterkrankung',
+      Herzkrankheit: 'Schwere Herzerkrankung',
+      LeberNierenkrankheit: 'Schwere Leber- oder Nierenerkrankung',
+    }
+    hitConditions.forEach((c) => reasons.push(conditionLabels[c] ?? c))
+  }
+  return reasons
+}
+
 export default function Step6({
   onNext,
   onBack,
@@ -71,11 +109,19 @@ export default function Step6({
     setPreExistingConditions(initialPreExistingConditions)
   }, [initialPreExistingConditions])
 
+  const disqualificationReasons = getDisqualificationReasons({
+    isPregnantOrBreastfeeding,
+    exceededMonthlyLimit,
+    preExistingConditions,
+  })
+  const isDisqualified = disqualificationReasons.length > 0
+
   const handleNext = () => {
     if (
       isPregnantOrBreastfeeding !== null &&
       exceededMonthlyLimit !== null &&
-      preExistingConditions.length > 0
+      preExistingConditions.length > 0 &&
+      !isDisqualified
     ) {
       onNext({ isPregnantOrBreastfeeding, exceededMonthlyLimit, preExistingConditions })
     }
@@ -135,11 +181,6 @@ export default function Step6({
                   )
                 })}
               </div>
-              {isPregnantOrBreastfeeding === true && (
-                <p className="form-warning-text" style={{ marginTop: '0.75rem' }}>
-                  ⚠️ Hinweis: Bei Schwangerschaft oder Stillzeit ist eine medizinische Cannabis-Therapie in der Regel nicht möglich. Bitte sprich mit einem Arzt vor Ort.
-                </p>
-              )}
             </section>
 
             <section className="form-step4-section form-step4-section--fit">
@@ -177,11 +218,6 @@ export default function Step6({
                   )
                 })}
               </div>
-              {exceededMonthlyLimit === true && (
-                <p className="form-warning-text" style={{ marginTop: '0.75rem' }}>
-                  ⚠️ Hinweis: Das monatliche Limit ist erreicht. Eine erneute Verschreibung über releafZ ist erst im Folgemonat möglich.
-                </p>
-              )}
             </section>
 
             <section className="form-step4-section form-step4-section--fit">
@@ -230,12 +266,32 @@ export default function Step6({
             </section>
           </div>
 
+          {isDisqualified && (
+            <div className="bg-red-50 border border-red-200 text-red-900 rounded-lg p-4 my-4">
+              <p className="font-bold">⚠️ Keine Cannabis-Therapie möglich</p>
+              <p className="mt-2">
+                Aufgrund Ihrer Angaben können wir Ihnen leider keine Cannabis-Therapie
+                anbieten. Bitte konsultieren Sie Ihre:n behandelnde:n Ärzt:in.
+              </p>
+              <p className="mt-3 font-semibold">Grund:</p>
+              <ul className="mt-1 list-disc list-inside">
+                {disqualificationReasons.map((reason) => (
+                  <li key={reason}>{reason}</li>
+                ))}
+              </ul>
+              <p className="mt-3 text-sm">
+                Bei Fragen erreichen Sie uns unter support@releafz.de
+              </p>
+            </div>
+          )}
+
           <Button
             onClick={handleNext}
             disabled={
               isPregnantOrBreastfeeding === null ||
               exceededMonthlyLimit === null ||
               preExistingConditions.length === 0 ||
+              isDisqualified ||
               submitting
             }
             className="form-cta btn-secondary form-step4-cta form-cta--step4-fit"
