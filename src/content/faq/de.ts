@@ -11,8 +11,8 @@ export interface FaqContent {
 }
 
 export const faqDe: FaqContent = {
-  eyebrow: 'FAQ',
-  title: 'Häufige Fragen',
+  eyebrow: 'Häufig gestellte Fragen',
+  title: 'Alles, was du wissen möchtest.',
   items: [
     {
       id: 'was-ist-medizinisches-cannabis',
