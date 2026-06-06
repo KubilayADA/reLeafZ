@@ -1374,6 +1374,24 @@ export default function PharmacyDashboard() {
   useEffect(() => { if (activeView !== 'inventory' || !pharmacyId) return; const t = setTimeout(() => loadInventory(pharmacyId, buildInventoryFilters()), 300); return () => clearTimeout(t) }, [inventorySearch, inventoryFormFilter, inventoryAvailability, inventorySortBy, inventorySortOrder, activeView, pharmacyId, loadInventory, buildInventoryFilters])
   useEffect(() => { if (activeView !== 'analytics' || !pharmacyId) return; loadAnalytics(pharmacyId, analyticsPeriod) }, [analyticsPeriod, activeView, pharmacyId, loadAnalytics])
 
+  useEffect(() => {
+    if (!pharmacyId) return
+    if (activeView === 'orders') return
+
+    const tick = () => {
+      fetchPharmacyOrders(pharmacyId, buildOrderFilters())
+        .then((next) => {
+          setOrdersResponse(next)
+        })
+        .catch(() => {
+          // intentional: background poll, no UI noise on transient failures
+        })
+    }
+
+    const interval = setInterval(tick, 30_000)
+    return () => clearInterval(interval)
+  }, [pharmacyId, activeView, buildOrderFilters])
+
   // pharmacy_id in localStorage is UI-only — it restores the dashboard view on reload.
   // All actual auth is enforced via the httpOnly session cookie on every API call.
   // The backend must verify that the session matches the requested pharmacyId on every endpoint.
