@@ -51,7 +51,7 @@ function buildHeroZStars(count: number): HeroZStar[] {
 const HERO_Z_STARS = buildHeroZStars(200)
 
 const HERO_NAV_LINKS = [
-  { href: '#faq', label: 'Ablauf', scrollKey: 'faq' as const },
+  { href: '#ablauf', label: 'Ablauf', scrollKey: 'ablauf' as const },
   { href: '#partner-apotheken', label: 'Apotheke in Ihrer Nähe' },
   { href: '#faq', label: 'FAQ' },
   { href: '#chat', label: 'Chat with us!' },
@@ -62,11 +62,11 @@ function HeroTopNav({ onScrollToAblauf }: { onScrollToAblauf: () => void }) {
     <nav className="hero-logo-bar__nav header-desktop-nav header-text" aria-label="Hauptnavigation">
       {HERO_NAV_LINKS.map((link) => (
         <a
-          key={link.href}
+          key={`${link.href}-${link.label}`}
           href={link.href}
           className="header-nav-link"
           onClick={(e) => {
-            if (link.scrollKey === 'faq') {
+            if (link.scrollKey === 'ablauf') {
               e.preventDefault()
               onScrollToAblauf()
             }
@@ -228,16 +228,29 @@ function HeroAccordionRows({
 export function MobileHero({ setDialogOpen }: { setDialogOpen: (open: boolean) => void }) {
   const heroRef = React.useRef<HTMLElement>(null)
 
-  const mobileParticles = React.useMemo(() =>
-    Array.from({ length: 6 }, (_, i) => ({
-      id: i,
-      size: Math.random() * 4 + 2,
-      left: Math.random() * 100,
-      top: Math.random() * 100,
-      duration: Math.random() * 10 + 10,
-      delay: Math.random() * 5,
-    })), []
-  )
+  const [mobileParticles, setMobileParticles] = React.useState<
+    Array<{
+      id: number
+      size: number
+      left: number
+      top: number
+      duration: number
+      delay: number
+    }>
+  >([])
+
+  React.useEffect(() => {
+    setMobileParticles(
+      Array.from({ length: 6 }, (_, i) => ({
+        id: i,
+        size: Math.random() * 4 + 2,
+        left: Math.random() * 100,
+        top: Math.random() * 100,
+        duration: Math.random() * 10 + 10,
+        delay: Math.random() * 5,
+      }))
+    )
+  }, [])
 
   return (
     <section className="mobile-hero" ref={heroRef}>

@@ -746,3 +746,11 @@
 #landing-main[data-theme='light'] .partner-apotheken-story-note {
   color: rgba(15, 23, 42, 0.58);
 }
+
+/* HOTFIX: Cap map container until Nico finalises the new layout */
+.partner-apotheken-map-wrap {
+  max-height: 480px !important;
+  max-width: 600px !important;
+  width: 100% !important;
+  aspect-ratio: auto !important;
+}

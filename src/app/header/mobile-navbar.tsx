@@ -13,7 +13,7 @@ interface MobileNavbarProps {
 }
 
 const NAV_LINKS = [
-  { href: '#faq', label: 'So funktionierts' },
+  { href: '#ablauf', label: 'So funktionierts' },
   { href: '#partner-apotheken', label: 'Partner-Apotheken' },
   { href: '#faq', label: 'FAQ' },
 ]
@@ -101,7 +101,7 @@ export default function MobileNavbar({
     e.preventDefault()
     setIsOpen(false)
 
-    if (href === '#faq') {
+    if (href === '#ablauf') {
       scrollLandingToAblauf()
       return
     }
@@ -148,7 +148,7 @@ export default function MobileNavbar({
         <nav className="mnav__links" aria-label="Hauptnavigation">
           {NAV_LINKS.map(link => (
             <a
-              key={link.href}
+              key={`${link.href}-${link.label}`}
               href={link.href}
               className="mnav__link"
               onClick={(e) => handleNavClick(e, link.href)}
