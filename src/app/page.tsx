@@ -8,9 +8,9 @@ import MobileNavbar from './header/mobile-navbar'
 import CookieBanner from '@/components/ui/cookie'
 import '@/components/ui/Hero/Words-Sliding-Smooth.css'
 import ComingSoon from '@/components/ComingSoon'
-import How from '@/components/ui/funktioniert/how'
 import PartnerApotheken from '@/components/ui/partnerApotheken/finden'
 import Faq from '@/components/ui/faq/faq'
+import MailReq from '@/components/ui/newsletter/mailreq'
 import Footer from '@/components/ui/footer/footer'
 import { attachLandingBinarySwitch } from '@/lib/scroll'
 import { useLandingTheme } from '@/lib/use-landing-theme'
@@ -387,9 +387,9 @@ function LandingPageContent() {
           suppressHydrationWarning
         >
           <MobileHero setDialogOpen={setDialogOpen} />
-          <How landingTheme={landingTheme} setDialogOpen={setDialogOpen} />
           <PartnerApotheken />
           <Faq />
+          <MailReq />
 
           <Footer />
         </div>

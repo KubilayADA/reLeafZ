@@ -4,7 +4,7 @@ import React from 'react'
 import './footer.css'
 
 const FOOTER_LINK_HREFS: Record<string, string> = {
-  'How it Works': '#ablauf',
+  'How it Works': '#faq',
   Community: 'https://www.instagram.com/releafz.hq/',
   'For Doctors': '/partners',
   'For Pharmacies': '/pharmacies',

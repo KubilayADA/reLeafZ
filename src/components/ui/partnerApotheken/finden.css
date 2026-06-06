@@ -36,7 +36,7 @@
   position: relative;
   overflow: hidden;
   scroll-margin-top: 150px;
-  padding: 9rem 1.55rem 10rem;
+  padding: 9rem 1.55rem 2rem;
   background: var(--pa-bg);
   font-family: var(--pa-sans);
   color: var(--pa-text);

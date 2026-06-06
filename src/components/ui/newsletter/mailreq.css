@@ -1,0 +1,295 @@
+/* ============================================
+   Newsletter CTA — matches FAQ / partner sections
+   Scoped under .mailreq-section
+   ============================================ */
+
+.mailreq-section {
+  --mr-bg: var(--releafz-bg);
+  --mr-text: var(--releafz-text);
+  --mr-muted: var(--releafz-muted);
+  --mr-cyan: var(--releafz-cyan);
+  --mr-sans: var(--releafz-sans);
+  --mr-ease: cubic-bezier(0.4, 0, 0.2, 1);
+  --mr-content-inset: 1.55rem;
+
+  position: relative;
+  overflow: hidden;
+  scroll-margin-top: 150px;
+  padding: 4rem 1.55rem 5rem;
+  background: var(--mr-bg);
+  font-family: var(--mr-sans);
+  color: var(--mr-text);
+  -webkit-font-smoothing: antialiased;
+  transition: color 280ms ease, background-color 280ms ease;
+}
+
+@media (max-width: 767px) {
+  .mailreq-section {
+    padding: 3rem 1.55rem 4rem;
+  }
+}
+
+@media (min-width: 1200px) {
+  .mailreq-section {
+    --mr-content-inset: 2rem;
+  }
+}
+
+.mailreq__bg {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.mailreq__bg-base {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, #0a0a0a 0%, #0f0f0f 50%, #0a0a0a 100%);
+}
+
+.mailreq__particles {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.mailreq__particles canvas {
+  position: absolute !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.mailreq__glow-radial {
+  position: absolute;
+  left: 50%;
+  top: 40%;
+  transform: translate(-50%, -50%);
+  width: 100%;
+  height: 240px;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(34, 211, 238, 0.08) 0%,
+    rgba(16, 185, 129, 0.06) 30%,
+    transparent 70%
+  );
+}
+
+.mailreq__grid {
+  position: absolute;
+  inset: 0;
+  opacity: 0.05;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.1) 1px, transparent 1px);
+  background-size: 50px 50px;
+}
+
+.mailreq-inner {
+  position: relative;
+  z-index: 1;
+  width: min(100%, 40rem);
+  margin-inline: auto;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.mailreq-intro-row {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.85rem;
+  width: 100%;
+  max-width: 36rem;
+  margin-bottom: 1.75rem;
+  text-align: center;
+}
+
+.mailreq-story-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.45rem 0.85rem;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  line-height: 1;
+  color: #0f172a;
+  background: #ffffff;
+  border-style: solid;
+  border-color: #333;
+  border-width: 2.5px 4px 4px 2.5px;
+  border-radius: 0.5rem;
+}
+
+.mailreq-title {
+  margin: 0;
+  font-size: clamp(1.75rem, 3.5vw, 2.75rem);
+  line-height: 1.05;
+  font-weight: 700;
+  color: var(--mr-text);
+  text-shadow: 0 0 30px rgba(255, 255, 255, 0.06);
+}
+
+.mailreq-lead {
+  margin: 0;
+  max-width: 32rem;
+  font-size: 0.975rem;
+  line-height: 1.6;
+  color: var(--mr-muted);
+  text-align: center;
+}
+
+.mailreq-form {
+  width: 100%;
+  max-width: 36rem;
+}
+
+.mailreq-form__row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  align-items: stretch;
+}
+
+@media (min-width: 640px) {
+  .mailreq-form__row {
+    flex-direction: row;
+    align-items: stretch;
+  }
+}
+
+.mailreq-error {
+  margin: 0.75rem 0 0;
+  font-size: 0.875rem;
+  color: #f87171;
+  text-align: center;
+}
+
+.mailreq-success {
+  margin: 0;
+  max-width: 36rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--mr-cyan);
+  text-align: center;
+}
+
+.mailreq-input {
+  flex: 1;
+  min-width: 0;
+  padding: 0.9rem 0;
+  border: none;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 0;
+  background: transparent;
+  color: var(--mr-text);
+  font-family: var(--mr-sans);
+  font-size: 1rem;
+  line-height: 1.4;
+  transition: border-color 220ms var(--mr-ease);
+}
+
+.mailreq-input::placeholder {
+  color: rgba(255, 255, 255, 0.38);
+}
+
+.mailreq-input:focus {
+  outline: none;
+  border-bottom-color: var(--mr-cyan);
+}
+
+.mailreq-submit {
+  flex-shrink: 0;
+  padding: 0.85rem 1.35rem;
+  border-style: solid;
+  border-color: #333;
+  border-width: 2.5px 4px 4px 2.5px;
+  border-radius: 0.5rem;
+  background: #ffffff;
+  color: #0f172a;
+  font-family: var(--mr-sans);
+  font-size: 0.875rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  transition:
+    transform 180ms var(--mr-ease),
+    opacity 180ms var(--mr-ease);
+}
+
+.mailreq-submit:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+.mailreq-submit:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.mailreq-submit:focus-visible {
+  outline: 2px solid var(--mr-cyan);
+  outline-offset: 3px;
+}
+
+.mailreq-form__label {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+#landing-main[data-theme='light'] .mailreq-section {
+  --mr-text: #0f172a;
+  --mr-muted: rgba(15, 23, 42, 0.72);
+}
+
+#landing-main[data-theme='light'] .mailreq__bg-base {
+  background: linear-gradient(to bottom, #f8fafc 0%, #f1f5f9 50%, #f8fafc 100%);
+}
+
+#landing-main[data-theme='light'] .mailreq__grid {
+  opacity: 0.11;
+  background-image:
+    linear-gradient(rgba(15, 23, 42, 0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(15, 23, 42, 0.08) 1px, transparent 1px);
+}
+
+#landing-main[data-theme='light'] .mailreq-title {
+  text-shadow: none;
+}
+
+#landing-main[data-theme='light'] .mailreq-input {
+  border-bottom-color: rgba(15, 23, 42, 0.18);
+}
+
+#landing-main[data-theme='light'] .mailreq-input::placeholder {
+  color: rgba(15, 23, 42, 0.4);
+}
+
+#landing-main[data-theme='light'] .mailreq-input:focus {
+  border-bottom-color: #0284c7;
+}
+
+#landing-main[data-theme='light'] .mailreq-success {
+  color: #0284c7;
+}
+
+@media (max-width: 767px) {
+  .mailreq-story-pill {
+    padding: 0.32rem 0.62rem;
+    font-size: 0.625rem;
+  }
+}

@@ -20,7 +20,7 @@ export function scrollToLandingTop(): void {
   window.scrollTo({ top: 0, behavior: 'smooth' })
 }
 
-/** Enter main view from hero, or scroll to #ablauf when already in main view. */
+/** Enter main view from hero, or scroll to #faq when already in main view. */
 export function scrollLandingToAblauf(): void {
   const landingMainTop = getLandingMainTop()
   const stillOnHero = window.scrollY < Math.max(0, landingMainTop - 8)
@@ -30,13 +30,13 @@ export function scrollLandingToAblauf(): void {
     return
   }
 
-  const el = document.getElementById('ablauf')
+  const el = document.getElementById('faq')
   if (el) {
     const top = el.getBoundingClientRect().top + window.scrollY - HEADER_OFFSET
     window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' })
   }
   try {
-    window.history.pushState({}, '', '/#ablauf')
+    window.history.pushState({}, '', '/#faq')
   } catch {
     /* ignore */
   }
