@@ -96,8 +96,19 @@ export default function Step5({
     setNonMedicalTherapies(initialNonMedicalTherapies)
   }, [initialNonMedicalTherapies])
 
+  const showTreatmentLocationsWarning =
+    hasSeenDoctor === true && treatmentLocations.length === 0
+  const showMedicationDetailsWarning =
+    hasTakenMedication === true && medicationDetails.trim().length < 3
+
   const handleNext = () => {
-    if (hasSeenDoctor !== null && hasTakenMedication !== null && nonMedicalTherapies.length > 0) {
+    if (
+      hasSeenDoctor !== null &&
+      hasTakenMedication !== null &&
+      nonMedicalTherapies.length > 0 &&
+      !showTreatmentLocationsWarning &&
+      !showMedicationDetailsWarning
+    ) {
       onNext({
         hasSeenDoctor,
         treatmentLocations,
@@ -208,6 +219,11 @@ export default function Step5({
                     )
                   })}
                 </div>
+                {showTreatmentLocationsWarning && (
+                  <p className="text-sm text-amber-700" style={{ marginTop: '0.75rem' }}>
+                    Bitte wählen Sie mindestens eine behandelnde Stelle aus.
+                  </p>
+                )}
               </section>
             )}
 
@@ -283,6 +299,11 @@ export default function Step5({
                 <p className="form-section-hint" style={{ textAlign: 'right', marginTop: '0.25rem', fontSize: '0.75rem' }}>
                   {medicationDetails.length}/2000
                 </p>
+                {showMedicationDetailsWarning && (
+                  <p className="text-sm text-amber-700" style={{ marginTop: '0.75rem' }}>
+                    Bitte geben Sie die eingenommenen Medikamente an (mind. 3 Zeichen).
+                  </p>
+                )}
               </section>
             )}
 
@@ -336,7 +357,14 @@ export default function Step5({
 
           <Button
             onClick={handleNext}
-            disabled={hasSeenDoctor === null || hasTakenMedication === null || nonMedicalTherapies.length === 0 || submitting}
+            disabled={
+              hasSeenDoctor === null ||
+              hasTakenMedication === null ||
+              nonMedicalTherapies.length === 0 ||
+              showTreatmentLocationsWarning ||
+              showMedicationDetailsWarning ||
+              submitting
+            }
             className="form-cta btn-secondary form-step4-cta form-cta--step4-fit"
           >
             {submitting ? 'Wird gesendet...' : 'Weiter'}
