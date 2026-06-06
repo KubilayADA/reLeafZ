@@ -21,6 +21,8 @@ import {
   type OrdersResponse, type OrderFilters, type OrderDetail, type InventoryResponse,
   type InventoryFilters, type AnalyticsResponse,
   STATUS_TRANSITIONS, STATUS_TRANSITION_LABELS,
+  getDeliveryCategory, DELIVERY_PIPELINES, ACTION_LABELS, CATEGORY_ACCENTS,
+  type DeliveryCategory,
   API_BASE,
 } from '@/lib/api'
 
@@ -88,7 +90,7 @@ function getStatusColor(status: string) {
   if (s === 'PICKED_UP') return { bg: 'bg-purple-500/15', text: 'text-purple-400', dot: 'bg-purple-400', border: 'border-purple-500/20' }
   return { bg: 'bg-white/10', text: 'text-white/60', dot: 'bg-white/40', border: 'border-white/10' }
 }
-function getStatusOrder(status: string) { const o: Record<string, number> = { PENDING: 0, APPROVED: 1, PAID: 2, PROCESSING: 3, READY: 4, PICKED_UP: 5, DELIVERED: 6, FULFILLED: 6 }; return o[status.toUpperCase()] ?? -1 }
+function getStatusOrder(status: string) { const o: Record<string, number> = { PENDING: 0, APPROVED: 1, PAID: 2, PROCESSING: 3, READY: 4, DISPATCHED: 5, PICKED_UP: 5, DELIVERED: 6, FULFILLED: 6 }; return o[status.toUpperCase()] ?? -1 }
 
 const STATUS_STEPS = [
   { key: 'APPROVED', label: 'Genehmigt', icon: CheckCircle }, { key: 'PAID', label: 'Bezahlt', icon: CreditCard },
@@ -112,42 +114,20 @@ type DeliveryMethodLabel = {
   icon: string
 }
 
-function getDeliveryMethodDisplay(
-  method: string | null | undefined,
-): DeliveryMethodLabel {
-  if (!method) {
-    return {
-      label: 'Unbekannt',
-      className: 'bg-slate-500 text-slate-50',
-      icon: '—',
-    }
-  }
-  if (method === 'DHL') {
-    return {
-      label: 'DHL Versand',
-      className: 'bg-amber-500 text-amber-50',
-      icon: '📦',
-    }
-  }
-  if (method === 'BOTENDIENST_NEARBY' || method === 'BOTENDIENST_FAR') {
-    return {
-      label: 'Botendienst',
-      className: 'bg-sky-500 text-sky-50',
-      icon: '🚴',
-    }
-  }
-  if (method === 'PICKUP') {
-    return {
-      label: 'Abholung',
-      className: 'bg-emerald-500 text-emerald-50',
-      icon: '🏪',
-    }
-  }
+function getDeliveryMethodDisplay(method: string | null | undefined): DeliveryMethodLabel {
+  const cat = getDeliveryCategory(method);
+  const accent = CATEGORY_ACCENTS[cat];
+  const specific =
+    method === 'BOTENDIENST_FAR'                                    ? 'Botendienst (weit)'
+    : method === 'BOTENDIENST_NEAR' || method === 'BOTENDIENST_NEARBY' ? 'Botendienst (nah)'
+    : method === 'DHL'                                              ? 'DHL Versand'
+    : method === 'MAIL_ORDER'                                       ? 'Versand'
+    : null;
   return {
-    label: method,
-    className: 'bg-slate-500 text-slate-50',
-    icon: '—',
-  }
+    label: specific ?? accent.label,
+    className: `${accent.badgeBg} ${accent.badgeText} border border-white/[0.06]`,
+    icon: accent.icon,
+  };
 }
 
 function DeliveryMethodBadge({ method }: { method: string | null | undefined }) {
@@ -205,6 +185,7 @@ export default function PharmacyDashboard() {
   const [activeView, setActiveView] = useState<ViewType>('dashboard'); const [loading, setLoading] = useState(false)
   const [dashboardData, setDashboardData] = useState<DashboardResponse | null>(null)
   const [ordersResponse, setOrdersResponse] = useState<OrdersResponse | null>(null)
+  const [deliveryCategoryTab, setDeliveryCategoryTab] = useState<DeliveryCategory | 'ALL'>('ALL')
   const [orderStatusTab, setOrderStatusTab] = useState('ALL'); const [orderSearch, setOrderSearch] = useState('')
   const [orderDateFrom, setOrderDateFrom] = useState(''); const [orderDateTo, setOrderDateTo] = useState(''); const [orderSort, setOrderSort] = useState('createdAt:desc')
   const [ordersLoading, setOrdersLoading] = useState(false)
@@ -227,6 +208,12 @@ export default function PharmacyDashboard() {
   const revenueStats = useMemo(() => dashboardData?.stats?.revenue ?? EMPTY_REVENUE_STATS, [dashboardData])
   const inventoryStats = useMemo(() => dashboardData?.stats?.inventory ?? EMPTY_INVENTORY_STATS, [dashboardData])
   const recentOrders = useMemo(() => dashboardData?.recentOrders ?? [], [dashboardData])
+  const visibleOrders = useMemo(
+    () => (ordersResponse?.data ?? []).filter(o =>
+      deliveryCategoryTab === 'ALL' ? true : getDeliveryCategory(o.deliveryMethod) === deliveryCategoryTab
+    ),
+    [ordersResponse, deliveryCategoryTab]
+  )
 
   useEffect(() => { setIsClient(true) }, [])
   useEffect(() => {
@@ -293,19 +280,44 @@ export default function PharmacyDashboard() {
   const handleInventorySortToggle = (col: string) => { if (inventorySortBy === col) setInventorySortOrder(p => p === 'asc' ? 'desc' : 'asc'); else { setInventorySortBy(col); setInventorySortOrder('asc') } }
 
   const renderNextStatusButton = (order: { id: number; status: string; deliveryMethod?: string | null }) => {
+    const cat = getDeliveryCategory(order.deliveryMethod);
     let allowed = STATUS_TRANSITIONS[order.status] ?? [];
     if (order.status === 'READY') {
-      allowed = order.deliveryMethod?.includes('BOTENDIENST')
-        ? ['DISPATCHED']
-        : ['PICKED_UP'];
+      allowed = cat === 'BOTENDIENST' ? ['DISPATCHED']
+              : cat === 'PICKUP'      ? ['PICKED_UP']
+              : cat === 'MAIL_ORDER'  ? ['DISPATCHED']
+              : ['PICKED_UP', 'DISPATCHED'];
     }
-    if (!allowed.length) return null
-    const colors: Record<string, string> = { PROCESSING: 'from-blue-600 to-blue-500', PREPARING: 'from-blue-600 to-blue-500', READY: 'from-green-600 to-green-500', PICKED_UP: 'from-purple-600 to-purple-500', DISPATCHED: 'from-orange-600 to-orange-500', DELIVERED: 'from-emerald-600 to-emerald-500' }
-    return <div className="flex gap-2">{allowed.map(ns => { const l = STATUS_TRANSITION_LABELS[ns]; if (!l) return null; return (
-      <button key={ns} onClick={ns === 'READY' ? () => handleMarkReady(order.id) : ns === 'DISPATCHED' ? () => handleDispatch(order.id) : () => handleUpdateStatus(order.id, ns)} disabled={ordersLoading}
-        className={`bg-gradient-to-r ${colors[ns] || 'from-white/20 to-white/10'} text-white px-3.5 py-1.5 ${G.btn} flex items-center gap-1.5 shadow-lg`}>
-        {ordersLoading && <Loader2 className="animate-spin" size={12} />}{l}
-      </button>) })}</div>
+    if (!allowed.length) return null;
+    const colorByCategory: Record<DeliveryCategory, string> = {
+      BOTENDIENST: 'from-amber-600 to-amber-500',
+      MAIL_ORDER:  'from-blue-600 to-blue-500',
+      PICKUP:      'from-emerald-600 to-emerald-500',
+      UNKNOWN:     'from-slate-600 to-slate-500',
+    };
+    return (
+      <div className="flex gap-2">
+        {allowed.map(ns => {
+          const label = ACTION_LABELS[cat]?.[ns] ?? STATUS_TRANSITION_LABELS[ns];
+          if (!label) return null;
+          const onClick =
+            ns === 'READY'      ? () => handleMarkReady(order.id)
+            : ns === 'DISPATCHED' ? () => handleDispatch(order.id)
+            : () => handleUpdateStatus(order.id, ns);
+          return (
+            <button
+              key={ns}
+              onClick={onClick}
+              disabled={ordersLoading}
+              className={`bg-gradient-to-r ${colorByCategory[cat]} text-white px-3.5 py-1.5 ${G.btn} flex items-center gap-1.5 shadow-lg`}
+            >
+              {ordersLoading && <Loader2 className="animate-spin" size={12} />}
+              {label}
+            </button>
+          );
+        })}
+      </div>
+    );
   }
 
   // ── Loading gate ──
@@ -485,21 +497,52 @@ export default function PharmacyDashboard() {
                 <select value={orderSort} onChange={e => setOrderSort(e.target.value)} className={`px-3 py-2.5 text-xs min-w-[180px] ${G.input}`}>{SORT_OPTIONS.map(o => <option key={o.value} value={o.value} className="bg-[#0a0f0a] text-white">{o.label}</option>)}</select>
               </div>
             </div>
+            <div className="flex flex-wrap gap-2 mb-3">
+              {([
+                { key: 'ALL' as const,         label: 'Alle',        icon: '·' },
+                { key: 'BOTENDIENST' as const, label: 'Botendienst', icon: '🚴' },
+                { key: 'MAIL_ORDER' as const,  label: 'Versand',     icon: '📦' },
+                { key: 'PICKUP' as const,      label: 'Abholung',    icon: '📍' },
+              ]).map(tab => {
+                const isActive = deliveryCategoryTab === tab.key;
+                const count = tab.key === 'ALL'
+                  ? (ordersResponse?.data.length ?? 0)
+                  : (ordersResponse?.data.filter(o => getDeliveryCategory(o.deliveryMethod) === tab.key).length ?? 0);
+                return (
+                  <button
+                    key={tab.key}
+                    onClick={() => setDeliveryCategoryTab(tab.key)}
+                    className={`px-4 py-2 ${G.btn} rounded-xl flex items-center gap-2 ${
+                      isActive ? G.tabActive : `${G.tabInactive} bg-white/[0.03] border-white/[0.06]`
+                    }`}
+                  >
+                    <span>{tab.icon}</span>
+                    <span>{tab.label}</span>
+                    <span className={`px-1.5 py-0.5 text-[10px] font-bold rounded-md ${
+                      isActive ? 'bg-emerald-400/20 text-emerald-300' : 'bg-white/[0.06] text-white/30'
+                    }`}>{count}</span>
+                  </button>
+                );
+              })}
+            </div>
             <div className="flex gap-1.5 flex-wrap">{ORDER_STATUS_TABS.map(tab => {
               const count = tab.key === 'ALL' ? Object.values(ordersResponse?.statusCounts || {}).reduce((a, b) => a + b, 0) : (ordersResponse?.statusCounts?.[tab.key] || 0)
               return <button key={tab.key} onClick={() => setOrderStatusTab(tab.key)} className={`px-3.5 py-2 ${G.btn} rounded-xl flex items-center gap-1.5 ${orderStatusTab === tab.key ? G.tabActive : `${G.tabInactive} bg-white/[0.03] border-white/[0.06]`}`}>{tab.label}<span className={`px-1.5 py-0.5 text-[10px] font-bold rounded-md ${orderStatusTab === tab.key ? 'bg-emerald-400/20 text-emerald-300' : 'bg-white/[0.06] text-white/30'}`}>{count}</span></button>
             })}</div>
 
             {ordersLoading ? <div className="space-y-3">{Array.from({ length: 5 }).map((_, i) => <Skeleton key={i} className="h-16" />)}</div>
-            : !ordersResponse?.data.length ? <div className={G.card}><EmptyState icon={ShoppingCart} title="Keine Bestellungen" description={`Keine Bestellungen${orderStatusTab !== 'ALL' ? ' mit diesem Status' : ''}.`} /></div>
+            : !visibleOrders.length ? <div className={G.card}><EmptyState icon={ShoppingCart} title="Keine Bestellungen" description={`Keine Bestellungen${orderStatusTab !== 'ALL' || deliveryCategoryTab !== 'ALL' ? ' für diese Auswahl' : ''}.`} /></div>
             : <>
               <div className={`${G.card} overflow-hidden`}>
                 <table className="w-full">
                   <thead><tr className="border-b border-white/[0.06]">
                     <th className={`${G.th} text-left`}>ID</th><th className={`${G.th} text-left`}>Patient</th><th className={`${G.th} text-left`}>Status</th><th className={`${G.th} text-left`}>Lieferung</th><th className={`${G.th} text-right`}>Betrag</th><th className={`${G.th} text-right hidden md:table-cell`}>Erstellt</th><th className={`${G.th} text-right hidden lg:table-cell`}>Aktualisiert</th><th className={`${G.th} text-right`}>Aktionen</th>
                   </tr></thead>
-                  <tbody className="divide-y divide-white/[0.04]">{ordersResponse.data.map(o => (
-                    <tr key={o.id} className="hover:bg-white/[0.03] transition-colors group">
+                  <tbody className="divide-y divide-white/[0.04]">{visibleOrders.map(o => {
+                    const cat = getDeliveryCategory(o.deliveryMethod);
+                    const accent = CATEGORY_ACCENTS[cat];
+                    return (
+                    <tr key={o.id} className={`group border-l-4 ${accent.border} hover:bg-white/[0.02] transition-colors`}>
                       <td className={`${G.td} text-xs font-mono text-white/30`}>#{o.id}</td>
                       <td className={G.td}><p className="text-sm font-medium text-white/80">{o.patientName}</p><p className="text-[11px] text-white/25">{o.patientEmail}</p></td>
                       <td className={G.td}><StatusBadge status={o.status} /></td>
@@ -509,12 +552,13 @@ export default function PharmacyDashboard() {
                       <td className={`${G.td} text-xs text-white/25 text-right hidden lg:table-cell`}>{formatShortDate(o.updatedAt)}</td>
                       <td className={`${G.td} text-right`}><div className="flex items-center justify-end gap-2"><button onClick={() => loadOrderDetail(o.id)} className="p-1.5 text-white/20 hover:text-emerald-400 hover:bg-emerald-500/10 rounded-lg transition-all opacity-0 group-hover:opacity-100"><ExternalLink size={13} /></button>{renderNextStatusButton({ id: o.id, status: o.status, deliveryMethod: o.deliveryMethod })}</div></td>
                     </tr>
-                  ))}</tbody>
+                    );
+                  })}</tbody>
                 </table>
               </div>
-              {ordersResponse.pagination.totalPages > 1 && <div className="flex items-center justify-between"><p className="text-xs text-white/25">Seite {ordersResponse.pagination.page}/{ordersResponse.pagination.totalPages} • {ordersResponse.pagination.total} Ergebnisse</p><div className="flex gap-1.5">
-                <button disabled={ordersResponse.pagination.page <= 1} onClick={() => { if (pharmacyId) { const f = buildOrderFilters(); f.page = ordersResponse.pagination.page - 1; loadOrders(pharmacyId, f) } }} className={`p-2 ${G.card} !rounded-xl disabled:opacity-30 hover:bg-white/[0.06]`}><ChevronLeft size={14} className="text-white/40" /></button>
-                <button disabled={ordersResponse.pagination.page >= ordersResponse.pagination.totalPages} onClick={() => { if (pharmacyId) { const f = buildOrderFilters(); f.page = ordersResponse.pagination.page + 1; loadOrders(pharmacyId, f) } }} className={`p-2 ${G.card} !rounded-xl disabled:opacity-30 hover:bg-white/[0.06]`}><ChevronRight size={14} className="text-white/40" /></button>
+              {(ordersResponse?.pagination.totalPages ?? 0) > 1 && <div className="flex items-center justify-between"><p className="text-xs text-white/25">Seite {ordersResponse?.pagination.page}/{ordersResponse?.pagination.totalPages} • {ordersResponse?.pagination.total} Ergebnisse</p><div className="flex gap-1.5">
+                <button disabled={(ordersResponse?.pagination.page ?? 1) <= 1} onClick={() => { if (pharmacyId && ordersResponse) { const f = buildOrderFilters(); f.page = ordersResponse.pagination.page - 1; loadOrders(pharmacyId, f) } }} className={`p-2 ${G.card} !rounded-xl disabled:opacity-30 hover:bg-white/[0.06]`}><ChevronLeft size={14} className="text-white/40" /></button>
+                <button disabled={(ordersResponse?.pagination.page ?? 1) >= (ordersResponse?.pagination.totalPages ?? 1)} onClick={() => { if (pharmacyId && ordersResponse) { const f = buildOrderFilters(); f.page = ordersResponse.pagination.page + 1; loadOrders(pharmacyId, f) } }} className={`p-2 ${G.card} !rounded-xl disabled:opacity-30 hover:bg-white/[0.06]`}><ChevronRight size={14} className="text-white/40" /></button>
               </div></div>}
             </>}
           </div>
@@ -526,20 +570,32 @@ export default function PharmacyDashboard() {
             <div className={`${G.card} max-w-3xl w-full max-h-[90vh] overflow-y-auto !shadow-2xl !shadow-black/40`} onClick={e => e.stopPropagation()}>
               {orderDetailLoading ? <div className="p-10 space-y-4"><Skeleton className="h-8 w-48" /><Skeleton className="h-16" /><Skeleton className="h-32" /><Skeleton className="h-24" /></div>
               : selectedOrderDetail ? <>
-                <div className="sticky top-0 bg-[#0a0f0a]/80 backdrop-blur-xl border-b border-white/[0.06] px-6 py-4 flex items-center justify-between rounded-t-2xl z-10">
+                <div className={`sticky top-0 bg-[#0a0f0a]/80 backdrop-blur-xl border-b border-white/[0.06] px-6 py-4 flex items-center justify-between rounded-t-2xl z-10 border-l-4 ${CATEGORY_ACCENTS[getDeliveryCategory(selectedOrderDetail.deliveryMethod)].border}`}>
                   <div className="flex items-center gap-3"><div className="w-9 h-9 rounded-xl bg-white/[0.06] flex items-center justify-center"><FileText size={15} className="text-white/40" /></div><div><h2 className="text-lg font-bold text-white">Bestellung #{selectedOrderDetail.id}</h2><div className="flex flex-wrap items-center gap-2 mt-1"><StatusBadge status={selectedOrderDetail.status} /><DeliveryMethodBadge method={selectedOrderDetail.deliveryMethod} /></div></div></div>
                   <button onClick={() => { setShowOrderDetail(false); setSelectedOrderDetail(null) }} className="p-2 text-white/20 hover:text-white/60 rounded-xl hover:bg-white/[0.06] transition-all"><X size={18} /></button>
                 </div>
                 <div className="p-6 space-y-6">
                   {/* Timeline */}
                   <div className="bg-white/[0.03] rounded-xl p-5 border border-white/[0.06]">
-                    <div className="flex items-center justify-between overflow-x-auto gap-1">{STATUS_STEPS.map((step, idx) => {
-                      const Icon = step.icon; const done = getStatusOrder(selectedOrderDetail.status) >= getStatusOrder(step.key); const cur = selectedOrderDetail.status.toUpperCase() === step.key
-                      return <div key={step.key} className="flex items-center flex-1 min-w-0"><div className="flex flex-col items-center flex-shrink-0">
-                        <div className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all ${cur ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/30 ring-4 ring-emerald-500/20' : done ? 'bg-emerald-600/80 text-white' : 'bg-white/[0.06] text-white/20'}`}><Icon size={15} /></div>
-                        <p className={`text-[10px] mt-1.5 text-center font-medium whitespace-nowrap ${done ? 'text-emerald-400' : 'text-white/20'}`}>{step.label}</p>
-                      </div>{idx < STATUS_STEPS.length - 1 && <div className={`flex-1 h-0.5 mx-1.5 rounded-full ${done ? 'bg-emerald-500/60' : 'bg-white/[0.06]'}`} />}</div>
-                    })}</div>
+                    {(() => {
+                      const detailCategory = getDeliveryCategory(selectedOrderDetail.deliveryMethod);
+                      const detailPipeline = DELIVERY_PIPELINES[detailCategory];
+                      const stepIconByKey: Record<string, React.ElementType> = {
+                        APPROVED: CheckCircle, PAID: CreditCard, PROCESSING: Loader2,
+                        READY: Package, DISPATCHED: Truck, PICKED_UP: Truck, DELIVERED: CheckCircle2,
+                      };
+                      return (
+                        <div className="flex items-center justify-between overflow-x-auto gap-1">{detailPipeline.map((step, idx) => {
+                          const Icon = stepIconByKey[step.key] ?? Package;
+                          const done = getStatusOrder(selectedOrderDetail.status) >= getStatusOrder(step.key);
+                          const cur = selectedOrderDetail.status.toUpperCase() === step.key;
+                          return <div key={step.key} className="flex items-center flex-1 min-w-0"><div className="flex flex-col items-center flex-shrink-0">
+                            <div className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all ${cur ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/30 ring-4 ring-emerald-500/20' : done ? 'bg-emerald-600/80 text-white' : 'bg-white/[0.06] text-white/20'}`}><Icon size={15} /></div>
+                            <p className={`text-[10px] mt-1.5 text-center font-medium whitespace-nowrap ${done ? 'text-emerald-400' : 'text-white/20'}`}>{step.label}</p>
+                          </div>{idx < detailPipeline.length - 1 && <div className={`flex-1 h-0.5 mx-1.5 rounded-full ${done ? 'bg-emerald-500/60' : 'bg-white/[0.06]'}`} />}</div>
+                        })}</div>
+                      );
+                    })()}
                   </div>
                   {/* Patient */}
                   <div><h3 className={G.label}>Patient</h3><div className="grid grid-cols-1 md:grid-cols-3 gap-3">{[
