@@ -251,6 +251,102 @@ export const STATUS_TRANSITION_LABELS: Record<string, string> = {
   DELIVERED: 'Als Geliefert markieren',
 };
 
+// ── Delivery-method-aware types & constants ──────────────────────────────────
+
+export type DeliveryMethodValue =
+  | 'BOTENDIENST_NEAR'
+  | 'BOTENDIENST_NEARBY'
+  | 'BOTENDIENST_FAR'
+  | 'MAIL_ORDER'
+  | 'DHL'
+  | 'PICKUP';
+
+export type DeliveryCategory = 'BOTENDIENST' | 'MAIL_ORDER' | 'PICKUP' | 'UNKNOWN';
+
+export function getDeliveryCategory(method: string | null | undefined): DeliveryCategory {
+  if (!method) return 'UNKNOWN';
+  const m = method.toUpperCase();
+  if (m.startsWith('BOTENDIENST')) return 'BOTENDIENST';
+  if (m === 'MAIL_ORDER' || m === 'DHL') return 'MAIL_ORDER';
+  if (m === 'PICKUP') return 'PICKUP';
+  return 'UNKNOWN';
+}
+
+export type StatusStep = { key: string; label: string };
+
+export const DELIVERY_PIPELINES: Record<DeliveryCategory, StatusStep[]> = {
+  BOTENDIENST: [
+    { key: 'APPROVED',   label: 'Genehmigt' },
+    { key: 'PAID',       label: 'Bezahlt' },
+    { key: 'PROCESSING', label: 'In Vorbereitung' },
+    { key: 'READY',      label: 'Bereit für Boten' },
+    { key: 'DISPATCHED', label: 'Bote unterwegs' },
+    { key: 'DELIVERED',  label: 'Geliefert' },
+  ],
+  MAIL_ORDER: [
+    { key: 'APPROVED',   label: 'Genehmigt' },
+    { key: 'PAID',       label: 'Bezahlt' },
+    { key: 'PROCESSING', label: 'In Vorbereitung' },
+    { key: 'READY',      label: 'Versandbereit' },
+    { key: 'DISPATCHED', label: 'Versendet' },
+    { key: 'DELIVERED',  label: 'Zugestellt' },
+  ],
+  PICKUP: [
+    { key: 'APPROVED',   label: 'Genehmigt' },
+    { key: 'PAID',       label: 'Bezahlt' },
+    { key: 'PROCESSING', label: 'In Vorbereitung' },
+    { key: 'READY',      label: 'Abholbereit' },
+    { key: 'PICKED_UP',  label: 'Abgeholt' },
+    { key: 'DELIVERED',  label: 'Geliefert' },
+  ],
+  UNKNOWN: [
+    { key: 'APPROVED',   label: 'Genehmigt' },
+    { key: 'PAID',       label: 'Bezahlt' },
+    { key: 'PROCESSING', label: 'In Vorbereitung' },
+    { key: 'READY',      label: 'Bereit' },
+    { key: 'DELIVERED',  label: 'Geliefert' },
+  ],
+};
+
+export const ACTION_LABELS: Record<DeliveryCategory, Record<string, string>> = {
+  BOTENDIENST: {
+    PROCESSING: 'Vorbereitung starten',
+    READY:      'Als bereit markieren',
+    DISPATCHED: '🚴 Boten beauftragen',
+    DELIVERED:  'Als geliefert markieren',
+  },
+  MAIL_ORDER: {
+    PROCESSING: 'Vorbereitung starten',
+    READY:      '📦 Als versandbereit markieren',
+    DISPATCHED: 'Als versendet markieren',
+    DELIVERED:  'Als zugestellt markieren',
+  },
+  PICKUP: {
+    PROCESSING: 'Vorbereitung starten',
+    READY:      '📍 Als abholbereit markieren',
+    PICKED_UP:  'Abholung bestätigen',
+    DELIVERED:  'Als geliefert markieren',
+  },
+  UNKNOWN: {
+    PROCESSING: 'In Bearbeitung nehmen',
+    READY:      'Als bereit markieren',
+    DELIVERED:  'Als geliefert markieren',
+  },
+};
+
+export const CATEGORY_ACCENTS: Record<DeliveryCategory, {
+  border: string;
+  badgeBg: string;
+  badgeText: string;
+  icon: string;
+  label: string;
+}> = {
+  BOTENDIENST: { border: 'border-l-amber-500',   badgeBg: 'bg-amber-500/15',   badgeText: 'text-amber-300',   icon: '🚴', label: 'Botendienst' },
+  MAIL_ORDER:  { border: 'border-l-blue-500',    badgeBg: 'bg-blue-500/15',    badgeText: 'text-blue-300',    icon: '📦', label: 'Versand' },
+  PICKUP:      { border: 'border-l-emerald-500', badgeBg: 'bg-emerald-500/15', badgeText: 'text-emerald-300', icon: '📍', label: 'Abholung' },
+  UNKNOWN:     { border: 'border-l-slate-500',   badgeBg: 'bg-slate-500/15',   badgeText: 'text-slate-300',   icon: '—',  label: 'Unbekannt' },
+};
+
 // ============================================
 // PRODUCT ENDPOINTS
 // ============================================
