@@ -28,6 +28,12 @@ export type PharmacyFormValues = {
   supportsPickup: boolean
   supportsMailOrder: boolean
   mailOrderFee: string
+  // Profile fields
+  description: string
+  logoUrl: string
+  operatingHours: string
+  apothekenLizenz: string
+  btmErlaubnis: string
 }
 
 type PharmacyFormState = PharmacyFormValues & {
@@ -70,6 +76,11 @@ export function pharmacyToFormValues(pharmacy: PharmacyDetail): PharmacyFormStat
     supportsMailOrder: pharmacy.supportsMailOrder ?? false,
     mailOrderFee:
       pharmacy.mailOrderFee != null ? String(pharmacy.mailOrderFee) : '',
+    description: pharmacy.description ?? '',
+    logoUrl: pharmacy.logoUrl ?? '',
+    operatingHours: pharmacy.operatingHours ?? '',
+    apothekenLizenz: pharmacy.apothekenLizenz ?? '',
+    btmErlaubnis: pharmacy.btmErlaubnis ?? '',
     apiKeyTouched: false,
     hadExistingApiKey: hasApiKey,
   }
@@ -119,6 +130,22 @@ function buildUpdatePayload(
     } else {
       payload.mailOrderFee = null
     }
+  }
+
+  if (form.description !== initial.description) {
+    payload.description = form.description.trim() || null
+  }
+  if (form.logoUrl !== initial.logoUrl) {
+    payload.logoUrl = form.logoUrl.trim() || null
+  }
+  if (form.operatingHours !== initial.operatingHours) {
+    payload.operatingHours = form.operatingHours.trim() || null
+  }
+  if (form.apothekenLizenz !== initial.apothekenLizenz) {
+    payload.apothekenLizenz = form.apothekenLizenz.trim() || null
+  }
+  if (form.btmErlaubnis !== initial.btmErlaubnis) {
+    payload.btmErlaubnis = form.btmErlaubnis.trim() || null
   }
 
   return payload
@@ -462,6 +489,103 @@ export function PharmacyEditModal({
                 ))}
               </div>
               <FieldError message={fieldErrors.inventorySource} />
+            </div>
+
+            {/* ── Profil & Compliance ── */}
+            <div>
+              <div className="flex items-center gap-2 my-5">
+                <div className="flex-1 h-px bg-gray-100" />
+                <span className="text-[10px] uppercase tracking-wider font-semibold text-gray-400 px-2">
+                  Profil &amp; Compliance
+                </span>
+                <div className="flex-1 h-px bg-gray-100" />
+              </div>
+
+              <SectionTitle>Profil</SectionTitle>
+              <div className="space-y-3">
+                <div>
+                  <label className="block text-xs font-semibold text-gray-600 mb-1.5">
+                    Beschreibung
+                  </label>
+                  <textarea
+                    rows={3}
+                    maxLength={2000}
+                    placeholder="Kurze Beschreibung der Apotheke (für Patient:innen sichtbar)"
+                    value={form.description}
+                    onChange={e => setForm(f => ({ ...f, description: e.target.value }))}
+                    className={`${inputCls} resize-none`}
+                  />
+                  <FieldError message={fieldErrors.description} />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-gray-600 mb-1.5">
+                    Logo URL
+                  </label>
+                  <input
+                    type="url"
+                    placeholder="https://..."
+                    value={form.logoUrl}
+                    onChange={e => setForm(f => ({ ...f, logoUrl: e.target.value }))}
+                    className={inputCls}
+                  />
+                  {form.logoUrl && (
+                    <img
+                      src={form.logoUrl}
+                      alt="Logo Vorschau"
+                      className="mt-2 h-12 w-12 rounded-xl object-cover border border-gray-200"
+                      onError={e => { (e.target as HTMLImageElement).style.display = 'none' }}
+                    />
+                  )}
+                  <FieldError message={fieldErrors.logoUrl} />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-gray-600 mb-1.5">
+                    Öffnungszeiten
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="z.B. Mo-Fr 8:00-18:30, Sa 9:00-13:00"
+                    value={form.operatingHours}
+                    onChange={e => setForm(f => ({ ...f, operatingHours: e.target.value }))}
+                    className={inputCls}
+                  />
+                  <FieldError message={fieldErrors.operatingHours} />
+                </div>
+              </div>
+
+              <div className="mt-4">
+                <SectionTitle>Compliance</SectionTitle>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-600 mb-1.5">
+                      Apotheken-Lizenz
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="Lizenznummer"
+                      value={form.apothekenLizenz}
+                      onChange={e => setForm(f => ({ ...f, apothekenLizenz: e.target.value }))}
+                      className={inputCls}
+                    />
+                    <FieldError message={fieldErrors.apothekenLizenz} />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-600 mb-1.5">
+                      BTM-Erlaubnis
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="Erlaubnisnummer"
+                      value={form.btmErlaubnis}
+                      onChange={e => setForm(f => ({ ...f, btmErlaubnis: e.target.value }))}
+                      className={inputCls}
+                    />
+                    <FieldError message={fieldErrors.btmErlaubnis} />
+                  </div>
+                </div>
+              </div>
             </div>
 
             <div className="flex gap-3 pt-2">
