@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useEffect, useMemo, useRef, useState } from 'react'
+import { Store, Clock } from 'lucide-react'
 import '@/app/main.css'
 import './finden.css'
 import SectionParticlesBackground from '@/components/ui/SectionParticlesBackground'
@@ -13,6 +14,8 @@ type Pharmacy = {
   mapsUrl: string
   x: number
   y: number
+  logoUrl?: string | null
+  description?: string | null
 }
 
 const PHARMACIES: Pharmacy[] = [
@@ -234,9 +237,31 @@ const PartnerApotheken = () => {
                   <span className="partner-apotheken-pulse" aria-hidden />
                 </button>
                 <span className="partner-apotheken-tooltip" role="tooltip">
-                  <strong>{pharmacy.name}</strong>
+                  <span className="partner-apotheken-tooltip__header">
+                    <span className="partner-apotheken-tooltip__logo">
+                      {pharmacy.logoUrl ? (
+                        <img
+                          src={pharmacy.logoUrl}
+                          alt={`${pharmacy.name} Logo`}
+                          className="partner-apotheken-tooltip__logo-img"
+                          onError={e => { (e.target as HTMLImageElement).style.display = 'none' }}
+                        />
+                      ) : (
+                        <Store size={20} className="partner-apotheken-tooltip__logo-fallback" />
+                      )}
+                    </span>
+                    <strong>{pharmacy.name}</strong>
+                  </span>
+                  {pharmacy.description && (
+                    <span className="partner-apotheken-tooltip__desc">{pharmacy.description}</span>
+                  )}
                   <span>{pharmacy.address}</span>
-                  <span>{pharmacy.hours}</span>
+                  {pharmacy.hours && (
+                    <span className="partner-apotheken-tooltip__hours">
+                      <Clock size={11} aria-hidden />
+                      {pharmacy.hours}
+                    </span>
+                  )}
                   <a href={pharmacy.mapsUrl} target="_blank" rel="noreferrer">
                     Navigation starten
                   </a>
@@ -249,9 +274,31 @@ const PartnerApotheken = () => {
 
         <div className={`partner-apotheken-mobile-card ${selectedPharmacy ? 'is-open' : ''}`} aria-hidden={!selectedPharmacy}>
           <article className="partner-apotheken-mobile-card-content" aria-live="polite">
-            <h3>{mobileCardPharmacy?.name ?? ''}</h3>
+            <div className="partner-apotheken-mobile-card__header">
+              <div className="partner-apotheken-mobile-card__logo">
+                {mobileCardPharmacy?.logoUrl ? (
+                  <img
+                    src={mobileCardPharmacy.logoUrl}
+                    alt={`${mobileCardPharmacy.name} Logo`}
+                    className="partner-apotheken-mobile-card__logo-img"
+                    onError={e => { (e.target as HTMLImageElement).style.display = 'none' }}
+                  />
+                ) : (
+                  <Store size={20} aria-hidden />
+                )}
+              </div>
+              <h3>{mobileCardPharmacy?.name ?? ''}</h3>
+            </div>
+            {mobileCardPharmacy?.description && (
+              <p className="partner-apotheken-mobile-card__desc">{mobileCardPharmacy.description}</p>
+            )}
             <p>{mobileCardPharmacy?.address ?? ''}</p>
-            <p>{mobileCardPharmacy?.hours ?? ''}</p>
+            {mobileCardPharmacy?.hours && (
+              <p className="partner-apotheken-mobile-card__hours">
+                <Clock size={12} aria-hidden />
+                {mobileCardPharmacy.hours}
+              </p>
+            )}
             {mobileCardPharmacy && (
               <a href={mobileCardPharmacy.mapsUrl} target="_blank" rel="noreferrer">
                 Route in Google Maps
