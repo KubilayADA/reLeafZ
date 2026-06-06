@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
-import { ArrowLeft, Bike, Package, Store } from 'lucide-react'
+import { ArrowLeft, Bike, Info, Package, Store } from 'lucide-react'
 import StepProgress from '@/form/step-progress'
 import FormLogoHomeExit from '@/form/form-logo-home-exit'
 import '@/form/form.css'
@@ -50,9 +50,7 @@ export default function Step2({ onNext, onBack, initialValue = '', onSelectionCh
   ]
 
   const handleNext = () => {
-    if (selectedOption) {
-      onNext(selectedOption)
-    }
+    onNext(selectedOption || '')
   }
 
   return (
@@ -75,6 +73,13 @@ export default function Step2({ onNext, onBack, initialValue = '', onSelectionCh
           <p className="form-question-hint">
             Berlin: Wähle deine Versandart und Apotheke aus *
           </p>
+
+          <div className="flex items-start gap-2 bg-stone-50 border border-stone-200 rounded-xl p-3 text-xs text-stone-600 mb-4">
+            <Info size={14} className="text-stone-500 flex-shrink-0 mt-0.5" />
+            <p>
+              Hinweis: Die Liefermethode wählen Sie im nächsten Schritt direkt bei der Apothekenauswahl. Hier sehen Sie nur, welche Optionen grundsätzlich verfügbar sind.
+            </p>
+          </div>
 
           <div className="form-options form-options--cols-3 form-options--center form-options--step2-fit">
             {options.map((option) => {
@@ -112,7 +117,6 @@ export default function Step2({ onNext, onBack, initialValue = '', onSelectionCh
 
           <Button
             onClick={handleNext}
-            disabled={!selectedOption}
             className="form-cta form-cta--step2-fit btn-secondary"
           >
             Weiter
