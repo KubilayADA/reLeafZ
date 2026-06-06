@@ -2,7 +2,8 @@
 
 import React, { useEffect, useRef, useState } from 'react'
 import { Button } from '@/components/ui/button'
-import { Menu, Moon, Sun, X } from 'lucide-react'
+import { Menu, X } from 'lucide-react'
+// import { Moon, Sun } from 'lucide-react'
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import './header.css'
 import { scrollToLandingTop, scrollLandingToAblauf } from '@/lib/scroll'
@@ -161,13 +162,13 @@ export default function Header({
         </div>
       </div> */}
       
-      <div className="header-row-wrap relative w-full h-[84px]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full">
-          <div className="flex justify-between items-center h-full">
-            {/* Logo geniş, navbar sabit yükseklikte - your turkish is not friendly to me*/}
+      <div className="header-row-wrap relative w-full h-[56px]">
+        <div className="max-w-7xl mx-auto px-3 sm:px-5 lg:px-6 h-full">
+          <div className="header-main-row">
+            <div className="header-side header-side--left">
             <button
               type="button"
-              className="flex items-center h-full overflow-visible"
+              className="header-logo-slot flex items-center h-full overflow-visible"
               onClick={() => {
                 scrollToLandingTop()
               }}
@@ -175,12 +176,13 @@ export default function Header({
             >
               <LeafLogo className="w-45 h-52 transform translate-y-0" />
             </button>
+            </div>
             
             {/* Desktop Nav */}
             <div className="header-center-controls hidden md:flex">
-              <nav className="header-desktop-nav header-text w-full justify-center">
+              <nav className="header-desktop-nav header-text">
                 <a
-                  href="#ablauf"
+                  href="#faq"
                   className="header-nav-link text-mg md:text-xl leading-relaxed"
                   onClick={(e) => {
                     e.preventDefault()
@@ -194,6 +196,7 @@ export default function Header({
                 <a href="#chat" className="header-nav-link text-lg md:text-xl leading-relaxed">Chat with us!</a>
               </nav>
 
+              {/* Theme toggle — temporarily disabled
               <button
                 type="button"
                 onClick={onThemeToggle}
@@ -201,14 +204,16 @@ export default function Header({
                 aria-pressed={landingTheme === 'light'}
                 aria-label={`Switch to ${landingTheme === 'dark' ? 'light' : 'dark'} mode`}
               >
-                <Moon className={`header-theme-icon ${landingTheme === 'dark' ? 'is-active' : ''}`} size={15} />
-                <Sun className={`header-theme-icon ${landingTheme === 'light' ? 'is-active' : ''}`} size={15} />
+                <Moon className={`header-theme-icon ${landingTheme === 'dark' ? 'is-active' : ''}`} size={13} />
+                <Sun className={`header-theme-icon ${landingTheme === 'light' ? 'is-active' : ''}`} size={13} />
               </button>
+              */}
             </div>
             
             {/* Desktop Button - Hidden on mobile, only in hamburger menu wish i believe is better let me know if you see this UwUwuu*/}
+            <div className="header-side header-side--right">
             <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-            <div className="hidden lg:block text-black lg:mr-[-8px]">
+            <div className="header-cta-wrap hidden lg:flex shrink-0 items-center">
               <DialogTrigger asChild>
                 <Button
                   className="header-button lg:!ml-0 !font-bold"
@@ -216,26 +221,28 @@ export default function Header({
                   style={
                     landingTheme === 'dark'
                       ? ({
-                          minHeight: '54px',
-                          paddingTop: '0.7rem',
-                          paddingBottom: '0.7rem',
+                          minHeight: '38px',
+                          paddingTop: '0.45rem',
+                          paddingBottom: '0.45rem',
+                          fontSize: '0.75rem',
                           borderTop: '2.5px solid #fff',
                           borderLeft: '2.5px solid #fff',
                           borderRight: '4px solid #fff',
                           borderBottom: '4px solid #fff',
-                          borderRadius: '12px',
+                          borderRadius: '8px',
                         } as React.CSSProperties)
                       : ({
                           background: '#ffffff',
                           color: '#0f172a',
-                          minHeight: '54px',
-                          paddingTop: '0.7rem',
-                          paddingBottom: '0.7rem',
+                          minHeight: '38px',
+                          paddingTop: '0.45rem',
+                          paddingBottom: '0.45rem',
+                          fontSize: '0.75rem',
                           borderTop: '2.5px solid #333',
                           borderLeft: '2.5px solid #333',
                           borderRight: '4px solid #333',
                           borderBottom: '4px solid #333',
-                          borderRadius: '12px',
+                          borderRadius: '8px',
                         } as React.CSSProperties)
                   }
                   onMouseEnter={playHoverSound}
@@ -290,6 +297,7 @@ export default function Header({
               </DialogFooter>
             </DialogContent>
             </Dialog>
+            </div>
           </div>
         </div>
       </div>
@@ -299,7 +307,7 @@ export default function Header({
           <div className="lg:hidden absolute top-full left-0 w-full bg-white shadow-lg border-t border-emerald-200 z-50">
             <nav className="flex flex-col items-center py-6 space-y-6">
               <a
-                href="#ablauf"
+                href="#faq"
                 className="text-xl text-black-800 inconsolata"
                 onClick={(e) => {
                   e.preventDefault()

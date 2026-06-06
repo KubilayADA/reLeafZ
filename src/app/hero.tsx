@@ -17,7 +17,7 @@ import './hero-mobile.css'
 
 interface HeroProps {
   setDialogOpen: (open: boolean) => void
-  /** Scroll to #ablauf; parent may sync URL with pushState (no overflow lock). */
+  /** Scroll to #faq; parent may sync URL with pushState (no overflow lock). */
   onScrollToAblauf: () => void
   landingTheme: 'dark' | 'light'
 }
@@ -51,7 +51,7 @@ function buildHeroZStars(count: number): HeroZStar[] {
 const HERO_Z_STARS = buildHeroZStars(200)
 
 const HERO_NAV_LINKS = [
-  { href: '#ablauf', label: 'Ablauf', scrollKey: 'ablauf' as const },
+  { href: '#faq', label: 'Ablauf', scrollKey: 'faq' as const },
   { href: '#partner-apotheken', label: 'Apotheke in Ihrer Nähe' },
   { href: '#faq', label: 'FAQ' },
   { href: '#chat', label: 'Chat with us!' },
@@ -66,7 +66,7 @@ function HeroTopNav({ onScrollToAblauf }: { onScrollToAblauf: () => void }) {
           href={link.href}
           className="header-nav-link"
           onClick={(e) => {
-            if (link.scrollKey === 'ablauf') {
+            if (link.scrollKey === 'faq') {
               e.preventDefault()
               onScrollToAblauf()
             }
@@ -133,7 +133,7 @@ function HeroAccordionRows({
       onDiscover()
       return
     }
-    const el = document.getElementById('ablauf')
+    const el = document.getElementById('faq')
     if (!el) return
     const top = Math.max(0, el.getBoundingClientRect().top + window.scrollY + 40)
     window.scrollTo({ top, behavior: 'smooth' })
@@ -369,7 +369,7 @@ export default function Hero({
         </div>
 
         <a
-          href="#ablauf"
+          href="#faq"
           className="hero-scroll-cta pointer-events-auto"
           onClick={(e) => {
             e.preventDefault()
