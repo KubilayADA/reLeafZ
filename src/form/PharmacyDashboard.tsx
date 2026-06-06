@@ -7,7 +7,8 @@ import {
   ShoppingCart, AlertTriangle, Plus, Pencil, Trash2, X, Save, Boxes, Search,
   ChevronDown, ChevronUp, ChevronLeft, ChevronRight, BarChart3, DollarSign,
   Calendar, FileText, CreditCard, Users, RefreshCw, ExternalLink, Activity,
-  ArrowUpRight, ArrowDownRight
+  ArrowUpRight, ArrowDownRight, Settings, Shield, Camera, Check, Copy,
+  SlidersHorizontal,
 } from 'lucide-react'
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
@@ -16,10 +17,10 @@ import {
 import {
   pharmacyLogin, fetchPharmacyDashboard, fetchPharmacyOrders, updateOrderStatus,
   markOrderReady, dispatchOrder, fetchPharmacyOrderDetail, fetchPharmacyInventory, fetchPharmacyAnalytics,
-  createProduct, updateProduct, deleteProduct,
-  type Product, type ProductFormData, type DashboardResponse,
+  createProduct, updateProduct, deleteProduct, updatePharmacyProfile,
+  type Product, type ProductFormData, type DashboardResponse, type Pharmacy,
   type OrdersResponse, type OrderFilters, type OrderDetail, type InventoryResponse,
-  type InventoryFilters, type AnalyticsResponse,
+  type InventoryFilters, type AnalyticsResponse, type EditableProfileFields,
   STATUS_TRANSITIONS, STATUS_TRANSITION_LABELS,
   getDeliveryCategory, DELIVERY_PIPELINES, ACTION_LABELS, CATEGORY_ACCENTS,
   type DeliveryCategory,
@@ -41,7 +42,7 @@ const G = {
   btnPrimary: 'bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 text-white shadow-lg shadow-emerald-600/20 hover:shadow-xl hover:shadow-emerald-500/30',
 } as const
 
-type ViewType = 'dashboard' | 'orders' | 'inventory' | 'analytics'
+type ViewType = 'dashboard' | 'orders' | 'inventory' | 'analytics' | 'profile' | 'settings' | 'compliance'
 
 const PRODUCT_FORMS = ['FLOWER', 'OIL', 'EXTRACT', 'CAPSULE', 'SPRAY'] as const
 const PRODUCT_UNITS: Record<string, string> = { FLOWER: 'gram', OIL: 'ml', EXTRACT: 'gram', CAPSULE: 'capsule', SPRAY: 'spray' }
@@ -178,6 +179,660 @@ function EmptyState({ icon: Icon, title, description, action }: { icon: React.El
   )
 }
 
+// ── Profile sub-components ──
+
+function LockedField({ label, value }: { label: string; value: React.ReactNode }) {
+  return (
+    <div>
+      <p className={`${G.label} flex items-center gap-1`}>
+        <Lock size={10} className="text-amber-400/60" />
+        {label}
+      </p>
+      <p className="text-sm text-white/40 bg-white/[0.02] border border-white/[0.05] rounded-xl px-3.5 py-2.5 font-mono break-all leading-relaxed">
+        {value || '—'}
+      </p>
+    </div>
+  )
+}
+
+function SimpleToggle({ id, value, onChange }: { id: string; value: boolean; onChange: (v: boolean) => void }) {
+  return (
+    <button
+      id={id}
+      type="button"
+      role="switch"
+      aria-checked={value}
+      onClick={() => onChange(!value)}
+      className={`relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors ${
+        value ? 'bg-emerald-500/80' : 'bg-white/10'
+      }`}
+    >
+      <span
+        className={`inline-block h-4 w-4 rounded-full bg-white shadow-sm transition-transform ${
+          value ? 'translate-x-6' : 'translate-x-1'
+        }`}
+      />
+    </button>
+  )
+}
+
+function makeProfileInitial(pharmacy: Pharmacy): EditableProfileFields {
+  return {
+    description: pharmacy.description ?? null,
+    logoUrl: pharmacy.logoUrl ?? null,
+    operatingHours: pharmacy.operatingHours ?? null,
+    contactPersonName: pharmacy.contactPersonName ?? null,
+    contactEmail: pharmacy.contactEmail ?? null,
+    phone: pharmacy.phone ?? null,
+    mailOrderFee: pharmacy.mailOrderFee ?? null,
+    baseDeliveryFee: pharmacy.baseDeliveryFee ?? 0,
+    extendedDeliveryFee: pharmacy.extendedDeliveryFee ?? 0,
+    deliveryRadius: pharmacy.deliveryRadius ?? 0,
+    maxDeliveryRadius: pharmacy.maxDeliveryRadius ?? 0,
+  }
+}
+
+type ProfileViewProps = {
+  pharmacy: Pharmacy
+  onSave: (patch: Partial<EditableProfileFields>) => Promise<void>
+  saving: boolean
+  saveError: string | null
+}
+
+function ProfileView({ pharmacy, onSave, saving, saveError }: ProfileViewProps) {
+  const [initial, setInitial] = useState<EditableProfileFields>(() => makeProfileInitial(pharmacy))
+  const [form, setForm] = useState<EditableProfileFields>(() => makeProfileInitial(pharmacy))
+  const [fieldErrors, setFieldErrors] = useState<Partial<Record<keyof EditableProfileFields, string>>>({})
+  const [saveSuccess, setSaveSuccess] = useState(false)
+  const [copied, setCopied] = useState(false)
+
+  const dirty = useMemo(
+    () => (Object.keys(form) as Array<keyof EditableProfileFields>).some(k => form[k] !== initial[k]),
+    [form, initial]
+  )
+
+  const validate = (): boolean => {
+    const errors: Partial<Record<keyof EditableProfileFields, string>> = {}
+    if (form.contactEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.contactEmail)) {
+      errors.contactEmail = 'Ungültige E-Mail-Adresse'
+    }
+    if (form.logoUrl && !/^https?:\/\//i.test(form.logoUrl)) {
+      errors.logoUrl = 'URL muss mit https:// beginnen'
+    }
+    if (form.baseDeliveryFee < 0) errors.baseDeliveryFee = 'Darf nicht negativ sein'
+    if (form.extendedDeliveryFee < 0) errors.extendedDeliveryFee = 'Darf nicht negativ sein'
+    if (form.deliveryRadius < 0) errors.deliveryRadius = 'Darf nicht negativ sein'
+    if (form.maxDeliveryRadius < 0) errors.maxDeliveryRadius = 'Darf nicht negativ sein'
+    if (form.mailOrderFee !== null && form.mailOrderFee < 0) {
+      errors.mailOrderFee = 'Darf nicht negativ sein'
+    }
+    if (form.description && form.description.length > 2000) {
+      errors.description = 'Maximal 2000 Zeichen'
+    }
+    setFieldErrors(errors)
+    return Object.keys(errors).length === 0
+  }
+
+  const handleSave = async () => {
+    if (!validate()) return
+    try {
+      await onSave(form)
+      setInitial({ ...form })
+      setSaveSuccess(true)
+      setTimeout(() => setSaveSuccess(false), 2000)
+    } catch {
+      // saveError is propagated via prop from parent
+    }
+  }
+
+  const copyApiKey = () => {
+    if (!pharmacy.apiKey) return
+    navigator.clipboard.writeText(pharmacy.apiKey).then(() => {
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    }).catch(() => {})
+  }
+
+  const isCannaleo = pharmacy.inventorySource === 'CANNALEO'
+
+  return (
+    <div className="space-y-6">
+      <h2 className={G.sectionTitle}>Apotheken-Profil</h2>
+
+      <div className="grid gap-6 lg:grid-cols-2">
+        {/* ── Editable card ── */}
+        <div className={`${G.card} border-l-4 border-l-emerald-500/60 p-6 space-y-5`}>
+          <h3 className="text-sm font-bold text-white/70 flex items-center gap-2">
+            <div className="w-7 h-7 rounded-lg bg-emerald-500/15 flex items-center justify-center flex-shrink-0">
+              <User size={13} className="text-emerald-400" />
+            </div>
+            Bearbeitbare Daten
+          </h3>
+
+          {/* Logo URL */}
+          <div>
+            <label className={G.label}>Logo URL</label>
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 rounded-xl bg-white/[0.06] border border-white/[0.10] flex items-center justify-center flex-shrink-0 overflow-hidden">
+                {form.logoUrl ? (
+                  <img
+                    src={form.logoUrl}
+                    alt="Logo Vorschau"
+                    className="w-full h-full object-cover"
+                    onError={e => { (e.target as HTMLImageElement).style.display = 'none' }}
+                  />
+                ) : (
+                  <Camera size={16} className="text-white/20" />
+                )}
+              </div>
+              <input
+                type="url"
+                placeholder="https://..."
+                value={form.logoUrl ?? ''}
+                onChange={e => setForm(f => ({ ...f, logoUrl: e.target.value || null }))}
+                className={`flex-1 px-3.5 py-2.5 ${G.input} ${fieldErrors.logoUrl ? 'border-red-500/50' : ''}`}
+              />
+            </div>
+            {fieldErrors.logoUrl && <p className="mt-1 text-xs text-red-400">{fieldErrors.logoUrl}</p>}
+            <p className="mt-1 text-[10px] text-white/25">
+              Wird im Patient-Marketplace neben Ihrem Apothekennamen angezeigt.
+            </p>
+          </div>
+
+          {/* Description */}
+          <div>
+            <label className={G.label}>Beschreibung</label>
+            <div className="relative">
+              <textarea
+                rows={4}
+                placeholder="Kurze Beschreibung Ihrer Apotheke (für Patient:innen sichtbar)"
+                value={form.description ?? ''}
+                maxLength={2000}
+                onChange={e => setForm(f => ({ ...f, description: e.target.value || null }))}
+                className={`w-full px-3.5 py-2.5 ${G.input} resize-none ${fieldErrors.description ? 'border-red-500/50' : ''}`}
+              />
+              <span className="absolute bottom-2.5 right-3 text-[10px] text-white/20 pointer-events-none">
+                {(form.description ?? '').length}/2000
+              </span>
+            </div>
+            {fieldErrors.description && <p className="mt-1 text-xs text-red-400">{fieldErrors.description}</p>}
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-4">
+            {/* Operating Hours */}
+            <div>
+              <label className={G.label}>Öffnungszeiten</label>
+              <input
+                type="text"
+                placeholder="z.B. Mo-Fr 8:00-18:30, Sa 9:00-13:00"
+                value={form.operatingHours ?? ''}
+                onChange={e => setForm(f => ({ ...f, operatingHours: e.target.value || null }))}
+                className={`w-full px-3.5 py-2.5 ${G.input}`}
+              />
+            </div>
+
+            {/* Phone */}
+            <div>
+              <label className={G.label}>Telefon</label>
+              <input
+                type="tel"
+                placeholder="+49 30 ..."
+                value={form.phone ?? ''}
+                onChange={e => setForm(f => ({ ...f, phone: e.target.value || null }))}
+                className={`w-full px-3.5 py-2.5 ${G.input}`}
+              />
+            </div>
+
+            {/* Contact Person */}
+            <div>
+              <label className={G.label}>Ansprechpartner</label>
+              <input
+                type="text"
+                placeholder="Max Mustermann"
+                value={form.contactPersonName ?? ''}
+                onChange={e => setForm(f => ({ ...f, contactPersonName: e.target.value || null }))}
+                className={`w-full px-3.5 py-2.5 ${G.input}`}
+              />
+            </div>
+
+            {/* Contact Email */}
+            <div>
+              <label className={G.label}>Kontakt E-Mail</label>
+              <input
+                type="email"
+                placeholder="kontakt@apotheke.de"
+                value={form.contactEmail ?? ''}
+                onChange={e => setForm(f => ({ ...f, contactEmail: e.target.value || null }))}
+                className={`w-full px-3.5 py-2.5 ${G.input} ${fieldErrors.contactEmail ? 'border-red-500/50' : ''}`}
+              />
+              {fieldErrors.contactEmail && (
+                <p className="mt-1 text-xs text-red-400">{fieldErrors.contactEmail}</p>
+              )}
+            </div>
+
+            {/* Mail Order Fee */}
+            <div>
+              <label className={G.label}>Versandgebühr</label>
+              <div className="relative">
+                <input
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  placeholder="0.00"
+                  value={form.mailOrderFee ?? ''}
+                  onChange={e =>
+                    setForm(f => ({ ...f, mailOrderFee: e.target.value ? parseFloat(e.target.value) : null }))
+                  }
+                  className={`w-full px-3.5 py-2.5 pr-8 ${G.input} ${fieldErrors.mailOrderFee ? 'border-red-500/50' : ''}`}
+                />
+                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-white/30 pointer-events-none">€</span>
+              </div>
+              {fieldErrors.mailOrderFee && (
+                <p className="mt-1 text-xs text-red-400">{fieldErrors.mailOrderFee}</p>
+              )}
+            </div>
+
+            {/* Base Delivery Fee */}
+            <div>
+              <label className={G.label}>Basis-Liefergebühr</label>
+              <div className="relative">
+                <input
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  value={form.baseDeliveryFee}
+                  onChange={e => setForm(f => ({ ...f, baseDeliveryFee: parseFloat(e.target.value) || 0 }))}
+                  className={`w-full px-3.5 py-2.5 pr-8 ${G.input} ${fieldErrors.baseDeliveryFee ? 'border-red-500/50' : ''}`}
+                />
+                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-white/30 pointer-events-none">€</span>
+              </div>
+              {fieldErrors.baseDeliveryFee && (
+                <p className="mt-1 text-xs text-red-400">{fieldErrors.baseDeliveryFee}</p>
+              )}
+            </div>
+
+            {/* Extended Delivery Fee */}
+            <div>
+              <label className={G.label}>Erw. Liefergebühr</label>
+              <div className="relative">
+                <input
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  value={form.extendedDeliveryFee}
+                  onChange={e => setForm(f => ({ ...f, extendedDeliveryFee: parseFloat(e.target.value) || 0 }))}
+                  className={`w-full px-3.5 py-2.5 pr-8 ${G.input} ${fieldErrors.extendedDeliveryFee ? 'border-red-500/50' : ''}`}
+                />
+                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-white/30 pointer-events-none">€</span>
+              </div>
+              {fieldErrors.extendedDeliveryFee && (
+                <p className="mt-1 text-xs text-red-400">{fieldErrors.extendedDeliveryFee}</p>
+              )}
+            </div>
+
+            {/* Delivery Radius */}
+            <div>
+              <label className={G.label}>Lieferradius</label>
+              <div className="relative">
+                <input
+                  type="number"
+                  min="0"
+                  value={form.deliveryRadius}
+                  onChange={e => setForm(f => ({ ...f, deliveryRadius: parseInt(e.target.value) || 0 }))}
+                  className={`w-full px-3.5 py-2.5 pr-10 ${G.input} ${fieldErrors.deliveryRadius ? 'border-red-500/50' : ''}`}
+                />
+                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-white/30 pointer-events-none">km</span>
+              </div>
+              {fieldErrors.deliveryRadius && (
+                <p className="mt-1 text-xs text-red-400">{fieldErrors.deliveryRadius}</p>
+              )}
+            </div>
+
+            {/* Max Delivery Radius */}
+            <div>
+              <label className={G.label}>Max. Lieferradius</label>
+              <div className="relative">
+                <input
+                  type="number"
+                  min="0"
+                  value={form.maxDeliveryRadius}
+                  onChange={e => setForm(f => ({ ...f, maxDeliveryRadius: parseInt(e.target.value) || 0 }))}
+                  className={`w-full px-3.5 py-2.5 pr-10 ${G.input} ${fieldErrors.maxDeliveryRadius ? 'border-red-500/50' : ''}`}
+                />
+                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-white/30 pointer-events-none">km</span>
+              </div>
+              {fieldErrors.maxDeliveryRadius && (
+                <p className="mt-1 text-xs text-red-400">{fieldErrors.maxDeliveryRadius}</p>
+              )}
+            </div>
+          </div>
+
+          {saveError && (
+            <div className="p-3.5 bg-red-500/10 border border-red-500/20 rounded-xl text-xs text-red-400 flex items-center gap-2">
+              <AlertCircle size={13} className="flex-shrink-0" />
+              {saveError}
+            </div>
+          )}
+
+          <div className="pt-2 flex items-center gap-3">
+            <button
+              onClick={handleSave}
+              disabled={!dirty || saving}
+              className={`flex items-center gap-2 px-5 py-2.5 ${G.btn} ${G.btnPrimary} disabled:opacity-40`}
+            >
+              {saving && <Loader2 className="animate-spin" size={13} />}
+              {saveSuccess && !saving && <Check size={13} />}
+              {saving ? 'Wird gespeichert...' : 'Änderungen speichern'}
+            </button>
+          </div>
+        </div>
+
+        {/* ── Locked card ── */}
+        <div className={`${G.card} border-l-4 border-l-amber-500/40 p-6 space-y-5 opacity-90`}>
+          <h3 className="text-sm font-bold text-white/50 flex items-center gap-2">
+            <div className="w-7 h-7 rounded-lg bg-amber-500/10 flex items-center justify-center flex-shrink-0">
+              <Lock size={13} className="text-amber-400/70" />
+            </div>
+            Admin-verwaltete Daten
+          </h3>
+
+          <div className="grid md:grid-cols-2 gap-4">
+            <LockedField label="Apothekenname" value={pharmacy.name} />
+            <LockedField label="Straße" value={pharmacy.street} />
+            <LockedField label="PLZ" value={pharmacy.zip} />
+            <LockedField label="Stadt" value={pharmacy.city} />
+            {pharmacy.latitude != null && (
+              <LockedField
+                label="Koordinaten"
+                value={`${pharmacy.latitude}, ${pharmacy.longitude}`}
+              />
+            )}
+            <LockedField label="Liefertyp" value={pharmacy.deliveryType} />
+          </div>
+
+          {/* Delivery capabilities */}
+          <div>
+            <p className={`${G.label} flex items-center gap-1`}>
+              <Lock size={10} className="text-amber-400/60" /> Liefermethoden
+            </p>
+            <div className="flex flex-wrap gap-2 mt-2">
+              {[
+                { label: 'Botendienst', enabled: pharmacy.supportsBotendienst },
+                { label: 'Versand', enabled: pharmacy.supportsMailOrder },
+                { label: 'Abholung', enabled: pharmacy.supportsPickup },
+              ].map(cap => (
+                <span
+                  key={cap.label}
+                  className={`inline-flex items-center gap-1.5 px-2.5 py-1 text-xs rounded-full border ${
+                    cap.enabled
+                      ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400'
+                      : 'bg-white/[0.03] border-white/[0.08] text-white/25'
+                  }`}
+                >
+                  {cap.enabled ? <CheckCircle size={11} /> : <XCircle size={11} />}
+                  {cap.label}
+                </span>
+              ))}
+            </div>
+          </div>
+
+          {/* Inventory source */}
+          <div>
+            <p className={`${G.label} flex items-center gap-1`}>
+              <Lock size={10} className="text-amber-400/60" /> Inventarquelle
+            </p>
+            <span
+              className={`inline-flex items-center gap-1.5 px-2.5 py-1 text-xs rounded-full border font-semibold ${
+                isCannaleo
+                  ? 'bg-blue-500/15 border-blue-500/20 text-blue-300'
+                  : 'bg-emerald-500/15 border-emerald-500/20 text-emerald-300'
+              }`}
+            >
+              {isCannaleo ? 'Cannaleo Sync' : 'Manuell'}
+            </span>
+          </div>
+
+          {isCannaleo && (
+            <div className="grid md:grid-cols-2 gap-4">
+              <LockedField label="Cannaleo Subdomain" value={pharmacy.cannaleoSubdomain} />
+              <LockedField label="Vendor ID" value={pharmacy.cannaleoVendorId} />
+              {pharmacy.cannaleoApiKey && (
+                <LockedField
+                  label="API Key (Cannaleo)"
+                  value={`●●●●●●●●●●●●${pharmacy.cannaleoApiKey.slice(-4)}`}
+                />
+              )}
+            </div>
+          )}
+
+          <div className="grid md:grid-cols-2 gap-4">
+            <LockedField label="Apotheken-Lizenz" value={pharmacy.apothekenLizenz} />
+            <LockedField label="BTM-Erlaubnis" value={pharmacy.btmErlaubnis} />
+          </div>
+
+          {pharmacy.apiKey && (
+            <div>
+              <p className={`${G.label} flex items-center gap-1`}>
+                <Lock size={10} className="text-amber-400/60" /> API-Schlüssel
+              </p>
+              <div className="flex items-center gap-2">
+                <p className="flex-1 text-sm text-white/40 bg-white/[0.02] border border-white/[0.05] rounded-xl px-3.5 py-2.5 font-mono truncate">
+                  {'●'.repeat(12)}{pharmacy.apiKey.slice(-4)}
+                </p>
+                <button
+                  onClick={copyApiKey}
+                  className={`flex-shrink-0 px-3 py-2.5 ${G.btn} bg-white/[0.06] border border-white/[0.10] hover:bg-white/[0.10] rounded-xl flex items-center gap-1.5 text-white/40 hover:text-white/70`}
+                >
+                  {copied ? (
+                    <><Check size={11} className="text-emerald-400" /><span className="text-emerald-400">Kopiert!</span></>
+                  ) : (
+                    <><Copy size={11} /> Kopieren</>
+                  )}
+                </button>
+              </div>
+            </div>
+          )}
+
+          <div className="pt-3 border-t border-white/[0.05]">
+            <p className="text-xs text-white/25 leading-relaxed">
+              Diese Daten werden vom releafZ-Team verwaltet. Bei Änderungswünschen:{' '}
+              <a
+                href="mailto:support@releafz.de"
+                className="text-amber-400/60 hover:text-amber-400 transition-colors underline underline-offset-2"
+              >
+                support@releafz.de
+              </a>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function SettingsView() {
+  // TODO: Wire notification toggles to backend notification preferences endpoint (API pending)
+  const [emailNewOrder, setEmailNewOrder] = useState(true)
+  const [emailDailySummary, setEmailDailySummary] = useState(false)
+  const [emailLowStock, setEmailLowStock] = useState(true)
+  // TODO: Wire pause-mode to backend pharmacy availability endpoint
+  const [pauseMode, setPauseMode] = useState(false)
+  // TODO: Wire processing time to backend pharmacy settings
+  const [processingMinutes, setProcessingMinutes] = useState(30)
+
+  return (
+    <div className="space-y-6">
+      <h2 className={G.sectionTitle}>Einstellungen</h2>
+      <div className={`${G.card} p-6 space-y-8`}>
+        <div>
+          <h3 className="text-sm font-bold text-white/70 flex items-center gap-2 mb-5">
+            <div className="w-7 h-7 rounded-lg bg-white/[0.06] flex items-center justify-center flex-shrink-0">
+              <Settings size={13} className="text-white/40" />
+            </div>
+            Benachrichtigungen
+          </h3>
+          <div className="space-y-1">
+            {([
+              { id: 'emailNewOrder', label: 'E-Mail bei neuer Bestellung', value: emailNewOrder, onChange: setEmailNewOrder },
+              { id: 'emailDailySummary', label: 'Tägliche Tageszusammenfassung', value: emailDailySummary, onChange: setEmailDailySummary },
+              { id: 'emailLowStock', label: 'Bei niedrigem Bestand', value: emailLowStock, onChange: setEmailLowStock },
+            ] as const).map(item => (
+              <div
+                key={item.id}
+                className="flex items-center justify-between py-3 border-b border-white/[0.05] last:border-0"
+              >
+                <label htmlFor={item.id} className="text-sm text-white/60 cursor-pointer">
+                  {item.label}
+                </label>
+                <SimpleToggle id={item.id} value={item.value} onChange={item.onChange} />
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="border-t border-white/[0.06]" />
+
+        <div>
+          <h3 className="text-sm font-bold text-white/70 flex items-center gap-2 mb-5">
+            <div className="w-7 h-7 rounded-lg bg-white/[0.06] flex items-center justify-center flex-shrink-0">
+              <SlidersHorizontal size={13} className="text-white/40" />
+            </div>
+            Betrieb
+          </h3>
+
+          <div className="space-y-5">
+            <div className="flex items-start justify-between gap-6 py-1">
+              <div className="flex-1">
+                <p className="text-sm text-white/60 mb-1">Pause-Modus</p>
+                <p className="text-xs text-white/30 leading-relaxed">
+                  Bei aktiviertem Pause-Modus erscheint Ihre Apotheke nicht im Marketplace
+                  und nimmt keine neuen Bestellungen an.
+                </p>
+              </div>
+              <SimpleToggle id="pauseMode" value={pauseMode} onChange={setPauseMode} />
+            </div>
+
+            <div className="border-t border-white/[0.05] pt-5">
+              <label htmlFor="processingTime" className={G.label}>
+                Standard-Bearbeitungsdauer
+              </label>
+              <div className="flex items-center gap-3 mt-1.5">
+                <input
+                  id="processingTime"
+                  type="number"
+                  min="5"
+                  max="480"
+                  step="5"
+                  value={processingMinutes}
+                  onChange={e => setProcessingMinutes(parseInt(e.target.value) || 30)}
+                  className={`w-24 px-3.5 py-2.5 ${G.input}`}
+                />
+                <span className="text-sm text-white/30">Minuten</span>
+              </div>
+              <p className="mt-1.5 text-xs text-white/20">
+                Durchschnittliche Bearbeitungszeit pro Bestellung.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <p className="text-xs text-white/20 pt-4 border-t border-white/[0.05] italic">
+          Einstellungen werden lokal angezeigt — Backend-Anbindung folgt in einem der nächsten Releases.
+        </p>
+      </div>
+    </div>
+  )
+}
+
+function ComplianceView({ pharmacy }: { pharmacy: Pharmacy }) {
+  return (
+    <div className="space-y-6">
+      <h2 className={G.sectionTitle}>Compliance</h2>
+      <div className={`${G.card} p-6 space-y-8`}>
+        {/* Section A — Lizenzen */}
+        <div>
+          <h3 className="text-sm font-bold text-white/70 flex items-center gap-2 mb-5">
+            <div className="w-7 h-7 rounded-lg bg-amber-500/10 flex items-center justify-center flex-shrink-0">
+              <Shield size={13} className="text-amber-400/70" />
+            </div>
+            Lizenzen und Erlaubnisse
+          </h3>
+          <div className="grid md:grid-cols-2 gap-4">
+            <LockedField
+              label="Apotheken-Lizenz"
+              value={pharmacy.apothekenLizenz || 'Nicht hinterlegt'}
+            />
+            <LockedField
+              label="BTM-Erlaubnis"
+              value={pharmacy.btmErlaubnis || 'Nicht hinterlegt'}
+            />
+          </div>
+          <p className="mt-4 text-xs text-white/25 leading-relaxed">
+            Diese Daten werden vom releafZ-Team verwaltet. Bei Änderungswünschen:{' '}
+            <a
+              href="mailto:support@releafz.de"
+              className="text-amber-400/60 hover:text-amber-400 transition-colors underline underline-offset-2"
+            >
+              support@releafz.de
+            </a>
+          </p>
+        </div>
+
+        <div className="border-t border-white/[0.06]" />
+
+        {/* Section B — Documents */}
+        <div>
+          <h3 className="text-sm font-bold text-white/70 mb-4">Datenschutz und Verträge</h3>
+          <div className="space-y-2">
+            {([
+              'Datenschutzvereinbarung mit releafZ',
+              'Pilot-Partnerschaftsvertrag',
+              'Allgemeine Geschäftsbedingungen',
+            ] as const).map(label => (
+              // TODO: Replace href="#" with actual hosted document URLs per document type
+              <a
+                key={label}
+                href="#"
+                target="_blank"
+                rel="noreferrer"
+                className="flex items-center justify-between p-3.5 bg-white/[0.03] border border-white/[0.06] rounded-xl hover:bg-white/[0.06] transition-colors group"
+              >
+                <span className="text-sm text-white/60 group-hover:text-white/80 transition-colors">
+                  {label}
+                </span>
+                <ExternalLink size={13} className="text-white/20 group-hover:text-emerald-400 transition-colors" />
+              </a>
+            ))}
+          </div>
+        </div>
+
+        <div className="border-t border-white/[0.06]" />
+
+        {/* Section C — Support */}
+        <div>
+          <h3 className="text-sm font-bold text-white/70 mb-4">releafZ-Support</h3>
+          <div className="p-4 bg-white/[0.03] border border-white/[0.06] rounded-xl space-y-3">
+            <div className="flex items-center gap-2.5 text-sm text-white/60">
+              <Mail size={14} className="text-emerald-400/70 flex-shrink-0" />
+              <a href="mailto:support@releafz.de" className="hover:text-white/90 transition-colors">
+                support@releafz.de
+              </a>
+            </div>
+            <div className="flex items-center gap-2.5 text-sm text-white/60">
+              <Phone size={14} className="text-emerald-400/70 flex-shrink-0" />
+              {/* TODO: Replace with actual support phone number */}
+              <span>+49 (0)30 XXXX-XXXX</span>
+            </div>
+            <p className="text-xs text-white/30 pt-2 border-t border-white/[0.05]">
+              Bei dringenden Anliegen rufen Sie uns bitte direkt an.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 // ── Main Component ──
 export default function PharmacyDashboard() {
   const [email, setEmail] = useState(''); const [password, setPassword] = useState(''); const [showPassword, setShowPassword] = useState(false)
@@ -201,6 +856,8 @@ export default function PharmacyDashboard() {
   const [editingStock, setEditingStock] = useState<{ id: number; value: number } | null>(null); const [productLoading, setProductLoading] = useState(false)
   const [analyticsData, setAnalyticsData] = useState<AnalyticsResponse | null>(null)
   const [analyticsPeriod, setAnalyticsPeriod] = useState<'7d' | '30d' | '90d' | '12m'>('30d'); const [analyticsLoading, setAnalyticsLoading] = useState(false)
+  const [profileSaving, setProfileSaving] = useState(false)
+  const [profileSaveError, setProfileSaveError] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
 
   const pharmacy = dashboardData?.pharmacy
@@ -255,6 +912,21 @@ export default function PharmacyDashboard() {
   // The backend must verify that the session matches the requested pharmacyId on every endpoint.
   const handleLogin = async () => { try { setLoading(true); setError(null); const d = await pharmacyLogin(email, password); if (d.pharmacy) { setPharmacyId(d.pharmacy.id); localStorage?.setItem('pharmacy_id', d.pharmacy.id.toString()); await loadDashboard() } else setError('Login fehlgeschlagen') } catch (e: unknown) { setError(e instanceof Error ? e.message : 'Anmeldung fehlgeschlagen') } finally { setLoading(false) } }
   const handleLogout = () => { setPharmacyId(null); setDashboardData(null); setOrdersResponse(null); setInventoryResponse(null); setAnalyticsData(null); setEmail(''); setPassword(''); setActiveView('dashboard'); setError(null); localStorage?.removeItem('pharmacy_id') }
+  const handleSaveProfile = useCallback(async (patch: Partial<EditableProfileFields>) => {
+    if (!pharmacyId) return
+    setProfileSaving(true)
+    setProfileSaveError(null)
+    try {
+      const updated = await updatePharmacyProfile(pharmacyId, patch)
+      setDashboardData(prev => prev ? { ...prev, pharmacy: updated } : prev)
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : 'Aktualisierung fehlgeschlagen — bitte erneut versuchen'
+      setProfileSaveError(msg)
+      throw e
+    } finally {
+      setProfileSaving(false)
+    }
+  }, [pharmacyId])
   const handleUpdateStatus = async (id: number, s: string) => { if (!pharmacyId) return; try { setOrdersLoading(true); await updateOrderStatus(pharmacyId, id, s); await loadOrders(pharmacyId, buildOrderFilters()); await loadDashboard() } catch (e: unknown) { setError(e instanceof Error ? e.message : 'Fehler') } finally { setOrdersLoading(false) } }
   const handleMarkReady = async (id: number) => { if (!pharmacyId) return; try { setOrdersLoading(true); await markOrderReady(pharmacyId, id); await loadOrders(pharmacyId, buildOrderFilters()); await loadDashboard() } catch (e: unknown) { setError(e instanceof Error ? e.message : 'Fehler') } finally { setOrdersLoading(false) } }
   const handleDispatch = async (id: number) => {
@@ -279,7 +951,10 @@ export default function PharmacyDashboard() {
   const handleStockUpdate = async () => { if (!editingStock || !pharmacyId) return; try { setProductLoading(true); await updateProduct(editingStock.id, { stock: editingStock.value }); setEditingStock(null); await loadInventory(pharmacyId, buildInventoryFilters()) } catch (e: unknown) { setError(e instanceof Error ? e.message : 'Fehler') } finally { setProductLoading(false) } }
   const handleInventorySortToggle = (col: string) => { if (inventorySortBy === col) setInventorySortOrder(p => p === 'asc' ? 'desc' : 'asc'); else { setInventorySortBy(col); setInventorySortOrder('asc') } }
 
-  const renderNextStatusButton = (order: { id: number; status: string; deliveryMethod?: string | null }) => {
+  const renderNextStatusButton = (
+    order: { id: number; status: string; deliveryMethod?: string | null },
+    syncDisabled?: boolean
+  ) => {
     const cat = getDeliveryCategory(order.deliveryMethod);
     let allowed = STATUS_TRANSITIONS[order.status] ?? [];
     if (order.status === 'READY') {
@@ -307,11 +982,12 @@ export default function PharmacyDashboard() {
           return (
             <button
               key={ns}
-              onClick={onClick}
-              disabled={ordersLoading}
-              className={`bg-gradient-to-r ${colorByCategory[cat]} text-white px-3.5 py-1.5 ${G.btn} flex items-center gap-1.5 shadow-lg`}
+              onClick={syncDisabled ? undefined : onClick}
+              disabled={ordersLoading || syncDisabled}
+              title={syncDisabled ? 'Automatische Sync via Cannaleo aktiv' : undefined}
+              className={`bg-gradient-to-r ${colorByCategory[cat]} text-white px-3.5 py-1.5 ${G.btn} flex items-center gap-1.5 shadow-lg ${syncDisabled ? 'opacity-40 cursor-not-allowed' : ''}`}
             >
-              {ordersLoading && <Loader2 className="animate-spin" size={12} />}
+              {ordersLoading && !syncDisabled && <Loader2 className="animate-spin" size={12} />}
               {label}
             </button>
           );
@@ -401,17 +1077,36 @@ export default function PharmacyDashboard() {
             { key: 'orders' as const, label: 'Bestellungen', icon: ShoppingCart, badge: orderStats.pending },
             { key: 'inventory' as const, label: 'Inventar', icon: Boxes, badge: inventoryStats.lowStock },
             { key: 'analytics' as const, label: 'Analytik', icon: BarChart3 },
+            { key: 'profile' as const, label: 'Profil', icon: User },
+            { key: 'settings' as const, label: 'Einstellungen', icon: Settings },
+            { key: 'compliance' as const, label: 'Compliance', icon: Shield },
           ]).map(tab => (
             <button key={tab.key} onClick={() => handleViewChange(tab.key)}
-              className={`px-8 py-2.5 text-xs font-semibold rounded-lg transition-all duration-200 flex items-center gap-2 ${activeView === tab.key ? G.tabActive : G.tabInactive}`}>
+              className={`px-4 sm:px-6 py-2.5 text-xs font-semibold rounded-lg transition-all duration-200 flex items-center gap-2 ${activeView === tab.key ? G.tabActive : G.tabInactive}`}>
               <tab.icon size={14} /><span className="hidden sm:inline">{tab.label}</span>
-              {tab.badge != null && tab.badge > 0 && <span className={`px-1.5 py-0.5 text-[10px] font-bold rounded-md ${activeView === tab.key ? 'bg-emerald-400/20 text-emerald-300' : 'bg-amber-500/20 text-amber-400'}`}>{tab.badge}</span>}
+              {'badge' in tab && tab.badge != null && tab.badge > 0 && <span className={`px-1.5 py-0.5 text-[10px] font-bold rounded-md ${activeView === tab.key ? 'bg-emerald-400/20 text-emerald-300' : 'bg-amber-500/20 text-amber-400'}`}>{tab.badge}</span>}
             </button>
           ))}
           </div>
         </div>
 
         <div className="pb-6">
+
+        {/* ── Cannaleo sync banner ── */}
+        {pharmacy?.isSyncMode && (
+          <div className="mb-5 flex items-center gap-3 p-4 rounded-2xl border border-emerald-500/20 bg-emerald-500/5 backdrop-blur-xl">
+            <div className="w-9 h-9 rounded-xl bg-emerald-500/15 flex items-center justify-center flex-shrink-0">
+              <RefreshCw size={16} className="text-emerald-400" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-semibold text-emerald-300">Cannaleo Sync aktiv</p>
+              <p className="text-xs text-emerald-200/60">
+                Bestellungen werden automatisch aktualisiert. Manuelle Statusänderungen sind deaktiviert.
+              </p>
+            </div>
+          </div>
+        )}
+
         {/* ── DASHBOARD ── */}
         {activeView === 'dashboard' && (loading ? (
           <div className="space-y-6"><div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">{Array.from({ length: 6 }).map((_, i) => <Skeleton key={i} className="h-28" />)}</div><div className="grid grid-cols-2 md:grid-cols-4 gap-3">{Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-28" />)}</div><Skeleton className="h-64" /></div>
@@ -550,7 +1245,7 @@ export default function PharmacyDashboard() {
                       <td className={`${G.td} text-sm font-semibold text-white/80 text-right`}>{o.totalPrice ? formatEUR(o.totalPrice) : '—'}</td>
                       <td className={`${G.td} text-xs text-white/25 text-right hidden md:table-cell`}>{formatShortDate(o.createdAt)}</td>
                       <td className={`${G.td} text-xs text-white/25 text-right hidden lg:table-cell`}>{formatShortDate(o.updatedAt)}</td>
-                      <td className={`${G.td} text-right`}><div className="flex items-center justify-end gap-2"><button onClick={() => loadOrderDetail(o.id)} className="p-1.5 text-white/20 hover:text-emerald-400 hover:bg-emerald-500/10 rounded-lg transition-all opacity-0 group-hover:opacity-100"><ExternalLink size={13} /></button>{renderNextStatusButton({ id: o.id, status: o.status, deliveryMethod: o.deliveryMethod })}</div></td>
+                      <td className={`${G.td} text-right`}><div className="flex items-center justify-end gap-2"><button onClick={() => loadOrderDetail(o.id)} className="p-1.5 text-white/20 hover:text-emerald-400 hover:bg-emerald-500/10 rounded-lg transition-all opacity-0 group-hover:opacity-100"><ExternalLink size={13} /></button>{renderNextStatusButton({ id: o.id, status: o.status, deliveryMethod: o.deliveryMethod }, pharmacy?.isSyncMode)}</div></td>
                     </tr>
                     );
                   })}</tbody>
@@ -610,7 +1305,7 @@ export default function PharmacyDashboard() {
                   {selectedOrderDetail.payments?.length > 0 && <div><h3 className={G.label}>Zahlungshistorie</h3><div className="bg-white/[0.03] border border-white/[0.06] rounded-xl overflow-hidden"><table className="w-full"><thead><tr className="border-b border-white/[0.06]"><th className={`${G.th} text-left`}>Typ</th><th className={`${G.th} text-left`}>Methode</th><th className={`${G.th} text-right`}>Betrag</th><th className={`${G.th} text-left`}>Status</th><th className={`${G.th} text-right`}>Datum</th></tr></thead><tbody className="divide-y divide-white/[0.04]">{selectedOrderDetail.payments.map(p => <tr key={p.id}><td className={`${G.td} text-sm capitalize text-white/50`}>{p.type}</td><td className={`${G.td} text-sm capitalize text-white/40`}>{p.method}</td><td className={`${G.td} text-sm text-right font-medium text-white/70`}>{formatEUR(p.amount)}</td><td className={G.td}><span className={`px-2 py-0.5 text-[10px] font-semibold rounded-md ${p.status === 'completed' ? 'bg-emerald-500/15 text-emerald-400' : p.status === 'pending' ? 'bg-amber-500/15 text-amber-400' : 'bg-white/[0.06] text-white/40'}`}>{p.status}</span></td><td className={`${G.td} text-xs text-white/25 text-right`}>{formatDate(p.completedAt || p.createdAt)}</td></tr>)}</tbody></table></div></div>}
                   {selectedOrderDetail.prescriptionPdfPath && <a href={`${API_BASE}/api/treatment/${selectedOrderDetail.treatmentRequestId}/prescription`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2.5 text-sm font-semibold text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-4 py-3 rounded-xl hover:bg-emerald-500/15 transition-all"><FileText size={16} /> Rezept PDF <ExternalLink size={12} /></a>}
                   <div className="flex gap-6 text-xs text-white/20 pt-3 border-t border-white/[0.06]"><span>Erstellt: {formatDate(selectedOrderDetail.createdAt)}</span><span>Aktualisiert: {formatDate(selectedOrderDetail.updatedAt)}</span></div>
-                  {STATUS_TRANSITIONS[selectedOrderDetail.status]?.length > 0 && <div className="pt-1">{renderNextStatusButton({ id: selectedOrderDetail.id, status: selectedOrderDetail.status, deliveryMethod: selectedOrderDetail.deliveryMethod })}</div>}
+                  {STATUS_TRANSITIONS[selectedOrderDetail.status]?.length > 0 && <div className="pt-1">{renderNextStatusButton({ id: selectedOrderDetail.id, status: selectedOrderDetail.status, deliveryMethod: selectedOrderDetail.deliveryMethod }, pharmacy?.isSyncMode)}</div>}
                 </div>
               </> : <div className="p-10 text-center text-white/20 text-sm">Nicht verfügbar</div>}
             </div>
@@ -749,7 +1444,24 @@ export default function PharmacyDashboard() {
               </>
             })() : <div className={G.card}><EmptyState icon={BarChart3} title="Keine Analytik-Daten" description="Daten konnten nicht geladen werden." /></div>}
           </div>
+        )        }
+
+        {/* ── PROFILE ── */}
+        {activeView === 'profile' && pharmacy && (
+          <ProfileView
+            pharmacy={pharmacy}
+            onSave={handleSaveProfile}
+            saving={profileSaving}
+            saveError={profileSaveError}
+          />
         )}
+
+        {/* ── SETTINGS ── */}
+        {activeView === 'settings' && <SettingsView />}
+
+        {/* ── COMPLIANCE ── */}
+        {activeView === 'compliance' && pharmacy && <ComplianceView pharmacy={pharmacy} />}
+
         </div>
       </div>
     </div>
