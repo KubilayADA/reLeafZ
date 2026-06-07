@@ -6,6 +6,7 @@ import type { ISourceOptions } from '@tsparticles/engine'
 import { Button } from '@/components/ui/button'
 import words from '@/constants/index'
 import SectionParticlesBackground from '@/components/ui/SectionParticlesBackground'
+import CookieBanner from '@/components/ui/cookie'
 import '@/components/ui/Hero/Words-Sliding-Smooth.css'
 import './ComingSoon.css'
 
@@ -264,7 +265,9 @@ export default function ComingSoon() {
   }
 
   return (
-    <div className="cs-root" onClick={handleStarBurst}>
+    <>
+      <CookieBanner />
+      <div className="cs-root" onClick={handleStarBurst}>
         <div className="cs-bg" aria-hidden>
           <SectionParticlesBackground
             className="cs-particles"
@@ -446,5 +449,6 @@ export default function ComingSoon() {
           </footer>
         </div>
       </div>
+    </>
   )
 }
