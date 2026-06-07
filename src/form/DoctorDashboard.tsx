@@ -4,9 +4,12 @@ import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react'
 import {
   Eye, EyeOff, Lock, Mail, User, Clock, CheckCircle, XCircle, Package, LogOut,
   Phone, AlertCircle, MapPin, Search, Menu, Bell, Settings, ChevronDown, X,
-  FileText, Users, History, Inbox, Loader2, AlertTriangle, Stethoscope, RefreshCw,
+  FileText, Users, Inbox, Loader2, AlertTriangle, Stethoscope, RefreshCw, UserCircle2,
 } from 'lucide-react'
-import { API_BASE } from '@/lib/api'
+import {
+  API_BASE, fetchDoctorMe, updateDoctorProfile, DoctorProfileError,
+  type Doctor, type DoctorEditableFields,
+} from '@/lib/api'
 
 // ── design tokens — premium light-mode SaaS surface ──
 const G = {
@@ -118,10 +121,14 @@ interface TreatmentRequest {
   age?: number; pharmacyName?: string; pharmacyCity?: string; address?: string
 }
 
-type ViewType = 'inbox' | 'history' | 'patients' | 'profile' | 'settings'
+type ViewType = 'inbox' | 'patients' | 'profile' | 'settings'
 const VIEW_TITLES: Record<ViewType, string> = {
-  inbox: 'Anfragen', history: 'Verlauf', patients: 'Patientenliste', profile: 'Profil', settings: 'Einstellungen',
+  inbox: 'Anfragen', patients: 'Patientenliste', profile: 'Profil', settings: 'Einstellungen',
 }
+
+type RequestBucket = 'pending' | 'approved' | 'declined'
+type RequestWithBucket = TreatmentRequest & { _bucket: RequestBucket }
+type StatusFilter = 'pending' | 'approved' | 'declined' | 'all'
 
 // TODO: Keep in sync with questionnaire/step6 disqualifying logic
 const DISQUALIFYING_CONDITION_KEYS = [
@@ -140,7 +147,15 @@ const DECLINE_REASONS = [
 ] as const
 
 type InboxTimeFilter = 'all' | 'today' | 'week' | 'older'
-type HistoryFilter = 'all' | 'approved' | 'declined' | 'last30' | 'older'
+
+type DoctorFormFields = {
+  bio: string | null
+  phone: string | null
+  specialty: string | null
+  workingHours: string | null
+  pictureUrl: string | null
+  signatureUrl: string | null
+}
 
 function formatEUR(amount: number) {
   return new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR' }).format(amount)
@@ -171,13 +186,112 @@ function buildPatientKey(req: { email?: string | null; fullName?: string; phone?
   if (req.email?.trim()) return `email:${req.email.trim().toLowerCase()}`
   return `np:${(req.fullName ?? '').trim().toLowerCase()}|${(req.phone ?? '').trim()}`
 }
-function isApprovedStatus(status: string) {
-  const s = status.toLowerCase()
-  return s === 'approved' || s === 'approve'
+// ── Doctor-relevant status sets ──
+//
+// A doctor's view of a request only exists from the moment the patient
+// has paid the prescription fee. Before that the request is the patient's
+// and the marketplace's concern (PENDING_STRAIN_SELECTION, PENDING_PAYMENT,
+// DISQUALIFIED). After the doctor decides, the request enters the pharmacy
+// pipeline (PAID → PROCESSING → PREPARING → READY → DISPATCHED → DELIVERED
+// for delivery, or → PICKED_UP for pickup, → FULFILLED as terminal).
+//
+// These sets keep the StatusPill, bucket classifier, and patient aggregation
+// counts in lockstep with the backend doctor route filters.
+
+const PENDING_DOCTOR_STATUSES = new Set([
+  'PENDING_DOCTOR_APPROVAL',
+])
+
+const APPROVED_STATUSES = new Set([
+  'APPROVED',
+  'APPROVE',
+  'PAID',
+  'PROCESSING',
+  'PREPARING',
+  'READY',
+  'PICKED_UP',
+  'DISPATCHED',
+  'DELIVERED',
+  'FULFILLED',
+])
+
+const DECLINED_STATUSES = new Set([
+  'DECLINED',
+  'DECLINE',
+  'CANCELLED',
+])
+
+// Pre-doctor states the doctor must never see. Defensive: backend already
+// filters via /api/doctor/requests (status=PENDING_DOCTOR_APPROVAL) and
+// /api/doctor/past-requests (status in approved/declined set), but the
+// frontend should still discard these if they ever leak.
+const PRE_DOCTOR_STATUSES = new Set([
+  'PENDING_STRAIN_SELECTION',
+  'PENDING_PAYMENT',
+  'DISQUALIFIED',
+])
+
+function isPendingDoctorStatus(status: string) {
+  return PENDING_DOCTOR_STATUSES.has(status.toUpperCase())
 }
+
+function isApprovedStatus(status: string) {
+  return APPROVED_STATUSES.has(status.toUpperCase())
+}
+
 function isDeclinedStatus(status: string) {
-  const s = status.toLowerCase()
-  return s === 'declined' || s === 'decline'
+  return DECLINED_STATUSES.has(status.toUpperCase())
+}
+
+function isDoctorRelevantStatus(status: string) {
+  const s = status.toUpperCase()
+  return !PRE_DOCTOR_STATUSES.has(s)
+}
+
+function resolveRequestBucket(req: TreatmentRequest, fromPending: boolean): RequestBucket {
+  if (fromPending) return 'pending'
+  if (isDeclinedStatus(req.status)) return 'declined'
+  if (isApprovedStatus(req.status)) return 'approved'
+  // If a request slips through that isn't approved or declined,
+  // surface it as 'pending' — this should not happen given the
+  // isDoctorRelevantStatus filter above, but it's a safe default.
+  return 'pending'
+}
+function BucketStatusPill({ bucket }: { bucket: RequestBucket }) {
+  if (bucket === 'approved') {
+    return <span className="inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-semibold rounded-full bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200"><CheckCircle size={12} /> Genehmigt</span>
+  }
+  if (bucket === 'declined') {
+    return <span className="inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-semibold rounded-full bg-rose-50 text-rose-700 ring-1 ring-rose-200"><XCircle size={12} /> Abgelehnt</span>
+  }
+  return <span className="inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-semibold rounded-full bg-amber-50 text-amber-700 ring-1 ring-amber-200"><Clock size={12} /> Wartend</span>
+}
+function LockedField({ label, value }: { label: string; value: React.ReactNode }) {
+  return (
+    <div>
+      <p className={`${G.label} flex items-center gap-1`}>
+        <Lock size={11} className="text-amber-500" />
+        {label}
+      </p>
+      <p className="text-sm text-stone-500 bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 break-all leading-relaxed">
+        {value || '—'}
+      </p>
+    </div>
+  )
+}
+function makeDoctorFormInitial(doctor: Doctor): DoctorFormFields {
+  return {
+    bio: doctor.bio,
+    phone: doctor.phone,
+    specialty: doctor.specialty,
+    workingHours: doctor.workingHours,
+    pictureUrl: doctor.pictureUrl,
+    signatureUrl: doctor.signatureUrl,
+  }
+}
+function emptyToNull(value: string | null): string | null {
+  if (value === null || value.trim() === '') return null
+  return value
 }
 function getDisqualifications(req: TreatmentRequest): string[] {
   const reasons: string[] = []
@@ -201,12 +315,12 @@ function StatusPill({ status }: { status: string }) {
   if (isDeclinedStatus(status)) return <span className="inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-semibold rounded-full bg-rose-50 text-rose-700 ring-1 ring-rose-200"><XCircle size={12} /> Abgelehnt</span>
   return <span className="inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-semibold rounded-full bg-amber-50 text-amber-700 ring-1 ring-amber-200"><Clock size={12} /> Ausstehend</span>
 }
-function EmptyState({ icon: Icon, title, description }: { icon: React.ElementType; title: string; description: string }) {
+function EmptyState({ icon: Icon, title, description }: { icon: React.ElementType; title: string; description?: string }) {
   return (
     <div className="flex flex-col items-center justify-center py-16 px-6">
       <div className="w-16 h-16 rounded-2xl bg-stone-50 border border-stone-200 flex items-center justify-center mb-5"><Icon className="w-7 h-7 text-stone-300" /></div>
       <h3 className="text-base font-semibold text-stone-800 mb-2">{title}</h3>
-      <p className="text-sm text-stone-500 text-center max-w-sm">{description}</p>
+      {description && <p className="text-sm text-stone-500 text-center max-w-sm">{description}</p>}
     </div>
   )
 }
@@ -261,7 +375,6 @@ function Sidebar({ activeView, onViewChange, doctorEmail, pendingCount, onLogout
   const groups: NavGroup[] = [
     { title: 'Posteingang', items: [
       { key: 'inbox', label: 'Anfragen', icon: Inbox, badge: pendingCount },
-      { key: 'history', label: 'Verlauf', icon: History },
     ]},
     { title: 'Patienten', items: [{ key: 'patients', label: 'Patientenliste', icon: Users }] },
     { title: 'Arzt-Profil', items: [
@@ -438,27 +551,17 @@ function matchesInboxTimeFilter(req: TreatmentRequest, filter: InboxTimeFilter):
   return true
 }
 
-function matchesHistoryFilter(req: TreatmentRequest, filter: HistoryFilter): boolean {
-  if (filter === 'all') return true
-  if (filter === 'approved') return isApprovedStatus(req.status)
-  if (filter === 'declined') return isDeclinedStatus(req.status)
-  if (!req.createdAt) return false
-  const created = new Date(req.createdAt)
-  const thirtyDaysAgo = new Date(Date.now() - 30 * 86400000)
-  if (filter === 'last30') return created >= thirtyDaysAgo
-  if (filter === 'older') return created < thirtyDaysAgo
-  return true
-}
-
 type RequestCardProps = {
-  req: TreatmentRequest; readOnly?: boolean
-  onView: (req: TreatmentRequest) => void; onQuickApprove?: (req: TreatmentRequest) => void
+  req: RequestWithBucket
+  onView: (req: TreatmentRequest) => void
+  onQuickApprove?: (req: TreatmentRequest) => void
   onPatientClick: (req: TreatmentRequest) => void
 }
 
-function RequestCard({ req, readOnly, onView, onQuickApprove, onPatientClick }: RequestCardProps) {
+function RequestCard({ req, onView, onQuickApprove, onPatientClick }: RequestCardProps) {
   const disqualifications = getDisqualifications(req)
   const productCount = req.selectedProducts?.length ?? 0
+  const readOnly = req._bucket !== 'pending'
   return (
     <div className={`${G.card} ${G.cardHover} p-5 space-y-4`}>
       <div className="flex flex-wrap items-start justify-between gap-3">
@@ -467,11 +570,11 @@ function RequestCard({ req, readOnly, onView, onQuickApprove, onPatientClick }: 
             <button type="button" onClick={() => onPatientClick(req)} className="text-base font-semibold text-stone-900 hover:text-emerald-700 hover:underline underline-offset-2">{req.fullName}</button>
             <span className="text-xs text-stone-400">{formatRelativeTime(req.createdAt)}</span>
             <SeverityPill severity={req.severity} />
-            {req.age != null && <span className="text-xs text-stone-500">{req.age} J.</span>}
+            {req.age != null && <span className="text-xs text-stone-500">{req.age} Jahre</span>}
           </div>
           <p className="text-sm text-stone-600 line-clamp-2">{getSymptomPreview(req)}</p>
         </div>
-        {readOnly && <StatusPill status={req.status} />}
+        <BucketStatusPill bucket={req._bucket} />
       </div>
       {!readOnly && <DisqualificationBanner reasons={disqualifications} />}
       <div className="flex flex-wrap items-center justify-between gap-3 pt-1 border-t border-stone-100">
@@ -715,21 +818,246 @@ function PatientProfileModal({ aggregate, onClose, onViewRequest }: { aggregate:
 }
 
 function DoctorProfileView() {
+  const [doctor, setDoctor] = useState<Doctor | null>(null)
+  const [original, setOriginal] = useState<DoctorFormFields | null>(null)
+  const [form, setForm] = useState<DoctorFormFields | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [loadError, setLoadError] = useState<string | null>(null)
+  const [saving, setSaving] = useState(false)
+  const [saveError, setSaveError] = useState<string | null>(null)
+  const [saveSuccess, setSaveSuccess] = useState(false)
+  const [fieldErrors, setFieldErrors] = useState<Partial<Record<keyof DoctorFormFields, string>>>({})
+
+  const loadProfile = useCallback(async () => {
+    setLoading(true)
+    setLoadError(null)
+    try {
+      const data = await fetchDoctorMe()
+      const initial = makeDoctorFormInitial(data)
+      setDoctor(data)
+      setOriginal(initial)
+      setForm(initial)
+    } catch (e: unknown) {
+      setLoadError(e instanceof Error ? e.message : 'Profil konnte nicht geladen werden.')
+    } finally {
+      setLoading(false)
+    }
+  }, [])
+
+  useEffect(() => { loadProfile() }, [loadProfile])
+
+  const isDirty = useMemo(() => {
+    if (!form || !original) return false
+    return JSON.stringify(form) !== JSON.stringify(original)
+  }, [form, original])
+
+  const validate = (): boolean => {
+    if (!form) return false
+    const errors: Partial<Record<keyof DoctorFormFields, string>> = {}
+    if ((form.bio ?? '').length > 2000) errors.bio = 'Maximal 2000 Zeichen'
+    if ((form.phone ?? '').length > 40) errors.phone = 'Maximal 40 Zeichen'
+    if ((form.specialty ?? '').length > 120) errors.specialty = 'Maximal 120 Zeichen'
+    if ((form.workingHours ?? '').length > 4000) errors.workingHours = 'Maximal 4000 Zeichen'
+    setFieldErrors(errors)
+    return Object.keys(errors).length === 0
+  }
+
+  const handleSave = async () => {
+    if (!form || !original || !doctor) return
+    if (!validate()) return
+    setSaving(true)
+    setSaveError(null)
+    try {
+      const patch: DoctorEditableFields = {}
+      if (form.bio !== original.bio) patch.bio = emptyToNull(form.bio)
+      if (form.phone !== original.phone) patch.phone = emptyToNull(form.phone)
+      if (form.workingHours !== original.workingHours) patch.workingHours = emptyToNull(form.workingHours)
+      if (form.specialty !== original.specialty) {
+        patch.specialty = (form.specialty ?? '').trim() === ''
+          ? original.specialty
+          : emptyToNull(form.specialty)
+      }
+      const updated = await updateDoctorProfile(patch)
+      const next = makeDoctorFormInitial(updated)
+      setDoctor(updated)
+      setOriginal(next)
+      setForm(next)
+      setFieldErrors({})
+      setSaveSuccess(true)
+      setTimeout(() => setSaveSuccess(false), 3000)
+    } catch (e: unknown) {
+      if (e instanceof DoctorProfileError && e.details?.length) {
+        const mapped: Partial<Record<keyof DoctorFormFields, string>> = {}
+        for (const detail of e.details) {
+          const key = detail.path as keyof DoctorFormFields
+          if (key in (form ?? {})) mapped[key] = detail.message
+        }
+        setFieldErrors(mapped)
+      }
+      setSaveError(e instanceof Error ? e.message : 'Speichern fehlgeschlagen.')
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  if (loading) {
+    return (
+      <div className="flex justify-center py-20">
+        <Loader2 className="animate-spin text-emerald-600" size={32} />
+      </div>
+    )
+  }
+
+  if (loadError || !doctor || !form || !original) {
+    return (
+      <div className={`${G.card} p-6 max-w-lg`}>
+        <div className="flex items-start gap-3 p-3.5 bg-rose-50 border border-rose-200 rounded-xl text-sm text-rose-700 mb-4">
+          <AlertCircle size={16} className="flex-shrink-0 mt-0.5" />
+          <p>{loadError ?? 'Profil konnte nicht geladen werden.'}</p>
+        </div>
+        <button onClick={loadProfile} className={`${G.btn} ${G.btnSecondary} ${G.focus} px-4 py-2.5`}>Erneut versuchen</button>
+      </div>
+    )
+  }
+
   return (
     <div className="space-y-6">
-      <PreviewBanner text="Profilbearbeitung ist in Vorbereitung. Persönliche Daten, Approbation und Signatur werden in einer zukünftigen Version freigeschaltet." />
-      <div className="grid gap-4 md:grid-cols-3">
-        {[
-          { title: 'Persönliche Daten', desc: 'Name, Kontakt, Fachrichtung' },
-          { title: 'Approbation', desc: 'Lanr, BSNR, Approbationsnummer' },
-          { title: 'Signatur', desc: 'Digitale Signatur für Rezepte' },
-        ].map(card => (
-          <div key={card.title} className={`${G.card} p-5 opacity-60 pointer-events-none`}>
-            <div className="w-9 h-9 rounded-xl bg-stone-100 flex items-center justify-center mb-3"><Lock size={16} className="text-stone-400" /></div>
-            <h3 className="text-sm font-bold text-stone-800">{card.title}</h3>
-            <p className="text-xs text-stone-500 mt-1">{card.desc}</p>
+      <div className="grid gap-6 lg:grid-cols-2">
+        <div className={`${G.card} border-l-4 border-l-emerald-500 p-6 space-y-5`}>
+          <h3 className="text-sm font-bold text-stone-700 flex items-center gap-2">
+            <div className="w-7 h-7 rounded-lg bg-emerald-50 flex items-center justify-center flex-shrink-0">
+              <User size={14} className="text-emerald-700" />
+            </div>
+            Bearbeitbare Daten
+          </h3>
+
+          <div>
+            <p className={G.label}>Profilbild & Signatur</p>
+            <div className="flex flex-col sm:flex-row gap-4">
+              <div>
+                <div className="w-24 h-24 rounded-xl bg-stone-50 border border-stone-200 overflow-hidden flex items-center justify-center">
+                  {form.pictureUrl ? (
+                    <img src={form.pictureUrl} alt="Profilbild" className="w-full h-full object-cover rounded-xl" />
+                  ) : (
+                    <UserCircle2 size={32} className="text-stone-300" />
+                  )}
+                </div>
+                <button
+                  type="button"
+                  disabled
+                  title="Datei-Upload wird in Kürze freigeschaltet"
+                  className={`mt-2 px-3 py-1.5 ${G.btn} ${G.btnSecondary} opacity-40 cursor-not-allowed text-xs`}
+                >
+                  Upload (in Kürze verfügbar)
+                </button>
+              </div>
+              <div className="flex-1">
+                <div className="w-full max-w-[240px] h-20 rounded-xl bg-stone-50 border border-stone-200 overflow-hidden flex items-center justify-center">
+                  {form.signatureUrl ? (
+                    <img src={form.signatureUrl} alt="Signatur" className="max-h-full max-w-full object-contain" />
+                  ) : (
+                    <span className="text-xs text-stone-400">Keine Signatur hinterlegt</span>
+                  )}
+                </div>
+                <button
+                  type="button"
+                  disabled
+                  title="Datei-Upload wird in Kürze freigeschaltet"
+                  className={`mt-2 px-3 py-1.5 ${G.btn} ${G.btnSecondary} opacity-40 cursor-not-allowed text-xs`}
+                >
+                  Upload (in Kürze verfügbar)
+                </button>
+              </div>
+            </div>
           </div>
-        ))}
+
+          <div>
+            <label className={G.label}>Bio</label>
+            <textarea
+              rows={4}
+              maxLength={2000}
+              value={form.bio ?? ''}
+              onChange={e => setForm(f => f ? { ...f, bio: e.target.value || null } : f)}
+              className={`w-full px-3.5 py-2.5 ${G.input} resize-none ${fieldErrors.bio ? 'border-rose-400' : ''}`}
+            />
+            <p className="mt-1 text-xs text-stone-400">Erscheint in Ihrem Profil und auf Patientenkommunikation. Maximal 2000 Zeichen.</p>
+            <p className="text-xs text-stone-400 tabular-nums">{(form.bio ?? '').length} / 2000</p>
+            {fieldErrors.bio && <p className="text-rose-600 text-xs mt-1">{fieldErrors.bio}</p>}
+          </div>
+
+          <div>
+            <label className={G.label}>Telefon</label>
+            <input
+              type="tel"
+              maxLength={40}
+              value={form.phone ?? ''}
+              onChange={e => setForm(f => f ? { ...f, phone: e.target.value || null } : f)}
+              className={`w-full px-3.5 py-2.5 ${G.input} ${fieldErrors.phone ? 'border-rose-400' : ''}`}
+            />
+            {fieldErrors.phone && <p className="text-rose-600 text-xs mt-1">{fieldErrors.phone}</p>}
+          </div>
+
+          <div>
+            <label className={G.label}>Fachrichtung</label>
+            <input
+              type="text"
+              maxLength={120}
+              placeholder="z.B. Allgemeinmedizin"
+              value={form.specialty ?? ''}
+              onChange={e => setForm(f => f ? { ...f, specialty: e.target.value || null } : f)}
+              className={`w-full px-3.5 py-2.5 ${G.input} ${fieldErrors.specialty ? 'border-rose-400' : ''}`}
+            />
+            {fieldErrors.specialty && <p className="text-rose-600 text-xs mt-1">{fieldErrors.specialty}</p>}
+          </div>
+
+          <div>
+            <label className={G.label}>Arbeitszeiten</label>
+            <textarea
+              rows={3}
+              maxLength={4000}
+              value={form.workingHours ?? ''}
+              onChange={e => setForm(f => f ? { ...f, workingHours: e.target.value || null } : f)}
+              className={`w-full px-3.5 py-2.5 ${G.input} resize-none ${fieldErrors.workingHours ? 'border-rose-400' : ''}`}
+            />
+            <p className="mt-1 text-xs text-stone-400">Z.B. &apos;Mo-Fr 09:00-18:00&apos;. Wird in der zukünftigen Cannaflow-Integration für automatische Anfragen-Zuteilung verwendet.</p>
+            {fieldErrors.workingHours && <p className="text-rose-600 text-xs mt-1">{fieldErrors.workingHours}</p>}
+          </div>
+
+          {saveError && (
+            <div className="p-3.5 bg-rose-50 border border-rose-200 rounded-xl text-sm text-rose-600 flex items-center gap-2">
+              <AlertCircle size={16} className="flex-shrink-0" />{saveError}
+            </div>
+          )}
+          {saveSuccess && (
+            <p className="text-emerald-600 flex items-center gap-2 text-sm"><CheckCircle size={16} /> Gespeichert</p>
+          )}
+          <button
+            onClick={handleSave}
+            disabled={!isDirty || saving}
+            className={`w-full sm:w-auto px-6 py-2.5 ${G.btn} ${G.btnPrimary} ${G.focus} flex items-center justify-center gap-2`}
+          >
+            {saving ? <Loader2 size={16} className="animate-spin" /> : 'Speichern'}
+          </button>
+        </div>
+
+        <div className={`${G.card} border-l-4 border-l-amber-400 p-6 space-y-5`}>
+          <h3 className="text-sm font-bold text-stone-700 flex items-center gap-2">
+            <div className="w-7 h-7 rounded-lg bg-amber-50 flex items-center justify-center flex-shrink-0">
+              <Lock size={14} className="text-amber-600" />
+            </div>
+            Vom releafZ-Team verwaltet
+          </h3>
+          <LockedField label="Name" value={doctor.name} />
+          <LockedField label="E-Mail" value={doctor.email} />
+          <LockedField label="Approbationsurkunde-Nr" value={doctor.approbationNumber} />
+          <LockedField label="LANR" value={doctor.lanr} />
+          <LockedField label="BTM-Nr" value={doctor.btmNumber} />
+          <LockedField label="Lizenz verifiziert am" value={doctor.licenseVerifiedAt ? formatDate(doctor.licenseVerifiedAt) : 'Noch nicht verifiziert'} />
+          <p className="text-xs text-stone-500 pt-2 border-t border-stone-200">
+            Diese Daten verwaltet das releafZ-Team. Für Änderungen wenden Sie sich an{' '}
+            <a href="mailto:support@releafz.de" className="text-emerald-700 hover:text-emerald-800 underline">support@releafz.de</a>.
+          </p>
+        </div>
       </div>
     </div>
   )
@@ -779,8 +1107,7 @@ export default function DoctorDashboard() {
   const [detailModalInitialConfirm, setDetailModalInitialConfirm] = useState<'none' | 'approve'>('none')
   const [inboxFilter, setInboxFilter] = useState<InboxTimeFilter>('all')
   const [inboxSearch, setInboxSearch] = useState('')
-  const [historyFilter, setHistoryFilter] = useState<HistoryFilter>('all')
-  const [historySearch, setHistorySearch] = useState('')
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>('pending')
   const [patientsSearch, setPatientsSearch] = useState('')
   const bellContainerRef = useRef<HTMLDivElement>(null)
 
@@ -879,9 +1206,46 @@ export default function DoctorDashboard() {
 
   const allRequests = useMemo(() => {
     const map = new Map<number, TreatmentRequest>()
-    ;[...pastRequests, ...requests].forEach(r => map.set(r.id, r))
+    ;[...pastRequests, ...requests]
+      .filter(r => isDoctorRelevantStatus(r.status))
+      .forEach(r => map.set(r.id, r))
     return Array.from(map.values())
   }, [requests, pastRequests])
+
+  const mergedRequests = useMemo((): RequestWithBucket[] => {
+    const pending = (requests ?? [])
+      .filter(r => isDoctorRelevantStatus(r.status))
+      .map(r => ({ ...r, _bucket: 'pending' as const }))
+    const past = (pastRequests ?? [])
+      .filter(r => isDoctorRelevantStatus(r.status))
+      .map(r => ({
+        ...r,
+        _bucket: resolveRequestBucket(r, false),
+      }))
+    return [...pending, ...past].sort(
+      (a, b) => new Date(b.createdAt ?? 0).getTime() - new Date(a.createdAt ?? 0).getTime()
+    )
+  }, [requests, pastRequests])
+
+  const statusCounts = useMemo(() => ({
+    pending: requests.length,
+    approved: pastRequests.filter(r => resolveRequestBucket(r, false) === 'approved').length,
+    declined: pastRequests.filter(r => resolveRequestBucket(r, false) === 'declined').length,
+  }), [requests, pastRequests])
+
+  const filteredByStatus = useMemo(() => {
+    if (statusFilter === 'all') return mergedRequests
+    return mergedRequests.filter(r => r._bucket === statusFilter)
+  }, [mergedRequests, statusFilter])
+
+  const filteredInbox = useMemo(() => {
+    const q = inboxSearch.trim().toLowerCase()
+    return filteredByStatus.filter(r => {
+      if (!matchesInboxTimeFilter(r, inboxFilter)) return false
+      if (!q) return true
+      return r.fullName.toLowerCase().includes(q) || r.email.toLowerCase().includes(q) || getSymptomPreview(r).toLowerCase().includes(q)
+    })
+  }, [filteredByStatus, inboxFilter, inboxSearch])
 
   const patientAggregates = useMemo((): PatientAggregate[] => {
     const map = new Map<string, TreatmentRequest[]>()
@@ -907,24 +1271,6 @@ export default function DoctorDashboard() {
     if (!selectedPatientKey) return null
     return patientAggregates.find(p => p.key === selectedPatientKey) ?? null
   }, [selectedPatientKey, patientAggregates])
-
-  const filteredInbox = useMemo(() => {
-    const q = inboxSearch.trim().toLowerCase()
-    return requests.filter(r => {
-      if (!matchesInboxTimeFilter(r, inboxFilter)) return false
-      if (!q) return true
-      return r.fullName.toLowerCase().includes(q) || r.email.toLowerCase().includes(q) || getSymptomPreview(r).toLowerCase().includes(q)
-    }).sort((a, b) => new Date(b.createdAt ?? 0).getTime() - new Date(a.createdAt ?? 0).getTime())
-  }, [requests, inboxFilter, inboxSearch])
-
-  const filteredHistory = useMemo(() => {
-    const q = historySearch.trim().toLowerCase()
-    return pastRequests.filter(r => {
-      if (!matchesHistoryFilter(r, historyFilter)) return false
-      if (!q) return true
-      return r.fullName.toLowerCase().includes(q) || r.email.toLowerCase().includes(q)
-    }).sort((a, b) => new Date(b.createdAt ?? 0).getTime() - new Date(a.createdAt ?? 0).getTime())
-  }, [pastRequests, historyFilter, historySearch])
 
   const filteredPatients = useMemo(() => {
     const q = patientsSearch.trim().toLowerCase()
@@ -988,14 +1334,33 @@ export default function DoctorDashboard() {
     )
   }
 
+  const STATUS_TABS: { key: StatusFilter; label: string; count?: number }[] = [
+    { key: 'pending', label: 'Wartend', count: statusCounts.pending },
+    { key: 'approved', label: 'Genehmigt', count: statusCounts.approved },
+    { key: 'declined', label: 'Abgelehnt', count: statusCounts.declined },
+    { key: 'all', label: 'Alle' },
+  ]
   const INBOX_TABS: { key: InboxTimeFilter; label: string }[] = [
-    { key: 'all', label: 'Alle' }, { key: 'today', label: 'Heute' },
+    { key: 'all', label: 'Alle' }, { key: 'today', label: 'Heute eingegangen' },
     { key: 'week', label: 'Diese Woche' }, { key: 'older', label: 'Ältere' },
   ]
-  const HISTORY_TABS: { key: HistoryFilter; label: string }[] = [
-    { key: 'all', label: 'Alle' }, { key: 'approved', label: 'Genehmigt' }, { key: 'declined', label: 'Abgelehnt' },
-    { key: 'last30', label: 'Letzten 30 Tage' }, { key: 'older', label: 'Älter' },
-  ]
+
+  const inboxSubtitle = (() => {
+    const count = filteredInbox.length
+    if (statusFilter === 'pending') {
+      return count === 1 ? '1 wartet auf Ihre Entscheidung.' : `${count} warten auf Ihre Entscheidung.`
+    }
+    if (statusFilter === 'approved') return `${count} genehmigte Anfragen`
+    if (statusFilter === 'declined') return `${count} abgelehnte Anfragen`
+    return `${count} Anfragen insgesamt`
+  })()
+
+  const inboxEmptyState = (() => {
+    if (statusFilter === 'approved') return { title: 'Keine genehmigten Anfragen.', description: '' }
+    if (statusFilter === 'declined') return { title: 'Keine abgelehnten Anfragen.', description: '' }
+    if (statusFilter === 'all') return { title: 'Noch keine Anfragen.', description: '' }
+    return { title: 'Keine offenen Anfragen.', description: 'Sobald ein Patient eine Anfrage stellt, erscheint sie hier.' }
+  })()
 
   return (
     <div className={`flex min-h-screen font-sans ${G.appBg}`}>
@@ -1016,7 +1381,24 @@ export default function DoctorDashboard() {
             <div className="space-y-4">
               <div>
                 <h2 className="text-2xl font-bold text-stone-900">Anfragen</h2>
-                <p className="text-sm text-stone-500 mt-1">{requests.length} wartet{requests.length === 1 ? '' : 'en'} auf Ihre Entscheidung.</p>
+                <p className="text-sm text-stone-500 mt-1">{inboxSubtitle}</p>
+              </div>
+              <div className="flex gap-1.5 flex-wrap">
+                {STATUS_TABS.map(tab => (
+                  <button
+                    key={tab.key}
+                    onClick={() => setStatusFilter(tab.key)}
+                    aria-label={`Filter: ${tab.label}`}
+                    className={`px-3.5 py-2 ${G.btn} ${G.focus} rounded-xl flex items-center gap-1.5 ${statusFilter === tab.key ? G.tabActive : G.tabInactive}`}
+                  >
+                    {tab.label}
+                    {tab.count != null && (
+                      <span className={`px-1.5 py-0.5 text-[10px] font-bold rounded-md tabular-nums ${statusFilter === tab.key ? 'bg-white/20 text-white' : 'bg-stone-100 text-stone-500'}`}>
+                        {tab.count}
+                      </span>
+                    )}
+                  </button>
+                ))}
               </div>
               <div className="flex flex-col lg:flex-row gap-3">
                 <div className="relative flex-1"><Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-400" size={16} /><input type="text" placeholder="Patient oder Symptome suchen..." value={inboxSearch} onChange={e => setInboxSearch(e.target.value)} className={`w-full pl-10 pr-4 py-2.5 ${G.input}`} /></div>
@@ -1025,22 +1407,19 @@ export default function DoctorDashboard() {
                 <button key={tab.key} onClick={() => setInboxFilter(tab.key)} className={`px-3.5 py-2 ${G.btn} ${G.focus} rounded-xl ${inboxFilter === tab.key ? G.tabActive : G.tabInactive}`}>{tab.label}</button>
               ))}</div>
               {loading ? <div className="flex justify-center py-16"><Loader2 className="animate-spin text-emerald-600" size={32} /></div>
-              : filteredInbox.length === 0 ? <div className={G.card}><EmptyState icon={Inbox} title="Keine offenen Anfragen." description="Sobald ein Patient eine Anfrage stellt, erscheint sie hier." /></div>
-              : <div className="space-y-3">{filteredInbox.map(req => (
-                <RequestCard key={req.id} req={req} onView={openDetailModal} onQuickApprove={handleQuickApprove} onPatientClick={openPatientProfile} />
-              ))}</div>}
-            </div>
-          )}
-          {activeView === 'history' && (
-            <div className="space-y-4">
-              <div className="relative max-w-md"><Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-400" size={16} /><input type="text" placeholder="Patient suchen..." value={historySearch} onChange={e => setHistorySearch(e.target.value)} className={`w-full pl-10 pr-4 py-2.5 ${G.input}`} /></div>
-              <div className="flex gap-1.5 flex-wrap">{HISTORY_TABS.map(tab => (
-                <button key={tab.key} onClick={() => setHistoryFilter(tab.key)} className={`px-3.5 py-2 ${G.btn} ${G.focus} rounded-xl ${historyFilter === tab.key ? G.tabActive : G.tabInactive}`}>{tab.label}</button>
-              ))}</div>
-              {filteredHistory.length === 0 ? <div className={G.card}><EmptyState icon={History} title="Kein Verlauf" description="Abgeschlossene Anfragen erscheinen hier." /></div>
-              : <div className="space-y-3">{filteredHistory.map(req => (
-                <RequestCard key={req.id} req={req} readOnly onView={openDetailModal} onPatientClick={openPatientProfile} />
-              ))}</div>}
+              : filteredInbox.length === 0 ? (
+                <div className={G.card}>
+                  <EmptyState
+                    icon={Inbox}
+                    title={inboxEmptyState.title}
+                    description={inboxEmptyState.description}
+                  />
+                </div>
+              ) : (
+                <div className="space-y-3">{filteredInbox.map(req => (
+                  <RequestCard key={req.id} req={req} onView={openDetailModal} onQuickApprove={handleQuickApprove} onPatientClick={openPatientProfile} />
+                ))}</div>
+              )}
             </div>
           )}
           {activeView === 'patients' && (
