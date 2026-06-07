@@ -4,7 +4,7 @@ import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react'
 import {
   Eye, EyeOff, Lock, Mail, User, Clock, CheckCircle, XCircle, Package, LogOut,
   Phone, AlertCircle, MapPin, Search, Menu, Bell, Settings, ChevronDown, X,
-  FileText, Users, Inbox, Loader2, AlertTriangle, Stethoscope, RefreshCw, UserCircle2,
+  FileText, Users, Inbox, Loader2, AlertTriangle, Stethoscope, RefreshCw, UserCircle2, Info,
 } from 'lucide-react'
 import {
   API_BASE, fetchDoctorMe, updateDoctorProfile, DoctorProfileError,
@@ -1063,20 +1063,212 @@ function DoctorProfileView() {
   )
 }
 
+type NotificationPrefs = {
+  emailOnNewRequest: boolean
+  emailDailySummary: boolean
+  emailPendingReminder: boolean
+}
+
+function NotificationToggle({ id, value, onChange }: { id: string; value: boolean; onChange: (v: boolean) => void }) {
+  return (
+    <button
+      id={id}
+      type="button"
+      role="switch"
+      aria-checked={value}
+      onClick={() => onChange(!value)}
+      className={`relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors ${G.focus} ${
+        value ? 'bg-emerald-600' : 'bg-stone-200'
+      }`}
+    >
+      <span
+        className={`inline-block h-4 w-4 rounded-full bg-white shadow transition-transform ${
+          value ? 'translate-x-6' : 'translate-x-1'
+        }`}
+      />
+    </button>
+  )
+}
+
+const NOTIFICATION_PREF_ROWS: Array<{
+  key: keyof NotificationPrefs
+  label: string
+  helper: string
+}> = [
+  {
+    key: 'emailOnNewRequest',
+    label: 'E-Mail bei neuer Anfrage',
+    helper: 'Sie erhalten eine E-Mail, sobald ein Patient eine neue Anfrage stellt.',
+  },
+  {
+    key: 'emailDailySummary',
+    label: 'Tägliche Zusammenfassung',
+    helper: 'Einmal täglich erhalten Sie eine Übersicht aller offenen Anfragen.',
+  },
+  {
+    key: 'emailPendingReminder',
+    label: 'Erinnerung bei ausstehenden Anfragen',
+    helper: 'Bei länger als 24 Stunden ausstehenden Anfragen wird Sie eine Erinnerung benachrichtigt.',
+  },
+]
+
+const WEEKDAY_LABELS = ['Mo', 'Di', 'Mi', 'Do', 'Fr'] as const
+
 function DoctorSettingsView() {
+  const [, setDoctor] = useState<Doctor | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [loadError, setLoadError] = useState<string | null>(null)
+  const [original, setOriginal] = useState<NotificationPrefs | null>(null)
+  const [form, setForm] = useState<NotificationPrefs | null>(null)
+  const [saving, setSaving] = useState(false)
+  const [saveError, setSaveError] = useState<string | null>(null)
+  const [showSavedCheck, setShowSavedCheck] = useState(false)
+
+  const loadSettings = useCallback(async () => {
+    setLoading(true)
+    setLoadError(null)
+    try {
+      const d = await fetchDoctorMe()
+      const prefs: NotificationPrefs = {
+        emailOnNewRequest: d.emailOnNewRequest,
+        emailDailySummary: d.emailDailySummary,
+        emailPendingReminder: d.emailPendingReminder,
+      }
+      setDoctor(d)
+      setOriginal(prefs)
+      setForm(prefs)
+    } catch (e: unknown) {
+      setLoadError(e instanceof Error ? e.message : 'Einstellungen konnten nicht geladen werden.')
+    } finally {
+      setLoading(false)
+    }
+  }, [])
+
+  useEffect(() => {
+    loadSettings()
+  }, [loadSettings])
+
+  const isDirty = useMemo(() => {
+    if (!form || !original) return false
+    return JSON.stringify(form) !== JSON.stringify(original)
+  }, [form, original])
+
+  const handleSave = async () => {
+    if (!form || !original) return
+    setSaving(true)
+    setSaveError(null)
+    try {
+      const diff: DoctorEditableFields = {}
+      if (form.emailOnNewRequest !== original.emailOnNewRequest) diff.emailOnNewRequest = form.emailOnNewRequest
+      if (form.emailDailySummary !== original.emailDailySummary) diff.emailDailySummary = form.emailDailySummary
+      if (form.emailPendingReminder !== original.emailPendingReminder) diff.emailPendingReminder = form.emailPendingReminder
+      const updated = await updateDoctorProfile(diff)
+      setDoctor(updated)
+      const prefs: NotificationPrefs = {
+        emailOnNewRequest: updated.emailOnNewRequest,
+        emailDailySummary: updated.emailDailySummary,
+        emailPendingReminder: updated.emailPendingReminder,
+      }
+      setOriginal(prefs)
+      setForm(prefs)
+      setShowSavedCheck(true)
+      setTimeout(() => setShowSavedCheck(false), 3000)
+    } catch (e: unknown) {
+      setSaveError(e instanceof Error ? e.message : 'Speichern fehlgeschlagen.')
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  if (loading) {
+    return (
+      <div className="flex justify-center py-20">
+        <Loader2 className="animate-spin text-emerald-600" size={32} />
+      </div>
+    )
+  }
+
+  if (loadError || !form || !original) {
+    return (
+      <div className={`${G.card} p-6 max-w-lg`}>
+        <div className="flex items-start gap-3 p-3.5 bg-rose-50 border border-rose-200 rounded-xl text-sm text-rose-700 mb-4">
+          <AlertCircle size={16} className="flex-shrink-0 mt-0.5" />
+          <p>{loadError ?? 'Einstellungen konnten nicht geladen werden.'}</p>
+        </div>
+        <button onClick={loadSettings} className={`${G.btn} ${G.btnSecondary} ${G.focus} px-4 py-2.5`}>Erneut versuchen</button>
+      </div>
+    )
+  }
+
   return (
     <div className="space-y-6">
-      <PreviewBanner text="Einstellungen sind in Vorbereitung. Benachrichtigungen und Sprechzeiten werden in einer zukünftigen Version konfigurierbar sein." />
-      <div className={`${G.card} p-6 space-y-6 opacity-60 pointer-events-none`}>
-        <div>
-          <h3 className="text-sm font-bold text-stone-800 mb-4 flex items-center gap-2"><Bell size={14} /> Benachrichtigungen</h3>
-          {['E-Mail bei neuer Anfrage', 'Tägliche Zusammenfassung', 'Erinnerung bei ausstehenden Anfragen'].map(l => (
-            <div key={l} className="flex items-center justify-between py-3 border-b border-stone-100 last:border-0"><span className="text-sm text-stone-700">{l}</span><div className="w-11 h-6 rounded-full bg-stone-200" /></div>
-          ))}
+      <div className="grid gap-6 lg:grid-cols-2">
+        <div className={`${G.card} border-l-4 border-l-emerald-500 p-6 space-y-5`}>
+          <h3 className="text-sm font-bold text-stone-700 flex items-center gap-2">
+            <div className="w-7 h-7 rounded-lg bg-emerald-50 flex items-center justify-center flex-shrink-0">
+              <Bell size={14} className="text-emerald-700" />
+            </div>
+            Benachrichtigungen
+          </h3>
+
+          <div className="space-y-1">
+            {NOTIFICATION_PREF_ROWS.map(row => (
+              <div key={row.key} className="flex items-center justify-between gap-4 py-3 border-b border-stone-100 last:border-0">
+                <div className="min-w-0">
+                  <p className="text-sm font-medium text-stone-800">{row.label}</p>
+                  <p className="text-xs text-stone-500 mt-0.5">{row.helper}</p>
+                </div>
+                <NotificationToggle
+                  id={`notif-${row.key}`}
+                  value={form[row.key]}
+                  onChange={v => setForm(f => f ? { ...f, [row.key]: v } : f)}
+                />
+              </div>
+            ))}
+          </div>
+
+          {saveError && (
+            <div className="p-3.5 bg-rose-50 border border-rose-200 rounded-xl text-sm text-rose-600 flex items-center gap-2">
+              <AlertCircle size={16} className="flex-shrink-0" />{saveError}
+            </div>
+          )}
+          {showSavedCheck && (
+            <p className="text-emerald-600 flex items-center gap-2 text-sm"><CheckCircle size={16} /> Gespeichert</p>
+          )}
+          <button
+            onClick={handleSave}
+            disabled={!isDirty || saving}
+            className={`w-full sm:w-auto px-6 py-2.5 ${G.btn} ${G.btnPrimary} ${G.focus} flex items-center justify-center gap-2`}
+          >
+            {saving ? <Loader2 size={16} className="animate-spin" /> : 'Speichern'}
+          </button>
         </div>
-        <div className="border-t border-stone-200 pt-6">
-          <h3 className="text-sm font-bold text-stone-800 mb-4 flex items-center gap-2"><Clock size={14} /> Sprechzeiten</h3>
-          <p className="text-sm text-stone-500">Sprechzeiten-Verwaltung folgt in Kürze.</p>
+
+        <div className={`${G.card} p-6 space-y-5`}>
+          <h3 className="text-sm font-bold text-stone-700 flex items-center gap-2">
+            <div className="w-7 h-7 rounded-lg bg-stone-50 flex items-center justify-center flex-shrink-0">
+              <Clock size={14} className="text-stone-600" />
+            </div>
+            Sprechzeiten
+          </h3>
+
+          <div className="flex items-start gap-3 p-3.5 bg-amber-50 border border-amber-200 rounded-xl text-sm text-amber-900">
+            <Info size={16} className="text-amber-600 flex-shrink-0 mt-0.5" />
+            <p>
+              Sprechzeiten-Verwaltung folgt mit der Cannaflow-Integration. Hier werden Sie demnächst Ihre Verfügbarkeit für automatische Anfragen-Zuteilung konfigurieren können.
+            </p>
+          </div>
+
+          <div className="space-y-3 opacity-50 pointer-events-none cursor-not-allowed">
+            {WEEKDAY_LABELS.map(day => (
+              <div key={day} className="flex items-center gap-3">
+                <span className="w-8 text-sm font-medium text-stone-600">{day}</span>
+                <input type="time" disabled defaultValue="09:00" className={`w-28 px-3 py-2 ${G.input} cursor-not-allowed`} />
+                <span className="text-stone-400 text-sm">–</span>
+                <input type="time" disabled defaultValue="18:00" className={`w-28 px-3 py-2 ${G.input} cursor-not-allowed`} />
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </div>
