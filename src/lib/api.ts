@@ -1057,3 +1057,26 @@ export async function updateDoctorProfile(fields: DoctorEditableFields): Promise
   }
   return res.json() as Promise<Doctor>
 }
+
+// ============================================
+// GDPR / PUBLIC
+// ============================================
+
+export type DeletionRequestPayload = {
+  email: string
+  message?: string
+}
+
+export async function requestDeletion(
+  payload: DeletionRequestPayload,
+): Promise<{ message: string }> {
+  const res = await fetch(`${API_BASE}/api/gdpr/deletion-request`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  })
+  if (!res.ok) {
+    throw new Error('Deletion request failed')
+  }
+  return res.json() as Promise<{ message: string }>
+}
