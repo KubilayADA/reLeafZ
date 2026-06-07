@@ -16,7 +16,6 @@ const QUESTIONNAIRE_DRAFT_KEY = 'questionnaireDraft'
 
 type QuestionnaireFormData = {
   consultationType: string
-  deliveryMethod: string
   condition: string
   onset: string
   frequency: string
@@ -48,7 +47,6 @@ export default function QuestionnairePage() {
   const [loading, setLoading] = useState(false)
   const [formData, setFormData] = useState({
     consultationType: '',
-    deliveryMethod: '',
     condition: '',
     onset: '',
     frequency: '',
@@ -88,15 +86,8 @@ export default function QuestionnairePage() {
           : 1
 
       const draftForm = draft.formData ?? {}
-      const migrateDeliveryMethod = (value: unknown): string => {
-        if (typeof value !== 'string') return ''
-        if (value === 'courier') return 'BOTENDIENST'
-        if (value === 'shipping') return 'PICKUP'
-        return value
-      }
       setFormData({
         consultationType: typeof draftForm.consultationType === 'string' ? draftForm.consultationType : '',
-        deliveryMethod: migrateDeliveryMethod(draftForm.deliveryMethod),
         condition: typeof draftForm.condition === 'string' ? draftForm.condition : '',
         onset: typeof draftForm.onset === 'string' ? draftForm.onset : '',
         frequency: typeof draftForm.frequency === 'string' ? draftForm.frequency : '',
@@ -135,9 +126,8 @@ export default function QuestionnairePage() {
     setCurrentStep(2)
   }
 
-  // Step2: Delivery method
-  const handleStep2Next = (deliveryMethod: string) => {
-    setFormData(prev => ({ ...prev, deliveryMethod }))
+  // Step2: Informational delivery overview — advances without storing a choice
+  const handleStep2Next = () => {
     setCurrentStep(3)
   }
 
@@ -309,8 +299,6 @@ export default function QuestionnairePage() {
         <Step2
           onNext={handleStep2Next}
           onBack={handleBack}
-          initialValue={formData.deliveryMethod}
-          onSelectionChange={(deliveryMethod) => setFormData((prev) => ({ ...prev, deliveryMethod }))}
         />
       )}
       {renderedStep === 3 && (

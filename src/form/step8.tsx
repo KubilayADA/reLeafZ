@@ -9,7 +9,6 @@ import '@/form/form.css'
 
 interface Step8FormData {
   consultationType: string
-  deliveryMethod: string
   condition: string
   onset: string
   frequency: string
@@ -40,13 +39,6 @@ const consultationLabels: Record<string, string> = {
   questionnaire: 'Online-Fragebogen',
   video: 'Video-Sprechstunde',
   onsite: 'Vor-Ort-Termin',
-}
-
-const deliveryLabels: Record<string, string> = {
-  BOTENDIENST: 'Express-Kurier',
-  PICKUP: 'Abholung in der Apotheke',
-  courier: 'Express-Kurier (legacy)',
-  shipping: 'Abholung in der Apotheke (legacy)',
 }
 
 const conditionLabels: Record<string, string> = {
@@ -144,10 +136,6 @@ export default function Step8({ formData, onSubmit, onBack, onEditStep, submitti
           <div className="form-step4-sections form-step4-sections--fit">
             <ReviewSection title="Schritt 1 — Behandlungsart" stepNumber={1} onEditStep={onEditStep} submitting={submitting}>
               <ReviewRow label="Behandlungsart" value={displayLabel(formData.consultationType, consultationLabels)} />
-            </ReviewSection>
-
-            <ReviewSection title="Schritt 2 — Lieferung" stepNumber={2} onEditStep={onEditStep} submitting={submitting}>
-              <ReviewRow label="Lieferung" value={displayLabel(formData.deliveryMethod, deliveryLabels)} />
             </ReviewSection>
 
             <ReviewSection title="Schritt 3 — Erkrankung" stepNumber={3} onEditStep={onEditStep} submitting={submitting}>
