@@ -378,6 +378,40 @@ export async function eraseAdminPatient(id: number): Promise<{ message: string }
   })
 }
 
+// DELETION REQUESTS (Art. 17 DSGVO)
+export type DeletionRequestStatus = 'PENDING' | 'RESOLVED' | 'REJECTED'
+
+export type DeletionRequest = {
+  id: number
+  email: string
+  message: string | null
+  status: DeletionRequestStatus
+  createdAt: string
+  resolvedAt: string | null
+  resolvedByAdminId: number | null
+  resolvedPatientId: number | null
+}
+
+export async function getDeletionRequests(params?: {
+  status?: DeletionRequestStatus
+}): Promise<DeletionRequest[]> {
+  return fetchAdmin('/api/admin/deletion-requests', { query: params })
+}
+
+export async function getDeletionRequestCount(): Promise<{ pending: number }> {
+  return fetchAdmin('/api/admin/deletion-requests/count')
+}
+
+export async function resolveDeletionRequest(
+  id: number,
+  payload: { status: 'RESOLVED' | 'REJECTED'; resolvedPatientId?: number },
+): Promise<DeletionRequest> {
+  return fetchAdmin(`/api/admin/deletion-requests/${id}`, {
+    method: 'PATCH',
+    body: JSON.stringify(payload),
+  })
+}
+
 // DOCTORS
 export async function getAdminDoctors(params?: {
   page?: number
