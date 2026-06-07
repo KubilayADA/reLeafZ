@@ -979,3 +979,81 @@ export async function updatePharmacyProfile(
   const json = await response.json() as { data: Pharmacy };
   return json.data;
 }
+
+// ============================================
+// DOCTOR PROFILE (self-update by doctor)
+// ============================================
+
+export type Doctor = {
+  id: number
+  name: string
+  email: string
+  phone: string | null
+  specialty: string | null
+  bio: string | null
+  pictureUrl: string | null
+  signatureUrl: string | null
+  approbationNumber: string | null
+  lanr: string | null
+  btmNumber: string | null
+  licenseVerifiedAt: string | null
+  workingHours: string | null
+  emailOnNewRequest: boolean
+  emailDailySummary: boolean
+  emailPendingReminder: boolean
+  createdAt: string
+  updatedAt: string
+}
+
+export type DoctorEditableFields = Partial<{
+  bio: string | null
+  phone: string | null
+  specialty: string | null
+  workingHours: string | null
+  pictureUrl: string | null
+  signatureUrl: string | null
+  emailOnNewRequest: boolean
+  emailDailySummary: boolean
+  emailPendingReminder: boolean
+}>
+
+export type DoctorValidationDetail = { path: string; message: string }
+
+export class DoctorProfileError extends Error {
+  details?: DoctorValidationDetail[]
+
+  constructor(message: string, details?: DoctorValidationDetail[]) {
+    super(message)
+    this.name = 'DoctorProfileError'
+    this.details = details
+  }
+}
+
+export async function fetchDoctorMe(): Promise<Doctor> {
+  const res = await fetch(`${API_BASE}/api/doctor/me`, {
+    credentials: 'include',
+    cache: 'no-store',
+  })
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({})) as { error?: string }
+    throw new Error(err.error ?? `Profil konnte nicht geladen werden (${res.status})`)
+  }
+  return res.json() as Promise<Doctor>
+}
+
+export async function updateDoctorProfile(fields: DoctorEditableFields): Promise<Doctor> {
+  const res = await fetch(`${API_BASE}/api/doctor/me`, {
+    method: 'PATCH',
+    credentials: 'include',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(fields),
+  })
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({})) as { error?: string; details?: DoctorValidationDetail[] }
+    throw new DoctorProfileError(
+      err.error ?? `Speichern fehlgeschlagen (${res.status})`,
+      err.details,
+    )
+  }
+  return res.json() as Promise<Doctor>
+}
