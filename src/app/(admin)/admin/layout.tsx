@@ -14,8 +14,10 @@ import {
   BarChart3,
   LogOut,
   ChevronRight,
+  ShieldAlert,
+  Bell,
 } from 'lucide-react'
-import { adminLogout, adminMe } from '@/lib/adminApi'
+import { adminLogout, adminMe, getDeletionRequestCount } from '@/lib/adminApi'
 
 const dmSans = DM_Sans({
   subsets: ['latin'],
@@ -27,6 +29,12 @@ const ADMIN_BASE = '/admin'
 const navItems = [
   { label: 'Dashboard', href: `${ADMIN_BASE}/dashboard`, icon: LayoutDashboard },
   { label: 'Patients', href: `${ADMIN_BASE}/patients`, icon: Users },
+  {
+    label: 'Löschanfragen',
+    href: `${ADMIN_BASE}/deletion-requests`,
+    icon: ShieldAlert,
+    pendingBadge: true,
+  },
   { label: 'Doctors', href: `${ADMIN_BASE}/doctors`, icon: Stethoscope },
   { label: 'Pharmacies', href: `${ADMIN_BASE}/pharmacies`, icon: Building2 },
   { label: 'Prescriptions', href: `${ADMIN_BASE}/prescriptions`, icon: FileText },
@@ -61,6 +69,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const pathname = usePathname()
   const router = useRouter()
   const [admin, setAdmin] = useState<AdminUser | null>(null)
+  const [pendingDeletionCount, setPendingDeletionCount] = useState(0)
 
   useEffect(() => {
     let mounted = true
@@ -76,6 +85,27 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       mounted = false
     }
   }, [])
+
+  useEffect(() => {
+    let mounted = true
+
+    const fetchPendingCount = async () => {
+      try {
+        const { pending } = await getDeletionRequestCount()
+        if (mounted) setPendingDeletionCount(pending)
+      } catch {
+        if (mounted) setPendingDeletionCount(0)
+      }
+    }
+
+    void fetchPendingCount()
+    const interval = setInterval(fetchPendingCount, 60_000)
+
+    return () => {
+      mounted = false
+      clearInterval(interval)
+    }
+  }, [pathname])
 
   const handleLogout = async () => {
     try {
@@ -112,6 +142,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           {navItems.map((item) => {
             const isActive = navItemIsActive(pathname, item.href)
             const Icon = item.icon
+            const showBadge = item.pendingBadge && pendingDeletionCount > 0
             return (
               <Link
                 key={item.href}
@@ -126,7 +157,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                   size={16}
                   className={isActive ? 'text-emerald-400' : 'text-gray-500 group-hover:text-white'}
                 />
-                <span>{item.label}</span>
+                <span className="flex-1">{item.label}</span>
+                {showBadge && (
+                  <span className="min-w-[1.25rem] h-5 px-1.5 rounded-full bg-rose-500 text-white text-[10px] font-bold flex items-center justify-center tabular-nums">
+                    {pendingDeletionCount > 99 ? '99+' : pendingDeletionCount}
+                  </span>
+                )}
               </Link>
             )
           })}
@@ -166,6 +202,23 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           <ChevronRight size={13} className="text-gray-300" />
           <span className="font-semibold text-gray-700">{pageTitle}</span>
         </div>
+        <button
+          type="button"
+          onClick={() => router.push(`${ADMIN_BASE}/deletion-requests`)}
+          className="ml-auto relative p-2 rounded-xl text-gray-500 hover:text-gray-800 hover:bg-black/[0.04] transition-colors"
+          aria-label={
+            pendingDeletionCount > 0
+              ? `${pendingDeletionCount} offene Löschanfragen`
+              : 'Löschanfragen'
+          }
+        >
+          <Bell size={18} />
+          {pendingDeletionCount > 0 && (
+            <span className="absolute -top-0.5 -right-0.5 min-w-[1.125rem] h-[1.125rem] px-1 rounded-full bg-rose-500 text-white text-[10px] font-bold flex items-center justify-center tabular-nums leading-none">
+              {pendingDeletionCount > 99 ? '99+' : pendingDeletionCount}
+            </span>
+          )}
+        </button>
       </div>
 
       {/* ── Main content ── */}
