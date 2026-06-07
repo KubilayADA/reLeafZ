@@ -12,8 +12,7 @@ const FOOTER_LINK_HREFS: Record<string, string> = {
   'Privacy Policy': '/datenschutz',
   'Terms of Service': '/agb',
   'GDPR Compliance': '/datenschutz',
-  Datenlöschung:
-    'mailto:support@releafz.de?subject=L%C3%B6schung%20meines%20Kontos%20(Art.%2017%20DSGVO)&body=Hallo%2C%0A%0Aich%20m%C3%B6chte%20die%20L%C3%B6schung%20meines%20Kontos%20und%20meiner%20personenbezogenen%20Daten%20gem%C3%A4%C3%9F%20Art.%2017%20DSGVO%20beantragen.%0A%0AMeine%20bei%20releafZ%20registrierte%20E-Mail-Adresse%3A%20',
+  Datenlöschung: '/datenloeschung',
 }
 
 const FOOTER_LINK_GROUPS = [
@@ -46,7 +45,7 @@ export default function Footer() {
         <div className="footer__brand">
           <FooterLogo />
           <p className="footer__tagline">
-            Germany&apos;s fastest, safest, and coolest medical cannabis platform.
+            Germany&apos;s fastest and safest platform for telemedical cannabis care.
           </p>
         </div>
 
@@ -67,7 +66,7 @@ export default function Footer() {
       </div>
 
       <div className="footer__bottom">
-        <p>© 2026 reLeafZ. All rights reserved. Licensed medical cannabis platform serving Berlin.</p>
+        <p>© 2026 reLeafZ (SC CODE UG). Software- und Vermittlungsplattform für telemedizinische Versorgung. reLeafZ ist keine Apotheke und kein Arzneimittelhändler — Arzneimittel werden ausschließlich durch zugelassene Apotheken abgegeben.</p>
       </div>
     </footer>
   )
