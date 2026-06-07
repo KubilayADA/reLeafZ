@@ -117,6 +117,7 @@ const CookieBanner = () => {
       COOKIE_STORAGE_KEY,
       JSON.stringify({ ...prefs, essential: true })
     )
+    window.dispatchEvent(new CustomEvent('cookieConsentChanged'))
   }
 
   const handleToggle = (key: CookieCategoryKey) => {
