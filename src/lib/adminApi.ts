@@ -395,7 +395,9 @@ export type DeletionRequest = {
 export async function getDeletionRequests(params?: {
   status?: DeletionRequestStatus
 }): Promise<DeletionRequest[]> {
-  return fetchAdmin('/api/admin/deletion-requests', { query: params })
+  const res = await fetchAdmin('/api/admin/deletion-requests', { query: params })
+  const cast = res as { deletionRequests?: DeletionRequest[] } | DeletionRequest[]
+  return Array.isArray(cast) ? cast : cast?.deletionRequests ?? []
 }
 
 export async function getDeletionRequestCount(): Promise<{ pending: number }> {
