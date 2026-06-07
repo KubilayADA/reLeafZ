@@ -372,6 +372,12 @@ export async function updatePatient(
   })
 }
 
+export async function eraseAdminPatient(id: number): Promise<{ message: string }> {
+  return fetchAdmin(`/api/admin/patients/${id}/erase`, {
+    method: 'DELETE',
+  })
+}
+
 // DOCTORS
 export async function getAdminDoctors(params?: {
   page?: number
