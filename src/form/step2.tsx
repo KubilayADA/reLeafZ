@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 import { Button } from '@/components/ui/button'
 import { ArrowLeft, Bike, Info, Package, Store } from 'lucide-react'
 import StepProgress from '@/form/step-progress'
@@ -10,47 +10,35 @@ import '@/form/form.css'
 interface Step2Props {
   onNext: (selectedOption: string) => void
   onBack?: () => void
-  initialValue?: string
-  onSelectionChange?: (selectedOption: string) => void
 }
 
-type DeliveryOption = 'BOTENDIENST' | 'DHL' | 'PICKUP'
-
-export default function Step2({ onNext, onBack, initialValue = '', onSelectionChange }: Step2Props) {
-  const [selectedOption, setSelectedOption] = useState<DeliveryOption | ''>(
-    initialValue as DeliveryOption | ''
-  )
-
-  useEffect(() => {
-    setSelectedOption(initialValue as DeliveryOption | '')
-  }, [initialValue])
-
+export default function Step2({ onNext, onBack }: Step2Props) {
   const options = [
     {
-      id: 'BOTENDIENST' as DeliveryOption,
+      id: 'BOTENDIENST',
       title: 'Express-Kurier',
       description: 'Lieferung in 60–90 Min. durch Apotheken-Botendienst (Mo–So: 09:00–21:30 Uhr)',
       icon: Bike,
-      time: '60-90 Min.'
+      time: '60-90 Min.',
     },
     {
-      id: 'DHL' as DeliveryOption,
+      id: 'DHL',
       title: 'DHL Versand',
       description: 'Lieferung per DHL in 1–3 Werktagen. Bequem zu dir nach Hause oder an eine Wunschadresse.',
       icon: Package,
-      time: '1-3 Werktage'
+      time: '1-3 Werktage',
     },
     {
-      id: 'PICKUP' as DeliveryOption,
+      id: 'PICKUP',
       title: 'Abholung in der Apotheke',
       description: 'Holen Sie Ihre Medikamente direkt in der Berliner Apotheke ab. Sofort nach Rezeptausstellung verfügbar.',
       icon: Store,
-      time: 'Sofort verfügbar'
-    }
+      time: 'Sofort verfügbar',
+    },
   ]
 
   const handleNext = () => {
-    onNext(selectedOption || '')
+    onNext('')
   }
 
   return (
@@ -71,39 +59,30 @@ export default function Step2({ onNext, onBack, initialValue = '', onSelectionCh
             Falls ein Rezept ausgestellt wird, wie möchtest du deine Medikamente erhalten?
           </h2>
           <p className="form-question-hint">
-            Berlin: Wähle deine Versandart und Apotheke aus *
+            Berlin: Diese Optionen stehen grundsätzlich zur Verfügung.
           </p>
 
           <div className="flex items-start gap-2 bg-stone-50 border border-stone-200 rounded-xl p-3 text-xs text-stone-600 mb-4">
             <Info size={14} className="text-stone-500 flex-shrink-0 mt-0.5" />
             <p>
-              Hinweis: Die Liefermethode wählen Sie im nächsten Schritt direkt bei der Apothekenauswahl. Hier sehen Sie nur, welche Optionen grundsätzlich verfügbar sind.
+              Hinweis: Die Liefermethode und Apotheke wählen Sie im nächsten Schritt bei der
+              Apothekenauswahl. Hier sehen Sie nur, welche Optionen grundsätzlich verfügbar sind.
             </p>
           </div>
 
           <div className="form-options form-options--cols-3 form-options--center form-options--step2-fit">
             {options.map((option) => {
               const Icon = option.icon
-              const isSelected = selectedOption === option.id
               return (
                 <div
                   key={option.id}
-                  onClick={() => {
-                    setSelectedOption(option.id)
-                    onSelectionChange?.(option.id)
-                  }}
-                  className={`form-option-card form-option-card--max-width form-option-card--text-center ${isSelected ? 'form-option-card--selected' : ''}`}
+                  className="form-option-card form-option-card--max-width form-option-card--text-center"
                 >
                   <div className="form-option-icon-wrap form-option-icon-wrap--large">
                     <Icon className="form-option-icon form-option-icon--step2" />
                   </div>
                   <h3 className="form-option-title">{option.title}</h3>
                   <p className="form-option-desc">{option.description}</p>
-                  <div className="form-option-card__radio-wrap">
-                    <div className="form-option-radio">
-                      {isSelected && <div className="form-option-radio__inner" />}
-                    </div>
-                  </div>
                 </div>
               )
             })}
