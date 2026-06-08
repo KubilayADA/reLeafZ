@@ -25,7 +25,7 @@ export default function MailReq(): React.JSX.Element {
     setError('')
 
     try {
-      const res = await fetch('/api/waitlist', {
+      const res = await fetch('/api/newsletter', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
