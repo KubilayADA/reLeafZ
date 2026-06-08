@@ -349,6 +349,7 @@ function LandingPageContent() {
     <>
       <CookieBanner />
       <div className="landing-page landing-snap-scroll min-h-screen bg-beige" style={helveticaNeueStyle}>
+        <div className="landing-top-bar" aria-hidden />
         <Header
           dialogOpen={dialogOpen}
           setDialogOpen={setDialogOpen}

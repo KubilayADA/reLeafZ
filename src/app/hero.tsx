@@ -51,7 +51,7 @@ function buildHeroZStars(count: number): HeroZStar[] {
 const HERO_Z_STARS = buildHeroZStars(200)
 
 const HERO_NAV_LINKS = [
-  { href: '#ablauf', label: 'Ablauf', scrollKey: 'ablauf' as const },
+  { href: '#faq', label: 'Ablauf', scrollKey: 'faq' as const },
   { href: '#partner-apotheken', label: 'Apotheke in Ihrer Nähe' },
   { href: '#faq', label: 'FAQ' },
   { href: '#chat', label: 'Chat with us!' },
@@ -66,7 +66,7 @@ function HeroTopNav({ onScrollToAblauf }: { onScrollToAblauf: () => void }) {
           href={link.href}
           className="header-nav-link"
           onClick={(e) => {
-            if (link.scrollKey === 'ablauf') {
+            if (link.scrollKey === 'faq') {
               e.preventDefault()
               onScrollToAblauf()
             }
