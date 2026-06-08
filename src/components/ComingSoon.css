@@ -631,6 +631,27 @@ html[data-releafz-coming-soon="true"][data-releafz-landing-theme] body {
   }
 }
 
+/* Tablet: drop fixed logo below the 64px nav row */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .cs-root {
+    --cs-logo-h: clamp(40px, 6.5svh, 64px);
+    --cs-logo-gap: clamp(12px, 2svh, 18px);
+    --cs-logo-offset: calc(64px + 14px);
+  }
+
+  .cs-hero > .cs-logo {
+    top: var(--cs-logo-offset);
+  }
+
+  .cs-main {
+    padding-top: max(
+        0px,
+        calc(var(--cs-logo-offset) + var(--cs-logo-h) + var(--cs-logo-gap) - 64px)
+      )
+      12px 0;
+  }
+}
+
 /* Short desktop: keep logo in flow so it cannot cover centered headline */
 @media (min-width: 768px) and (max-height: 680px) {
   .cs-hero > .cs-logo {

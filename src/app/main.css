@@ -938,7 +938,8 @@ header .behandlung-button {
 .landing-main {
     position: relative;
     z-index: 10;
-    background: var(--releafz-bg);
+    /* Transparent so rounded section corners don't reveal a black fill behind them */
+    background: transparent;
     color: var(--releafz-text);
     -webkit-font-smoothing: antialiased;
 }

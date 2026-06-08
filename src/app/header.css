@@ -45,10 +45,10 @@
 }
 
 /* Responsive adjustments */
-@media (max-width: 768px) {
+@media (max-width: 767px) {
   .header {
     display: none;
-  } 
+  }
 }
 
 .header {
@@ -309,7 +309,74 @@ header .header-button .wrapper {
   }
 }
 
-@media (max-width: 1160px) {
+/* Tablet: full-width bar, desktop nav + CTA (no hamburger) */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .header {
+    width: calc(100vw - 1.5rem);
+    max-width: calc(100vw - 1.5rem);
+    padding: 0 0.35rem;
+  }
+
+  .header-row-wrap > .max-w-7xl {
+    max-width: none;
+    width: 100%;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+  }
+
+  .header-main-row {
+    gap: 0.25rem;
+  }
+
+  .header-side--left {
+    flex: 0 0 auto;
+  }
+
+  .header-side--right {
+    flex: 0 0 auto;
+  }
+
+  .header-center-controls {
+    flex: 1 1 auto;
+    min-width: 0;
+    gap: 0.4rem;
+  }
+
+  .header-desktop-nav {
+    flex: 1 1 auto;
+    min-width: 0;
+    gap: clamp(0.35rem, 1vw, 0.75rem);
+  }
+
+  .header-desktop-nav .header-nav-link {
+    font-size: clamp(0.62rem, 1.15vw, 0.75rem);
+  }
+
+  .logo-header {
+    left: 10px;
+    width: 7rem;
+    height: 8rem;
+    top: -40px;
+  }
+
+  .header-logo-slot {
+    min-width: 2.5rem;
+  }
+
+  header .header-button.uiverse,
+  header .header-button[data-slot='button'].header-button {
+    min-height: 34px !important;
+    height: 34px;
+    max-height: 34px;
+    font-size: 0.65rem !important;
+  }
+
+  header .header-button .wrapper {
+    padding: 0.28rem 0.45rem;
+  }
+}
+
+@media (min-width: 1024px) and (max-width: 1160px) {
   .header {
     width: calc(100vw - 1rem);
     max-width: calc(100vw - 1rem);

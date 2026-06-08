@@ -273,7 +273,9 @@
     width: 100%;
     margin-left: 0;
   }
+}
 
+@media (min-width: 1024px) {
   .faq-headings-row .faq-intro-row--faq,
   .faq-headings-row .how-stories-intro,
   .faq-main {
@@ -285,6 +287,110 @@
     width: calc((100% - var(--faq-column-gap)) / 2);
     margin-top: 0;
     box-sizing: border-box;
+  }
+}
+
+/* ── Mobile & medium (< desktop): stack with funktioniert (stories) on top
+   of the FAQ, full-width content ── */
+@media (max-width: 1023px) {
+  .faq__shell {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    margin-left: 0;
+  }
+
+  /* Dissolve the two wrapper rows so headings + content become direct
+     flex items of the shell and can be freely reordered. */
+  .faq-headings-row,
+  .faq-layout {
+    display: contents;
+  }
+
+  /* 1) funktioniert heading */
+  .faq-headings-row .how-stories-intro {
+    order: 1;
+    width: 100%;
+    max-width: none;
+    margin: 0 0 1.1rem;
+  }
+
+  /* 2) funktioniert stories slider */
+  .faq-stories {
+    order: 2;
+    width: 100%;
+    margin: 0 0 2.75rem;
+  }
+
+  /* 3) FAQ heading */
+  .faq-headings-row .faq-intro-row--faq {
+    order: 3;
+    width: 100%;
+    max-width: none;
+    margin: 0 0 1.25rem;
+  }
+
+  /* 4) FAQ accordion list */
+  .faq-main {
+    order: 4;
+    width: 100%;
+    max-width: none;
+    margin: 0;
+  }
+
+  /* Left-align the slider with the left-aligned headings + give the card
+     comfortable height now that it's the lead element. */
+  .faq-stories .how-stories-stack {
+    margin-inline: 0;
+  }
+
+  .faq-stories .how-stories-stack .how-stories--fill {
+    min-height: 26rem;
+  }
+
+  .faq-section .faq-title {
+    white-space: normal;
+  }
+}
+
+@media (max-width: 440px) {
+  .faq-stories .how-stories-stack .how-stories--fill {
+    min-height: 24rem;
+  }
+}
+
+/* Tablet: center stacked column so headings, slider & FAQ share one axis */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .faq__shell {
+    align-items: center;
+    --faq-tablet-column: min(100%, 26rem);
+  }
+
+  .faq-headings-row .how-stories-intro,
+  .faq-headings-row .faq-intro-row--faq,
+  .faq-stories,
+  .faq-main {
+    width: var(--faq-tablet-column);
+    max-width: 100%;
+    align-self: center;
+    margin-left: 0;
+    margin-right: 0;
+  }
+
+  .faq-headings-row .how-stories-intro,
+  .faq-headings-row .faq-intro-row--faq {
+    align-items: center;
+    text-align: center;
+  }
+
+  .faq-stories {
+    display: flex;
+    justify-content: center;
+  }
+
+  .faq-stories .how-stories-stack {
+    width: 100%;
+    margin-inline: 0;
   }
 }
 

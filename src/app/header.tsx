@@ -213,7 +213,7 @@ export default function Header({
             {/* Desktop Button - Hidden on mobile, only in hamburger menu wish i believe is better let me know if you see this UwUwuu*/}
             <div className="header-side header-side--right">
             <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-            <div className="header-cta-wrap hidden lg:flex shrink-0 items-center">
+            <div className="header-cta-wrap hidden md:flex shrink-0 items-center">
               <DialogTrigger asChild>
                 <Button
                   className="header-button lg:!ml-0 !font-bold"
@@ -252,9 +252,9 @@ export default function Header({
                 </Button>
               </DialogTrigger>
             </div>
-            {/* Hamburger for mobile and tablet */}
+            {/* Hamburger for mobile only */}
             <button
-              className="lg:hidden ml-4 p-2 rounded focus:outline-none"
+              className="md:hidden ml-4 p-2 rounded focus:outline-none"
               onClick={() => setMobileNavOpen(!mobileNavOpen)}
               aria-label="Open menu"
             >
@@ -304,7 +304,7 @@ export default function Header({
         
         {/* Mobile Nav Drawer */}
         {mobileNavOpen && (
-          <div className="lg:hidden absolute top-full left-0 w-full bg-white shadow-lg border-t border-emerald-200 z-50">
+          <div className="md:hidden absolute top-full left-0 w-full bg-white shadow-lg border-t border-emerald-200 z-50">
             <nav className="flex flex-col items-center py-6 space-y-6">
               <a
                 href="#faq"
