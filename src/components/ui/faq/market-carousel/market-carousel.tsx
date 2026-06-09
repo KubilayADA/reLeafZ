@@ -1,15 +1,17 @@
 'use client'
 
 import React, { useCallback, useEffect, useRef, useState } from 'react'
-import { Truck, Store, Check, Info, Sprout } from 'lucide-react'
+import { Sprout } from 'lucide-react'
 import '@/app/main.css'
 import SectionParticlesBackground from '@/components/ui/SectionParticlesBackground'
-import { getStrainType, getStrainImage } from '@/lib/strains'
+import { getStrainImage } from '@/lib/strains'
 import { API_BASE, type Product } from '@/lib/api'
+import {
+  ProductStrainCard,
+  type Fulfillment,
+  type ProductStrainCardData,
+} from './product-strain-card'
 import './market-carousel.css'
-
-const THC_ICON = '/placholder-market-thc.png'
-const CBD_ICON = '/placholder-market-cbd.png'
 
 const LANDING_STRAIN_COUNT = 4
 
@@ -18,33 +20,7 @@ const LANDING_STRAIN_COUNT = 4
 const SHOWCASE_CITY = 'Berlin'
 const SHOWCASE_ZIP = '10115'
 
-function getThcLevel(thc: number): 1 | 2 | 3 {
-  if (thc >= 22) return 3
-  if (thc >= 15) return 2
-  return 1
-}
-
-function getDominant(thc: number, cbd: number): 'thc' | 'cbd' {
-  return cbd > thc ? 'cbd' : 'thc'
-}
-
-type ShowcasePharmacy = {
-  name: string
-  city: string
-}
-
-type Fulfillment = 'delivery' | 'pickup' | 'both'
-
-type ShowcaseStrain = {
-  id: string
-  name: string
-  thc: number
-  cbd: number
-  price: number
-  pharmacy: ShowcasePharmacy
-  fulfillment: Fulfillment
-  image?: string
-}
+type ShowcaseStrain = ProductStrainCardData & { id: string }
 
 // Shape returned by the live marketplace endpoint (mirrors src/app/marketplace).
 type MarketplaceDeliveryOption = {
@@ -74,7 +50,7 @@ function marketplaceToStrains(data: MarketplacePharmacy[]): ShowcaseStrain[] {
   const others: ShowcaseStrain[] = []
 
   for (const entry of data) {
-    const pharmacy: ShowcasePharmacy = {
+    const pharmacy = {
       name: entry.pharmacy.name,
       city: entry.pharmacy.city,
     }
@@ -206,125 +182,6 @@ const SHOWCASE_STRAINS: ShowcaseStrain[] = [
     image: '/strains/zoiks-space-rider.webp',
   },
 ]
-
-function StrainCard({ strain }: { strain: ShowcaseStrain }) {
-  const strainInfo = getStrainType(strain.name)
-  const thcLevel = getThcLevel(strain.thc)
-  const dominant = getDominant(strain.thc, strain.cbd)
-  const dominantIcon = dominant === 'cbd' ? CBD_ICON : THC_ICON
-  const dominantLabel = dominant === 'cbd' ? 'CBD-dominant' : 'THC-dominant'
-
-  return (
-    <article className="market-carousel__card mc-prod">
-      <div className="mc-prod__media">
-        <span className={`mc-prod__tag mc-prod__tag--${strainInfo.variant}`}>
-          {strainInfo.type}
-        </span>
-        <img
-          src={getStrainImage(strain.name, strain.image)}
-          alt="reLeafz Cannabis Blüte"
-          className="mc-prod__img mc-prod__img--blur"
-          loading="lazy"
-          decoding="async"
-        />
-        <span className="mc-prod__media-veil" aria-hidden />
-      </div>
-
-      <div className="mc-prod__body">
-        <div className="mc-prod__headline">
-          <h3 className="mc-prod__name">{strain.name}</h3>
-          <span
-            className="mc-prod__potency"
-            title={`THC-Gehalt: ${strain.thc}%`}
-          >
-            <span className="mc-prod__bars" aria-hidden>
-              <i className={thcLevel >= 1 ? 'is-on' : ''} />
-              <i className={thcLevel >= 2 ? 'is-on' : ''} />
-              <i className={thcLevel >= 3 ? 'is-on' : ''} />
-            </span>
-            <span className="mc-prod__potency-label">THC</span>
-          </span>
-        </div>
-
-        <p className="mc-prod__brand">{strain.pharmacy.name}</p>
-
-        <div className="mc-prod__cannabinoid">
-          <img
-            src={dominantIcon}
-            alt={dominantLabel}
-            className="mc-prod__cb-icon"
-            loading="lazy"
-            decoding="async"
-          />
-          <span className="mc-prod__cb-sep" aria-hidden>
-            |
-          </span>
-          <span className="mc-prod__cb-text">{dominantLabel}</span>
-        </div>
-
-        <span className="mc-prod__values">
-          THC {strain.thc}% · CBD {strain.cbd}%
-        </span>
-
-        <div className="mc-prod__price-row">
-          <span className="mc-prod__price">€{strain.price.toFixed(2)}</span>
-          <span className="mc-prod__price-unit">/ g</span>
-        </div>
-
-        <div className="mc-prod__fulfill">
-          {(strain.fulfillment === 'delivery' || strain.fulfillment === 'both') && (
-            <div className="mc-prod__fulfill-item">
-              <div className="mc-prod__fulfill-head">
-                <span className="mc-prod__fulfill-check" aria-hidden>
-                  <Check />
-                </span>
-                <span className="mc-prod__fulfill-label">Lieferung verfügbar</span>
-                <span className="mc-prod__fulfill-info" tabIndex={0}>
-                  <Info aria-hidden />
-                  <span className="mc-prod__tooltip" role="tooltip">
-                    Diskreter Versand per DHL — deutschlandweit in 1–3 Werktagen.
-                  </span>
-                </span>
-              </div>
-              <div className="mc-prod__fulfill-mode">
-                <span className="mc-prod__fulfill-mode-icon" aria-hidden>
-                  <Truck />
-                </span>
-                <span className="mc-prod__fulfill-mode-text">Versand nach Hause</span>
-              </div>
-            </div>
-          )}
-
-          {strain.fulfillment === 'both' && <div className="mc-prod__fulfill-divider" />}
-
-          {(strain.fulfillment === 'pickup' || strain.fulfillment === 'both') && (
-            <div className="mc-prod__fulfill-item">
-              <div className="mc-prod__fulfill-head">
-                <span className="mc-prod__fulfill-check" aria-hidden>
-                  <Check />
-                </span>
-                <span className="mc-prod__fulfill-label">Abholung möglich</span>
-                <span className="mc-prod__fulfill-info" tabIndex={0}>
-                  <Info aria-hidden />
-                  <span className="mc-prod__tooltip" role="tooltip">
-                    Persönliche Abholung in der Partnerapotheke {strain.pharmacy.name},{' '}
-                    {strain.pharmacy.city}.
-                  </span>
-                </span>
-              </div>
-              <div className="mc-prod__fulfill-mode">
-                <span className="mc-prod__fulfill-mode-icon" aria-hidden>
-                  <Store />
-                </span>
-                <span className="mc-prod__fulfill-mode-text">In der Apotheke</span>
-              </div>
-            </div>
-          )}
-        </div>
-      </div>
-    </article>
-  )
-}
 
 function BoutiqueCtaCard({ onRequest }: { onRequest: () => void }) {
   return (
@@ -492,7 +349,9 @@ export default function MarketCarousel({
           >
             {strains.slice(0, LANDING_STRAIN_COUNT).map((strain) => (
               <div key={strain.id} className="market-carousel__slide" role="listitem">
-                <StrainCard strain={strain} />
+                <div className="market-carousel__card">
+                  <ProductStrainCard strain={strain} blurImage />
+                </div>
               </div>
             ))}
             <div className="market-carousel__slide" role="listitem">

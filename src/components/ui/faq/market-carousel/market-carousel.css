@@ -63,7 +63,7 @@
   background: radial-gradient(
     ellipse at center,
     rgba(34, 211, 238, 0.10) 0%,
-    rgba(16, 185, 129, 0.07) 30%,
+    rgba(96, 165, 250, 0.07) 30%,
     transparent 70%
   );
   animation: market-carousel-glow-pulse 6s ease-in-out infinite;
@@ -282,9 +282,9 @@
 }
 
 .mc-prod__tag--hybrid {
-  background: #d1fae5;
-  color: #047857;
-  border-color: #a7f3d0;
+  background: #dbeafe;
+  color: #2563eb;
+  border-color: #bfdbfe;
 }
 
 .mc-prod__body {
@@ -380,7 +380,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  color: #047857;
+  color: #2563eb;
   flex-shrink: 0;
 }
 
@@ -393,7 +393,7 @@
 .mc-prod__fulfill-label {
   font-size: 0.8rem;
   font-weight: 700;
-  color: #047857;
+  color: #2563eb;
 }
 
 .mc-prod__fulfill-info {
@@ -414,7 +414,7 @@
 
 .mc-prod__fulfill-info:hover,
 .mc-prod__fulfill-info:focus-visible {
-  color: #047857;
+  color: #2563eb;
 }
 
 .mc-prod__tooltip {
@@ -536,9 +536,9 @@
   border-radius: 0.75rem;
   overflow: hidden;
   background:
-    radial-gradient(120% 120% at 50% 0%, rgba(16, 185, 129, 0.12) 0%, transparent 55%),
+    radial-gradient(120% 120% at 50% 0%, rgba(96, 165, 250, 0.12) 0%, transparent 55%),
     #ffffff;
-  border: 1px dashed #bbf7d0;
+  border: 1px dashed #bfdbfe;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
   transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
 }
@@ -567,8 +567,8 @@
   width: 3rem;
   height: 3rem;
   border-radius: 9999px;
-  background: #ecfdf5;
-  color: #059669;
+  background: #eff6ff;
+  color: #60a5fa;
 }
 
 .mc-cta__icon svg {
@@ -686,7 +686,7 @@
 /* ── Light mode (matches faq / partner-apotheken) ── */
 #landing-main[data-theme='light'] .market-carousel-section {
   --mc-bg: #f8fafc;
-  --mc-accent: #0f9f6e;
+  --mc-accent: #60a5fa;
   --mc-cyan: #0284c7;
   --mc-text: #0f172a;
   --mc-muted: rgba(15, 23, 42, 0.74);
@@ -707,7 +707,7 @@
   background: radial-gradient(
     ellipse at center,
     rgba(2, 132, 199, 0.08) 0%,
-    rgba(15, 159, 110, 0.06) 30%,
+    rgba(96, 165, 250, 0.06) 30%,
     transparent 70%
   );
 }
