@@ -9,7 +9,7 @@ html[data-releafz-coming-soon="true"][data-releafz-landing-theme] body {
 }
 
 .cs-root {
-  --cs-logo-h: clamp(32px, 8svh, 56px);
+  --cs-logo-h: clamp(56px, 14svh, 104px);
   --cs-logo-gap: clamp(10px, 2.5svh, 20px);
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
   color: #000000;
@@ -191,7 +191,7 @@ html[data-releafz-coming-soon="true"][data-releafz-landing-theme] body {
 /* Desktop: logo centered on viewport top; main reserves space so headline never overlaps */
 @media (min-width: 768px) {
   .cs-root {
-    --cs-logo-h: clamp(36px, 9svh, 100px);
+    --cs-logo-h: clamp(68px, 15svh, 180px);
     --cs-logo-gap: clamp(8px, 1.5svh, 20px);
     --cs-logo-offset: max(24px, calc(env(safe-area-inset-top, 0px) + 12px));
   }
@@ -373,10 +373,11 @@ html[data-releafz-coming-soon="true"][data-releafz-landing-theme] body {
    The .uiverse base already provides the chunky borders (2.5px/2.5px/4px/4px #333),
    so we only override the "balloon" visuals (gradient bg, glow, animation, radius, circles). */
 .cs-submit-btn2:not(:hover):not(:focus-visible) {
-  background: #ffffff !important;
+  background-image: var(--btn-texture-light), var(--btn-texture-hatch) !important;
+  background-color: #ffffff !important;
   color: #0f172a !important;
   border-radius: 12px !important;
-  box-shadow: none !important;
+  box-shadow: var(--btn-texture-inset) !important;
   filter: none !important;
   animation: none !important;
   transform: none !important;
@@ -634,7 +635,7 @@ html[data-releafz-coming-soon="true"][data-releafz-landing-theme] body {
 /* Tablet: drop fixed logo below the 64px nav row */
 @media (min-width: 768px) and (max-width: 1023px) {
   .cs-root {
-    --cs-logo-h: clamp(40px, 6.5svh, 64px);
+    --cs-logo-h: clamp(72px, 11svh, 116px);
     --cs-logo-gap: clamp(12px, 2svh, 18px);
     --cs-logo-offset: calc(64px + 14px);
   }
@@ -742,7 +743,7 @@ html[data-releafz-coming-soon="true"][data-releafz-landing-theme] body {
 
 @media (max-width: 767px) and (max-height: 560px) {
   .cs-root {
-    --cs-logo-h: clamp(26px, 7svh, 44px);
+    --cs-logo-h: clamp(46px, 11svh, 78px);
     --cs-logo-gap: clamp(8px, 2svh, 14px);
   }
 }

@@ -8,7 +8,7 @@ import {
   Lock, Wifi,
   PhoneCall, Store, HeartHandshake,
 } from 'lucide-react'
-import { scrollToLandingTop } from '@/lib/scroll'
+import { scrollLandingToPartnerApotheken, scrollToLandingTop } from '@/lib/scroll'
 import { heroParticlesOptions } from '@/constants/particles'
 import SectionParticlesBackground from '@/components/ui/SectionParticlesBackground'
 import { HeroImageCarousel } from './hero-carousel'
@@ -283,7 +283,11 @@ export function MobileHero({ setDialogOpen }: { setDialogOpen: (open: boolean) =
         </div>
       </header>
 
-      <HeroAccordionRows setDialogOpen={setDialogOpen} scrollAnchorRef={heroRef} />
+      <HeroAccordionRows
+        setDialogOpen={setDialogOpen}
+        scrollAnchorRef={heroRef}
+        onDiscover={scrollLandingToPartnerApotheken}
+      />
     </section>
   )
 }

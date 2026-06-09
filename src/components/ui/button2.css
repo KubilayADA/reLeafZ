@@ -37,12 +37,15 @@
   letter-spacing: 0.02em;
   line-height: 1.5;
   color: var(--c-color);
-  background: radial-gradient(
-    circle,
-    var(--c-radial-inner),
-    var(--c-radial-outer) 80%
-  );
-  box-shadow: 0 0 14px var(--c-shadow);
+  background-image:
+    var(--btn-texture-light),
+    var(--btn-texture-hatch),
+    radial-gradient(
+      circle,
+      var(--c-radial-inner),
+      var(--c-radial-outer) 80%
+    );
+  box-shadow: var(--btn-texture-inset), 0 0 14px var(--c-shadow);
   transition: transform 220ms ease, box-shadow 260ms ease, filter 260ms ease;
   animation: balloon-idle 3.8s ease-in-out infinite;
 }
@@ -87,7 +90,7 @@
 .uiverse:hover {
   --duration: 2200ms;
   transform: translateY(-1px) scale(1.015);
-  box-shadow: 0 10px 26px var(--c-shadow);
+  box-shadow: var(--btn-texture-inset), 0 10px 26px var(--c-shadow);
   filter: saturate(1.1);
 }
 

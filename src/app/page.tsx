@@ -9,6 +9,7 @@ import CookieBanner from '@/components/ui/cookie'
 import '@/components/ui/Hero/Words-Sliding-Smooth.css'
 import ComingSoon from '@/components/ComingSoon'
 import PartnerApotheken from '@/components/ui/partnerApotheken/finden'
+import MarketCarousel from '@/components/ui/faq/market-carousel/market-carousel'
 import Faq from '@/components/ui/faq/faq'
 import MailReq from '@/components/ui/newsletter/mailreq'
 import Footer from '@/components/ui/footer/footer'
@@ -389,6 +390,7 @@ function LandingPageContent() {
         >
           <MobileHero setDialogOpen={setDialogOpen} />
           <PartnerApotheken />
+          <MarketCarousel setDialogOpen={setDialogOpen} />
           <Faq />
           <MailReq />
 

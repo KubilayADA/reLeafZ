@@ -309,6 +309,12 @@ header .header-button .wrapper {
   }
 }
 
+/* Header is hidden below 768px (MobileNavbar handles mobile). Never show hamburger here. */
+.header-menu-toggle,
+.header-mobile-drawer {
+  display: none !important;
+}
+
 /* Tablet: full-width bar, desktop nav + CTA (no hamburger) */
 @media (min-width: 768px) and (max-width: 1023px) {
   .header {

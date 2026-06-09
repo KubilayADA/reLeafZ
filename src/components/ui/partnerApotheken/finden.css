@@ -573,13 +573,15 @@
   width: 2.15rem;
   height: 1.55rem;
   padding: 0;
-  background: #ffffff;
+  background-image: var(--btn-texture-light), var(--btn-texture-hatch);
+  background-color: #ffffff;
   border-style: solid;
   border-color: #333;
   border-width: 2.5px 4px 4px 2.5px;
   border-radius: 0.45rem;
   color: #333;
   cursor: pointer;
+  box-shadow: var(--btn-texture-inset);
   transition:
     transform 120ms ease,
     opacity 120ms ease,

@@ -2,16 +2,26 @@
    Mobile Navbar  —  visible on screens < 768 px only
    ============================================================ */
 
-/* Hidden on all screen sizes by default; media query below re-enables it */
+/* Hidden on desktop and tablet; only enabled inside the mobile media query below */
 .mnav {
-  display: none;
+  display: none !important;
+}
+
+@media (min-width: 768px) {
+  .mnav {
+    display: none !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+  }
 }
 
 @media (max-width: 767px) {
 
   /* ── Container ────────────────────────────────────────────── */
   .mnav {
-    display: block;
+    display: block !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
     position: fixed;
     top: max(12px, env(safe-area-inset-top));
     right: max(12px, env(safe-area-inset-right));
@@ -509,8 +519,10 @@
     width: 100%;
     display: block;
     padding: 10px 16px;
-    background: #72906F;
+    background-image: var(--btn-texture-colored), var(--btn-texture-hatch);
+    background-color: #72906F;
     color: #fff;
+    box-shadow: var(--btn-texture-inset);
     font-family: "Inconsolata", monospace;
     font-variation-settings: "wdth" 108;
     font-weight: 900;

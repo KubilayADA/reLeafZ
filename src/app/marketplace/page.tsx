@@ -1,52 +1,17 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import Link from 'next/link'
 import { Product, API_BASE } from '@/lib/api'
 import { useRouter } from 'next/navigation'
-import { Check, Leaf, ArrowRight, ChevronDown, ChevronUp, Package, Loader2, Trash2 } from 'lucide-react'
+import { Check, Leaf, ArrowRight, Package, Loader2, Trash2 } from 'lucide-react'
 import { isLocalAccessBypassEnabled } from '@/lib/devAccess'
+import { getStrainImage, STRAIN_PLACEHOLDER_IMAGE } from '@/lib/strains'
+import {
+  ProductStrainCard,
+  fulfillmentFromDeliveryMethod,
+} from '@/components/ui/faq/market-carousel/product-strain-card'
 import './marketplace.css'
-
-// =====================================================
-// CENTRALIZED STRAIN IMAGE LIBRARY
-// =====================================================
-const STRAIN_IMAGE_LIBRARY: Record<string, string> = {
-  'Mac Driver': '/strains/mac-driver.webp',
-  'Black Cherry Punch': '/strains/black-cherry-punch.webp',
-  'White Widow': '/strains/white-widow-cheese.jpg',
-  'Slurricane': '/strains/slurricane.webp',
-  'Hi Society': '/strains/hi-society-dfr.webp',
-  'DFR': '/strains/hi-society-dfr.webp',
-  'Madrecan': '/strains/madrecan-granddaddy-og.webp',
-  'GDY': '/strains/madrecan-granddaddy-og.webp',
-  'Granddaddy': '/strains/madrecan-granddaddy-og.webp',
-  'Medical Saints': '/strains/medical-saints-lemon-skunk.jpg',
-  'LSK': '/strains/medical-saints-lemon-skunk.jpg',
-  'Lemon Skunk': '/strains/medical-saints-lemon-skunk.jpg',
-  'Organic Sweetgrass': '/strains/organic-sweetgrass-mint-chocolate.webp',
-  'MCC': '/strains/organic-sweetgrass-mint-chocolate.webp',
-  'Mint Chocolate': '/strains/organic-sweetgrass-mint-chocolate.webp',
-  'Remexian': '/strains/remexian-arr.webp',
-  'ARR': '/strains/remexian-arr.webp',
-  'Slouw': '/strains/slouw-ps3-og-kush.webp',
-  'PS3': '/strains/slouw-ps3-og-kush.webp',
-  'OGK': '/strains/slouw-ps3-og-kush.webp',
-  'ZOIKS': '/strains/zoiks-bb.webp',
-  'BB': '/strains/zoiks-bb.webp',
-  'Space Rider': '/strains/zoiks-space-rider.webp',
-}
-
-const findStrainImage = (productName: string): string | null => {
-  const nameLower = productName.toLowerCase()
-  for (const [strainPattern, imageUrl] of Object.entries(STRAIN_IMAGE_LIBRARY)) {
-    if (nameLower.includes(strainPattern.toLowerCase())) {
-      return imageUrl
-    }
-  }
-  return null
-}
-
-const PLACEHOLDER_IMAGE = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'%3E%3Cdefs%3E%3ClinearGradient id='g1' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%2334d399'/%3E%3Cstop offset='100%25' stop-color='%2310b981'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='200' height='200' fill='%23f0fdf4'/%3E%3Ccircle cx='100' cy='85' r='50' fill='url(%23g1)' opacity='0.9'/%3E%3Cellipse cx='80' cy='75' rx='20' ry='25' fill='%2322c55e'/%3E%3Cellipse cx='120' cy='75' rx='20' ry='25' fill='%2316a34a'/%3E%3Cellipse cx='100' cy='95' rx='25' ry='20' fill='%2315803d'/%3E%3Ccircle cx='85' cy='70' r='3' fill='%23fbbf24' opacity='0.8'/%3E%3Ccircle cx='110' cy='80' r='2' fill='%23fb923c' opacity='0.7'/%3E%3Cpath d='M100 115 Q100 140 100 155' stroke='%2315803d' stroke-width='4' fill='none'/%3E%3Cpath d='M100 130 Q85 125 75 135' stroke='%2322c55e' stroke-width='2' fill='none'/%3E%3Cpath d='M100 130 Q115 125 125 135' stroke='%2322c55e' stroke-width='2' fill='none'/%3E%3C/svg%3E"
 
 // localStorage treatmentRequest shape (city and zip/postcode)
 interface TreatmentRequest {
@@ -153,26 +118,6 @@ const LOCALHOST_FALLBACK_MARKETPLACE_DATA: MarketplacePharmacy[] = [
 ]
 /* LOCAL ACCESS BYPASS BLOCK END (demo treatment + marketplace fallback data) */
 
-type StrainTagVariant = 'indica' | 'sativa' | 'hybrid'
-
-const getStrainType = (name: string): { type: string; variant: StrainTagVariant } => {
-  const nameLower = name.toLowerCase()
-  if (nameLower.includes('indica') || nameLower.includes('kush') || nameLower.includes('og') || nameLower.includes('punch') || nameLower.includes('slurricane')) {
-    return { type: 'Indica', variant: 'indica' }
-  }
-  if (nameLower.includes('sativa') || nameLower.includes('haze') || nameLower.includes('lemon') || nameLower.includes('skunk')) {
-    return { type: 'Sativa', variant: 'sativa' }
-  }
-  return { type: 'Hybrid', variant: 'hybrid' }
-}
-
-const getProductImage = (product: Product): string => {
-  if (product.imageUrl) return product.imageUrl
-  const strainImage = findStrainImage(product.name)
-  if (strainImage) return strainImage
-  return PLACEHOLDER_IMAGE
-}
-
 const PRESCRIPTION_FEE = 14.99
 const MIN_FLOWER_QUANTITY = 5
 const FLOWER_INCREMENT = 5
@@ -204,23 +149,12 @@ export default function MarketplacePage() {
   const [failedImages, setFailedImages] = useState<Set<number>>(new Set())
   const [isClient, setIsClient] = useState(false)
   const [validationError, setValidationError] = useState<string | null>(null)
-  const [expandedPharmacyId, setExpandedPharmacyId] = useState<number | null>(null)
-  const [flippedProductIds, setFlippedProductIds] = useState<Set<number>>(new Set())
-
   const MAX_SELECTIONS = 3
 
-  const toggleProductCardFlip = (productId: number) => {
-    setFlippedProductIds(prev => {
-      const next = new Set(prev)
-      if (next.has(productId)) next.delete(productId)
-      else next.add(productId)
-      return next
-    })
-  }
-
-  const products = selectedPharmacyId
-    ? (marketplaceData.find(m => m.pharmacy.id === selectedPharmacyId)?.products ?? [])
-    : []
+  const selectedPharmacy = selectedPharmacyId
+    ? (marketplaceData.find(m => m.pharmacy.id === selectedPharmacyId) ?? null)
+    : null
+  const products = selectedPharmacy?.products ?? []
 
   useEffect(() => {
     setIsClient(true)
@@ -313,18 +247,33 @@ export default function MarketplacePage() {
     setFailedImages(prev => new Set(prev).add(productId))
   }
 
-  const selectPharmacyAndDelivery = (pharmacyId: number, option: DeliveryOption) => {
-    if (!option.available) return
+  const selectPharmacy = (pharmacyId: number) => {
+    if (pharmacyId === selectedPharmacyId) return
     setSelectedPharmacyId(pharmacyId)
-    setSelectedDeliveryMethod(option.method)
-    setSelectedDeliveryFee(option.fee)
     setSelectedProducts(new Set())
     const pharmacy = marketplaceData.find(m => m.pharmacy.id === pharmacyId)
+    // Keep the previously chosen Lieferoption if the new pharmacy offers it.
+    const carriedOver = pharmacy?.deliveryOptions.find(
+      opt => opt.method === selectedDeliveryMethod && opt.available
+    )
+    if (carriedOver) {
+      setSelectedDeliveryFee(carriedOver.fee)
+    } else {
+      setSelectedDeliveryMethod(null)
+      setSelectedDeliveryFee(0)
+    }
     if (pharmacy) {
       const initialQuantities: Record<number, number> = {}
       pharmacy.products.forEach(p => { initialQuantities[p.id] = getDefaultQuantity(p) })
       setQuantities(prev => ({ ...prev, ...initialQuantities }))
     }
+    setValidationError(null)
+  }
+
+  const selectDelivery = (option: DeliveryOption) => {
+    if (!option.available || selectedPharmacyId === null) return
+    setSelectedDeliveryMethod(option.method)
+    setSelectedDeliveryFee(option.fee)
     setValidationError(null)
   }
 
@@ -461,6 +410,7 @@ export default function MarketplacePage() {
   if (!isClient || loading) {
     return (
       <div className="marketplace-page">
+        <MarketplaceLogoHeader />
         <div className="marketplace-loading">
           <div className="marketplace-loading-inner">
             <Loader2 className="marketplace-loading-icon" aria-hidden />
@@ -474,6 +424,7 @@ export default function MarketplacePage() {
   if (error) {
     return (
       <div className="marketplace-page">
+        <MarketplaceLogoHeader />
         <div className="marketplace-error">
           <div className="marketplace-error-inner">
             <div className="marketplace-error-card">
@@ -491,32 +442,7 @@ export default function MarketplacePage() {
 
   return (
     <div className="marketplace-page">
-      <header className="marketplace-header">
-        <div className="marketplace-header-inner">
-          <div className="marketplace-steps">
-            <div className="marketplace-step-group">
-              <div className="marketplace-step-dot">
-                <Check className="shrink-0" aria-hidden />
-              </div>
-              <span className="marketplace-step-label marketplace-step-label--active">Anfrage</span>
-            </div>
-            <div className="marketplace-step-line" role="presentation" />
-            <div className="marketplace-step-group">
-              <div className="marketplace-step-dot marketplace-step-dot--current">
-                <span className="marketplace-step-num">2</span>
-              </div>
-              <span className="marketplace-step-label marketplace-step-label--active">Produktauswahl</span>
-            </div>
-            <div className="marketplace-step-line marketplace-step-line--muted" role="presentation" />
-            <div className="marketplace-step-group">
-              <div className="marketplace-step-dot marketplace-step-dot--muted">
-                <span className="marketplace-step-num">3</span>
-              </div>
-              <span className="marketplace-step-label marketplace-step-label--inactive">Anfrage absenden</span>
-            </div>
-          </div>
-        </div>
-      </header>
+      <MarketplaceLogoHeader />
 
       <main className="marketplace-main">
         <div className="marketplace-intro">
@@ -532,210 +458,226 @@ export default function MarketplacePage() {
           </p>
         </div>
 
-        <div className="marketplace-pharmacy-list">
-          {marketplaceData.map(m => {
-            const isExpanded = expandedPharmacyId === m.pharmacy.id
-            const isSelected = selectedPharmacyId === m.pharmacy.id
-            const showProducts = isSelected && selectedDeliveryMethod !== null
+        <div className="marketplace-shell">
+          <aside className="marketplace-sidebar">
+            <section className="marketplace-sidebar-section">
+              <h2 className="marketplace-sidebar-title">
+                <span className="marketplace-step-badge">1</span>
+                Apotheke wählen
+              </h2>
+              <div className="marketplace-choice-list" role="radiogroup" aria-label="Apotheke">
+                {marketplaceData.map(m => {
+                  const isSelected = selectedPharmacyId === m.pharmacy.id
+                  return (
+                    <button
+                      key={m.pharmacy.id}
+                      type="button"
+                      role="radio"
+                      aria-checked={isSelected}
+                      onClick={() => selectPharmacy(m.pharmacy.id)}
+                      className={`marketplace-choice marketplace-choice--radio${isSelected ? ' marketplace-choice--selected' : ''}`}
+                    >
+                      <span className="marketplace-choice-tick" aria-hidden>
+                        {isSelected && <Check className="shrink-0" />}
+                      </span>
+                      <span className="marketplace-choice-body">
+                        <span className="marketplace-choice-name">{m.pharmacy.name}</span>
+                        <span className="marketplace-choice-meta">
+                          {m.pharmacy.zip} {m.pharmacy.city} · {m.productCount} Produkte
+                        </span>
+                      </span>
+                    </button>
+                  )
+                })}
+              </div>
+            </section>
 
-            return (
-              <div
-                key={m.pharmacy.id}
-                className={`marketplace-pharmacy-card${isSelected ? ' marketplace-pharmacy-card--selected' : ''}`}
-              >
-                <button
-                  type="button"
-                  onClick={() => setExpandedPharmacyId(isExpanded ? null : m.pharmacy.id)}
-                  className="marketplace-pharmacy-toggle"
-                >
-                  <div>
-                    <h2 className="marketplace-pharmacy-name">{m.pharmacy.name}</h2>
-                    <p className="marketplace-pharmacy-meta">
-                      {m.pharmacy.zip} {m.pharmacy.city} · {m.productCount} Produkte
-                    </p>
-                  </div>
-                  {isExpanded ? (
-                    <ChevronUp className="marketplace-chevron marketplace-chevron--open" aria-hidden />
-                  ) : (
-                    <ChevronDown className="marketplace-chevron" aria-hidden />
-                  )}
-                </button>
+            <section
+              className={`marketplace-sidebar-section${selectedPharmacy ? '' : ' marketplace-sidebar-section--locked'}`}
+            >
+              <h2 className="marketplace-sidebar-title">
+                <span className="marketplace-step-badge">2</span>
+                Lieferoption
+              </h2>
+              {selectedPharmacy ? (
+                <div className="marketplace-choice-list" role="radiogroup" aria-label="Lieferoption">
+                  {selectedPharmacy.deliveryOptions.map(opt => {
+                    const active = selectedDeliveryMethod === opt.method
+                    return (
+                      <button
+                        key={opt.method}
+                        type="button"
+                        role="radio"
+                        aria-checked={active}
+                        disabled={!opt.available}
+                        onClick={() => selectDelivery(opt)}
+                        className={`marketplace-choice marketplace-choice--check${active ? ' marketplace-choice--selected' : ''}${!opt.available ? ' marketplace-choice--disabled' : ''}`}
+                      >
+                        <span className="marketplace-choice-tick" aria-hidden>
+                          {active && <Check className="shrink-0" />}
+                        </span>
+                        <span className="marketplace-choice-body">
+                          <span className="marketplace-choice-name">{opt.label}</span>
+                          <span className="marketplace-choice-meta">
+                            €{opt.fee.toFixed(2)} · {opt.estimatedTime}
+                          </span>
+                        </span>
+                      </button>
+                    )
+                  })}
+                </div>
+              ) : (
+                <p className="marketplace-sidebar-hint">Bitte zuerst eine Apotheke wählen.</p>
+              )}
+            </section>
+          </aside>
 
-                <div className={`marketplace-pharmacy-expand ${isExpanded ? 'marketplace-pharmacy-expand--open' : 'marketplace-pharmacy-expand--closed'}`}>
-                  <div className="marketplace-pharmacy-expand-inner">
-                    <div className="marketplace-pharmacy-body">
-                    <p className="marketplace-delivery-label">Lieferoptionen:</p>
-                    <div className="marketplace-delivery-options">
-                      {m.deliveryOptions.map(opt => {
-                        const active = isSelected && selectedDeliveryMethod === opt.method
-                        return (
-                          <button
-                            key={opt.method}
-                            type="button"
-                            disabled={!opt.available}
-                            onClick={() => selectPharmacyAndDelivery(m.pharmacy.id, opt)}
-                            className={`marketplace-delivery-btn${active ? ' marketplace-delivery-btn--active' : ''}${!opt.available ? ' marketplace-delivery-btn--disabled' : ''}`}
-                          >
-                            {opt.label} · €{opt.fee.toFixed(2)} · {opt.estimatedTime}
-                          </button>
-                        )
-                      })}
-                    </div>
-
-                    <div className={`marketplace-products-reveal ${showProducts ? 'marketplace-products-reveal--open' : 'marketplace-products-reveal--closed'}`}>
-                        <div className="marketplace-products-reveal-inner">
-                          <div className="marketplace-products-inner">
-                            <p className="marketplace-products-title">Produkte:</p>
-                            <div className="marketplace-product-grid">
-                              {products
-                                .filter(product => {
-                                  const minQty = product.form === 'FLOWER' ? MIN_FLOWER_QUANTITY : MIN_OTHER_QUANTITY
-                                  return product.stock >= minQty
-                                })
-                                .map(product => {
-                                const isProductSelected = selectedProducts.has(product.id)
-                                const strainInfo = getStrainType(product.name)
-                                const imageUrl = failedImages.has(product.id) ? PLACEHOLDER_IMAGE : getProductImage(product)
-                                const atSelectionLimit = selectedProducts.size >= MAX_SELECTIONS && !isProductSelected
-                                const currentQty = quantities[product.id] || getDefaultQuantity(product)
-                                const minQty = getMinQuantity(product)
-                                const isFlipped = flippedProductIds.has(product.id)
-                                return (
-                                  <div
-                                    key={product.id}
-                                    onClick={() => toggleProductCardFlip(product.id)}
-                                    className={`marketplace-product-card${isProductSelected ? ' marketplace-product-card--selected' : ''}${atSelectionLimit ? ' marketplace-product-card--limit' : ''}${isFlipped ? ' marketplace-product-card--flipped' : ''}`}
-                                  >
-                                    <div className="marketplace-product-card-flip">
-                                      <div className="marketplace-product-card-face marketplace-product-card-face--front">
-                                        <button
-                                          type="button"
-                                          onClick={e => {
-                                            e.stopPropagation()
-                                            toggleProduct(product.id)
-                                          }}
-                                          disabled={atSelectionLimit}
-                                          aria-label={isProductSelected ? 'Produkt abwählen' : 'Produkt auswählen'}
-                                          className={`marketplace-product-check${isProductSelected ? ' marketplace-product-check--on' : ''}`}
-                                        >
-                                          {isProductSelected && <Check className="shrink-0" aria-hidden />}
-                                        </button>
-                                        <span className={`marketplace-strain-tag marketplace-strain-tag--${strainInfo.variant}`}>
-                                          {strainInfo.type}
-                                        </span>
-                                        <div className="marketplace-product-media">
-                                          <img
-                                            src={imageUrl}
-                                            alt={product.name}
-                                            onError={() => handleImageError(product.id)}
-                                            className="marketplace-product-img"
-                                          />
+          <section className="marketplace-products-panel">
+            {!selectedPharmacy || selectedDeliveryMethod === null ? (
+              <div className="marketplace-products-empty">
+                <div className="marketplace-products-empty-icon" aria-hidden>
+                  <Package />
+                </div>
+                <p className="marketplace-products-empty-title">Noch keine Produkte</p>
+                <p className="marketplace-products-empty-text">
+                  Wähle eine Apotheke und eine Lieferoption, um die verfügbaren Produkte zu sehen.
+                </p>
+              </div>
+            ) : (
+              <>
+                <div className="marketplace-products-panel-header">
+                  <h2 className="marketplace-products-panel-title">Produkte wählen</h2>
+                  <span className="marketplace-products-counter">
+                    {selectedProducts.size} / {MAX_SELECTIONS} Blüten
+                  </span>
+                </div>
+                <div className="marketplace-product-grid">
+                  {products
+                    .filter(product => {
+                      const minQty = product.form === 'FLOWER' ? MIN_FLOWER_QUANTITY : MIN_OTHER_QUANTITY
+                      return product.stock >= minQty
+                    })
+                    .map(product => {
+                      const isProductSelected = selectedProducts.has(product.id)
+                      const imageUrl = failedImages.has(product.id)
+                        ? STRAIN_PLACEHOLDER_IMAGE
+                        : getStrainImage(product.name, product.imageUrl)
+                      const atSelectionLimit = selectedProducts.size >= MAX_SELECTIONS && !isProductSelected
+                      const currentQty = quantities[product.id] || getDefaultQuantity(product)
+                      const minQty = getMinQuantity(product)
+                      return (
+                        <div
+                          key={product.id}
+                          className={`marketplace-product-card${isProductSelected ? ' marketplace-product-card--selected' : ''}${atSelectionLimit ? ' marketplace-product-card--limit' : ''}`}
+                        >
+                          <ProductStrainCard
+                            strain={{
+                              name: product.name,
+                              thc: product.thcPercent,
+                              cbd: product.cbdPercent,
+                              price: product.price,
+                              pharmacy: {
+                                name: selectedPharmacy.pharmacy.name,
+                                city: selectedPharmacy.pharmacy.city,
+                              },
+                              fulfillment: fulfillmentFromDeliveryMethod(selectedDeliveryMethod),
+                              image: imageUrl,
+                            }}
+                            onImageError={() => handleImageError(product.id)}
+                            mediaOverlay={
+                              <button
+                                type="button"
+                                onClick={() => toggleProduct(product.id)}
+                                disabled={atSelectionLimit}
+                                aria-label={
+                                  isProductSelected ? 'Produkt abwählen' : 'Produkt auswählen'
+                                }
+                                className={`marketplace-product-check${isProductSelected ? ' marketplace-product-check--on' : ''}`}
+                              >
+                                {isProductSelected && <Check className="shrink-0" aria-hidden />}
+                              </button>
+                            }
+                            footer={
+                              <>
+                                <button
+                                  type="button"
+                                  onClick={() => toggleProduct(product.id)}
+                                  disabled={atSelectionLimit}
+                                  className={`marketplace-product-action${isProductSelected ? ' marketplace-product-action--selected' : ''}`}
+                                >
+                                  {isProductSelected ? 'Entfernen' : 'Auswählen'}
+                                </button>
+                                <div
+                                  className={`marketplace-qty-reveal ${isProductSelected ? 'marketplace-qty-reveal--open' : 'marketplace-qty-reveal--closed'}`}
+                                >
+                                  <div className="marketplace-qty-reveal-inner">
+                                    <div className="marketplace-qty-block">
+                                      <div className="marketplace-qty-row">
+                                        <div className="marketplace-qty-labels">
+                                          <small>Menge:</small>
+                                          {isFlower(product) && (
+                                            <span className="marketplace-qty-hint">
+                                              (nur {FLOWER_INCREMENT}g Schritte)
+                                            </span>
+                                          )}
                                         </div>
-                                        <div className="marketplace-product-body">
-                                          <h3 className="marketplace-product-name">
-                                            {product.name}
-                                          </h3>
-                                          <div className="marketplace-product-price-row">
-                                            <span className="marketplace-product-price">€{product.price.toFixed(2)}/g</span>
-                                            <span className="marketplace-product-vat">inkl. MwSt.</span>
-                                          </div>
-                                          <div className="marketplace-product-meta">
-                                            <span><b>THC:</b> {product.thcPercent}%</span>
-                                            <span><b>CBD:</b> {product.cbdPercent}%</span>
-                                          </div>
+                                        <div className="marketplace-qty-controls">
                                           <button
                                             type="button"
-                                            onClick={e => {
-                                              e.stopPropagation()
-                                              toggleProduct(product.id)
+                                            onClick={() => {
+                                              if (currentQty <= minQty) {
+                                                toggleProduct(product.id)
+                                                return
+                                              }
+                                              handleQuantityChange(
+                                                product.id,
+                                                currentQty - getQuantityIncrement(product),
+                                                'down'
+                                              )
                                             }}
-                                            disabled={atSelectionLimit}
-                                            className={`marketplace-product-action${isProductSelected ? ' marketplace-product-action--selected' : ''}`}
+                                            className="marketplace-qty-btn"
+                                            aria-label={
+                                              currentQty <= minQty
+                                                ? 'Produkt entfernen'
+                                                : 'Menge reduzieren'
+                                            }
                                           >
-                                            {isProductSelected ? 'Entfernen' : 'Auswählen'}
+                                            {currentQty <= minQty ? (
+                                              <Trash2 size={12} aria-hidden />
+                                            ) : (
+                                              '-'
+                                            )}
                                           </button>
-                                          <div
-                                            className={`marketplace-qty-reveal ${isProductSelected ? 'marketplace-qty-reveal--open' : 'marketplace-qty-reveal--closed'}`}
-                                            onClick={e => e.stopPropagation()}
-                                          >
-                                            <div className="marketplace-qty-reveal-inner">
-                                              <div className="marketplace-qty-block">
-                                                <div className="marketplace-qty-row">
-                                                  <div className="marketplace-qty-labels">
-                                                    <small>Menge:</small>
-                                                    {isFlower(product) && (
-                                                      <span className="marketplace-qty-hint">(nur {FLOWER_INCREMENT}g Schritte)</span>
-                                                    )}
-                                                  </div>
-                                                  <div className="marketplace-qty-controls">
-                                                    <button
-                                                      type="button"
-                                                      onClick={e => {
-                                                        e.stopPropagation()
-                                                        if (currentQty <= minQty) {
-                                                          toggleProduct(product.id)
-                                                          return
-                                                        }
-                                                        handleQuantityChange(product.id, currentQty - getQuantityIncrement(product), 'down')
-                                                      }}
-                                                      className="marketplace-qty-btn"
-                                                      aria-label={currentQty <= minQty ? 'Produkt entfernen' : 'Menge reduzieren'}
-                                                    >
-                                                      {currentQty <= minQty ? <Trash2 size={12} aria-hidden /> : '-'}
-                                                    </button>
-                                                    <span className="marketplace-qty-value">{currentQty}g</span>
-                                                    <button
-                                                      type="button"
-                                                      onClick={e => {
-                                                        e.stopPropagation()
-                                                        handleQuantityChange(product.id, currentQty + getQuantityIncrement(product), 'up')
-                                                      }}
-                                                      disabled={currentQty >= product.stock}
-                                                      className="marketplace-qty-btn"
-                                                    >
-                                                      +
-                                                    </button>
-                                                  </div>
-                                                </div>
-                                              </div>
-                                            </div>
-                                          </div>
-                                        </div>
-                                      </div>
-                                      <div className="marketplace-product-card-face marketplace-product-card-face--back">
-                                        <div className="marketplace-product-card-back-inner">
-                                          <p className="marketplace-product-back-label">{strainInfo.type}</p>
-                                          <h3 className="marketplace-product-back-title">{product.name}</h3>
-                                          <p className="marketplace-product-back-placeholder">
-                                            Hier erscheinen später Details zur Sorte.
-                                          </p>
+                                          <span className="marketplace-qty-value">{currentQty}g</span>
                                           <button
                                             type="button"
-                                            className="marketplace-product-back-dismiss"
-                                            onClick={e => {
-                                              e.stopPropagation()
-                                              toggleProductCardFlip(product.id)
-                                            }}
+                                            onClick={() =>
+                                              handleQuantityChange(
+                                                product.id,
+                                                currentQty + getQuantityIncrement(product),
+                                                'up'
+                                              )
+                                            }
+                                            disabled={currentQty >= product.stock}
+                                            className="marketplace-qty-btn"
                                           >
-                                            Zurück
+                                            +
                                           </button>
-                                          <p className="marketplace-product-back-hint">Oder auf die Karte tippen</p>
                                         </div>
                                       </div>
                                     </div>
                                   </div>
-                                )
-                              })}
-                            </div>
-                          </div>
+                                </div>
+                              </>
+                            }
+                          />
                         </div>
-                    </div>
-                  </div>
-                  </div>
+                      )
+                    })}
                 </div>
-              </div>
-            )
-          })}
+              </>
+            )}
+          </section>
         </div>
       </main>
 
@@ -811,5 +753,15 @@ export default function MarketplacePage() {
         </div>
       </div>
     </div>
+  )
+}
+
+function MarketplaceLogoHeader() {
+  return (
+    <header className="marketplace-logo-bar">
+      <Link href="/" className="marketplace-logo-link" aria-label="reLeafZ Startseite">
+        <img src="/logo1.png" alt="reLeafZ" className="marketplace-logo" />
+      </Link>
+    </header>
   )
 }

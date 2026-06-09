@@ -20,6 +20,23 @@ export function scrollToLandingTop(): void {
   window.scrollTo({ top: 0, behavior: 'smooth' })
 }
 
+/** Smooth-scroll to a landing section by id (accounts for fixed header). */
+export function scrollLandingToSection(sectionId: string): void {
+  const el = document.getElementById(sectionId)
+  if (!el) return
+  const top = el.getBoundingClientRect().top + window.scrollY - HEADER_OFFSET
+  window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' })
+  try {
+    window.history.pushState({}, '', `/#${sectionId}`)
+  } catch {
+    /* ignore */
+  }
+}
+
+export function scrollLandingToPartnerApotheken(): void {
+  scrollLandingToSection('partner-apotheken')
+}
+
 /** Enter main view from hero, or scroll to #faq when already in main view. */
 export function scrollLandingToAblauf(): void {
   const landingMainTop = getLandingMainTop()
