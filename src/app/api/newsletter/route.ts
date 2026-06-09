@@ -25,7 +25,7 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const target = `${BACKEND_URL.replace(/\/+$/, '')}/api/newsletter/subscribe`;
+  const target = `${BACKEND_URL.replace(/\/+$/, '')}/api/newsletter`;
 
   let upstream: Response;
   try {
