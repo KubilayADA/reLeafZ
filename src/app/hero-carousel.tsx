@@ -4,21 +4,11 @@ import React from 'react'
 import './hero-carousel.css'
 
 const HERO_CAROUSEL_SLIDES = [
-  { src: '/hero/hero-desktop.png', alt: 'Medizinal Cannabis Lieferung' },
-  { src: '/hero/2.png', alt: 'Cannabis Therapie Berlin' },
+  { src: '/landing-2.png', alt: 'reLeafz Produktverpackung' },
+  { src: '/landing-1.png', alt: 'reLeafz Cannabis Produkte' },
 ] as const
 
 const SLIDE_INTERVAL_MS = 5000
-
-function StarRow({ color }: { color: 'trustpilot' | 'google' }) {
-  return (
-    <span className={`hero-carousel__stars hero-carousel__stars--${color}`} aria-hidden>
-      {Array.from({ length: 5 }, (_, i) => (
-        <span key={i} className="hero-carousel__star" />
-      ))}
-    </span>
-  )
-}
 
 export function HeroImageCarousel() {
   const [activeIndex, setActiveIndex] = React.useState(0)
@@ -48,36 +38,6 @@ export function HeroImageCarousel() {
             decoding="async"
           />
         ))}
-
-        <div className="hero-carousel__badges">
-          <div className="hero-carousel__review-card">
-            <span className="hero-carousel__review-brand hero-carousel__review-brand--trustpilot">
-              <span className="hero-carousel__trustpilot-icon" aria-hidden>★</span>
-              Trustpilot
-            </span>
-            <span className="hero-carousel__review-meta">
-              <span className="hero-carousel__review-count">1.263+</span>
-              <span className="hero-carousel__review-score">4.9</span>
-              <StarRow color="trustpilot" />
-            </span>
-          </div>
-          <div className="hero-carousel__review-card">
-            <span className="hero-carousel__review-brand hero-carousel__review-brand--google">
-              <span className="hero-carousel__google-icon" aria-hidden>G</span>
-              Google
-            </span>
-            <span className="hero-carousel__review-meta">
-              <span className="hero-carousel__review-count">2.035+</span>
-              <span className="hero-carousel__review-score">4.8</span>
-              <StarRow color="google" />
-            </span>
-          </div>
-        </div>
-
-        <div className="hero-carousel__live-badge">
-          <span>100+ Blüten LIVE</span>
-          <span className="hero-carousel__live-dot" aria-hidden />
-        </div>
 
         {HERO_CAROUSEL_SLIDES.length > 1 && (
           <div className="hero-carousel__dots" role="tablist" aria-label="Bildauswahl">

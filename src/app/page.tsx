@@ -13,7 +13,7 @@ import MarketCarousel from '@/components/ui/faq/market-carousel/market-carousel'
 import Faq from '@/components/ui/faq/faq'
 import MailReq from '@/components/ui/newsletter/mailreq'
 import Footer from '@/components/ui/footer/footer'
-import { attachLandingBinarySwitch } from '@/lib/scroll'
+import { attachLandingBinarySwitch, scrollLandingToAblauf } from '@/lib/scroll'
 import { useLandingTheme } from '@/lib/use-landing-theme'
 import { useLandingThemeInitial } from './providers'
 import { APIProvider, useMapsLibrary } from '@vis.gl/react-google-maps'
@@ -371,14 +371,7 @@ function LandingPageContent() {
         <Hero
           setDialogOpen={setDialogOpen}
           landingTheme={landingTheme}
-          onScrollToAblauf={() => {
-            const landingMain = document.getElementById('landing-main')
-            const mainTop =
-              landingMain?.getBoundingClientRect().top != null
-                ? landingMain.getBoundingClientRect().top + window.scrollY
-                : window.innerHeight
-            window.scrollTo({ top: mainTop, behavior: 'smooth' })
-          }}
+          onScrollToAblauf={scrollLandingToAblauf}
         />
 
         <div className="landing-hero-snap-target" aria-hidden />
