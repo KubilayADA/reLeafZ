@@ -6,6 +6,75 @@ const HEADER_OFFSET = 70
 const SWITCH_EPSILON = 2
 const SWITCH_IDLE_MS = 90
 
+let activeScrollFrame = 0
+let landingProgrammaticScrollActive = false
+
+function easeInOutCubic(t: number): number {
+  return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2
+}
+
+function setLandingProgrammaticScroll(active: boolean): void {
+  landingProgrammaticScrollActive = active
+  if (active) {
+    document.documentElement.dataset.landingProgrammaticScroll = 'true'
+  } else {
+    delete document.documentElement.dataset.landingProgrammaticScroll
+  }
+}
+
+export function isLandingProgrammaticScrollActive(): boolean {
+  return landingProgrammaticScrollActive
+}
+
+function smoothScrollLandingTo(targetTop: number): void {
+  const clampedTarget = Math.max(0, targetTop)
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+
+  activeScrollFrame += 1
+  const frameId = activeScrollFrame
+
+  if (prefersReducedMotion) {
+    window.scrollTo({ top: clampedTarget, behavior: 'auto' })
+    return
+  }
+
+  const startTop = window.scrollY
+  const distance = clampedTarget - startTop
+
+  if (Math.abs(distance) < 2) {
+    window.scrollTo({ top: clampedTarget, behavior: 'auto' })
+    return
+  }
+
+  const duration = Math.min(1400, Math.max(650, Math.abs(distance) * 0.55))
+  const startTime = performance.now()
+
+  setLandingProgrammaticScroll(true)
+
+  const finish = () => {
+    if (frameId !== activeScrollFrame) return
+    window.scrollTo({ top: clampedTarget, behavior: 'auto' })
+    setLandingProgrammaticScroll(false)
+  }
+
+  const step = (now: number) => {
+    if (frameId !== activeScrollFrame) return
+
+    const progress = Math.min((now - startTime) / duration, 1)
+    const nextTop = startTop + distance * easeInOutCubic(progress)
+    window.scrollTo({ top: nextTop, behavior: 'auto' })
+
+    if (progress < 1) {
+      window.requestAnimationFrame(step)
+      return
+    }
+
+    finish()
+  }
+
+  window.requestAnimationFrame(step)
+}
+
 function getLandingMainTop(): number {
   const landingMain = document.getElementById('landing-main')
   if (!landingMain) return window.innerHeight
@@ -17,15 +86,19 @@ function isAt(top: number): boolean {
 }
 
 export function scrollToLandingTop(): void {
-  window.scrollTo({ top: 0, behavior: 'smooth' })
+  smoothScrollLandingTo(0)
 }
 
 /** Smooth-scroll to a landing section by id (accounts for fixed header). */
-export function scrollLandingToSection(sectionId: string): void {
+export function scrollLandingToSection(
+  sectionId: string,
+  options?: { extraScrollDown?: number },
+): void {
   const el = document.getElementById(sectionId)
   if (!el) return
-  const top = el.getBoundingClientRect().top + window.scrollY - HEADER_OFFSET
-  window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' })
+  const extraScrollDown = options?.extraScrollDown ?? 0
+  const top = el.getBoundingClientRect().top + window.scrollY - HEADER_OFFSET + extraScrollDown
+  smoothScrollLandingTo(top)
   try {
     window.history.pushState({}, '', `/#${sectionId}`)
   } catch {
@@ -37,23 +110,33 @@ export function scrollLandingToPartnerApotheken(): void {
   scrollLandingToSection('partner-apotheken')
 }
 
+/** Mobile standalone funktioniert block; desktop funktioniert lives inside #faq. */
+export function scrollLandingToFunktioniert(): void {
+  const sectionId = window.matchMedia('(max-width: 767px)').matches
+    ? 'how-funktioniert'
+    : 'faq'
+  scrollLandingToSection(sectionId)
+}
+
 /** Enter main view from hero, or scroll to #faq when already in main view. */
 export function scrollLandingToAblauf(): void {
   const landingMainTop = getLandingMainTop()
   const stillOnHero = window.scrollY < Math.max(0, landingMainTop - 8)
 
   if (stillOnHero) {
-    window.scrollTo({ top: landingMainTop, behavior: 'smooth' })
+    smoothScrollLandingTo(landingMainTop)
     return
   }
 
-  const el = document.getElementById('faq')
+  const isMobile = window.matchMedia('(max-width: 767px)').matches
+  const targetId = isMobile ? 'how-funktioniert' : 'faq'
+  const el = document.getElementById(targetId)
   if (el) {
     const top = el.getBoundingClientRect().top + window.scrollY - HEADER_OFFSET
-    window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' })
+    smoothScrollLandingTo(top)
   }
   try {
-    window.history.pushState({}, '', '/#faq')
+    window.history.pushState({}, '', `/#${targetId}`)
   } catch {
     /* ignore */
   }
@@ -110,7 +193,7 @@ export function attachLandingBinarySwitch(): () => void {
   }
 
   const onWheel = (e: WheelEvent) => {
-    if (isHeroAccordionBlockingScroll()) return
+    if (landingProgrammaticScrollActive || isHeroAccordionBlockingScroll()) return
 
     const mainTop = getLandingMainTop()
     const y = window.scrollY
@@ -143,7 +226,7 @@ export function attachLandingBinarySwitch(): () => void {
   }
 
   const onScroll = () => {
-    if (animating || isHeroAccordionBlockingScroll()) return
+    if (landingProgrammaticScrollActive || animating || isHeroAccordionBlockingScroll()) return
     const mainTop = getLandingMainTop()
     const y = window.scrollY
     const crossingBridge = y > SWITCH_EPSILON && y < mainTop - SWITCH_EPSILON

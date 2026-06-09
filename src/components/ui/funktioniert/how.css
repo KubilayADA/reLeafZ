@@ -979,6 +979,126 @@
   color: #0f172a;
 }
 
+/* ── Standalone mobile section (first block in landing-main) ── */
+.funktioniert-section {
+  display: none;
+}
+
+@media (max-width: 767px) {
+  .funktioniert-section {
+    --funktioniert-top-radius: 22px;
+    display: block;
+    position: relative;
+    overflow: hidden;
+    scroll-margin-top: 100px;
+    padding: 1.5rem 1.55rem 2.5rem;
+    background: var(--how-bg);
+    border-top-left-radius: var(--funktioniert-top-radius);
+    border-top-right-radius: var(--funktioniert-top-radius);
+  }
+
+  /* Blue top accent — transition from mobile hero into dark section */
+  .funktioniert-section::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-top-left-radius: inherit;
+    border-top-right-radius: inherit;
+    border-top: 2px solid #60a5fa;
+    pointer-events: none;
+    z-index: 3;
+  }
+
+  .funktioniert-section__shell {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+
+  .funktioniert-section__intro {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.65rem;
+    margin-bottom: 0.15rem;
+  }
+
+  .funktioniert-section__pill {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.32rem 0.62rem;
+    font-size: 0.625rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    line-height: 1;
+    color: #0f172a;
+    background: #ffffff;
+    border-style: solid;
+    border-color: #333;
+    border-width: 2.5px 4px 4px 2.5px;
+    border-radius: 0.5rem;
+  }
+
+  .funktioniert-section__title {
+    margin: 0;
+    font-size: clamp(1.55rem, 7.5vw, 1.85rem);
+    line-height: 1.05;
+    font-weight: 700;
+    color: var(--how-text);
+    text-shadow: 0 0 30px rgba(255, 255, 255, 0.06);
+    white-space: normal;
+  }
+
+  .funktioniert-section {
+    --how-stories-card-h: 36rem;
+  }
+
+  .funktioniert-section .how-stories-stack {
+    width: 100%;
+    max-width: none;
+    margin-inline: 0;
+  }
+
+  .funktioniert-section .how-stories-stack .how-stories--fill {
+    min-height: var(--how-stories-card-h);
+    height: var(--how-stories-card-h);
+  }
+
+  .funktioniert-section .how-stories--tap-advance {
+    cursor: pointer;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+  }
+
+  .funktioniert-section .how-stories-slide .how-story-content {
+    padding: 3.5rem 1.35rem 2rem;
+  }
+
+  .funktioniert-section .how-stories-slide .how-story-copy .how-story-title {
+    white-space: normal;
+    overflow: visible;
+    text-overflow: unset;
+  }
+
+  .funktioniert-section .how-stories-slide .how-story-copy .how-story-desc {
+    -webkit-line-clamp: 8;
+    line-clamp: 8;
+  }
+}
+
+@media (max-width: 440px) {
+  .funktioniert-section {
+    --how-stories-card-h: 34rem;
+  }
+}
+
+#landing-main[data-theme='light'] .funktioniert-section__title {
+  color: #0f172a;
+  text-shadow: none;
+}
+
 #landing-main[data-theme='light'] .how-funktioniert .how-story-copy .how-story-desc,
 .how-funktioniert.theme-light .how-story-copy .how-story-desc {
   color: rgba(15, 23, 42, 0.78);

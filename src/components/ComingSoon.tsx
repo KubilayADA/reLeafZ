@@ -146,7 +146,7 @@ export default function ComingSoon() {
 
   const hoverAudioRef = useRef<HTMLAudioElement | null>(null)
   const playHoverSound = () => {
-    const src = '/tekkkk.mp3'
+    const src = '/tekk.mp3'
     if (!hoverAudioRef.current) {
       hoverAudioRef.current = new Audio(src)
       hoverAudioRef.current.preload = 'auto'

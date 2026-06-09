@@ -8,7 +8,11 @@ import {
   Lock, Wifi,
   PhoneCall, Store, HeartHandshake,
 } from 'lucide-react'
-import { scrollLandingToPartnerApotheken, scrollToLandingTop } from '@/lib/scroll'
+import {
+  scrollLandingToFunktioniert,
+  scrollLandingToSection,
+  scrollToLandingTop,
+} from '@/lib/scroll'
 import { heroParticlesOptions } from '@/constants/particles'
 import SectionParticlesBackground from '@/components/ui/SectionParticlesBackground'
 import { HeroImageCarousel } from './hero-carousel'
@@ -51,25 +55,25 @@ function buildHeroZStars(count: number): HeroZStar[] {
 const HERO_Z_STARS = buildHeroZStars(200)
 
 const HERO_NAV_LINKS = [
-  { href: '#faq', label: 'Ablauf', scrollKey: 'faq' as const },
-  { href: '#partner-apotheken', label: 'Apotheke in Ihrer Nähe' },
-  { href: '#faq', label: 'FAQ' },
-  { href: '#chat', label: 'Chat with us!' },
-]
+  { href: '#partner-apotheken', label: 'Partner-Apotheken', sectionId: 'partner-apotheken', extraScrollDown: 96 },
+  { href: '#sortiment', label: 'Sortiment', sectionId: 'sortiment' },
+  { href: '#faq', label: 'FAQ', sectionId: 'faq' },
+  { href: '#newsletter', label: 'Newsletter', sectionId: 'newsletter' },
+] as const
 
-function HeroTopNav({ onScrollToAblauf }: { onScrollToAblauf: () => void }) {
+function HeroTopNav() {
   return (
     <nav className="hero-logo-bar__nav header-desktop-nav header-text" aria-label="Hauptnavigation">
       {HERO_NAV_LINKS.map((link) => (
         <a
-          key={`${link.href}-${link.label}`}
+          key={link.sectionId}
           href={link.href}
           className="header-nav-link"
           onClick={(e) => {
-            if (link.scrollKey === 'faq') {
-              e.preventDefault()
-              onScrollToAblauf()
-            }
+            e.preventDefault()
+            scrollLandingToSection(link.sectionId, {
+              extraScrollDown: 'extraScrollDown' in link ? link.extraScrollDown : 0,
+            })
           }}
         >
           {link.label}
@@ -133,10 +137,7 @@ function HeroAccordionRows({
       onDiscover()
       return
     }
-    const el = document.getElementById('faq')
-    if (!el) return
-    const top = Math.max(0, el.getBoundingClientRect().top + window.scrollY + 40)
-    window.scrollTo({ top, behavior: 'smooth' })
+    scrollLandingToFunktioniert()
   }
 
   return (
@@ -286,7 +287,7 @@ export function MobileHero({ setDialogOpen }: { setDialogOpen: (open: boolean) =
       <HeroAccordionRows
         setDialogOpen={setDialogOpen}
         scrollAnchorRef={heroRef}
-        onDiscover={scrollLandingToPartnerApotheken}
+        onDiscover={scrollLandingToFunktioniert}
       />
     </section>
   )
@@ -380,7 +381,7 @@ export default function Hero({
             >
               <img src="/logo1.png" alt="reLeafZ Logo" className="logo-hero" />
             </a>
-            <HeroTopNav onScrollToAblauf={onScrollToAblauf} />
+            <HeroTopNav />
           </div>
           <div className="hero-logo-divider" aria-hidden />
         </div>

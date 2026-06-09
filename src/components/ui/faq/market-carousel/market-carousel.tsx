@@ -1,7 +1,6 @@
 'use client'
 
 import React, { useCallback, useEffect, useRef, useState } from 'react'
-import { Sprout } from 'lucide-react'
 import '@/app/main.css'
 import SectionParticlesBackground from '@/components/ui/SectionParticlesBackground'
 import { getStrainImage } from '@/lib/strains'
@@ -13,7 +12,8 @@ import {
 } from './product-strain-card'
 import './market-carousel.css'
 
-const LANDING_STRAIN_COUNT = 4
+const LANDING_STRAIN_COUNT = 5
+const TOUCH_CAROUSEL_MQ = '(max-width: 1023px)'
 
 // Representative location used to query the live marketplace for the public
 // landing showcase (our partner pharmacies operate in Berlin).
@@ -76,28 +76,8 @@ function marketplaceToStrains(data: MarketplacePharmacy[]): ShowcaseStrain[] {
   return flowers.length > 0 ? flowers : others
 }
 
-function CarouselNavIcon({ direction }: { direction: 'prev' | 'next' }) {
-  return (
-    <svg className="market-carousel__nav-icon" viewBox="0 0 16 16" fill="none" aria-hidden>
-      {direction === 'prev' ? (
-        <path
-          d="M10 3L5 8l5 5"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-      ) : (
-        <path
-          d="M6 3l5 5-5 5"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-      )}
-    </svg>
-  )
+function easeInOutQuart(t: number): number {
+  return t < 0.5 ? 8 * t * t * t * t : 1 - Math.pow(-2 * t + 2, 4) / 2
 }
 
 const SHOWCASE_STRAINS: ShowcaseStrain[] = [
@@ -142,6 +122,16 @@ const SHOWCASE_STRAINS: ShowcaseStrain[] = [
     image: '/strains/slurricane.webp',
   },
   {
+    id: 'hi-society',
+    name: 'Hi Society',
+    thc: 21,
+    cbd: 1,
+    price: 10.2,
+    pharmacy: { name: 'Partnerapotheke', city: 'Berlin' },
+    fulfillment: 'delivery',
+    image: '/strains/hi-society-dfr.webp',
+  },
+  {
     id: 'black-cherry-punch',
     name: 'Black Cherry Punch',
     thc: 20,
@@ -183,22 +173,33 @@ const SHOWCASE_STRAINS: ShowcaseStrain[] = [
   },
 ]
 
-function BoutiqueCtaCard({ onRequest }: { onRequest: () => void }) {
+function BoutiqueCtaCard({
+  onRequest,
+  revealed = false,
+}: {
+  onRequest: () => void
+  revealed?: boolean
+}) {
   return (
-    <div className="market-carousel__card mc-cta">
-      <div className="mc-cta__content">
-        <span className="mc-cta__icon" aria-hidden>
-          <Sprout />
-        </span>
+    <button
+      type="button"
+      className={`market-carousel__card mc-cta${revealed ? ' is-revealed' : ''}`}
+      onClick={onRequest}
+      aria-label="Jetzt anfragen und das volle Sortiment entdecken"
+    >
+      <div className="mc-cta__content" aria-hidden>
+        <img src="/logo-1-icon.png" alt="" className="mc-cta__logo" />
         <h3 className="mc-cta__title">Entdecke das volle Sortiment</h3>
         <p className="mc-cta__text">
           Stelle deine Behandlungsanfrage und erhalte Zugang zur kompletten Boutique.
         </p>
-        <button type="button" className="mc-cta__btn" onClick={onRequest}>
-          Jetzt anfragen &rarr;
-        </button>
+        <span className="mc-cta__btn">
+          Jetzt anfragen
+          <span className="mc-cta__btn-arrow">&rarr;</span>
+        </span>
       </div>
-    </div>
+      <span className="mc-cta__veil" aria-hidden />
+    </button>
   )
 }
 
@@ -207,9 +208,12 @@ export default function MarketCarousel({
 }: {
   setDialogOpen?: (open: boolean) => void
 } = {}): React.JSX.Element {
+  const sectionRef = useRef<HTMLElement | null>(null)
   const trackRef = useRef<HTMLDivElement | null>(null)
-  const [canScrollPrev, setCanScrollPrev] = useState(false)
-  const [canScrollNext, setCanScrollNext] = useState(true)
+  const viewportRef = useRef<HTMLDivElement | null>(null)
+  const ctaRef = useRef<HTMLDivElement | null>(null)
+  const animRef = useRef({ currentX: 0, targetX: 0, raf: 0 })
+  const [ctaRevealed, setCtaRevealed] = useState(false)
   const [strains, setStrains] = useState<ShowcaseStrain[]>(SHOWCASE_STRAINS)
 
   useEffect(() => {
@@ -236,69 +240,144 @@ export default function MarketCarousel({
     }
   }, [])
 
-  const getScrollStep = useCallback(() => {
+  const getMaxTranslate = useCallback(() => {
     const track = trackRef.current
-    if (!track) return 0
-    const slide = track.querySelector<HTMLElement>('.market-carousel__slide')
-    if (!slide) return 0
-    const gap = parseFloat(getComputedStyle(track).gap) || 16
-    return slide.offsetWidth + gap
+    const viewport = viewportRef.current
+    const cta = ctaRef.current
+    if (!track || !viewport) return 0
+
+    const naturalMax = track.scrollWidth - viewport.clientWidth
+    if (!cta) return naturalMax
+
+    const fullCtaLeft = cta.offsetLeft + cta.offsetWidth - viewport.clientWidth + 16
+    return Math.min(naturalMax, Math.max(0, fullCtaLeft))
   }, [])
 
-  const updateScrollState = useCallback(() => {
+  const applyTransform = useCallback((x: number) => {
     const track = trackRef.current
     if (!track) return
-    const { scrollLeft, scrollWidth, clientWidth } = track
-    setCanScrollPrev(scrollLeft > 4)
-    setCanScrollNext(scrollLeft + clientWidth < scrollWidth - 4)
+    track.style.transform = `translate3d(${-x}px, 0, 0)`
   }, [])
 
-  const scrollByCard = useCallback(
-    (direction: 'prev' | 'next') => {
-      const track = trackRef.current
-      if (!track) return
-
-      const distance = getScrollStep()
-      if (!distance) return
-
-      const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-      const maxScroll = track.scrollWidth - track.clientWidth
-
-      if (direction === 'next' && track.scrollLeft >= maxScroll - 4) {
-        track.scrollTo({ left: 0, behavior: prefersReduced ? 'auto' : 'smooth' })
-        return
-      }
-
-      if (direction === 'prev' && track.scrollLeft <= 4) {
-        track.scrollTo({ left: maxScroll, behavior: prefersReduced ? 'auto' : 'smooth' })
-        return
-      }
-
-      track.scrollBy({
-        left: direction === 'next' ? distance : -distance,
-        behavior: prefersReduced ? 'auto' : 'smooth',
-      })
-    },
-    [getScrollStep]
-  )
-
+  // Mobile/tablet: native horizontal swipe carousel (no page-scroll-linked transform).
   useEffect(() => {
-    const track = trackRef.current
-    if (!track) return
+    const mq = window.matchMedia(TOUCH_CAROUSEL_MQ)
+    const syncTouchLayout = () => {
+      const track = trackRef.current
+      const viewport = viewportRef.current
+      if (!track || !viewport) return
 
-    updateScrollState()
-    track.addEventListener('scroll', updateScrollState, { passive: true })
-    window.addEventListener('resize', updateScrollState)
+      if (mq.matches) {
+        track.style.transform = ''
+        animRef.current.currentX = 0
+        animRef.current.targetX = 0
+      } else {
+        viewport.scrollLeft = 0
+      }
+    }
+
+    syncTouchLayout()
+    mq.addEventListener('change', syncTouchLayout)
+    return () => mq.removeEventListener('change', syncTouchLayout)
+  }, [strains])
+
+  // Drive the horizontal carousel from the page's vertical scroll so scrolling
+  // down progressively reveals the cards (and the CTA at the very end).
+  useEffect(() => {
+    const section = sectionRef.current
+    const track = trackRef.current
+    if (!section || !track) return
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+    if (window.matchMedia(TOUCH_CAROUSEL_MQ).matches) return
+
+    const anim = animRef.current
+
+    const tick = () => {
+      anim.raf = 0
+      const diff = anim.targetX - anim.currentX
+
+      if (Math.abs(diff) > 0.35) {
+        anim.currentX += diff * 0.16
+        applyTransform(anim.currentX)
+        anim.raf = window.requestAnimationFrame(tick)
+        return
+      }
+
+      if (anim.currentX !== anim.targetX) {
+        anim.currentX = anim.targetX
+        applyTransform(anim.currentX)
+      }
+    }
+
+    const update = () => {
+      const maxTranslate = getMaxTranslate()
+      if (maxTranslate <= 0) {
+        anim.targetX = 0
+        anim.currentX = 0
+        applyTransform(0)
+        return
+      }
+
+      const rect = section.getBoundingClientRect()
+      const vh = window.innerHeight || document.documentElement.clientHeight
+      const viewportWidth = window.innerWidth || document.documentElement.clientWidth
+      const isTablet = viewportWidth >= 768 && viewportWidth < 1024
+      const isMobile = viewportWidth < 768
+      const startTop = vh * (isMobile ? 0.74 : isTablet ? 0.72 : 0.78)
+      const endTop = vh * (isMobile ? -0.08 : isTablet ? -0.1 : -0.12)
+      const span = startTop - endTop || 1
+      const rawProgress = Math.min(1, Math.max(0, (startTop - rect.top) / span))
+      const carouselProgress = easeInOutQuart(rawProgress)
+
+      anim.targetX = carouselProgress * maxTranslate
+
+      if (!anim.raf) {
+        anim.raf = window.requestAnimationFrame(tick)
+      }
+    }
+
+    const onScroll = () => {
+      update()
+    }
+
+    update()
+    window.addEventListener('scroll', onScroll, { passive: true })
+    window.addEventListener('resize', onScroll)
 
     return () => {
-      track.removeEventListener('scroll', updateScrollState)
-      window.removeEventListener('resize', updateScrollState)
+      window.removeEventListener('scroll', onScroll)
+      window.removeEventListener('resize', onScroll)
+      if (anim.raf) window.cancelAnimationFrame(anim.raf)
+      track.style.transform = ''
+      anim.currentX = 0
+      anim.targetX = 0
+      anim.raf = 0
     }
-  }, [updateScrollState, strains])
+  }, [strains, getMaxTranslate, applyTransform])
+
+  // Unblur the CTA card once it scrolls into view inside the carousel viewport.
+  useEffect(() => {
+    const root = viewportRef.current
+    const target = ctaRef.current
+    if (!root || !target) return
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          setCtaRevealed(entry.intersectionRatio >= 0.45)
+        }
+      },
+      { root, threshold: [0, 0.3, 0.6, 0.9, 1] }
+    )
+
+    observer.observe(target)
+    return () => observer.disconnect()
+  }, [strains])
 
   return (
     <section
       id="sortiment"
+      ref={sectionRef}
       className="market-carousel-section"
       aria-label="Medizinisches Cannabis Sortiment"
     >
@@ -312,50 +391,30 @@ export default function MarketCarousel({
       <div className="market-carousel__shell">
         <div className="market-carousel__intro">
           <span className="market-carousel__pill">Unser Sortiment</span>
-          <h2 className="market-carousel__title">Blüten aus unserer Partnerapotheke</h2>
-          <p className="market-carousel__subtitle">
-            Ausgewählte medizinische Cannabis-Sorten — verfügbar über unsere Partnerapotheke in
-            Berlin.
-          </p>
+          <h2 className="market-carousel__title">
+            <span className="market-carousel__title-line">Blüten aus unserer</span>
+            <span className="market-carousel__title-line">Partnerapotheke.</span>
+          </h2>
         </div>
 
-        <div className="market-carousel__controls">
-          <button
-            type="button"
-            className="market-carousel__nav-btn"
-            aria-label="Vorherige Sorte"
-            onClick={() => scrollByCard('prev')}
-            disabled={!canScrollPrev}
-          >
-            <CarouselNavIcon direction="prev" />
-          </button>
-          <button
-            type="button"
-            className="market-carousel__nav-btn"
-            aria-label="Nächste Sorte"
-            onClick={() => scrollByCard('next')}
-            disabled={!canScrollNext}
-          >
-            <CarouselNavIcon direction="next" />
-          </button>
-        </div>
-
-        <div className="market-carousel__viewport">
-          <div
-            ref={trackRef}
-            className="market-carousel__track"
-            role="list"
-            aria-label="Cannabis Sorten Karussell"
-          >
-            {strains.slice(0, LANDING_STRAIN_COUNT).map((strain) => (
-              <div key={strain.id} className="market-carousel__slide" role="listitem">
-                <div className="market-carousel__card">
-                  <ProductStrainCard strain={strain} blurImage />
+        <div className="market-carousel__stage">
+          <div className="market-carousel__viewport" ref={viewportRef}>
+            <div
+              ref={trackRef}
+              className="market-carousel__track"
+              role="list"
+              aria-label="Cannabis Sorten Karussell"
+            >
+              {strains.slice(0, LANDING_STRAIN_COUNT).map((strain) => (
+                <div key={strain.id} className="market-carousel__slide" role="listitem">
+                  <div className="market-carousel__card">
+                    <ProductStrainCard strain={strain} blurImage />
+                  </div>
                 </div>
+              ))}
+              <div ref={ctaRef} className="market-carousel__slide" role="listitem">
+                <BoutiqueCtaCard onRequest={() => setDialogOpen?.(true)} revealed={ctaRevealed} />
               </div>
-            ))}
-            <div className="market-carousel__slide" role="listitem">
-              <BoutiqueCtaCard onRequest={() => setDialogOpen?.(true)} />
             </div>
           </div>
         </div>

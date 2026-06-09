@@ -4,7 +4,7 @@ import React, { useState, useEffect, useRef } from 'react'
 import { Menu, Moon, Sun } from 'lucide-react'
 
 import './header-mobile.css'
-import { scrollLandingToAblauf } from '@/lib/scroll'
+import { scrollLandingToSection } from '@/lib/scroll'
 
 interface MobileNavbarProps {
   setDialogOpen: (open: boolean) => void
@@ -13,8 +13,9 @@ interface MobileNavbarProps {
 }
 
 const NAV_LINKS = [
-  { href: '#faq', label: 'So funktionierts' },
+  { href: '#how-funktioniert', label: 'So funktionierts' },
   { href: '#partner-apotheken', label: 'Partner-Apotheken' },
+  { href: '#sortiment', label: 'Sortiment' },
   { href: '#faq', label: 'FAQ' },
 ]
 
@@ -33,7 +34,7 @@ export default function MobileNavbar({
   useEffect(() => { isOpenRef.current = isOpen }, [isOpen])
 
   useEffect(() => {
-    const SECTION_IDS = ['partner-apotheken', 'faq'] as const
+    const SECTION_IDS = ['how-funktioniert', 'partner-apotheken', 'sortiment', 'faq'] as const
     const SECTION_ACTIVE_OFFSET = 110
     const getTargetSections = () =>
       SECTION_IDS
@@ -101,17 +102,8 @@ export default function MobileNavbar({
     e.preventDefault()
     setIsOpen(false)
 
-    if (href === '#faq') {
-      scrollLandingToAblauf()
-      return
-    }
-
     const id = href.replace('#', '')
-    const el = document.getElementById(id)
-    if (el) {
-      const top = el.getBoundingClientRect().top + window.pageYOffset - 70
-      window.scrollTo({ top, behavior: 'smooth' })
-    }
+    scrollLandingToSection(id)
   }
 
   return (

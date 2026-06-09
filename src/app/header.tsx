@@ -6,7 +6,7 @@ import { Menu, X } from 'lucide-react'
 // import { Moon, Sun } from 'lucide-react'
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import './header.css'
-import { scrollToLandingTop, scrollLandingToAblauf } from '@/lib/scroll'
+import { scrollLandingToAblauf, scrollLandingToSection, scrollToLandingTop } from '@/lib/scroll'
 
 // logo
 const LeafLogo = ({ className = 'logo-header' }) => (
@@ -191,8 +191,26 @@ export default function Header({
                 >
                   Ablauf
                 </a>
-                <a href="#partner-apotheken" className="header-nav-link text-mg md:text-xl leading-relaxed">Apotheke in Ihrer Nähe</a>
-                <a href="#faq" className="header-nav-link text-mg md:text-xl leading-relaxed">FAQ</a>
+                <a
+                  href="#partner-apotheken"
+                  className="header-nav-link text-mg md:text-xl leading-relaxed"
+                  onClick={(e) => {
+                    e.preventDefault()
+                    scrollLandingToSection('partner-apotheken')
+                  }}
+                >
+                  Apotheke in Ihrer Nähe
+                </a>
+                <a
+                  href="#faq"
+                  className="header-nav-link text-mg md:text-xl leading-relaxed"
+                  onClick={(e) => {
+                    e.preventDefault()
+                    scrollLandingToSection('faq')
+                  }}
+                >
+                  FAQ
+                </a>
                 <a href="#chat" className="header-nav-link text-lg md:text-xl leading-relaxed">Chat with us!</a>
               </nav>
 

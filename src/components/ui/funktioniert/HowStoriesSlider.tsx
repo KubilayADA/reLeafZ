@@ -45,7 +45,14 @@ function resolveSlideDir(from: number, to: number): SlideDir {
   return to > from ? 1 : -1
 }
 
-export default function HowStoriesSlider(): React.JSX.Element {
+type HowStoriesSliderProps = {
+  /** Tap card to go next (left edge = previous). Used on mobile funktioniert section. */
+  tapToAdvance?: boolean
+}
+
+export default function HowStoriesSlider({
+  tapToAdvance = false,
+}: HowStoriesSliderProps = {}): React.JSX.Element {
   const [current, setCurrent] = useState<number>(0)
   const [slideDir, setSlideDir] = useState<SlideDir>(1)
   const [slideTick, setSlideTick] = useState(0)
@@ -98,13 +105,24 @@ export default function HowStoriesSlider(): React.JSX.Element {
 
   const activeStep = STEPS[current]
 
+  const handleStoryTap = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!tapToAdvance) return
+    if ((e.target as HTMLElement).closest('.how-stories-seg')) return
+
+    const rect = e.currentTarget.getBoundingClientRect()
+    const xRatio = (e.clientX - rect.left) / rect.width
+    if (xRatio < 0.28) goPrev()
+    else goNext()
+  }
+
   return (
     <div className="how-stories-stack">
       <div
-        className={`how-stories how-stories--fill${storyPaused ? ' how-stories--paused' : ''}`}
+        className={`how-stories how-stories--fill${storyPaused ? ' how-stories--paused' : ''}${tapToAdvance ? ' how-stories--tap-advance' : ''}`}
         role="region"
         aria-roledescription="Karussell"
         aria-label={`Schritt ${current + 1} von ${TOTAL}`}
+        onClick={tapToAdvance ? handleStoryTap : undefined}
         onKeyDown={(e: React.KeyboardEvent) => {
           if (e.key === 'ArrowRight') {
             e.preventDefault()
@@ -154,25 +172,29 @@ export default function HowStoriesSlider(): React.JSX.Element {
           </article>
         </div>
 
-        <button
-          type="button"
-          className="how-stories-hit how-stories-hit--prev"
-          aria-label="Vorheriger Schritt"
-          onClick={goPrev}
-        />
-        <button
-          type="button"
-          className="how-stories-hit how-stories-hit--pause"
-          aria-label={storyPaused ? 'Automatischen Wechsel fortsetzen' : 'Automatischen Wechsel anhalten'}
-          aria-pressed={storyPaused}
-          onClick={() => setStoryPaused((paused) => !paused)}
-        />
-        <button
-          type="button"
-          className="how-stories-hit how-stories-hit--next"
-          aria-label="Nächster Schritt"
-          onClick={goNext}
-        />
+        {!tapToAdvance && (
+          <>
+            <button
+              type="button"
+              className="how-stories-hit how-stories-hit--prev"
+              aria-label="Vorheriger Schritt"
+              onClick={goPrev}
+            />
+            <button
+              type="button"
+              className="how-stories-hit how-stories-hit--pause"
+              aria-label={storyPaused ? 'Automatischen Wechsel fortsetzen' : 'Automatischen Wechsel anhalten'}
+              aria-pressed={storyPaused}
+              onClick={() => setStoryPaused((paused) => !paused)}
+            />
+            <button
+              type="button"
+              className="how-stories-hit how-stories-hit--next"
+              aria-label="Nächster Schritt"
+              onClick={goNext}
+            />
+          </>
+        )}
       </div>
     </div>
   )
