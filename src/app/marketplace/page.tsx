@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import Link from 'next/link'
 import { Product, API_BASE } from '@/lib/api'
 import { useRouter } from 'next/navigation'
 import { Check, Leaf, ArrowRight, Package, Loader2, Trash2 } from 'lucide-react'
@@ -758,9 +759,9 @@ export default function MarketplacePage() {
 function MarketplaceLogoHeader() {
   return (
     <header className="marketplace-logo-bar">
-      <a href="/" className="marketplace-logo-link" aria-label="reLeafZ Startseite">
+      <Link href="/" className="marketplace-logo-link" aria-label="reLeafZ Startseite">
         <img src="/logo1.png" alt="reLeafZ" className="marketplace-logo" />
-      </a>
+      </Link>
     </header>
   )
 }
