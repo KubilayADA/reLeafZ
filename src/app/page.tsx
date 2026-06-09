@@ -9,6 +9,7 @@ import CookieBanner from '@/components/ui/cookie'
 import '@/components/ui/Hero/Words-Sliding-Smooth.css'
 import ComingSoon from '@/components/ComingSoon'
 import PartnerApotheken from '@/components/ui/partnerApotheken/finden'
+import MarketCarousel from '@/components/ui/faq/market-carousel/market-carousel'
 import Faq from '@/components/ui/faq/faq'
 import MailReq from '@/components/ui/newsletter/mailreq'
 import Footer from '@/components/ui/footer/footer'
@@ -17,7 +18,7 @@ import { useLandingTheme } from '@/lib/use-landing-theme'
 import { useLandingThemeInitial } from './providers'
 import { APIProvider, useMapsLibrary } from '@vis.gl/react-google-maps'
 
-const COMING_SOON_MODE = true;
+const COMING_SOON_MODE = false;
 
 const helveticaNeueStyle: React.CSSProperties = {
   fontFamily: '"Helvetica Neue", Helvetica, Arial, sans-serif',
@@ -389,6 +390,7 @@ function LandingPageContent() {
         >
           <MobileHero setDialogOpen={setDialogOpen} />
           <PartnerApotheken />
+          <MarketCarousel setDialogOpen={setDialogOpen} />
           <Faq />
           <MailReq />
 

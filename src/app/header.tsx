@@ -252,11 +252,14 @@ export default function Header({
                 </Button>
               </DialogTrigger>
             </div>
-            {/* Hamburger for mobile only */}
+            {/* Hamburger — mobile nav uses MobileNavbar; header is desktop/tablet only */}
             <button
-              className="md:hidden ml-4 p-2 rounded focus:outline-none"
+              type="button"
+              className="header-menu-toggle ml-4 p-2 rounded focus:outline-none"
               onClick={() => setMobileNavOpen(!mobileNavOpen)}
               aria-label="Open menu"
+              aria-hidden="true"
+              tabIndex={-1}
             >
               {mobileNavOpen ? <X className="w-7 h-7" /> : <Menu className="w-7 h-7" />}
             </button>
@@ -304,7 +307,7 @@ export default function Header({
         
         {/* Mobile Nav Drawer */}
         {mobileNavOpen && (
-          <div className="md:hidden absolute top-full left-0 w-full bg-white shadow-lg border-t border-emerald-200 z-50">
+          <div className="header-mobile-drawer absolute top-full left-0 w-full bg-white shadow-lg border-t border-emerald-200 z-50">
             <nav className="flex flex-col items-center py-6 space-y-6">
               <a
                 href="#faq"

@@ -126,10 +126,11 @@
 .form-page .btn-secondary {
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
   font-weight: 400;
+  background-image: var(--btn-texture-colored), var(--btn-texture-hatch);
   background-color: #72906f;
   color: white;
   border: 1px solid #000000;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  box-shadow: var(--btn-texture-inset), 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
   transition: all 0.3s ease;
 }
 
@@ -400,8 +401,10 @@
   border-right: 4px solid #333;
   border-bottom: 4px solid #333;
   box-sizing: border-box;
-  background: #ffffff;
+  background-image: var(--btn-texture-light), var(--btn-texture-hatch);
+  background-color: #ffffff;
   color: #111827;
+  box-shadow: var(--btn-texture-inset);
 }
 .form-page .form-back-button:hover:not(:disabled) {
   background: #f8fafc;

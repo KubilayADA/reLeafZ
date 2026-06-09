@@ -213,8 +213,10 @@
   border-color: #333;
   border-width: 2.5px 4px 4px 2.5px;
   border-radius: 0.5rem;
-  background: #ffffff;
+  background-image: var(--btn-texture-light), var(--btn-texture-hatch);
+  background-color: #ffffff;
   color: #0f172a;
+  box-shadow: var(--btn-texture-inset);
   font-family: var(--mr-sans);
   font-size: 0.875rem;
   font-weight: 700;

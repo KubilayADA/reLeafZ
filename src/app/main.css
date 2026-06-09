@@ -101,6 +101,34 @@
     --releafz-glass-elevated: rgba(26, 26, 26, 0.75);
     --releafz-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
     --releafz-mono: "Inconsolata", monospace;
+    /* Subtle tactile surface — distinguishes chunky CTAs from flat inputs */
+    --btn-texture-light: linear-gradient(
+        168deg,
+        rgba(255, 255, 255, 0.28) 0%,
+        rgba(255, 255, 255, 0.08) 30%,
+        transparent 55%,
+        rgba(0, 0, 0, 0.06) 100%
+    );
+    --btn-texture-dark: linear-gradient(
+        168deg,
+        rgba(255, 255, 255, 0.1) 0%,
+        transparent 45%,
+        rgba(0, 0, 0, 0.14) 100%
+    );
+    --btn-texture-colored: linear-gradient(
+        168deg,
+        rgba(255, 255, 255, 0.18) 0%,
+        transparent 42%,
+        rgba(0, 0, 0, 0.14) 100%
+    );
+    --btn-texture-hatch: repeating-linear-gradient(
+        -38deg,
+        transparent 0,
+        transparent 3px,
+        rgba(0, 0, 0, 0.02) 3px,
+        rgba(0, 0, 0, 0.02) 4px
+    );
+    --btn-texture-inset: inset 0 1px 0 rgba(255, 255, 255, 0.32), inset 0 -2px 0 rgba(0, 0, 0, 0.1);
 }
 
 /* Root background: matches landing light/dark (see `data-releafz-landing-theme` on <html> in layout + theme toggle).
@@ -435,6 +463,12 @@ button[disabled] {
     opacity: 0.6;
 }
 
+/* Chunky-bordered header CTA — tactile surface so it reads as a button, not an input */
+.behandlung-button2 {
+    background-image: var(--btn-texture-colored), var(--btn-texture-hatch);
+    box-shadow: var(--btn-texture-inset);
+}
+
 /* Shared button styling - colors, font, shadows */
 .btn-primary,
 .behandlung-button {
@@ -517,10 +551,11 @@ header .behandlung-button {
 .btn-secondary {
     font-family: "Inconsolata", monospace;
     font-weight: 400;
+    background-image: var(--btn-texture-colored), var(--btn-texture-hatch);
     background-color: #72906F;
     color: white;
     border: 1px solid #000000;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    box-shadow: var(--btn-texture-inset), 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
     transition: all 0.3s ease;
 }
 
@@ -539,10 +574,11 @@ header .behandlung-button {
 .btn-outline {
     font-family: "Inconsolata", monospace;
     font-weight: 400;
+    background-image: var(--btn-texture-light), var(--btn-texture-hatch);
     background-color: transparent;
     color: #111827;
     border: 1px solid #000000;
-    box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.05);
+    box-shadow: var(--btn-texture-inset), 0 2px 4px -1px rgba(0, 0, 0, 0.05);
     transition: all 0.3s ease;
 }
 

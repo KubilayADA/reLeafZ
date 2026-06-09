@@ -373,10 +373,11 @@ html[data-releafz-coming-soon="true"][data-releafz-landing-theme] body {
    The .uiverse base already provides the chunky borders (2.5px/2.5px/4px/4px #333),
    so we only override the "balloon" visuals (gradient bg, glow, animation, radius, circles). */
 .cs-submit-btn2:not(:hover):not(:focus-visible) {
-  background: #ffffff !important;
+  background-image: var(--btn-texture-light), var(--btn-texture-hatch) !important;
+  background-color: #ffffff !important;
   color: #0f172a !important;
   border-radius: 12px !important;
-  box-shadow: none !important;
+  box-shadow: var(--btn-texture-inset) !important;
   filter: none !important;
   animation: none !important;
   transform: none !important;
