@@ -110,6 +110,14 @@ export function scrollLandingToPartnerApotheken(): void {
   scrollLandingToSection('partner-apotheken')
 }
 
+/** Mobile standalone funktioniert block; desktop funktioniert lives inside #faq. */
+export function scrollLandingToFunktioniert(): void {
+  const sectionId = window.matchMedia('(max-width: 767px)').matches
+    ? 'how-funktioniert'
+    : 'faq'
+  scrollLandingToSection(sectionId)
+}
+
 /** Enter main view from hero, or scroll to #faq when already in main view. */
 export function scrollLandingToAblauf(): void {
   const landingMainTop = getLandingMainTop()
@@ -120,13 +128,15 @@ export function scrollLandingToAblauf(): void {
     return
   }
 
-  const el = document.getElementById('faq')
+  const isMobile = window.matchMedia('(max-width: 767px)').matches
+  const targetId = isMobile ? 'how-funktioniert' : 'faq'
+  const el = document.getElementById(targetId)
   if (el) {
     const top = el.getBoundingClientRect().top + window.scrollY - HEADER_OFFSET
     smoothScrollLandingTo(top)
   }
   try {
-    window.history.pushState({}, '', '/#faq')
+    window.history.pushState({}, '', `/#${targetId}`)
   } catch {
     /* ignore */
   }

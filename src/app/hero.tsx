@@ -8,7 +8,11 @@ import {
   Lock, Wifi,
   PhoneCall, Store, HeartHandshake,
 } from 'lucide-react'
-import { scrollLandingToPartnerApotheken, scrollLandingToSection, scrollToLandingTop } from '@/lib/scroll'
+import {
+  scrollLandingToFunktioniert,
+  scrollLandingToSection,
+  scrollToLandingTop,
+} from '@/lib/scroll'
 import { heroParticlesOptions } from '@/constants/particles'
 import SectionParticlesBackground from '@/components/ui/SectionParticlesBackground'
 import { HeroImageCarousel } from './hero-carousel'
@@ -133,10 +137,7 @@ function HeroAccordionRows({
       onDiscover()
       return
     }
-    const el = document.getElementById('faq')
-    if (!el) return
-    const top = Math.max(0, el.getBoundingClientRect().top + window.scrollY + 40)
-    window.scrollTo({ top, behavior: 'smooth' })
+    scrollLandingToFunktioniert()
   }
 
   return (
@@ -286,7 +287,7 @@ export function MobileHero({ setDialogOpen }: { setDialogOpen: (open: boolean) =
       <HeroAccordionRows
         setDialogOpen={setDialogOpen}
         scrollAnchorRef={heroRef}
-        onDiscover={scrollLandingToPartnerApotheken}
+        onDiscover={scrollLandingToFunktioniert}
       />
     </section>
   )

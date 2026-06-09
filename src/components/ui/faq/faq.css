@@ -38,6 +38,12 @@
   .faq-section {
     padding: 0 1.55rem 3rem;
   }
+
+  /* Funktioniert is its own first section on mobile — hide duplicate here */
+  .faq-section .how-stories-intro,
+  .faq-section .faq-stories {
+    display: none !important;
+  }
 }
 
 @media (min-width: 1200px) {
@@ -206,6 +212,10 @@
 }
 
 @media (min-width: 1024px) {
+  .faq-section {
+    --faq-stories-max-width: 30rem;
+  }
+
   .faq-headings-row {
     display: grid;
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
@@ -216,8 +226,8 @@
 
   .faq-headings-row .how-stories-intro {
     justify-self: start;
-    width: min(100%, 22rem);
-    max-width: 22rem;
+    width: min(100%, var(--faq-stories-max-width));
+    max-width: var(--faq-stories-max-width);
   }
 
   .faq-layout {
@@ -239,7 +249,7 @@
   }
 
   .faq-stories .how-stories-stack {
-    width: min(100%, 22rem);
+    width: min(100%, var(--faq-stories-max-width));
     height: 100%;
     margin-inline: auto;
     gap: 1.5rem;
@@ -247,6 +257,20 @@
 
   .faq-stories .how-stories-stack .how-stories--fill {
     min-height: 0;
+  }
+
+  .faq-stories .how-story-copy {
+    max-width: min(100%, 28rem);
+  }
+}
+
+@media (min-width: 1200px) {
+  .faq-section {
+    --faq-stories-max-width: 34rem;
+  }
+
+  .faq-stories .how-story-copy {
+    max-width: min(100%, 30rem);
   }
 }
 

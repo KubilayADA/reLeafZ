@@ -13,6 +13,7 @@ import {
 import './market-carousel.css'
 
 const LANDING_STRAIN_COUNT = 5
+const TOUCH_CAROUSEL_MQ = '(max-width: 1023px)'
 
 // Representative location used to query the live marketplace for the public
 // landing showcase (our partner pharmacies operate in Berlin).
@@ -258,6 +259,28 @@ export default function MarketCarousel({
     track.style.transform = `translate3d(${-x}px, 0, 0)`
   }, [])
 
+  // Mobile/tablet: native horizontal swipe carousel (no page-scroll-linked transform).
+  useEffect(() => {
+    const mq = window.matchMedia(TOUCH_CAROUSEL_MQ)
+    const syncTouchLayout = () => {
+      const track = trackRef.current
+      const viewport = viewportRef.current
+      if (!track || !viewport) return
+
+      if (mq.matches) {
+        track.style.transform = ''
+        animRef.current.currentX = 0
+        animRef.current.targetX = 0
+      } else {
+        viewport.scrollLeft = 0
+      }
+    }
+
+    syncTouchLayout()
+    mq.addEventListener('change', syncTouchLayout)
+    return () => mq.removeEventListener('change', syncTouchLayout)
+  }, [strains])
+
   // Drive the horizontal carousel from the page's vertical scroll so scrolling
   // down progressively reveals the cards (and the CTA at the very end).
   useEffect(() => {
@@ -265,6 +288,7 @@ export default function MarketCarousel({
     const track = trackRef.current
     if (!section || !track) return
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+    if (window.matchMedia(TOUCH_CAROUSEL_MQ).matches) return
 
     const anim = animRef.current
 

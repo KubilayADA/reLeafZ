@@ -11,6 +11,7 @@ import ComingSoon from '@/components/ComingSoon'
 import PartnerApotheken from '@/components/ui/partnerApotheken/finden'
 import MarketCarousel from '@/components/ui/faq/market-carousel/market-carousel'
 import Faq from '@/components/ui/faq/faq'
+import Funktioniert from '@/components/ui/funktioniert/funktioniert'
 import MailReq from '@/components/ui/newsletter/mailreq'
 import Footer from '@/components/ui/footer/footer'
 import { attachLandingBinarySwitch, scrollLandingToAblauf } from '@/lib/scroll'
@@ -382,6 +383,7 @@ function LandingPageContent() {
           suppressHydrationWarning
         >
           <MobileHero setDialogOpen={setDialogOpen} />
+          <Funktioniert />
           <PartnerApotheken />
           <MarketCarousel setDialogOpen={setDialogOpen} />
           <Faq />
