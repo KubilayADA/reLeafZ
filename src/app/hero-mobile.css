@@ -221,7 +221,7 @@
 
 .mobile-hero__row-hint {
   font-size: 15px;
-  opacity: 0.45;
+  color: rgba(15, 23, 42, 0.72);
   letter-spacing: 0.04em;
 }
 
@@ -535,7 +535,7 @@
 
 /* ── Desktop hero: same accordion rows in left column (≥768px) ── */
 
-.hero-section:has(.mobile-hero__row.is-open) .hero-scroll-overlay {
+.hero-section:has(.mobile-hero__row:first-child.is-open) .hero-scroll-overlay {
   pointer-events: none;
 }
 
@@ -594,7 +594,7 @@
 }
 
 .hero-section--light .hero-accordion .mobile-hero__row-hint {
-  color: rgba(15, 23, 42, 0.45);
+  color: rgba(15, 23, 42, 0.78);
 }
 
 .hero-section--dark .hero-accordion .mobile-hero__row {

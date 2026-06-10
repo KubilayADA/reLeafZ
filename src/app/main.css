@@ -871,28 +871,14 @@ header .behandlung-button {
 }
 
 /*
- * Tablet + iPad Pro (≤1400px): nav + accordion on screen; carousel below (scroll to reveal).
- * Covers iPad Pro 11" (834/1194), 12.9" (1024/1366), 13" M4 (1032/1376).
+ * Tablet + iPad Pro (≤1400px): nav → carousel → accordion (compact stack, no forced gaps).
  */
 @media (min-width: 768px) and (max-width: 1400px) {
-    .hero-section.hero-section--fixed {
-        overflow-x: hidden;
-        overflow-y: auto;
-        overscroll-behavior: contain;
-        -webkit-overflow-scrolling: touch;
-    }
-
     .hero-layout {
-        padding-top: clamp(5rem, 4rem + 2.5vw, 7rem);
+        padding-top: clamp(5.5rem, 4.5rem + 2vw, 7rem);
         padding-left: clamp(1.25rem, 2vw, 2rem);
         padding-right: clamp(1.25rem, 2vw, 2rem);
-        padding-bottom: 2rem;
-    }
-
-    .hero-layout__content {
-        flex: 1 1 auto;
-        min-height: calc(100dvh - clamp(5rem, 4rem + 2.5vw, 7rem) - 2.5rem);
-        justify-content: flex-start;
+        padding-bottom: 1rem;
     }
 
     .hero-logo-bar__row {
@@ -905,16 +891,6 @@ header .behandlung-button {
 
     .hero-logo-bar__nav .header-nav-link {
         font-size: clamp(0.8rem, 0.55vw + 0.55rem, 1.2rem);
-    }
-}
-
-@media (min-width: 1024px) and (max-width: 1400px) {
-    .hero-layout {
-        padding-top: clamp(5.5rem, 4.5rem + 2.5vw, 7.5rem);
-    }
-
-    .hero-layout__content {
-        min-height: calc(100dvh - clamp(5.5rem, 4.5rem + 2.5vw, 7.5rem) - 2.5rem);
     }
 }
 
@@ -1004,19 +980,19 @@ header .behandlung-button {
 .hero-layout__media {
     display: none;
     min-width: 0;
-    pointer-events: auto;
+    pointer-events: none;
 }
 
-/* Tablet + iPad Pro: carousel after accordion — below the initial viewport */
+/* Tablet + iPad Pro: carousel directly under nav, accordion follows */
 @media (min-width: 768px) and (max-width: 1400px) {
     .hero-layout__media {
         display: flex;
         flex-shrink: 0;
         align-items: flex-start;
         justify-content: center;
-        margin-top: clamp(1rem, 2vw, 2rem);
-        padding-bottom: 1.5rem;
-        pointer-events: auto;
+        margin-top: 0.25rem;
+        margin-bottom: clamp(0.5rem, 1.25vw, 1rem);
+        pointer-events: none;
     }
 }
 
@@ -1033,9 +1009,21 @@ header .behandlung-button {
     }
 }
 
-/* Landing: two-section bridge with snap from fixed hero to main content */
+/* Landing: hero↔main bridge handled in JS (`attachLandingBinarySwitch`) on desktop */
 .landing-snap-scroll {
     scroll-snap-type: y mandatory;
+}
+
+@media (min-width: 768px) {
+    .landing-snap-scroll {
+        scroll-snap-type: none;
+    }
+}
+
+@media (min-width: 768px) {
+    html[data-landing-programmatic-scroll] {
+        overflow-y: hidden !important;
+    }
 }
 
 html[data-landing-programmatic-scroll] .landing-snap-scroll,
@@ -1156,66 +1144,18 @@ html[data-landing-programmatic-scroll] .landing-snap-target {
     }
 }
 
-/* Hero scroll CTA ("Entdecke wie es funktioniert") */
-.hero-scroll-cta {
-    position: absolute;
-    left: 50%;
-    bottom: 2rem;
-    transform: translateX(-50%);
-    z-index: 10;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.5rem;
-    text-decoration: none;
-    color: inherit;
-    transition: opacity 150ms ease;
+/* Bottom tap zone: scroll from hero into landing (not full-screen) */
+.hero-scroll-overlay {
+    height: min(30vh, 240px);
+    cursor: pointer;
 }
 
-.hero-scroll-cta:hover {
-    opacity: 1;
-}
-
-.hero-scroll-cta:hover .hero-scroll-cta-icon {
-    transform: translateY(3px);
-    box-shadow: 0 0 0 6px rgba(255,255,255,0.15);
-}
-
-.hero-scroll-cta-icon {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 2.25rem;
-    height: 2.25rem;
-    border-radius: 50%;
-    border: 1.5px solid rgba(255,255,255,0.55);
-    background: rgba(255,255,255,0.08);
-    color: rgba(255,255,255,0.95);
-    backdrop-filter: blur(4px);
-    transition: transform 200ms ease, box-shadow 200ms ease;
-    animation: hero-cta-pulse 2.5s ease-in-out infinite;
-}
-
-@keyframes hero-cta-pulse {
-    0%, 100% { box-shadow: 0 0 0 0 rgba(255,255,255,0.25); }
-    50%       { box-shadow: 0 0 0 8px rgba(255,255,255,0); }
-}
-
-.hero-scroll-cta-text {
-    font-family: "Helvetica Neue", sans-serif;
-    font-size: 0.995rem;
-    font-weight: 900;
-    text-align: center;
-    color: rgba(255, 255, 255, 0.95);
-    text-shadow: 0 1px 2px rgba(0,0,0,0.8);
-}
-
-@media (min-width: 640px) {
-    .hero-scroll-cta-text {
-        font-size: 1rem;
+@media (min-width: 768px) {
+    html[data-landing-programmatic-scroll] .hero-section.hero-section--fixed .hero-section__backdrop {
+        transition: opacity 520ms ease-out;
+        opacity: 0.35;
     }
 }
-
 
 .hero-cta-arrow {
     position: absolute;
