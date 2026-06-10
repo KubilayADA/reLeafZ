@@ -1456,7 +1456,10 @@ export default function PharmacyDashboard() {
           if (!label) return null;
           const onClick =
             ns === 'READY'      ? () => handleMarkReady(order.id)
-            : ns === 'DISPATCHED' ? () => handleDispatch(order.id)
+            : ns === 'DISPATCHED'
+                ? (cat === 'BOTENDIENST'
+                    ? () => handleDispatch(order.id)
+                    : () => handleUpdateStatus(order.id, 'DISPATCHED'))
             : () => handleUpdateStatus(order.id, ns);
           return (
             <button
