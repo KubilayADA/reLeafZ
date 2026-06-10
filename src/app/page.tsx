@@ -228,7 +228,7 @@ function LandingPageContent() {
     return () => clearTimeout(timer)
   }, [houseNumber, streetName, cityName])
 
-  if (COMING_SOON_MODE && bypass !== 'daniel2024') {
+  if (COMING_SOON_MODE && bypass !== 'mj-demo') {
     return <ComingSoon />
   }
 
