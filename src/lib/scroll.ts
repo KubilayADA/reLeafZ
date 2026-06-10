@@ -141,6 +141,13 @@ function isInHeroLandingBridge(y = window.scrollY): boolean {
   return y > SWITCH_EPSILON && y < landingTarget - SWITCH_EPSILON
 }
 
+function isEditableKeyTarget(target: EventTarget | null): boolean {
+  if (!(target instanceof HTMLElement)) return false
+  const tag = target.tagName
+  if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return true
+  return target.isContentEditable
+}
+
 export function scrollToLandingTop(): void {
   smoothScrollLandingTo(0)
 }
@@ -148,13 +155,14 @@ export function scrollToLandingTop(): void {
 /** Smooth-scroll to a landing section by id (accounts for fixed header). */
 export function scrollLandingToSection(
   sectionId: string,
-  options?: { extraScrollDown?: number },
+  options?: { extraScrollDown?: number; updateUrl?: boolean },
 ): void {
   const el = document.getElementById(sectionId)
   if (!el) return
   const extraScrollDown = options?.extraScrollDown ?? 0
   const top = el.getBoundingClientRect().top + window.scrollY - HEADER_OFFSET + extraScrollDown
   smoothScrollLandingTo(top)
+  if (options?.updateUrl === false) return
   try {
     window.history.pushState({}, '', `/#${sectionId}`)
   } catch {
@@ -193,18 +201,21 @@ function getMobileHeroScrollTarget(): number | null {
 }
 
 /** Smooth transition from hero into the landing sections (bottom CTA / ENTDECKEN). */
-export function scrollHeroToLanding(): void {
+export function scrollHeroToLanding(options?: { updateUrl?: boolean }): void {
+  const updateUrl = options?.updateUrl === true
+
   if (isMobileLandingViewport()) {
     scrollLandingToMain()
     return
   }
 
   if (!isOnFixedHero()) {
-    scrollLandingToSection('how-funktioniert')
+    scrollLandingToSection('how-funktioniert', { updateUrl })
     return
   }
 
   smoothScrollLandingTo(getHeroToLandingTarget())
+  if (!updateUrl) return
   try {
     window.history.pushState({}, '', '/#how-funktioniert')
   } catch {
@@ -227,7 +238,7 @@ export function scrollLandingToMain(): void {
     return
   }
 
-  scrollLandingToSection('how-funktioniert')
+  scrollLandingToSection('how-funktioniert', { updateUrl: false })
 }
 
 /** Scroll to the standalone funktioniert section. */
@@ -237,7 +248,7 @@ export function scrollLandingToFunktioniert(): void {
 
 /** Enter main view from hero, or scroll to #how-funktioniert when already in main view. */
 export function scrollLandingToAblauf(): void {
-  scrollHeroToLanding()
+  scrollHeroToLanding({ updateUrl: true })
 }
 
 /** True once the fixed hero has scrolled out of view (mobile docked nav). */
@@ -386,6 +397,7 @@ export function attachLandingBinarySwitch(): () => void {
   }
 
   const onKeyDown = (e: KeyboardEvent) => {
+    if (isEditableKeyTarget(e.target)) return
     if (landingProgrammaticScrollActive || isHeroAccordionBlockingScroll()) return
 
     const y = window.scrollY
