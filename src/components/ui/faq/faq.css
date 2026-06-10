@@ -308,7 +308,8 @@
 
   .faq-intro-row--faq {
     gap: 0.65rem;
-    width: calc((100% - var(--faq-column-gap)) / 2);
+    width: 100%;
+    max-width: var(--faq-main-max-width);
     margin-top: 0;
     box-sizing: border-box;
   }

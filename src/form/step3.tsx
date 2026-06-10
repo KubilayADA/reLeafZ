@@ -2,9 +2,11 @@
 
 import React, { useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
-import { ArrowLeft, MoonStar, Activity, Brain, Sparkles } from 'lucide-react'
+import { ArrowLeft, MoonStar, Activity, Brain } from 'lucide-react'
+import BrainPainIcon from '@/form/form-brain-pain-icon'
 import StepProgress from '@/form/step-progress'
 import FormLogoHomeExit from '@/form/form-logo-home-exit'
+import FormOptionCheck from '@/form/form-option-check'
 import '@/form/form.css'
 
 interface Step3Props {
@@ -48,7 +50,7 @@ export default function Step3({ onNext, onBack, initialValue = '', onSelectionCh
       id: 'migraine' as ConditionOption,
       title: 'Migräne',
       description: 'Regelmäßige Migräneanfälle oder starke Kopfschmerzen',
-      icon: Sparkles
+      icon: BrainPainIcon
     }
   ]
 
@@ -79,7 +81,7 @@ export default function Step3({ onNext, onBack, initialValue = '', onSelectionCh
             Wähle eine Beschwerde aus, die deinen Zustand am besten beschreibt.
           </p>
 
-          <div className="form-options form-options--cols-4 form-options--center form-options--step3-fit">
+          <div className="form-options form-options--step3-fit">
             {options.map((option) => {
               const Icon = option.icon
               const isSelected = selectedOption === option.id
@@ -91,13 +93,18 @@ export default function Step3({ onNext, onBack, initialValue = '', onSelectionCh
                     setSelectedOption(option.id)
                     onSelectionChange?.(option.id)
                   }}
-                  className={`form-option-card form-option-card--rounded-lg form-option-card--max-width form-option-card--text-center form-step3-option-card ${isSelected ? 'form-option-card--selected' : ''}`}
+                  className={`form-option-card form-step3-option-card ${isSelected ? 'form-option-card--selected' : ''}`}
                 >
-                  <div className="form-option-icon-wrap form-option-icon-wrap--circle">
-                    <Icon className="form-option-icon form-step3-option-icon" />
+                  <FormOptionCheck selected={isSelected} className="form-option-check--corner form-step3-option-check" />
+                  <div className="form-step3-option-body">
+                    <div className="form-option-icon-wrap form-step3-option-icon-wrap">
+                      <Icon className="form-option-icon form-step3-option-icon" />
+                    </div>
+                    <div className="form-step3-option-text">
+                      <h3 className="form-option-title">{option.title}</h3>
+                      <p className="form-option-desc form-step3-option-desc">{option.description}</p>
+                    </div>
                   </div>
-                  <h3 className="form-option-title">{option.title}</h3>
-                  <p className="form-option-desc form-step3-option-desc">{option.description}</p>
                 </button>
               )
             })}

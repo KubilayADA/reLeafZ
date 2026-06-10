@@ -1,10 +1,8 @@
 'use client'
 import React, { useState, useRef, useEffect } from 'react'
 import '@/app/main.css'
-import '@/components/ui/funktioniert/how.css'
 import './faq.css'
 import SectionParticlesBackground from '@/components/ui/SectionParticlesBackground'
-import HowStoriesSlider from '@/components/ui/funktioniert/HowStoriesSlider'
 import { faqDe } from '@/content/faq/de'
 
 interface AccordionItemProps {
@@ -72,36 +70,23 @@ export default function Faq(): React.JSX.Element {
       </div>
 
       <div className="faq-inner faq__shell">
-        <div className="faq-headings-row">
-          <div className="faq-intro-row faq-intro-row--faq">
-            <span className="faq-story-pill">{content.eyebrow}</span>
-            <h2 className="faq-title">{content.title}</h2>
-          </div>
-
-          <div className="faq-intro-row how-stories-intro">
-            <span className="faq-story-pill">So funktioniert&apos;s</span>
-            <h2 className="faq-title">Dein Rezept in 4 Schritten</h2>
-          </div>
+        <div className="faq-intro-row faq-intro-row--faq">
+          <span className="faq-story-pill">{content.eyebrow}</span>
+          <h2 className="faq-title">{content.title}</h2>
         </div>
 
-        <div className="faq-layout">
-          <div className="faq-main">
-            <div className="faq-list" role="list">
-              {content.items.map((item, idx) => (
-                <AccordionItem
-                  key={item.id}
-                  question={item.question}
-                  answer={item.answer}
-                  isOpen={openIdx === idx}
-                  onToggle={() => toggle(idx)}
-                />
-              ))}
-            </div>
+        <div className="faq-main">
+          <div className="faq-list" role="list">
+            {content.items.map((item, idx) => (
+              <AccordionItem
+                key={item.id}
+                question={item.question}
+                answer={item.answer}
+                isOpen={openIdx === idx}
+                onToggle={() => toggle(idx)}
+              />
+            ))}
           </div>
-
-          <aside className="faq-stories how-funktioniert" aria-label="So funktioniert der Ablauf">
-            <HowStoriesSlider />
-          </aside>
         </div>
       </div>
     </section>
