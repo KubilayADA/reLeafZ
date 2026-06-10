@@ -267,6 +267,14 @@ export default function QuestionnairePage() {
     return () => window.clearTimeout(transitionTimer)
   }, [currentStep, renderedStep])
 
+  useEffect(() => {
+    if (!isStepVisible) return
+
+    window.scrollTo({ top: 0, left: 0, behavior: 'auto' })
+    document.documentElement.scrollTop = 0
+    document.body.scrollTop = 0
+  }, [renderedStep, isStepVisible])
+
   if (loading) {
     return (
       <div className="min-h-screen bg-beige flex items-center justify-center">

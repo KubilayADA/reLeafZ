@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button'
 import { ArrowLeft } from 'lucide-react'
 import StepProgress from '@/form/step-progress'
 import FormLogoHomeExit from '@/form/form-logo-home-exit'
+import FormOptionCheck from '@/form/form-option-check'
 import '@/form/form.css'
 
 interface Step7Props {
@@ -129,9 +130,7 @@ export default function Step7({
                       <div className="form-option-row__content">
                         <p className="form-option-row__title">{option.title}</p>
                       </div>
-                      <span className="form-option-radio form-option-radio--inline">
-                        {isSelected && <span className="form-option-radio__inner" />}
-                      </span>
+                      <FormOptionCheck selected={isSelected} className="form-option-check--inline" />
                     </button>
                   )
                 })}
@@ -167,9 +166,7 @@ export default function Step7({
                         <div className="form-option-row__content">
                           <p className="form-option-row__title">{option.title}</p>
                         </div>
-                        <span className="form-option-radio form-option-radio--inline">
-                          {isSelected && <span className="form-option-radio__inner" />}
-                        </span>
+                        <FormOptionCheck selected={isSelected} className="form-option-check--inline" />
                       </button>
                     )
                   })}
@@ -207,9 +204,7 @@ export default function Step7({
                       <div className="form-option-row__content">
                         <p className="form-option-row__title">{option.title}</p>
                       </div>
-                      <span className="form-option-radio form-option-radio--inline">
-                        {isSelected && <span className="form-option-radio__inner" />}
-                      </span>
+                      <FormOptionCheck selected={isSelected} className="form-option-check--inline" />
                     </button>
                   )
                 })}

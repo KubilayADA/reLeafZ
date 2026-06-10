@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button'
 import { ArrowLeft, FileText, Video, Building2 } from 'lucide-react'
 import StepProgress from '@/form/step-progress'
 import FormLogoHomeExit from '@/form/form-logo-home-exit'
+import FormOptionCheck from '@/form/form-option-check'
 import '@/form/form.css'
 
 interface Step1Props {
@@ -61,7 +62,7 @@ export default function Step1({ onNext, onBack, initialValue = '', onSelectionCh
     }
 
     if (selectedOption === 'video') {
-      window.open('https://drterp.de', '_blank')
+      window.open('https://www.cannabis-aerzte.de/karte/?type=arzt', '_blank')
       setExternalRedirectNotice('video')
       return
     }
@@ -107,19 +108,21 @@ export default function Step1({ onNext, onBack, initialValue = '', onSelectionCh
                   }}
                   className={`form-option-card ${isSelected ? 'form-option-card--selected' : ''}`}
                 >
-                  <div className="form-option-icon-wrap">
-                    <Icon className="form-option-icon form-option-icon--step1" />
+                  <div className="form-option-card__header">
+                    <FormOptionCheck selected={isSelected} className="form-option-check--corner" />
+                  </div>
+                  <div className="form-option-icon-row">
+                    <div className="form-option-icon-wrap">
+                      <Icon className="form-option-icon form-option-icon--step1" />
+                    </div>
+                    {option.price ? (
+                      <div className="form-option-price form-option-price--inline">
+                        <span className="form-option-price__value">{option.price}</span>
+                      </div>
+                    ) : null}
                   </div>
                   <h3 className="form-option-title">{option.title}</h3>
                   <p className="form-option-desc">{option.description}</p>
-                  <div className="form-option-price">
-                    <span className="form-option-price__value">{option.price}</span>
-                  </div>
-                  <div className="form-option-card__radio-wrap">
-                    <div className="form-option-radio">
-                      {isSelected && <div className="form-option-radio__inner" />}
-                    </div>
-                  </div>
                 </div>
               )
             })}

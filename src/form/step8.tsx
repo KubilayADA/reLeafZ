@@ -106,11 +106,6 @@ function displayLabel(value: string, labelMap: Record<string, string>): string {
   return labelMap[value] ?? displayStr(value)
 }
 
-function truncate(value: string, maxLen = 80): string {
-  if (value.length <= maxLen) return value
-  return value.slice(0, maxLen) + '…'
-}
-
 export default function Step8({ formData, onSubmit, onBack, onEditStep, submitting = false }: Step8Props) {
   return (
     <div className="form-page form-page--step4-fit inconsolata">
@@ -133,7 +128,7 @@ export default function Step8({ formData, onSubmit, onBack, onEditStep, submitti
             Bitte überprüfe deine Angaben vor dem Absenden.
           </p>
 
-          <div className="form-step4-sections form-step4-sections--fit">
+          <div className="form-review-sections">
             <ReviewSection title="Schritt 1 — Behandlungsart" stepNumber={1} onEditStep={onEditStep} submitting={submitting}>
               <ReviewRow label="Behandlungsart" value={displayLabel(formData.consultationType, consultationLabels)} />
             </ReviewSection>
@@ -146,12 +141,7 @@ export default function Step8({ formData, onSubmit, onBack, onEditStep, submitti
               <ReviewRow label="Symptombeginn" value={displayLabel(formData.onset, onsetLabels)} />
               <ReviewRow label="Häufigkeit" value={displayLabel(formData.frequency, frequencyLabels)} />
               <ReviewRow label="Schweregrad" value={displayLabel(formData.severity, severityLabels)} />
-              <ReviewRow
-                label="Diagnose / ICD"
-                value={displayStr(formData.diagnosisText)}
-                fullText={formData.diagnosisText}
-                truncated
-              />
+              <ReviewRow label="Diagnose / ICD" value={displayStr(formData.diagnosisText)} />
             </ReviewSection>
 
             <ReviewSection title="Schritt 5 — Vorherige Behandlung" stepNumber={5} onEditStep={onEditStep} submitting={submitting}>
@@ -161,12 +151,7 @@ export default function Step8({ formData, onSubmit, onBack, onEditStep, submitti
               )}
               <ReviewRow label="Medikamente eingenommen" value={displayBool(formData.hasTakenMedication)} />
               {formData.hasTakenMedication === true && (
-                <ReviewRow
-                  label="Medikamentendetails"
-                  value={displayStr(formData.medicationDetails)}
-                  fullText={formData.medicationDetails}
-                  truncated
-                />
+                <ReviewRow label="Medikamentendetails" value={displayStr(formData.medicationDetails)} />
               )}
               <ReviewRow label="Nicht-medikamentöse Therapien" value={displayArr(formData.nonMedicalTherapies, {})} />
             </ReviewSection>
@@ -210,25 +195,19 @@ interface ReviewSectionProps {
 
 function ReviewSection({ title, stepNumber, onEditStep, submitting, children }: ReviewSectionProps) {
   return (
-    <section
-      className="form-step4-section form-step4-section--fit"
-      style={{ borderBottom: '1px solid rgba(0,0,0,0.07)', paddingBottom: '1rem', marginBottom: '0.5rem' }}
-    >
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
-        <h3 className="form-section-title" style={{ margin: 0 }}>
-          {title}
-        </h3>
-        <button
+    <section className="form-review-section">
+      <div className="form-review-section__header">
+        <h3 className="form-review-section__title">{title}</h3>
+        <Button
           type="button"
           onClick={() => onEditStep(stepNumber)}
           disabled={submitting}
-          className="btn-outline form-back-button text-sm"
-          style={{ padding: '0.125rem 0.625rem', fontSize: '0.75rem' }}
+          className="btn-secondary form-review-edit"
         >
           Bearbeiten
-        </button>
+        </Button>
       </div>
-      <div>{children}</div>
+      <div className="form-review-rows">{children}</div>
     </section>
   )
 }
@@ -236,31 +215,13 @@ function ReviewSection({ title, stepNumber, onEditStep, submitting, children }: 
 interface ReviewRowProps {
   label: string
   value: string
-  fullText?: string
-  truncated?: boolean
 }
 
-function ReviewRow({ label, value, fullText, truncated = false }: ReviewRowProps) {
-  const displayValue = truncated && fullText ? truncate(fullText) : value
+function ReviewRow({ label, value }: ReviewRowProps) {
   return (
-    <div
-      style={{
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'flex-start',
-        padding: '0.2rem 0',
-        gap: '1rem',
-      }}
-    >
-      <span className="form-section-hint" style={{ margin: 0, flexShrink: 0 }}>
-        {label}
-      </span>
-      <span
-        title={fullText && fullText.length > 80 ? fullText : undefined}
-        style={{ textAlign: 'right', wordBreak: 'break-word' }}
-      >
-        {displayValue}
-      </span>
+    <div className="form-review-row">
+      <span className="form-review-row__label">{label}</span>
+      <span className="form-review-row__value">{value}</span>
     </div>
   )
 }

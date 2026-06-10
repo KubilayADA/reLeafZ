@@ -40,6 +40,11 @@
   --form-input-radius: 0.5rem;
   --form-input-focus-ring: 2px;
   --form-transition: 0.2s ease;
+  --form-option-border: #e5e7eb;
+  --form-option-border-hover: #cbd5e1;
+  --form-option-selected-border: #93c5fd;
+  --form-option-selected-bg: #f8fbff;
+  --form-option-selected-accent: #3b82f6;
 }
 
 /* ============================================
@@ -193,12 +198,14 @@
   content: "";
   position: fixed;
   top: 0;
-  left: 0;
-  width: 14.5rem;
-  height: 5.8rem;
+  left: 50%;
+  width: 10.5rem;
+  height: 5.25rem;
+  transform: translateX(-50%);
   background-image: url('/logo1.png');
   background-repeat: no-repeat;
-  background-size: 11.2rem 3.3rem;
+  /* logo1.png is ~2:1 — height-only sizing keeps the wordmark from squashing */
+  background-size: auto 5rem;
   background-position: center;
   z-index: 60;
   pointer-events: none;
@@ -207,32 +214,58 @@
 .form-logo-home-exit {
   position: fixed;
   top: 0;
-  left: 0;
-  width: 14.5rem;
-  height: 5.8rem;
+  left: 50%;
+  width: 10.5rem;
+  height: 5.25rem;
+  transform: translateX(-50%);
   z-index: 70;
   border: none;
   background: transparent;
   cursor: pointer;
 }
 
+/* Medizinische Anfrage (mashallah) — logo top-left */
+.form-page--mashallah::before {
+  left: 0.75rem;
+  transform: none;
+  background-position: left center;
+}
+
+.form-page--mashallah .form-logo-home-exit {
+  left: 0.75rem;
+  transform: none;
+}
+
 @media (max-width: 640px) {
   .form-page::before {
     position: absolute;
     top: 0.35rem;
-    left: 0.35rem;
-    width: 11.2rem;
-    height: 4.6rem;
-    background-size: 8.2rem 2.4rem;
-    background-position: left top;
+    left: 50%;
+    width: 6.75rem;
+    height: 3.5rem;
+    transform: translateX(-50%);
+    background-size: auto 3.2rem;
+    background-position: center;
   }
 
   .form-logo-home-exit {
     position: absolute;
     top: 0.35rem;
-    left: 0.35rem;
-    width: 11.2rem;
-    height: 4.6rem;
+    left: 50%;
+    width: 6.75rem;
+    height: 3.5rem;
+    transform: translateX(-50%);
+  }
+
+  .form-page--mashallah::before {
+    left: 0.75rem;
+    transform: none;
+    background-position: left center;
+  }
+
+  .form-page--mashallah .form-logo-home-exit {
+    left: 0.75rem;
+    transform: none;
   }
 }
 
@@ -301,7 +334,7 @@
 /* Mashallah mobile optimization */
 @media (max-width: 640px) {
   .form-page--mashallah {
-    padding-top: 3.6rem;
+    padding-top: 4.5rem;
   }
 
   .form-container--mashallah {
@@ -347,10 +380,6 @@
 
   .form-page--mashallah .form-header__postcode-inline--boxed {
     padding: 0.5rem 0.65rem;
-  }
-
-  .form-card--mashallah {
-    padding: 0.95rem;
   }
 
   .form-fields--mashallah {
@@ -414,12 +443,6 @@
   height: 1rem;
   margin-right: 0.5rem;
 }
-.form-option-card__radio-wrap {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-top: 1rem;
-}
 .form-header__title-wrap {
   display: flex;
   flex-direction: column;
@@ -429,7 +452,7 @@
 /* Legal pages with only the fixed corner logo (no inline logo block) */
 .form-header__title-wrap--corner-logo {
   width: 100%;
-  padding-top: 3.25rem;
+  padding-top: 4rem;
   align-items: stretch; /* override .form-header__title-wrap center so the h1 can be full width */
 }
 @media (min-width: 640px) {
@@ -701,8 +724,8 @@
    ============================================ */
 .form-options {
   display: grid;
-  gap: var(--form-spacing-lg);
-  margin-bottom: var(--form-spacing-2xl);
+  gap: var(--form-spacing-md);
+  margin-bottom: var(--form-spacing-xl);
 }
 .form-options--cols-1 {
   grid-template-columns: 1fr;
@@ -746,35 +769,36 @@
 }
 
 .form-option-card {
-  border-top: 2.5px solid #333;
-  border-left: 2.5px solid #333;
-  border-right: 4px solid #333;
-  border-bottom: 4px solid #333;
+  position: relative;
+  border: 1px solid var(--form-option-border);
   box-sizing: border-box;
-  border-radius: var(--form-card-radius);
-  padding: var(--form-spacing-lg);
+  border-radius: 0.625rem;
+  padding: 1rem 1rem 0.85rem;
   cursor: pointer;
-  transition: border-color var(--form-transition), box-shadow var(--form-transition), background-color var(--form-transition);
+  transition:
+    border-color var(--form-transition),
+    background-color var(--form-transition),
+    box-shadow var(--form-transition);
   background: var(--form-card-bg);
+  box-shadow: none;
 }
 @media (min-width: 640px) {
   .form-option-card {
-    padding: var(--form-spacing-2xl);
+    padding: 1.15rem 1.15rem 1rem;
   }
 }
 .form-option-card:hover {
-  border-color: #72906F;
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+  border-color: var(--form-option-border-hover);
+  background: #fcfcfd;
 }
 .form-option-card--selected {
-  border-color: var(--form-accent);
-  background: linear-gradient(
-    135deg,
-    rgba(114, 144, 111, 0.2) 0%,
-    rgba(114, 144, 111, 0.1) 52%,
-    rgba(114, 144, 111, 0.03) 100%
-  );
-  box-shadow: var(--form-card-shadow);
+  border-color: var(--form-option-selected-border);
+  background: var(--form-option-selected-bg);
+  box-shadow: 0 1px 3px rgba(59, 130, 246, 0.08);
+}
+.form-option-card--selected:hover {
+  border-color: #7cb3f5;
+  background: #f0f7ff;
 }
 .form-option-card--rounded-lg {
   border-radius: var(--form-card-radius-lg);
@@ -792,13 +816,13 @@
   flex-direction: row;
   align-items: flex-start;
   justify-content: space-between;
-  gap: var(--form-spacing-lg);
+  gap: var(--form-spacing-md);
   text-align: left;
-  padding: var(--form-spacing-lg) var(--form-spacing-xl);
+  padding: 0.9rem 1rem;
 }
 @media (min-width: 640px) {
   .form-option-card--row {
-    padding: var(--form-spacing-lg) 1.75rem;
+    padding: 1rem 1.15rem;
   }
 }
 .form-option-card--row .form-option-row__content {
@@ -826,29 +850,51 @@
     font-size: 0.875rem;
   }
 }
-.form-option-card--row .form-option-radio--inline {
-  margin-top: 0.25rem;
+.form-option-card__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.55rem;
+  min-height: 1.125rem;
+}
+.form-option-card--text-center .form-option-card__header {
+  justify-content: flex-end;
+}
+.form-option-check--corner {
+  margin-left: auto;
+  flex-shrink: 0;
+}
+.form-option-card--row .form-option-check--inline {
+  align-self: center;
+  margin-top: 0;
 }
 
+.form-option-icon-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 0.65rem;
+}
+.form-option-icon-row .form-option-icon-wrap {
+  margin-bottom: 0;
+}
 .form-option-icon-wrap {
-  width: 3rem;
-  height: 3rem;
-  border-radius: var(--form-card-radius);
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 0.5rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: var(--form-spacing-md);
-  background: #f3f4f6;
+  margin-bottom: 0.65rem;
+  background: #f9fafb;
+  flex-shrink: 0;
 }
 .form-option-card--selected .form-option-icon-wrap {
-  background: linear-gradient(
-    140deg,
-    rgba(114, 144, 111, 0.28) 0%,
-    rgba(114, 144, 111, 0.14) 100%
-  );
+  background: rgba(59, 130, 246, 0.1);
 }
 .form-option-icon {
-  color: #4b5563;
+  color: #6b7280;
 }
 .form-option-icon--step1 {
   width: 1.5rem;
@@ -871,13 +917,17 @@
   }
 }
 .form-option-card--selected .form-option-icon {
-  color: var(--form-accent);
+  color: var(--form-option-selected-accent);
+}
+.form-option-card--selected .form-option-title,
+.form-option-card--selected .form-option-row__title {
+  color: #1e293b;
 }
 @media (min-width: 640px) {
   .form-option-icon-wrap {
-    width: 4rem;
-    height: 4rem;
-    margin-bottom: var(--form-spacing-lg);
+    width: 2.75rem;
+    height: 2.75rem;
+    margin-bottom: 0.75rem;
   }
 }
 .form-option-icon-wrap--large {
@@ -905,20 +955,22 @@
 }
 
 .form-option-title {
-  font-size: 1rem;
+  font-size: 0.9375rem;
   font-weight: 600;
   color: var(--form-text);
-  margin-bottom: var(--form-spacing-sm);
+  margin-bottom: 0.2rem;
+  line-height: 1.3;
 }
 @media (min-width: 640px) {
   .form-option-title {
-    font-size: 1.125rem;
+    font-size: 1rem;
   }
 }
 .form-option-desc {
-  font-size: 0.75rem;
+  font-size: 0.8125rem;
   color: var(--form-text-muted);
-  margin-bottom: var(--form-spacing-md);
+  margin-bottom: 0.5rem;
+  line-height: 1.4;
 }
 @media (min-width: 640px) {
   .form-option-desc {
@@ -926,43 +978,76 @@
   }
 }
 .form-option-price {
-  margin-bottom: var(--form-spacing-md);
+  margin-bottom: 0.35rem;
+}
+.form-option-price--corner,
+.form-option-price--inline {
+  margin: 0;
+  flex-shrink: 0;
 }
 .form-option-price__value {
-  font-size: 1.125rem;
-  font-weight: 700;
+  font-size: 1rem;
+  font-weight: 600;
   color: var(--form-text);
+}
+.form-option-price--corner .form-option-price__value,
+.form-option-price--inline .form-option-price__value {
+  display: inline-block;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: #4b5563;
+  padding: 0.2rem 0.5rem;
+  border-radius: 0.375rem;
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  line-height: 1.2;
+}
+.form-option-card--selected .form-option-price--corner .form-option-price__value,
+.form-option-card--selected .form-option-price--inline .form-option-price__value {
+  color: var(--form-option-selected-accent);
+  background: #ffffff;
+  border-color: #bfdbfe;
 }
 @media (min-width: 640px) {
   .form-option-price__value {
-    font-size: 1.25rem;
+    font-size: 1.0625rem;
+  }
+  .form-option-price--corner .form-option-price__value,
+  .form-option-price--inline .form-option-price__value {
+    font-size: 0.875rem;
   }
 }
 
-/* Radio dot (custom circle) */
-.form-option-radio {
-  width: 1.25rem;
-  height: 1.25rem;
-  min-width: 1.25rem;
-  min-height: 1.25rem;
-  border-radius: 9999px;
-  border: var(--form-border-strong);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  margin-top: var(--form-spacing-lg);
-  margin-left: auto;
-  margin-right: auto;
-  background: white;
+/* Tick box (replaces radio) */
+.form-option-check {
+  position: relative;
+  display: inline-block;
+  width: 1.125rem;
+  height: 1.125rem;
+  min-width: 1.125rem;
+  min-height: 1.125rem;
+  border: 1.5px solid #d1d5db;
+  border-radius: 0.3rem;
+  background: #ffffff;
   flex-shrink: 0;
+  transition:
+    border-color var(--form-transition),
+    background-color var(--form-transition);
 }
-.form-option-card--selected .form-option-radio {
-  border-color: var(--form-accent);
-  background: linear-gradient(
-    135deg,
-    rgba(114, 144, 111, 0.92) 0%,
-    rgba(114, 144, 111, 0.68) 100%
-  );
+.form-option-check--selected {
+  border-color: var(--form-option-selected-accent);
+  background: var(--form-option-selected-accent);
+}
+.form-option-check--selected::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 46%;
+  width: 0.28rem;
+  height: 0.5rem;
+  border: solid #ffffff;
+  border-width: 0 2px 2px 0;
+  transform: translate(-50%, -50%) rotate(45deg);
 }
 
 /* Step 2 card slimming */
@@ -996,10 +1081,6 @@
   margin-bottom: 0.55rem;
 }
 
-.form-options--step2-fit .form-option-card__radio-wrap {
-  margin-top: 0.55rem;
-}
-
 @media (min-width: 640px) {
   .form-options--step2-fit {
     gap: 1rem;
@@ -1028,24 +1109,6 @@
     font-size: 0.84rem;
   }
 }
-.form-option-radio__inner {
-  display: block;
-  width: 0.625rem;
-  height: 0.625rem;
-  border-radius: 9999px;
-  background: white;
-}
-.form-option-radio--inline {
-  margin-top: 0.25rem;
-  margin-left: 0;
-  margin-right: 0;
-  flex-shrink: 0;
-}
-.form-option-card--row .form-option-radio .form-option-radio__inner {
-  width: 0.5rem;
-  height: 0.5rem;
-}
-
 /* ============================================
    DISCLAIMER BLOCK (below options, above CTA)
    ============================================ */
@@ -1068,23 +1131,74 @@
 }
 
 /* ============================================
-   CTA BUTTON (full-width primary action)
+   CTA BUTTON (primary action — clinical style)
    ============================================ */
-.form-cta {
-  width: 100%;
+.form-page .form-cta,
+.form-page [data-slot="button"].form-cta {
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  width: fit-content;
+  max-width: 100%;
+  min-width: 9.5rem;
+  height: auto !important;
+  min-height: 2.75rem;
+  margin-left: auto;
+  margin-right: 0;
+  box-sizing: border-box;
+  padding: 0.625rem 1.75rem !important;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: 0.02em;
+  text-align: center;
+  white-space: nowrap;
+  border-radius: var(--form-card-radius);
   border-top: 2.5px solid #333;
   border-left: 2.5px solid #333;
   border-right: 4px solid #333;
   border-bottom: 4px solid #333;
-  box-sizing: border-box;
-  padding: var(--form-spacing-md) var(--form-spacing-lg);
-  font-size: 1rem;
-  font-weight: 700;
 }
+
+.form-page .form-cta.btn-secondary {
+  background-image: var(--btn-texture-colored), var(--btn-texture-hatch);
+  background-color: #72906f;
+  color: #ffffff;
+  box-shadow: var(--btn-texture-inset), 0 2px 4px -1px rgba(0, 0, 0, 0.08);
+}
+
+.form-page .form-cta.btn-secondary:hover:not(:disabled) {
+  background-color: #72906f;
+  color: #ffffff;
+  box-shadow: var(--btn-texture-inset), 0 4px 8px -2px rgba(0, 0, 0, 0.12);
+  transform: translateY(-1px);
+}
+
+.form-page .form-cta.btn-secondary:active:not(:disabled) {
+  background-color: #637d61;
+  color: #ffffff;
+  transform: translateY(0);
+  box-shadow: var(--btn-texture-inset), 0 1px 2px rgba(0, 0, 0, 0.08);
+}
+
+.form-page .form-cta.btn-secondary:disabled,
+.form-page .form-cta.btn-secondary[disabled] {
+  background-image: none;
+  background-color: #d1d5db;
+  color: #6b7280;
+  opacity: 1;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
 @media (min-width: 640px) {
-  .form-cta {
-    padding: var(--form-spacing-lg) var(--form-spacing-lg);
-    font-size: 1.125rem;
+  .form-page .form-cta,
+  .form-page [data-slot="button"].form-cta {
+    min-width: 10.5rem;
+    min-height: 2.875rem;
+    padding: 0.7rem 2rem !important;
+    font-size: 1rem;
   }
 }
 
@@ -1377,6 +1491,55 @@
     font-size: 1.25rem;
   }
 }
+
+/* Main step titles — comic pill (matches landing funktioniert-section__pill) */
+.form-card > .form-section-title,
+.form-card > .form-question,
+.form-page--mashallah .form-header__title-card-title {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  max-width: 100%;
+  box-sizing: border-box;
+  padding: 0.45rem 0.75rem;
+  margin-bottom: var(--form-spacing-md);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  line-height: 1.35;
+  text-align: center;
+  color: #0f172a;
+  background: #ffffff;
+  border-style: solid;
+  border-color: #333;
+  border-width: 2.5px 4px 4px 2.5px;
+  border-radius: 0.5rem;
+  background-image: none;
+  -webkit-background-clip: unset;
+  background-clip: unset;
+  -webkit-text-fill-color: #0f172a;
+  position: static;
+  left: auto;
+}
+@media (min-width: 640px) {
+  .form-card > .form-section-title,
+  .form-card > .form-question,
+  .form-page--mashallah .form-header__title-card-title {
+    padding: 0.5rem 0.85rem;
+    font-size: 0.75rem;
+  }
+}
+.form-card:has(> .form-section-title),
+.form-card:has(> .form-question--center) {
+  text-align: center;
+}
+.form-card:has(> .form-question:not(.form-question--center)) {
+  text-align: left;
+}
+.form-page--mashallah .form-header__title-card {
+  text-align: center;
+}
 .form-section-hint {
   font-size: 0.75rem;
   color: var(--form-text-muted);
@@ -1444,25 +1607,146 @@
 .form-step3-options {
   margin-bottom: 2.5rem;
 }
-.form-step3-option-card {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1rem;
+
+@media (min-width: 640px) {
+  .form-options--step1-fit {
+    align-items: stretch;
+  }
+
+  .form-options--step1-fit .form-option-card {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .form-options--step1-fit .form-option-desc {
+    flex: 1;
+    min-height: 2.75em;
+    margin-bottom: 0;
+  }
 }
+
+.form-options--step3-fit {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.75rem;
+  margin-bottom: var(--form-spacing-xl);
+}
+@media (min-width: 640px) {
+  .form-options--step3-fit {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.85rem;
+    align-items: stretch;
+  }
+
+  .form-step3-option-card {
+    height: 100%;
+    min-height: 6.5rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .form-step3-option-body {
+    flex: 1;
+    align-items: center;
+    width: 100%;
+  }
+
+  .form-step3-option-desc {
+    min-height: 2.8em;
+  }
+}
+
+.form-step3-option-card {
+  position: relative;
+  display: block;
+  width: 100%;
+  max-width: none;
+  text-align: left;
+  border-radius: 0.5rem;
+  padding: 0.9rem 2.5rem 0.9rem 0.9rem;
+}
+
+.form-step3-option-check {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  margin-left: 0;
+}
+
+.form-step3-option-body {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
+.form-step3-option-icon-wrap {
+  width: 2.5rem;
+  height: 2.5rem;
+  margin-bottom: 0;
+  border-radius: 0.375rem;
+  flex-shrink: 0;
+}
+
+.form-step3-option-text {
+  flex: 1;
+  min-width: 0;
+  padding-top: 0.1rem;
+}
+
+.form-step3-option-card .form-option-title {
+  margin-bottom: 0.15rem;
+}
+
 .form-step3-option-icon {
-  width: 2rem;
-  height: 2rem;
+  width: 1.35rem;
+  height: 1.35rem;
 }
 @media (min-width: 640px) {
   .form-step3-option-icon {
-    width: 2.5rem;
-    height: 2.5rem;
+    width: 1.5rem;
+    height: 1.5rem;
+  }
+}
+.form-brain-pain-icon {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.35rem;
+  height: 1.35rem;
+}
+@media (min-width: 640px) {
+  .form-brain-pain-icon {
+    width: 1.5rem;
+    height: 1.5rem;
+  }
+}
+.form-brain-pain-icon__brain {
+  width: 100%;
+  height: 100%;
+}
+.form-brain-pain-icon__bolt {
+  position: absolute;
+  top: -0.12rem;
+  right: -0.14rem;
+  width: 0.62rem;
+  height: 0.62rem;
+  stroke-width: 2.75;
+}
+@media (min-width: 640px) {
+  .form-brain-pain-icon__bolt {
+    top: -0.14rem;
+    right: -0.16rem;
+    width: 0.68rem;
+    height: 0.68rem;
   }
 }
 .form-step3-option-desc {
-  line-height: 1.625;
+  line-height: 1.4;
   overflow-wrap: anywhere;
+  margin-bottom: 0;
 }
 
 .form-step4-header {
@@ -1525,6 +1809,273 @@
   margin-top: 2.5rem;
 }
 
+/* Step 8 — Zusammenfassung recap */
+.form-review-sections {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin-bottom: var(--form-spacing-lg);
+  text-align: left;
+}
+.form-review-section {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.07);
+  padding-bottom: 1rem;
+  margin-bottom: 0.85rem;
+  text-align: left;
+}
+.form-review-section:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+.form-review-section__header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem 0.75rem;
+  margin-bottom: 0.65rem;
+}
+.form-review-section__title {
+  margin: 0;
+  flex: 1 1 12rem;
+  min-width: 0;
+  font-size: 0.875rem;
+  font-weight: 600;
+  line-height: 1.35;
+  color: var(--form-text);
+  text-align: left;
+}
+.form-page .form-review-edit,
+.form-page [data-slot="button"].form-review-edit {
+  flex-shrink: 0;
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  width: fit-content;
+  min-width: auto;
+  height: auto !important;
+  min-height: 2.125rem;
+  margin: 0;
+  padding: 0.4rem 0.9rem !important;
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  border-radius: var(--form-card-radius);
+  border-top: 2.5px solid #333;
+  border-left: 2.5px solid #333;
+  border-right: 4px solid #333;
+  border-bottom: 4px solid #333;
+  box-sizing: border-box;
+  cursor: pointer;
+}
+.form-page .form-review-edit.btn-secondary,
+.form-page [data-slot="button"].form-review-edit.btn-secondary {
+  background-image: var(--btn-texture-colored), var(--btn-texture-hatch);
+  background-color: #72906f;
+  color: #ffffff;
+  box-shadow: var(--btn-texture-inset), 0 2px 4px -1px rgba(0, 0, 0, 0.08);
+}
+.form-page .form-review-edit.btn-secondary:hover:not(:disabled),
+.form-page [data-slot="button"].form-review-edit.btn-secondary:hover:not(:disabled) {
+  background-color: #72906f;
+  color: #ffffff;
+  box-shadow: var(--btn-texture-inset), 0 4px 8px -2px rgba(0, 0, 0, 0.12);
+  transform: translateY(-1px);
+}
+.form-page .form-review-edit.btn-secondary:active:not(:disabled),
+.form-page [data-slot="button"].form-review-edit.btn-secondary:active:not(:disabled) {
+  background-color: #637d61;
+  color: #ffffff;
+  transform: translateY(0);
+  box-shadow: var(--btn-texture-inset), 0 1px 2px rgba(0, 0, 0, 0.08);
+}
+.form-page .form-review-edit.btn-secondary:disabled,
+.form-page [data-slot="button"].form-review-edit.btn-secondary:disabled {
+  background-image: none;
+  background-color: #d1d5db;
+  color: #6b7280;
+  opacity: 1;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+@media (min-width: 640px) {
+  .form-page .form-review-edit,
+  .form-page [data-slot="button"].form-review-edit {
+    min-height: 2.25rem;
+    padding: 0.45rem 1rem !important;
+    font-size: 0.8125rem;
+  }
+}
+.form-review-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+.form-review-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  padding: 0.55rem 0;
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
+}
+.form-review-row:first-child {
+  border-top: none;
+  padding-top: 0;
+}
+.form-review-row__label {
+  margin: 0;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--form-text-muted);
+  line-height: 1.35;
+  text-align: left;
+}
+.form-review-row__value {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--form-text);
+  line-height: 1.45;
+  text-align: left;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+}
+@media (min-width: 640px) {
+  .form-review-section__title {
+    font-size: 0.9375rem;
+  }
+  .form-review-row {
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.35rem 0;
+  }
+  .form-review-row__label {
+    flex: 0 0 40%;
+    max-width: 40%;
+  }
+  .form-review-row__value {
+    flex: 1 1 auto;
+    min-width: 0;
+    text-align: right;
+  }
+}
+
+/* ============================================
+   FLOWLESS QUESTIONNAIRE (no outer card box)
+   ============================================ */
+.form-page--step1-fit,
+.form-page--step2-fit,
+.form-page--step3-fit,
+.form-page--step4-fit,
+.form-page--mashallah {
+  background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 55%, #eef2f7 100%);
+}
+
+.form-page--step1-fit .form-card,
+.form-page--step2-fit .form-card,
+.form-page--step3-fit .form-card,
+.form-page--step4-fit .form-card,
+.form-page--mashallah .form-card {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  padding: 0;
+  border-radius: 0;
+}
+
+.form-page--step1-fit .form-card > .form-question,
+.form-page--step2-fit .form-card > .form-question,
+.form-page--step3-fit .form-card > .form-section-title,
+.form-page--step4-fit .form-card > .form-section-title,
+.form-page--step5-fit .form-card > .form-section-title,
+.form-page--step6-fit .form-card > .form-section-title,
+.form-page--step7-fit .form-card > .form-section-title,
+.form-page--step8-fit .form-card > .form-section-title,
+.form-page--mashallah .form-header__title-card-title {
+  margin-bottom: 1.25rem;
+}
+
+.form-page--step1-fit .form-question-hint,
+.form-page--step2-fit .form-question-hint,
+.form-page--step3-fit .form-section-hint,
+.form-page--step4-fit .form-section-hint {
+  color: #64748b;
+  margin-bottom: 1.25rem;
+}
+
+.form-page--step1-fit .form-disclaimer,
+.form-page--step2-fit .form-disclaimer,
+.form-page--step3-fit .form-disclaimer,
+.form-page--step4-fit .form-disclaimer {
+  border-top: none;
+  padding-top: 0;
+  margin-bottom: 1.25rem;
+}
+
+.form-page--step1-fit .form-progress,
+.form-page--step2-fit .form-progress,
+.form-page--step3-fit .form-progress,
+.form-page--step4-fit .form-progress {
+  margin-top: 1.5rem;
+  margin-bottom: 0;
+}
+
+.form-page--step1-fit .form-progress__track,
+.form-page--step2-fit .form-progress__track,
+.form-page--step3-fit .form-progress__track,
+.form-page--step4-fit .form-progress__track {
+  height: 0.375rem;
+  border: none;
+  background: #e2e8f0;
+  box-shadow: none;
+}
+
+.form-page--step1-fit .form-progress__fill,
+.form-page--step2-fit .form-progress__fill,
+.form-page--step3-fit .form-progress__fill,
+.form-page--step4-fit .form-progress__fill {
+  background: linear-gradient(90deg, #3b82f6 0%, #60a5fa 100%);
+  box-shadow: none;
+}
+
+.form-page--step1-fit .form-progress__summary,
+.form-page--step2-fit .form-progress__summary,
+.form-page--step3-fit .form-progress__summary,
+.form-page--step4-fit .form-progress__summary {
+  font-size: 0.8125rem;
+  color: #64748b;
+}
+
+.form-page--step1-fit .form-back-button,
+.form-page--step2-fit .form-back-button,
+.form-page--step3-fit .form-back-button,
+.form-page--step4-fit .form-back-button,
+.form-page--mashallah .form-back-button {
+  border: 1px solid #e2e8f0;
+  background: rgba(255, 255, 255, 0.85);
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+  border-radius: 0.5rem;
+}
+
+.form-page--step1-fit .form-header__back-wrap,
+.form-page--step2-fit .form-header__back-wrap,
+.form-page--step3-fit .form-header__back-wrap,
+.form-page--step4-fit .form-header__back-wrap {
+  margin-bottom: 1.25rem;
+}
+
+.form-page--mashallah .form-header__postcode-inline--boxed {
+  border: 1px solid #e2e8f0;
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+  border-radius: 0.5rem;
+}
+
 /* ============================================
    STEP 1 DESKTOP FIT (no-scroll target)
    ============================================ */
@@ -1543,22 +2094,20 @@
     padding-bottom: 1.55rem;
   }
 
-  .form-card--step1-fit {
-    padding: 2.25rem 1.5rem 1.9rem;
-  }
-
   .form-card--step1-fit .form-question {
-    font-size: 1.35rem;
     margin-bottom: 1.6rem;
-    line-height: 1.2;
   }
 
   .form-options--step1-fit {
     gap: 1rem;
     margin-bottom: 1.6rem;
+    align-items: stretch;
   }
 
   .form-options--step1-fit .form-option-card {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
     padding: 1.55rem 0.95rem;
   }
 
@@ -1576,15 +2125,9 @@
   .form-options--step1-fit .form-option-desc {
     font-size: 0.82rem;
     line-height: 1.38;
-    min-height: auto;
-  }
-
-  .form-options--step1-fit .form-option-price {
-    margin-top: 0.9rem;
-  }
-
-  .form-options--step1-fit .form-option-card__radio-wrap {
-    margin-top: 0.9rem;
+    flex: 1;
+    min-height: 2.75em;
+    margin-bottom: 0;
   }
 
   .form-disclaimer--step1-fit {
@@ -1598,8 +2141,7 @@
   }
 
   .form-cta--step1-fit {
-    padding-top: 1.15rem;
-    padding-bottom: 1.15rem;
+    min-height: 2.875rem;
     font-size: 1rem;
   }
 
@@ -1615,10 +2157,6 @@
     max-width: 80rem;
     padding-top: 1.55rem;
     padding-bottom: 1.55rem;
-  }
-
-  .form-card--step2-fit {
-    padding: 2.25rem 1.5rem 1.9rem;
   }
 
   .form-card--step2-fit .form-question {
@@ -1660,18 +2198,13 @@
     margin-bottom: 0.5rem;
   }
 
-  .form-options--step2-fit .form-option-card__radio-wrap {
-    margin-top: 0.55rem;
-  }
-
   .form-disclaimer--step2-fit {
     margin-bottom: 1.4rem;
     padding-top: 1.05rem;
   }
 
   .form-cta--step2-fit {
-    padding-top: 1.15rem;
-    padding-bottom: 1.15rem;
+    min-height: 2.875rem;
     font-size: 1rem;
   }
 
@@ -1691,10 +2224,9 @@
 
   .form-card--step3-fit {
     max-width: 80rem;
-    padding: 2.25rem 1.5rem 1.9rem;
   }
 
-  .form-card--step3-fit .form-section-title {
+  .form-card--step3-fit > .form-section-title {
     margin-bottom: 0.9rem;
   }
 
@@ -1703,30 +2235,37 @@
   }
 
   .form-options--step3-fit {
-    gap: 1rem;
+    gap: 0.85rem;
     margin-bottom: 1.6rem;
+    align-items: stretch;
   }
 
-  .form-options--step3-fit .form-option-card {
-    padding: 1.2rem 1rem;
+  .form-step3-option-card {
+    height: 100%;
+    min-height: 6.75rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 1rem 2.75rem 1rem 1rem;
   }
 
-  .form-options--step3-fit .form-step3-option-icon {
-    width: 2.2rem;
-    height: 2.2rem;
+  .form-step3-option-body {
+    flex: 1;
+    align-items: center;
+    width: 100%;
   }
 
-  .form-options--step3-fit .form-option-title {
-    margin-bottom: 0.45rem;
+  .form-step3-option-desc {
+    min-height: 2.8em;
   }
 
-  .form-options--step3-fit .form-step3-option-desc {
-    line-height: 1.35;
+  .form-step3-option-check {
+    top: 0.85rem;
+    right: 0.85rem;
   }
 
   .form-cta--step3-fit {
-    padding-top: 1.15rem;
-    padding-bottom: 1.15rem;
+    min-height: 2.875rem;
     font-size: 1rem;
   }
 
@@ -1746,10 +2285,9 @@
 
   .form-card--step4-fit {
     max-width: 80rem;
-    padding: 2.25rem 1.5rem 1.9rem;
   }
 
-  .form-card--step4-fit .form-section-title {
+  .form-card--step4-fit > .form-section-title {
     margin-bottom: 0.9rem;
   }
 
@@ -1779,8 +2317,7 @@
   }
 
   .form-cta--step4-fit {
-    padding-top: 1.15rem;
-    padding-bottom: 1.15rem;
+    min-height: 2.875rem;
     font-size: 1rem;
   }
 }
