@@ -6,7 +6,6 @@ const HEADER_OFFSET = 70
 const SWITCH_EPSILON = 2
 const WHEEL_DELTA_THRESHOLD = 4
 const MOBILE_LANDING_MQ = '(max-width: 767px)'
-/** Matches mobile-navbar visibility offset + gap so funktioniert blue top sits below mnav */
 const MOBILE_NAV_CLEARANCE_FALLBACK = 70
 
 let activeScrollFrame = 0
@@ -173,9 +172,10 @@ function getMobileNavbarClearance(): number {
 
   const topPx = Number.parseFloat(getComputedStyle(mnav).top) || 12
   const height = mnav.getBoundingClientRect().height || 44
-  return topPx + height + -58
+  return topPx + height - 58
 }
 
+/** Mobile discover scroll position (blue line below mnav); no URL change. */
 function getMobileDiscoverScrollTarget(): number | null {
   const funktioniert = document.getElementById('how-funktioniert')
   if (!funktioniert) return getMobileHeroScrollTarget()
@@ -223,13 +223,8 @@ export function scrollLandingToMain(): void {
     const mobileTarget = getMobileDiscoverScrollTarget()
     if (mobileTarget !== null && mobileTarget > window.scrollY + SWITCH_EPSILON) {
       smoothScrollLandingTo(mobileTarget)
-      try {
-        window.history.pushState({}, '', '/#how-funktioniert')
-      } catch {
-        /* ignore */
-      }
-      return
     }
+    return
   }
 
   scrollLandingToSection('how-funktioniert')
