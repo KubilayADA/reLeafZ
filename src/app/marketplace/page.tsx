@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { Product, API_BASE } from '@/lib/api'
 import { useRouter } from 'next/navigation'
-import { Check, Leaf, ArrowRight, Package, Loader2, Trash2 } from 'lucide-react'
+import { Check, Leaf, ArrowRight, Package, Loader2, Trash2, ShoppingBag } from 'lucide-react'
 import { isLocalAccessBypassEnabled } from '@/lib/devAccess'
 import { getStrainImage, STRAIN_PLACEHOLDER_IMAGE } from '@/lib/strains'
 import {
@@ -406,11 +406,23 @@ export default function MarketplacePage() {
   }, 0)
 
   const displayDeliveryFee = selectedDeliveryFee
+  const cartGrandTotal = totalPrice + PRESCRIPTION_FEE + displayDeliveryFee
+
+  const marketplaceHeader = (
+    <MarketplaceLogoHeader
+      cartCount={selectedProducts.size}
+      cartTotal={cartGrandTotal}
+      onCheckout={handleCheckout}
+      checkoutDisabled={isSubmitDisabled()}
+      submitting={submitting}
+      validationError={validationError}
+    />
+  )
 
   if (!isClient || loading) {
     return (
       <div className="marketplace-page">
-        <MarketplaceLogoHeader />
+        {marketplaceHeader}
         <div className="marketplace-loading">
           <div className="marketplace-loading-inner">
             <Loader2 className="marketplace-loading-icon" aria-hidden />
@@ -424,7 +436,7 @@ export default function MarketplacePage() {
   if (error) {
     return (
       <div className="marketplace-page">
-        <MarketplaceLogoHeader />
+        {marketplaceHeader}
         <div className="marketplace-error">
           <div className="marketplace-error-inner">
             <div className="marketplace-error-card">
@@ -442,7 +454,7 @@ export default function MarketplacePage() {
 
   return (
     <div className="marketplace-page">
-      <MarketplaceLogoHeader />
+      {marketplaceHeader}
 
       <main className="marketplace-main">
         <div className="marketplace-intro">
@@ -680,88 +692,65 @@ export default function MarketplacePage() {
           </section>
         </div>
       </main>
-
-      <div
-        className={`marketplace-floating-cart${
-          selectedProducts.size > 0 ? ' marketplace-floating-cart--visible' : ' marketplace-floating-cart--hidden'
-        }`}
-      >
-        <div className="marketplace-cart-wrap">
-          <div className="marketplace-cart-panel">
-            <div className="marketplace-cart-row-main">
-              <div className="marketplace-cart-icon-wrap">
-                <div className="marketplace-cart-icon-bg">
-                  <Leaf aria-hidden />
-                </div>
-                <div className="marketplace-cart-badge">{selectedProducts.size}</div>
-              </div>
-              <div className="marketplace-cart-totals">
-                <p className="marketplace-cart-label">Gesamtsumme</p>
-                <p className="marketplace-cart-amount">
-                  €{(totalPrice + PRESCRIPTION_FEE + displayDeliveryFee).toFixed(2)}
-                </p>
-              </div>
-              <button
-                type="button"
-                onClick={handleCheckout}
-                disabled={isSubmitDisabled() || submitting}
-                className={`marketplace-cart-cta${!isSubmitDisabled() && !submitting ? ' marketplace-cart-cta--active' : ' marketplace-cart-cta--disabled'}`}
-              >
-                {submitting ? (
-                  <Loader2 className="marketplace-cart-spinner" aria-hidden />
-                ) : (
-                  <>
-                    <span>Weiter</span>
-                    <ArrowRight aria-hidden />
-                  </>
-                )}
-              </button>
-            </div>
-            <div className="marketplace-cart-details">
-              <div className="marketplace-cart-details-inner">
-                <div className="marketplace-cart-chips">
-                  {Array.from(selectedProducts).map(id => {
-                    const product = products.find(p => p.id === id)
-                    if (!product) return null
-                    return (
-                      <span key={id} className="marketplace-cart-chip">
-                        {product.name.split(' - ')[1]?.split(' ')[0] || product.name.split(' ')[0]}
-                        <span className="marketplace-cart-chip-qty">{quantities[id] || getDefaultQuantity(product)}g</span>
-                      </span>
-                    )
-                  })}
-                </div>
-                <div className="marketplace-cart-breakdown">
-                  <div className="marketplace-cart-breakdown-row">
-                    <span>Produkte</span>
-                    <span>€{totalPrice.toFixed(2)}</span>
-                  </div>
-                  <div className="marketplace-cart-breakdown-row">
-                    <span>Rezeptgebühr</span>
-                    <span>€{PRESCRIPTION_FEE.toFixed(2)}</span>
-                  </div>
-                  <div className="marketplace-cart-breakdown-row">
-                    <span>Lieferung</span>
-                    <span>€{displayDeliveryFee.toFixed(2)}</span>
-                  </div>
-                </div>
-                {validationError && <p className="marketplace-cart-validation">{validationError}</p>}
-              </div>
-            </div>
-          </div>
-          <div className="marketplace-cart-glow" aria-hidden />
-        </div>
-      </div>
     </div>
   )
 }
 
-function MarketplaceLogoHeader() {
+interface MarketplaceLogoHeaderProps {
+  cartCount: number
+  cartTotal: number
+  onCheckout: () => void
+  checkoutDisabled: boolean
+  submitting: boolean
+  validationError?: string | null
+}
+
+function MarketplaceLogoHeader({
+  cartCount,
+  cartTotal,
+  onCheckout,
+  checkoutDisabled,
+  submitting,
+  validationError,
+}: MarketplaceLogoHeaderProps) {
   return (
     <header className="marketplace-logo-bar">
       <Link href="/" className="marketplace-logo-link" aria-label="reLeafZ Startseite">
         <img src="/logo1.png" alt="reLeafZ" className="marketplace-logo" />
       </Link>
+
+      {cartCount > 0 && (
+        <div className="marketplace-nav-cart">
+          <div className="marketplace-nav-cart-summary">
+            <span className="marketplace-nav-cart-icon-wrap" aria-hidden>
+              <ShoppingBag />
+              <span className="marketplace-nav-cart-badge">{cartCount}</span>
+            </span>
+            <div className="marketplace-nav-cart-total">
+              <span className="marketplace-nav-cart-label">Gesamt</span>
+              <span className="marketplace-nav-cart-amount">€{cartTotal.toFixed(2)}</span>
+            </div>
+          </div>
+          {validationError && (
+            <p className="marketplace-nav-cart-error">{validationError}</p>
+          )}
+          <button
+            type="button"
+            onClick={onCheckout}
+            disabled={checkoutDisabled || submitting}
+            className="marketplace-nav-cart-btn"
+          >
+            {submitting ? (
+              <Loader2 className="marketplace-nav-cart-spinner" aria-hidden />
+            ) : (
+              <>
+                <span>Weiter</span>
+                <ArrowRight aria-hidden />
+              </>
+            )}
+          </button>
+        </div>
+      )}
     </header>
   )
 }
