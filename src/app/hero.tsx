@@ -9,7 +9,7 @@ import {
   PhoneCall, Store, HeartHandshake,
 } from 'lucide-react'
 import {
-  scrollLandingToMain,
+  scrollHeroToLanding,
   scrollLandingToSection,
   scrollToLandingTop,
 } from '@/lib/scroll'
@@ -21,8 +21,6 @@ import './hero-mobile.css'
 
 interface HeroProps {
   setDialogOpen: (open: boolean) => void
-  /** Scroll to #faq; parent may sync URL with pushState (no overflow lock). */
-  onScrollToAblauf: () => void
   landingTheme: 'dark' | 'light'
 }
 
@@ -83,6 +81,21 @@ function HeroTopNav() {
   )
 }
 
+function TrustCard({ icon, title, sub }: { icon: React.ReactNode; title: string; sub: string }) {
+  return (
+    <div className="mobile-hero__trust-card">
+      <span className="mobile-hero__trust-icon">{icon}</span>
+      <div className="mobile-hero__trust-text">
+        <div className="mobile-hero__trust-title">{title}</div>
+        <div className="mobile-hero__trust-sub">{sub}</div>
+      </div>
+      <span className="mobile-hero__trust-check">
+        <Check />
+      </span>
+    </div>
+  )
+}
+
 function HeroAccordionRows({
   setDialogOpen,
   onDiscover,
@@ -114,7 +127,7 @@ function HeroAccordionRows({
   }, [openRow, onOpenRowChange])
 
   React.useEffect(() => {
-    if (openRow !== null) {
+    if (openRow === 'trust') {
       document.documentElement.dataset.heroAccordionOpen = 'true'
     } else {
       delete document.documentElement.dataset.heroAccordionOpen
@@ -137,7 +150,7 @@ function HeroAccordionRows({
       onDiscover()
       return
     }
-    scrollLandingToMain()
+    scrollHeroToLanding()
   }
 
   return (
@@ -287,7 +300,7 @@ export function MobileHero({ setDialogOpen }: { setDialogOpen: (open: boolean) =
       <HeroAccordionRows
         setDialogOpen={setDialogOpen}
         scrollAnchorRef={heroRef}
-        onDiscover={scrollLandingToMain}
+        onDiscover={scrollHeroToLanding}
       />
     </section>
   )
@@ -295,7 +308,6 @@ export function MobileHero({ setDialogOpen }: { setDialogOpen: (open: boolean) =
 
 export default function Hero({
   setDialogOpen,
-  onScrollToAblauf,
   landingTheme,
 }: HeroProps) {
   const [openAccordionRow, setOpenAccordionRow] = React.useState<AccordionRow>(null)
@@ -304,7 +316,7 @@ export default function Hero({
   return (
     <section
       id="hero"
-      className={`hero-section hero-section--${landingTheme} pointer-events-none z-0 flex w-full min-h-[100dvh] flex-col pt-16 pb-28 sm:pt-20 sm:pb-32 ${
+      className={`hero-section hero-section--${landingTheme} pointer-events-none z-0 flex w-full min-h-[100dvh] flex-col pt-14 pb-28 sm:pt-16 sm:pb-32 lg:pt-14 xl:pt-20 ${
         isHeroExpanded
           ? 'hero-section--expanded relative overflow-visible'
           : 'hero-section--fixed fixed inset-0 overflow-hidden'
@@ -365,11 +377,11 @@ export default function Hero({
         <button
           type="button"
           aria-label="Go to next section"
-          className="hero-scroll-overlay pointer-events-auto absolute inset-0 z-[1] bg-transparent"
-          onClick={onScrollToAblauf}
+          className="hero-scroll-overlay pointer-events-auto absolute inset-x-0 bottom-0 z-[1] bg-transparent"
+          onClick={scrollHeroToLanding}
         />
 
-        <div className="hero-logo-bar pointer-events-none absolute top-5 right-0 left-0 z-20 sm:top-8">
+        <div className="hero-logo-bar pointer-events-none absolute top-4 right-0 left-0 z-20 sm:top-6 lg:top-5 xl:top-8">
           <div className="hero-logo-bar__row">
             <a
               href="#hero"
@@ -386,47 +398,21 @@ export default function Hero({
           <div className="hero-logo-divider" aria-hidden />
         </div>
 
-        <a
-          href="#faq"
-          className="hero-scroll-cta pointer-events-auto"
-          onClick={(e) => {
-            e.preventDefault()
-            onScrollToAblauf()
-          }}
-        >
-        </a>
-
         <div className="hero-layout">
-          <div
-            className="hero-layout__content hero-accordion pointer-events-auto"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <HeroAccordionRows
-              setDialogOpen={setDialogOpen}
-              onDiscover={scrollLandingToMain}
-              onOpenRowChange={setOpenAccordionRow}
-            />
-          </div>
-
           <div className="hero-layout__media">
             <HeroImageCarousel />
+          </div>
+
+          <div className="hero-layout__content hero-accordion pointer-events-auto">
+            <HeroAccordionRows
+              setDialogOpen={setDialogOpen}
+              onDiscover={scrollHeroToLanding}
+              onOpenRowChange={setOpenAccordionRow}
+            />
           </div>
         </div>
     </section>
   )
 }
 
-function TrustCard({ icon, title, sub }: { icon: React.ReactNode; title: string; sub: string }) {
-  return (
-    <div className="mobile-hero__trust-card">
-      <span className="mobile-hero__trust-icon">{icon}</span>
-      <div className="mobile-hero__trust-text">
-        <div className="mobile-hero__trust-title">{title}</div>
-        <div className="mobile-hero__trust-sub">{sub}</div>
-      </div>
-      <span className="mobile-hero__trust-check">
-        <Check />
-      </span>
-    </div>
-  )
-}
+

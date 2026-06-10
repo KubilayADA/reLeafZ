@@ -4,21 +4,37 @@
 
 const HEADER_OFFSET = 70
 const SWITCH_EPSILON = 2
-const SWITCH_IDLE_MS = 90
+const WHEEL_DELTA_THRESHOLD = 4
+const MOBILE_LANDING_MQ = '(max-width: 767px)'
+/** Matches mobile-navbar visibility offset + gap so funktioniert blue top sits below mnav */
+const MOBILE_NAV_CLEARANCE_FALLBACK = 70
 
 let activeScrollFrame = 0
 let landingProgrammaticScrollActive = false
 
-function easeInOutCubic(t: number): number {
-  return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2
+function isMobileLandingViewport(): boolean {
+  return window.matchMedia(MOBILE_LANDING_MQ).matches
+}
+
+function easeOutQuint(t: number): number {
+  return 1 - Math.pow(1 - t, 5)
+}
+
+function easeInOutQuart(t: number): number {
+  return t < 0.5 ? 8 * t * t * t * t : 1 - Math.pow(-2 * t + 2, 4) / 2
 }
 
 function setLandingProgrammaticScroll(active: boolean): void {
+  if (isMobileLandingViewport()) return
+
   landingProgrammaticScrollActive = active
   if (active) {
     document.documentElement.dataset.landingProgrammaticScroll = 'true'
   } else {
     delete document.documentElement.dataset.landingProgrammaticScroll
+  }
+  if (typeof document !== 'undefined') {
+    document.documentElement.style.overflowY = active ? 'hidden' : ''
   }
 }
 
@@ -26,9 +42,24 @@ export function isLandingProgrammaticScrollActive(): boolean {
   return landingProgrammaticScrollActive
 }
 
+function getScrollDuration(distance: number): number {
+  const abs = Math.abs(distance)
+  const viewport = window.innerHeight || 800
+  const ratio = abs / viewport
+  return Math.min(1050, Math.max(780, 780 + ratio * 180))
+}
+
 function smoothScrollLandingTo(targetTop: number): void {
   const clampedTarget = Math.max(0, targetTop)
   const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+
+  if (isMobileLandingViewport()) {
+    window.scrollTo({
+      top: clampedTarget,
+      behavior: prefersReducedMotion ? 'auto' : 'smooth',
+    })
+    return
+  }
 
   activeScrollFrame += 1
   const frameId = activeScrollFrame
@@ -46,8 +77,9 @@ function smoothScrollLandingTo(targetTop: number): void {
     return
   }
 
-  const duration = Math.min(1400, Math.max(650, Math.abs(distance) * 0.55))
+  const duration = getScrollDuration(distance)
   const startTime = performance.now()
+  const ease = distance > 0 ? easeOutQuint : easeInOutQuart
 
   setLandingProgrammaticScroll(true)
 
@@ -61,7 +93,7 @@ function smoothScrollLandingTo(targetTop: number): void {
     if (frameId !== activeScrollFrame) return
 
     const progress = Math.min((now - startTime) / duration, 1)
-    const nextTop = startTop + distance * easeInOutCubic(progress)
+    const nextTop = startTop + distance * ease(progress)
     window.scrollTo({ top: nextTop, behavior: 'auto' })
 
     if (progress < 1) {
@@ -83,6 +115,31 @@ function getLandingMainTop(): number {
 
 function isAt(top: number): boolean {
   return Math.abs(window.scrollY - top) <= SWITCH_EPSILON
+}
+
+function getSectionScrollTop(sectionId: string, extraScrollDown = 0): number | null {
+  const el = document.getElementById(sectionId)
+  if (!el) return null
+  return el.getBoundingClientRect().top + window.scrollY - HEADER_OFFSET + extraScrollDown
+}
+
+function isOnFixedHero(): boolean {
+  const landingMainTop = getLandingMainTop()
+  return window.scrollY < Math.max(0, landingMainTop - 8)
+}
+
+/** Scroll target when leaving the hero for the landing sections. */
+function getHeroToLandingTarget(): number {
+  const funktioniertTop = getSectionScrollTop('how-funktioniert')
+  if (funktioniertTop !== null && funktioniertTop > window.scrollY + SWITCH_EPSILON) {
+    return funktioniertTop
+  }
+  return getLandingMainTop()
+}
+
+function isInHeroLandingBridge(y = window.scrollY): boolean {
+  const landingTarget = getHeroToLandingTarget()
+  return y > SWITCH_EPSILON && y < landingTarget - SWITCH_EPSILON
 }
 
 export function scrollToLandingTop(): void {
@@ -110,8 +167,21 @@ export function scrollLandingToPartnerApotheken(): void {
   scrollLandingToSection('partner-apotheken')
 }
 
-function isMobileLandingViewport(): boolean {
-  return window.matchMedia('(max-width: 767px)').matches
+function getMobileNavbarClearance(): number {
+  const mnav = document.querySelector<HTMLElement>('.mnav')
+  if (!mnav) return MOBILE_NAV_CLEARANCE_FALLBACK
+
+  const topPx = Number.parseFloat(getComputedStyle(mnav).top) || 12
+  const height = mnav.getBoundingClientRect().height || 44
+  return topPx + height + -58
+}
+
+function getMobileDiscoverScrollTarget(): number | null {
+  const funktioniert = document.getElementById('how-funktioniert')
+  if (!funktioniert) return getMobileHeroScrollTarget()
+
+  const clearance = getMobileNavbarClearance()
+  return funktioniert.getBoundingClientRect().top + window.scrollY - clearance
 }
 
 function getMobileHeroScrollTarget(): number | null {
@@ -122,23 +192,47 @@ function getMobileHeroScrollTarget(): number | null {
   return rect.bottom + window.scrollY - HEADER_OFFSET
 }
 
+/** Smooth transition from hero into the landing sections (bottom CTA / ENTDECKEN). */
+export function scrollHeroToLanding(): void {
+  if (isMobileLandingViewport()) {
+    scrollLandingToMain()
+    return
+  }
+
+  if (!isOnFixedHero()) {
+    scrollLandingToSection('how-funktioniert')
+    return
+  }
+
+  smoothScrollLandingTo(getHeroToLandingTarget())
+  try {
+    window.history.pushState({}, '', '/#how-funktioniert')
+  } catch {
+    /* ignore */
+  }
+}
+
 /** Scroll from hero into the next content block (no section anchor / URL change). */
 export function scrollLandingToMain(): void {
-  const landingMainTop = getLandingMainTop()
-  const stillOnFixedHero = window.scrollY < Math.max(0, landingMainTop - 8)
-
-  if (stillOnFixedHero) {
-    smoothScrollLandingTo(landingMainTop)
+  if (isOnFixedHero()) {
+    scrollHeroToLanding()
     return
   }
 
-  const mobileTarget = isMobileLandingViewport() ? getMobileHeroScrollTarget() : null
-  if (mobileTarget !== null && mobileTarget > window.scrollY + SWITCH_EPSILON) {
-    smoothScrollLandingTo(mobileTarget)
-    return
+  if (isMobileLandingViewport()) {
+    const mobileTarget = getMobileDiscoverScrollTarget()
+    if (mobileTarget !== null && mobileTarget > window.scrollY + SWITCH_EPSILON) {
+      smoothScrollLandingTo(mobileTarget)
+      try {
+        window.history.pushState({}, '', '/#how-funktioniert')
+      } catch {
+        /* ignore */
+      }
+      return
+    }
   }
 
-  smoothScrollLandingTo(window.scrollY + window.innerHeight * 0.9)
+  scrollLandingToSection('how-funktioniert')
 }
 
 /** Scroll to the standalone funktioniert section. */
@@ -148,15 +242,7 @@ export function scrollLandingToFunktioniert(): void {
 
 /** Enter main view from hero, or scroll to #how-funktioniert when already in main view. */
 export function scrollLandingToAblauf(): void {
-  const landingMainTop = getLandingMainTop()
-  const stillOnHero = window.scrollY < Math.max(0, landingMainTop - 8)
-
-  if (stillOnHero) {
-    smoothScrollLandingTo(landingMainTop)
-    return
-  }
-
-  scrollLandingToSection('how-funktioniert')
+  scrollHeroToLanding()
 }
 
 /** True once the fixed hero has scrolled out of view (mobile docked nav). */
@@ -173,33 +259,16 @@ export function isLandingPastHero(): boolean {
 }
 
 /**
- * Enforce binary hero<->main switching near the bridge:
- * - scrolling down from hero snaps to main start
- * - scrolling up at main start snaps to hero
- * - never rests between those two positions
+ * Enforce binary hero<->landing switching:
+ * - no manual scrolling in the bridge zone (only programmatic animation)
+ * - wheel / touch gestures trigger a full animated transition
  */
 export function attachLandingBinarySwitch(): () => void {
-  const mq = window.matchMedia('(max-width: 767px)')
+  const mq = window.matchMedia(MOBILE_LANDING_MQ)
   if (mq.matches) return () => {}
 
-  let snapTimer: number | null = null
-  let animating = false
-
-  const settleTo = (targetTop: number) => {
-    if (isAt(targetTop)) return
-    animating = true
-    window.scrollTo({ top: targetTop, behavior: 'smooth' })
-
-    const startedAt = performance.now()
-    const tick = () => {
-      if (isAt(targetTop) || performance.now() - startedAt > 700) {
-        animating = false
-        return
-      }
-      window.requestAnimationFrame(tick)
-    }
-    window.requestAnimationFrame(tick)
-  }
+  let pendingGesture: 'down' | 'up' | null = null
+  let touchLastY = 0
 
   const isHeroAccordionBlockingScroll = () => {
     if (document.documentElement.dataset.heroAccordionOpen !== 'true') return false
@@ -209,59 +278,164 @@ export function attachLandingBinarySwitch(): () => void {
     return window.scrollY < heroBottom - HEADER_OFFSET - SWITCH_EPSILON
   }
 
+  const settleTo = (targetTop: number) => {
+    if (isAt(targetTop) || landingProgrammaticScrollActive) return
+    pendingGesture = null
+    smoothScrollLandingTo(targetTop)
+  }
+
+  const snapBridgeToNearest = (y = window.scrollY) => {
+    const landingTarget = getHeroToLandingTarget()
+    settleTo(y < landingTarget / 2 ? 0 : landingTarget)
+  }
+
   const onWheel = (e: WheelEvent) => {
-    if (landingProgrammaticScrollActive || isHeroAccordionBlockingScroll()) return
+    if (isHeroAccordionBlockingScroll()) return
 
     const mainTop = getLandingMainTop()
+    const landingTarget = getHeroToLandingTarget()
     const y = window.scrollY
-    const crossingBridge = y > SWITCH_EPSILON && y < mainTop - SWITCH_EPSILON
 
-    if (Math.abs(e.deltaY) < 4 || animating) return
-
-    // From hero toward main: hard snap to main start.
-    if (e.deltaY > 0 && y < mainTop - SWITCH_EPSILON) {
+    if (landingProgrammaticScrollActive) {
       e.preventDefault()
-      settleTo(mainTop)
       return
     }
 
-    // From main start toward hero: hard snap back to top.
+    if (isInHeroLandingBridge(y)) {
+      e.preventDefault()
+      if (Math.abs(e.deltaY) < WHEEL_DELTA_THRESHOLD) return
+      snapBridgeToNearest(y)
+      return
+    }
+
+    if (Math.abs(e.deltaY) < WHEEL_DELTA_THRESHOLD) return
+
+    if (e.deltaY > 0 && y < mainTop - SWITCH_EPSILON) {
+      e.preventDefault()
+      settleTo(landingTarget)
+      return
+    }
+
     if (e.deltaY < 0 && y <= mainTop + SWITCH_EPSILON) {
       e.preventDefault()
       settleTo(0)
-      return
-    }
-
-    // If user lands between states, force nearest state on idle.
-    if (crossingBridge) {
-      if (snapTimer) window.clearTimeout(snapTimer)
-      snapTimer = window.setTimeout(() => {
-        const midpoint = mainTop / 2
-        settleTo(window.scrollY < midpoint ? 0 : mainTop)
-      }, SWITCH_IDLE_MS)
     }
   }
 
   const onScroll = () => {
-    if (landingProgrammaticScrollActive || animating || isHeroAccordionBlockingScroll()) return
-    const mainTop = getLandingMainTop()
-    const y = window.scrollY
-    const crossingBridge = y > SWITCH_EPSILON && y < mainTop - SWITCH_EPSILON
-    if (!crossingBridge) return
+    if (landingProgrammaticScrollActive || isHeroAccordionBlockingScroll()) return
 
-    if (snapTimer) window.clearTimeout(snapTimer)
-    snapTimer = window.setTimeout(() => {
-      const midpoint = mainTop / 2
-      settleTo(window.scrollY < midpoint ? 0 : mainTop)
-    }, SWITCH_IDLE_MS)
+    const y = window.scrollY
+    if (!isInHeroLandingBridge(y)) return
+
+    snapBridgeToNearest(y)
+  }
+
+  const onTouchStart = (e: TouchEvent) => {
+    pendingGesture = null
+    touchLastY = e.touches[0]?.clientY ?? 0
+  }
+
+  const onTouchMove = (e: TouchEvent) => {
+    if (isHeroAccordionBlockingScroll() || landingProgrammaticScrollActive) {
+      e.preventDefault()
+      return
+    }
+
+    const y = window.scrollY
+    const mainTop = getLandingMainTop()
+
+    if (isInHeroLandingBridge(y)) {
+      e.preventDefault()
+      return
+    }
+
+    if (y < mainTop - SWITCH_EPSILON || y <= mainTop + SWITCH_EPSILON) {
+      e.preventDefault()
+    }
+
+    if (e.touches.length !== 1) return
+
+    const touchY = e.touches[0].clientY
+    const deltaY = touchY - touchLastY
+    touchLastY = touchY
+
+    if (Math.abs(deltaY) < 6) return
+
+    if (deltaY < 0 && y < mainTop - SWITCH_EPSILON) {
+      pendingGesture = 'down'
+    } else if (deltaY > 0 && y <= mainTop + SWITCH_EPSILON) {
+      pendingGesture = 'up'
+    }
+  }
+
+  const onTouchEnd = () => {
+    if (landingProgrammaticScrollActive || isHeroAccordionBlockingScroll()) return
+
+    const y = window.scrollY
+    const landingTarget = getHeroToLandingTarget()
+
+    if (isInHeroLandingBridge(y)) {
+      snapBridgeToNearest(y)
+      pendingGesture = null
+      return
+    }
+
+    if (pendingGesture === 'down') {
+      settleTo(landingTarget)
+    } else if (pendingGesture === 'up') {
+      settleTo(0)
+    }
+
+    pendingGesture = null
+  }
+
+  const onKeyDown = (e: KeyboardEvent) => {
+    if (landingProgrammaticScrollActive || isHeroAccordionBlockingScroll()) return
+
+    const y = window.scrollY
+    const mainTop = getLandingMainTop()
+    const landingTarget = getHeroToLandingTarget()
+    const scrollKeys = ['ArrowDown', 'ArrowUp', 'PageDown', 'PageUp', 'Home', 'End', ' ']
+
+    if (!scrollKeys.includes(e.key)) return
+
+    if (isInHeroLandingBridge(y)) {
+      e.preventDefault()
+      if (e.key === 'ArrowDown' || e.key === 'PageDown' || e.key === 'End' || e.key === ' ') {
+        settleTo(landingTarget)
+      } else {
+        settleTo(0)
+      }
+      return
+    }
+
+    if ((e.key === 'ArrowDown' || e.key === 'PageDown' || e.key === ' ' || e.key === 'End') && y < mainTop - SWITCH_EPSILON) {
+      e.preventDefault()
+      settleTo(landingTarget)
+      return
+    }
+
+    if ((e.key === 'ArrowUp' || e.key === 'PageUp' || e.key === 'Home') && y <= mainTop + SWITCH_EPSILON) {
+      e.preventDefault()
+      settleTo(0)
+    }
   }
 
   window.addEventListener('wheel', onWheel, { passive: false })
   window.addEventListener('scroll', onScroll, { passive: true })
+  window.addEventListener('touchstart', onTouchStart, { passive: true })
+  window.addEventListener('touchmove', onTouchMove, { passive: false })
+  window.addEventListener('touchend', onTouchEnd, { passive: true })
+  window.addEventListener('keydown', onKeyDown)
 
   return () => {
     window.removeEventListener('wheel', onWheel)
     window.removeEventListener('scroll', onScroll)
-    if (snapTimer) window.clearTimeout(snapTimer)
+    window.removeEventListener('touchstart', onTouchStart)
+    window.removeEventListener('touchmove', onTouchMove)
+    window.removeEventListener('touchend', onTouchEnd)
+    window.removeEventListener('keydown', onKeyDown)
+    document.documentElement.style.overflowY = ''
   }
 }

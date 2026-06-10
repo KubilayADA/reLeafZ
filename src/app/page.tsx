@@ -14,7 +14,7 @@ import Faq from '@/components/ui/faq/faq'
 import Funktioniert from '@/components/ui/funktioniert/funktioniert'
 import MailReq from '@/components/ui/newsletter/mailreq'
 import Footer from '@/components/ui/footer/footer'
-import { attachLandingBinarySwitch, scrollLandingToAblauf } from '@/lib/scroll'
+import { attachLandingBinarySwitch } from '@/lib/scroll'
 import { useLandingTheme } from '@/lib/use-landing-theme'
 import { useLandingThemeInitial } from './providers'
 import { APIProvider, useMapsLibrary } from '@vis.gl/react-google-maps'
@@ -371,7 +371,6 @@ function LandingPageContent() {
         <Hero
           setDialogOpen={setDialogOpen}
           landingTheme={landingTheme}
-          onScrollToAblauf={scrollLandingToAblauf}
         />
 
         <div className="landing-hero-snap-target" aria-hidden />

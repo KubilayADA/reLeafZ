@@ -3,12 +3,14 @@
 import React from 'react'
 import './hero-carousel.css'
 
+
+
+const SLIDE_INTERVAL_MS = 5000
+
 const HERO_CAROUSEL_SLIDES = [
   { src: '/landing-2.png', alt: 'reLeafz Produktverpackung' },
   { src: '/landing-1.png', alt: 'reLeafz Cannabis Produkte' },
 ] as const
-
-const SLIDE_INTERVAL_MS = 5000
 
 export function HeroImageCarousel() {
   const [activeIndex, setActiveIndex] = React.useState(0)
