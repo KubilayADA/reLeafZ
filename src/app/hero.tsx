@@ -300,7 +300,7 @@ export function MobileHero({ setDialogOpen }: { setDialogOpen: (open: boolean) =
       <HeroAccordionRows
         setDialogOpen={setDialogOpen}
         scrollAnchorRef={heroRef}
-        onDiscover={scrollHeroToLanding}
+        onDiscover={() => scrollHeroToLanding()}
       />
     </section>
   )
@@ -378,7 +378,7 @@ export default function Hero({
           type="button"
           aria-label="Go to next section"
           className="hero-scroll-overlay pointer-events-auto absolute inset-x-0 bottom-0 z-[1] bg-transparent"
-          onClick={scrollHeroToLanding}
+          onClick={() => scrollHeroToLanding()}
         />
 
         <div className="hero-logo-bar pointer-events-none absolute top-4 right-0 left-0 z-20 sm:top-6 lg:top-5 xl:top-8">
@@ -406,7 +406,7 @@ export default function Hero({
           <div className="hero-layout__content hero-accordion pointer-events-auto">
             <HeroAccordionRows
               setDialogOpen={setDialogOpen}
-              onDiscover={scrollHeroToLanding}
+              onDiscover={() => scrollHeroToLanding()}
               onOpenRowChange={setOpenAccordionRow}
             />
           </div>

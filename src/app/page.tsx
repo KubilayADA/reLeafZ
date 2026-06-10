@@ -68,7 +68,7 @@ function AddressAutocomplete({ onAddressSelect, onInputChange, onInputFocus, onI
   }, [])
 
   const handleInput = (value: string) => {
-    const sanitized = value.replace(/<[^>]*>/g, '').slice(0, 200)
+    const sanitized = value.replace(/<[^>]*>/g, '').trimStart().slice(0, 200)
     setInputValue(sanitized)
     onInputChange(sanitized)
     if (debounceTimer.current) clearTimeout(debounceTimer.current)
