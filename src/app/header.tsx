@@ -182,7 +182,7 @@ export default function Header({
             <div className="header-center-controls hidden md:flex">
               <nav className="header-desktop-nav header-text">
                 <a
-                  href="#faq"
+                  href="#how-funktioniert"
                   className="header-nav-link text-mg md:text-xl leading-relaxed"
                   onClick={(e) => {
                     e.preventDefault()
@@ -328,7 +328,7 @@ export default function Header({
           <div className="header-mobile-drawer absolute top-full left-0 w-full bg-white shadow-lg border-t border-emerald-200 z-50">
             <nav className="flex flex-col items-center py-6 space-y-6">
               <a
-                href="#faq"
+                href="#how-funktioniert"
                 className="text-xl text-black-800 inconsolata"
                 onClick={(e) => {
                   e.preventDefault()

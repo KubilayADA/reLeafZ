@@ -125,7 +125,7 @@ export default function Datenloeschung() {
                   type="button"
                   disabled={isSubmitting}
                   onClick={() => void handleSubmit()}
-                  className="form-cta btn-secondary w-full sm:w-auto"
+                  className="form-cta btn-secondary"
                 >
                   {isSubmitting ? (
                     <span className="inline-flex items-center gap-2">

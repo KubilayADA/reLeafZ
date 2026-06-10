@@ -110,15 +110,12 @@ export function scrollLandingToPartnerApotheken(): void {
   scrollLandingToSection('partner-apotheken')
 }
 
-/** Mobile standalone funktioniert block; desktop funktioniert lives inside #faq. */
+/** Scroll to the standalone funktioniert section. */
 export function scrollLandingToFunktioniert(): void {
-  const sectionId = window.matchMedia('(max-width: 767px)').matches
-    ? 'how-funktioniert'
-    : 'faq'
-  scrollLandingToSection(sectionId)
+  scrollLandingToSection('how-funktioniert')
 }
 
-/** Enter main view from hero, or scroll to #faq when already in main view. */
+/** Enter main view from hero, or scroll to #how-funktioniert when already in main view. */
 export function scrollLandingToAblauf(): void {
   const landingMainTop = getLandingMainTop()
   const stillOnHero = window.scrollY < Math.max(0, landingMainTop - 8)
@@ -128,18 +125,7 @@ export function scrollLandingToAblauf(): void {
     return
   }
 
-  const isMobile = window.matchMedia('(max-width: 767px)').matches
-  const targetId = isMobile ? 'how-funktioniert' : 'faq'
-  const el = document.getElementById(targetId)
-  if (el) {
-    const top = el.getBoundingClientRect().top + window.scrollY - HEADER_OFFSET
-    smoothScrollLandingTo(top)
-  }
-  try {
-    window.history.pushState({}, '', `/#${targetId}`)
-  } catch {
-    /* ignore */
-  }
+  scrollLandingToSection('how-funktioniert')
 }
 
 /** True once the fixed hero has scrolled out of view (mobile docked nav). */
