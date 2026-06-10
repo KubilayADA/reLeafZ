@@ -110,6 +110,37 @@ export function scrollLandingToPartnerApotheken(): void {
   scrollLandingToSection('partner-apotheken')
 }
 
+function isMobileLandingViewport(): boolean {
+  return window.matchMedia('(max-width: 767px)').matches
+}
+
+function getMobileHeroScrollTarget(): number | null {
+  const mobileHero = document.querySelector('.mobile-hero')
+  if (!mobileHero) return null
+  const rect = mobileHero.getBoundingClientRect()
+  if (rect.height <= 0) return null
+  return rect.bottom + window.scrollY - HEADER_OFFSET
+}
+
+/** Scroll from hero into the next content block (no section anchor / URL change). */
+export function scrollLandingToMain(): void {
+  const landingMainTop = getLandingMainTop()
+  const stillOnFixedHero = window.scrollY < Math.max(0, landingMainTop - 8)
+
+  if (stillOnFixedHero) {
+    smoothScrollLandingTo(landingMainTop)
+    return
+  }
+
+  const mobileTarget = isMobileLandingViewport() ? getMobileHeroScrollTarget() : null
+  if (mobileTarget !== null && mobileTarget > window.scrollY + SWITCH_EPSILON) {
+    smoothScrollLandingTo(mobileTarget)
+    return
+  }
+
+  smoothScrollLandingTo(window.scrollY + window.innerHeight * 0.9)
+}
+
 /** Scroll to the standalone funktioniert section. */
 export function scrollLandingToFunktioniert(): void {
   scrollLandingToSection('how-funktioniert')

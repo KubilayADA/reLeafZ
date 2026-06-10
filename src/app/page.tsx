@@ -366,7 +366,6 @@ function LandingPageContent() {
         <MobileNavbar
           setDialogOpen={setDialogOpen}
           landingTheme={landingTheme}
-          onThemeToggle={() => setLandingTheme((prev) => (prev === 'dark' ? 'light' : 'dark'))}
         />
 
         <Hero

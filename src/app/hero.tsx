@@ -9,7 +9,7 @@ import {
   PhoneCall, Store, HeartHandshake,
 } from 'lucide-react'
 import {
-  scrollLandingToFunktioniert,
+  scrollLandingToMain,
   scrollLandingToSection,
   scrollToLandingTop,
 } from '@/lib/scroll'
@@ -98,7 +98,7 @@ function HeroAccordionRows({
 
   React.useEffect(() => {
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    const delayMs = prefersReducedMotion ? 0 : 3000
+    const delayMs = prefersReducedMotion ? 0 : 1000
 
     const timerId = window.setTimeout(() => {
       requestAnimationFrame(() => {
@@ -137,7 +137,7 @@ function HeroAccordionRows({
       onDiscover()
       return
     }
-    scrollLandingToFunktioniert()
+    scrollLandingToMain()
   }
 
   return (
@@ -287,7 +287,7 @@ export function MobileHero({ setDialogOpen }: { setDialogOpen: (open: boolean) =
       <HeroAccordionRows
         setDialogOpen={setDialogOpen}
         scrollAnchorRef={heroRef}
-        onDiscover={scrollLandingToFunktioniert}
+        onDiscover={scrollLandingToMain}
       />
     </section>
   )
@@ -403,7 +403,7 @@ export default function Hero({
           >
             <HeroAccordionRows
               setDialogOpen={setDialogOpen}
-              onDiscover={onScrollToAblauf}
+              onDiscover={scrollLandingToMain}
               onOpenRowChange={setOpenAccordionRow}
             />
           </div>

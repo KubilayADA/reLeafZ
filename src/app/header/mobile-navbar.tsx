@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState, useEffect, useRef } from 'react'
-import { Menu, Moon, Sun } from 'lucide-react'
+import { Menu } from 'lucide-react'
 
 import './header-mobile.css'
 import { scrollLandingToSection } from '@/lib/scroll'
@@ -9,7 +9,6 @@ import { scrollLandingToSection } from '@/lib/scroll'
 interface MobileNavbarProps {
   setDialogOpen: (open: boolean) => void
   landingTheme: 'dark' | 'light'
-  onThemeToggle: () => void
 }
 
 const NAV_LINKS = [
@@ -22,7 +21,6 @@ const NAV_LINKS = [
 export default function MobileNavbar({
   setDialogOpen,
   landingTheme,
-  onThemeToggle,
 }: MobileNavbarProps) {
   const [isVisible, setIsVisible] = useState(false)
   const [isOpen, setIsOpen] = useState(false)
@@ -94,10 +92,6 @@ export default function MobileNavbar({
     }
   }
 
-  const handleThemeToggleClick = () => {
-    onThemeToggle()
-  }
-
   const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
     e.preventDefault()
     setIsOpen(false)
@@ -149,36 +143,6 @@ export default function MobileNavbar({
             </a>
           ))}
         </nav>
-
-        <div className="mnav__theme-row">
-          <span className="mnav__theme-label" id="mnav-theme-label">
-            Theme
-          </span>
-          <div
-            className={`mnav__theme-switch${landingTheme === 'light' ? ' mnav__theme-switch--light' : ''}`}
-            role="group"
-            aria-labelledby="mnav-theme-label"
-          >
-            <span className="mnav__theme-label-stack" aria-hidden>
-              <span className={`mnav__theme-end-label mnav__theme-end-label--dark${landingTheme === 'dark' ? ' is-active' : ''}`}>
-                Dark
-              </span>
-              <span className={`mnav__theme-end-label mnav__theme-end-label--light${landingTheme === 'light' ? ' is-active' : ''}`}>
-                Light
-              </span>
-            </span>
-            <button
-              type="button"
-              className="mnav__theme-icon-btn"
-              onClick={handleThemeToggleClick}
-              aria-label={landingTheme === 'light' ? 'Switch to dark mode' : 'Switch to light mode'}
-              aria-pressed={landingTheme === 'light'}
-            >
-              <Moon className={`mnav__theme-icon mnav__theme-icon--moon${landingTheme === 'dark' ? ' is-active' : ''}`} size={15} />
-              <Sun className={`mnav__theme-icon mnav__theme-icon--sun${landingTheme === 'light' ? ' is-active' : ''}`} size={15} />
-            </button>
-          </div>
-        </div>
 
         <div className="mnav__cta-wrap">
           <button

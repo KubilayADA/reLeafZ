@@ -22,7 +22,8 @@
     height: auto;
   }
 
-  .mobile-hero:has(.mobile-hero__row.is-open) .mobile-hero__rows {
+  /* Only pin to top for the long Über-uns panel; keep Behandlung centered */
+  .mobile-hero:has(.mobile-hero__row:first-child.is-open) .mobile-hero__rows {
     flex: none;
     justify-content: flex-start;
   }

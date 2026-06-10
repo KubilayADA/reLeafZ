@@ -14,6 +14,14 @@ import './market-carousel.css'
 
 const LANDING_STRAIN_COUNT = 5
 const TOUCH_CAROUSEL_MQ = '(max-width: 1023px)'
+const MOBILE_MQ = '(max-width: 767px)'
+const SCROLL_HINT_DELAY_MS = 750
+const SCROLL_HINT_HOLD_MS = 850
+const SCROLL_HINT_RETURN_MS = 450
+const SCROLL_HINT_GLIMPSE_RATIO = 0.14
+const SCROLL_HINT_GLIMPSE_MIN_PX = 36
+const SCROLL_HINT_GLIMPSE_MAX_PX = 64
+const SCROLL_HINT_SESSION_KEY = 'releafz-sortiment-scroll-hint'
 
 // Representative location used to query the live marketplace for the public
 // landing showcase (our partner pharmacies operate in Berlin).
@@ -354,6 +362,149 @@ export default function MarketCarousel({
       anim.raf = 0
     }
   }, [strains, getMaxTranslate, applyTransform])
+
+  // Mobile scroll hint: peek at the next card, then return to signal horizontal swipe.
+  useEffect(() => {
+    const viewport = viewportRef.current
+    const track = trackRef.current
+    if (!viewport || !track) return
+
+    const mobileMq = window.matchMedia(MOBILE_MQ)
+    const motionMq = window.matchMedia('(prefers-reduced-motion: reduce)')
+    if (!mobileMq.matches || motionMq.matches) return
+    if (sessionStorage.getItem(SCROLL_HINT_SESSION_KEY)) return
+
+    let cancelled = false
+    let hintPlayed = false
+    let pendingHintTimer = 0
+    const timers: number[] = []
+
+    const schedule = (fn: () => void, ms: number) => {
+      timers.push(window.setTimeout(fn, ms))
+    }
+
+    const cancel = () => {
+      if (cancelled) return
+      cancelled = true
+      if (pendingHintTimer) {
+        window.clearTimeout(pendingHintTimer)
+        pendingHintTimer = 0
+      }
+      timers.forEach((id) => window.clearTimeout(id))
+      timers.length = 0
+      viewport.style.scrollSnapType = ''
+    }
+
+    const getFirstCard = () =>
+      track.querySelector('.market-carousel__slide:first-child .market-carousel__card') as HTMLElement | null
+
+    const isFirstCardFullyInView = () => {
+      if (viewport.scrollLeft > 8) return false
+
+      const card = getFirstCard()
+      if (!card) return false
+
+      const rect = card.getBoundingClientRect()
+      const vh = window.innerHeight
+      const vw = window.innerWidth
+      const inset = 2
+
+      // Entire card must fit inside the viewport.
+      return (
+        rect.width > 0 &&
+        rect.height > 0 &&
+        rect.top >= inset &&
+        rect.bottom <= vh - inset &&
+        rect.left >= inset &&
+        rect.right <= vw - inset
+      )
+    }
+
+    const clearPendingHint = () => {
+      if (!pendingHintTimer) return
+      window.clearTimeout(pendingHintTimer)
+      pendingHintTimer = 0
+    }
+
+    const getGlimpseOffset = () => {
+      const firstSlide = track.querySelector('.market-carousel__slide:first-child') as HTMLElement | null
+      if (!firstSlide) return 0
+      const slideWidth = firstSlide.offsetWidth
+      return Math.round(
+        Math.min(
+          SCROLL_HINT_GLIMPSE_MAX_PX,
+          Math.max(SCROLL_HINT_GLIMPSE_MIN_PX, slideWidth * SCROLL_HINT_GLIMPSE_RATIO)
+        )
+      )
+    }
+
+    const runHint = () => {
+      if (cancelled || hintPlayed || !isFirstCardFullyInView()) return
+
+      const glimpse = getGlimpseOffset()
+      const maxScroll = track.scrollWidth - viewport.clientWidth
+      if (glimpse <= 8 || maxScroll <= 8) return
+
+      hintPlayed = true
+      sessionStorage.setItem(SCROLL_HINT_SESSION_KEY, '1')
+      observer.disconnect()
+
+      // Partial peek — disable snap so we don't jump to the full second card.
+      viewport.style.scrollSnapType = 'none'
+      viewport.scrollTo({ left: glimpse, behavior: 'smooth' })
+      schedule(() => {
+        if (cancelled) return
+        viewport.scrollTo({ left: 0, behavior: 'smooth' })
+        schedule(() => {
+          viewport.style.scrollSnapType = ''
+        }, SCROLL_HINT_RETURN_MS)
+      }, SCROLL_HINT_HOLD_MS)
+    }
+
+    const syncHintSchedule = () => {
+      if (cancelled || hintPlayed) return
+
+      if (!isFirstCardFullyInView()) {
+        clearPendingHint()
+        return
+      }
+
+      if (pendingHintTimer) return
+
+      pendingHintTimer = window.setTimeout(() => {
+        pendingHintTimer = 0
+        runHint()
+      }, SCROLL_HINT_DELAY_MS)
+    }
+
+    const onUserIntent = () => cancel()
+
+    viewport.addEventListener('touchstart', onUserIntent, { passive: true })
+    viewport.addEventListener('pointerdown', onUserIntent)
+
+    const firstCard = getFirstCard()
+    if (!firstCard) return
+
+    const observer = new IntersectionObserver(
+      () => syncHintSchedule(),
+      { threshold: [0, 0.5, 0.85, 1] }
+    )
+
+    observer.observe(firstCard)
+    syncHintSchedule()
+
+    window.addEventListener('scroll', syncHintSchedule, { passive: true })
+    window.addEventListener('resize', syncHintSchedule)
+
+    return () => {
+      cancel()
+      viewport.removeEventListener('touchstart', onUserIntent)
+      viewport.removeEventListener('pointerdown', onUserIntent)
+      window.removeEventListener('scroll', syncHintSchedule)
+      window.removeEventListener('resize', syncHintSchedule)
+      observer.disconnect()
+    }
+  }, [strains])
 
   // Unblur the CTA card once it scrolls into view inside the carousel viewport.
   useEffect(() => {
