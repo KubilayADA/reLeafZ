@@ -136,6 +136,12 @@
     flex-shrink: 0;
   }
 
+  .mnav--open .mnav__header {
+    padding: 4px 14px 0;
+    height: 52px;
+    align-items: flex-start;
+  }
+
   /* Icon button — animates wider to reveal the full logo */
   .mnav__icon-btn {
     width: 32px;
@@ -157,7 +163,10 @@
   }
 
   .mnav__icon-btn--open {
-    width: 110px;
+    width: 100%;
+    height: 40px;
+    min-width: 0;
+    justify-content: flex-start;
   }
 
   .mnav__icon-btn:active {
@@ -171,6 +180,11 @@
     height: 32px;
     display: flex;
     align-items: center;
+    justify-content: center;
+  }
+
+  .mnav--open .mnav__logo-wrap {
+    height: 40px;
     justify-content: flex-start;
   }
 
@@ -193,16 +207,19 @@
     opacity: 0;
   }
 
-  /* Full wordmark logo */
+  /* Full wordmark logo — shown when menu is open */
   .mnav__logo-full {
     position: absolute;
-    right: 0;
-    width: 106px;
-    height: 28px;
+    left: 0;
+    top: 0;
+    width: 132px;
+    height: 36px;
+    transform: none;
     object-fit: contain;
-    object-position: right center;
+    object-position: left top;
     opacity: 0;
-    /* slight delay so the button width expands first */
+    pointer-events: none;
+    /* slight delay so the panel width expands first */
     transition: opacity 0.28s ease 0.14s;
   }
 

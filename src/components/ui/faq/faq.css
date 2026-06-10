@@ -300,8 +300,7 @@
 }
 
 @media (min-width: 1024px) {
-  .faq-headings-row .faq-intro-row--faq,
-  .faq-headings-row .how-stories-intro,
+  .faq-intro-row--faq,
   .faq-main {
     margin-left: var(--faq-content-shift);
   }
@@ -318,6 +317,19 @@
 /* ── Mobile & medium (< desktop): stack with funktioniert (stories) on top
    of the FAQ, full-width content ── */
 @media (max-width: 1023px) {
+  .faq-inner {
+    width: 100%;
+    margin-left: 0;
+  }
+
+  .faq-intro-row,
+  .faq-intro-row--faq {
+    width: 100%;
+    max-width: none;
+    margin-left: 0;
+    margin-right: 0;
+  }
+
   .faq__shell {
     display: flex;
     flex-direction: column;
@@ -391,9 +403,7 @@
     --faq-tablet-column: min(100%, 26rem);
   }
 
-  .faq-headings-row .how-stories-intro,
-  .faq-headings-row .faq-intro-row--faq,
-  .faq-stories,
+  .faq-intro-row--faq,
   .faq-main {
     width: var(--faq-tablet-column);
     max-width: 100%;
@@ -402,8 +412,7 @@
     margin-right: 0;
   }
 
-  .faq-headings-row .how-stories-intro,
-  .faq-headings-row .faq-intro-row--faq {
+  .faq-intro-row--faq {
     align-items: center;
     text-align: center;
   }
@@ -450,6 +459,10 @@
   .faq-story-pill {
     padding: 0.32rem 0.62rem;
     font-size: 0.625rem;
+    max-width: 100%;
+    white-space: normal;
+    text-align: left;
+    line-height: 1.35;
   }
 }
 
